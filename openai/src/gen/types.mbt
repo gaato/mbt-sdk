@@ -3,7 +3,7 @@
 ///|
 fn json_array_matches(value : Json, predicate : (Json) -> Bool) -> Bool {
   match value {
-    Array(items) => items.length() > 0 && items.all(predicate)
+    @json.Json::Array(items) => items.length() > 0 && items.all(predicate)
     _ => false
   }
 }
@@ -16,27 +16,27 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 
 ///|
 fn parse_plain_int64(text : String) -> Int64? {
   if text.length() == 0 {
-    return None
+    return Option::None
   }
   let negative = text[0] == '-'
   let digits_start = if negative { 1 } else { 0 }
   if digits_start == text.length() {
-    return None
+    return Option::None
   }
   for index in digits_start..<text.length() {
     if text[index] < '0' || text[index] > '9' {
-      return None
+      return Option::None
     }
   }
   let mut significant_start = digits_start
@@ -44,7 +44,7 @@ fn parse_plain_int64(text : String) -> Int64? {
     significant_start += 1
   }
   if significant_start == text.length() {
-    return Some(0L)
+    return Option::Some(0L)
   }
   let significant_length = text.length() - significant_start
   let limit = if negative {
@@ -53,14 +53,14 @@ fn parse_plain_int64(text : String) -> Int64? {
     "9223372036854775807"
   }
   if significant_length > limit.length() {
-    return None
+    return Option::None
   }
   if significant_length == limit.length() {
     for offset in 0..<significant_length {
       let digit = text[significant_start + offset]
       let boundary = limit[offset]
       if digit > boundary {
-        return None
+        return Option::None
       }
       if digit < boundary {
         break
@@ -76,7 +76,7 @@ fn parse_plain_int64(text : String) -> Int64? {
       result = result * 10L + digit
     }
   }
-  Some(result)
+  Option::Some(result)
 }
 
 ///|
@@ -101,14 +101,16 @@ fn json_int64(
   value : Json,
   path : @json.JsonPath,
 ) -> Int64 raise @json.JsonDecodeError {
-  guard value is Number(raw, repr~) else {
-    raise @json.JsonDecodeError((path, "expected JSON number for Int64"))
+  guard value is @json.Json::Number(raw, repr~) else {
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected JSON number for Int64"),
+    )
   }
-  if repr is Some(text) && is_plain_integer(text) {
+  if repr is Option::Some(text) && is_plain_integer(text) {
     match parse_plain_int64(text) {
-      Some(value) => return value
-      None =>
-        raise @json.JsonDecodeError(
+      Option::Some(value) => return value
+      Option::None =>
+        raise @json.JsonDecodeError::JsonDecodeError(
           (path, "JSON number is outside Int64 range"),
         )
     }
@@ -116,11 +118,15 @@ fn json_int64(
   if raw.is_nan() ||
     raw < -9223372036854775808.0 ||
     raw >= 9223372036854775808.0 {
-    raise @json.JsonDecodeError((path, "JSON number is outside Int64 range"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "JSON number is outside Int64 range"),
+    )
   }
   let result = raw.to_int64()
   if result.to_double() != raw {
-    raise @json.JsonDecodeError((path, "expected integral JSON number"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected integral JSON number"),
+    )
   }
   result
 }
@@ -138,16 +144,16 @@ fn decode_optional_int64(
 ) -> Int64? raise @json.JsonDecodeError {
   let raw : Json? = @sdkjson.opt_field(obj, key, path)
   match raw {
-    Some(value) => Some(json_int64(value, path.add_key(key)))
-    None => None
+    Option::Some(value) => Option::Some(json_int64(value, path.add_key(key)))
+    Option::None => Option::None
   }
 }
 
 ///|
 fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
   match value {
-    Some(value) => @sdkjson.Value(value)
-    None => @sdkjson.Null
+    Option::Some(value) => @sdkjson.Presence::Value(value)
+    Option::None => @sdkjson.Presence::Null
   }
 }
 
@@ -159,8 +165,8 @@ fn[T : @json.FromJson] decode_nullable_field(
 ) -> T? raise @json.JsonDecodeError {
   let raw : Json = required_field(obj, key, path)
   match raw {
-    Null => None
-    value => Some(@json.from_json(value, path=path.add_key(key)))
+    @json.Json::Null => Option::None
+    value => Option::Some(@json.from_json(value, path=path.add_key(key)))
   }
 }
 
@@ -168,7 +174,7 @@ fn[T : @json.FromJson] decode_nullable_field(
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = Json(item)
+    result[key] = @json.Json::Json(item)
   }
   Json::object(result)
 }
@@ -193,9 +199,10 @@ fn[T : @json.FromJson] decode_presence_json_map(
   path : @json.JsonPath,
 ) -> @sdkjson.Presence[Map[String, T]] raise @json.JsonDecodeError {
   match obj.get(key) {
-    None => @sdkjson.Absent
-    Some(Null) => @sdkjson.Null
-    Some(value) => @sdkjson.Value(decode_json_map(value, path.add_key(key)))
+    Option::None => @sdkjson.Presence::Absent
+    Option::Some(@json.Json::Null) => @sdkjson.Presence::Null
+    Option::Some(value) =>
+      @sdkjson.Presence::Value(decode_json_map(value, path.add_key(key)))
   }
 }
 
@@ -803,9 +810,11 @@ pub impl ToJson for ChatCompletionRequestAssistantMessageContentPart with fn to_
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    Refusal(value) => Json(value)
-    Unknown(_, value) => value
+    ChatCompletionRequestAssistantMessageContentPart::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestAssistantMessageContentPart::Refusal(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestAssistantMessageContentPart::Unknown(_, value) => value
   }
 }
 
@@ -824,9 +833,16 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContentPart wit
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    "refusal" => Refusal(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" =>
+      ChatCompletionRequestAssistantMessageContentPart::Text(
+        @json.from_json(value, path~),
+      )
+    "refusal" =>
+      ChatCompletionRequestAssistantMessageContentPart::Refusal(
+        @json.from_json(value, path~),
+      )
+    other =>
+      ChatCompletionRequestAssistantMessageContentPart::Unknown(other, value)
   }
 }
 
@@ -863,8 +879,11 @@ pub impl ToJson for ChatCompletionRequestAssistantMessageContent with fn to_json
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionRequestAssistantMessageContentPartArray(value) => Json(value)
+    ChatCompletionRequestAssistantMessageContent::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestAssistantMessageContent::ChatCompletionRequestAssistantMessageContentPartArray(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -880,18 +899,20 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContent with fn
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ChatCompletionRequestAssistantMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ChatCompletionRequestAssistantMessageContentPart] = @json.from_json(
       value,
       path~,
     )
-    return ChatCompletionRequestAssistantMessageContentPartArray(decoded)
+    return ChatCompletionRequestAssistantMessageContent::ChatCompletionRequestAssistantMessageContentPartArray(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ChatCompletionRequestAssistantMessageContent variant",
     ),
@@ -1140,8 +1161,11 @@ pub impl ToJson for ChatCompletionRequestDeveloperMessageContent with fn to_json
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionRequestMessageContentPartTextArray(value) => Json(value)
+    ChatCompletionRequestDeveloperMessageContent::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestDeveloperMessageContent::ChatCompletionRequestMessageContentPartTextArray(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -1157,18 +1181,20 @@ pub impl @json.FromJson for ChatCompletionRequestDeveloperMessageContent with fn
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ChatCompletionRequestDeveloperMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ChatCompletionRequestMessageContentPartText] = @json.from_json(
       value,
       path~,
     )
-    return ChatCompletionRequestMessageContentPartTextArray(decoded)
+    return ChatCompletionRequestDeveloperMessageContent::ChatCompletionRequestMessageContentPartTextArray(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ChatCompletionRequestDeveloperMessageContent variant",
     ),
@@ -1326,8 +1352,9 @@ pub impl ToJson for ChatCompletionRequestSystemMessageContentPart with fn to_jso
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    Unknown(_, value) => value
+    ChatCompletionRequestSystemMessageContentPart::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestSystemMessageContentPart::Unknown(_, value) => value
   }
 }
 
@@ -1346,8 +1373,12 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessageContentPart with f
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" =>
+      ChatCompletionRequestSystemMessageContentPart::Text(
+        @json.from_json(value, path~),
+      )
+    other =>
+      ChatCompletionRequestSystemMessageContentPart::Unknown(other, value)
   }
 }
 
@@ -1381,8 +1412,11 @@ pub impl ToJson for ChatCompletionRequestSystemMessageContent with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionRequestSystemMessageContentPartArray(value) => Json(value)
+    ChatCompletionRequestSystemMessageContent::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestSystemMessageContent::ChatCompletionRequestSystemMessageContentPartArray(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -1398,18 +1432,20 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessageContent with fn fr
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ChatCompletionRequestSystemMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ChatCompletionRequestSystemMessageContentPart] = @json.from_json(
       value,
       path~,
     )
-    return ChatCompletionRequestSystemMessageContentPartArray(decoded)
+    return ChatCompletionRequestSystemMessageContent::ChatCompletionRequestSystemMessageContentPartArray(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ChatCompletionRequestSystemMessageContent variant",
     ),
@@ -1510,12 +1546,13 @@ pub impl ToJson for ChatCompletionRequestMessageContentPartImageImageUrlDetail w
   self,
 ) {
   let raw = match self {
-    Auto => "auto"
-    Low => "low"
-    High => "high"
-    Custom(raw) => raw
+    ChatCompletionRequestMessageContentPartImageImageUrlDetail::Auto => "auto"
+    ChatCompletionRequestMessageContentPartImageImageUrlDetail::Low => "low"
+    ChatCompletionRequestMessageContentPartImageImageUrlDetail::High => "high"
+    ChatCompletionRequestMessageContentPartImageImageUrlDetail::Custom(raw) =>
+      raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1535,13 +1572,24 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "low" => Some(Low)
-        "high" => Some(High)
-        _ => None
+        "auto" =>
+          Option::Some(
+            ChatCompletionRequestMessageContentPartImageImageUrlDetail::Auto,
+          )
+        "low" =>
+          Option::Some(
+            ChatCompletionRequestMessageContentPartImageImageUrlDetail::Low,
+          )
+        "high" =>
+          Option::Some(
+            ChatCompletionRequestMessageContentPartImageImageUrlDetail::High,
+          )
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => {
+      ChatCompletionRequestMessageContentPartImageImageUrlDetail::Custom(raw)
+    },
   )
 }
 
@@ -1709,11 +1757,12 @@ pub impl ToJson for ChatCompletionRequestMessageContentPartAudioInputAudioFormat
   self,
 ) {
   let raw = match self {
-    Wav => "wav"
-    Mp3 => "mp3"
-    Custom(raw) => raw
+    ChatCompletionRequestMessageContentPartAudioInputAudioFormat::Wav => "wav"
+    ChatCompletionRequestMessageContentPartAudioInputAudioFormat::Mp3 => "mp3"
+    ChatCompletionRequestMessageContentPartAudioInputAudioFormat::Custom(raw) =>
+      raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1733,12 +1782,20 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAud
     path,
     raw => {
       match raw {
-        "wav" => Some(Wav)
-        "mp3" => Some(Mp3)
-        _ => None
+        "wav" =>
+          Option::Some(
+            ChatCompletionRequestMessageContentPartAudioInputAudioFormat::Wav,
+          )
+        "mp3" =>
+          Option::Some(
+            ChatCompletionRequestMessageContentPartAudioInputAudioFormat::Mp3,
+          )
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => {
+      ChatCompletionRequestMessageContentPartAudioInputAudioFormat::Custom(raw)
+    },
   )
 }
 
@@ -2040,11 +2097,15 @@ pub impl ToJson for ChatCompletionRequestUserMessageContentPart with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    ImageUrl(value) => Json(value)
-    InputAudio(value) => Json(value)
-    File(value) => Json(value)
-    Unknown(_, value) => value
+    ChatCompletionRequestUserMessageContentPart::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestUserMessageContentPart::ImageUrl(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestUserMessageContentPart::InputAudio(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestUserMessageContentPart::File(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestUserMessageContentPart::Unknown(_, value) => value
   }
 }
 
@@ -2063,11 +2124,23 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessageContentPart with fn 
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    "image_url" => ImageUrl(@json.from_json(value, path~))
-    "input_audio" => InputAudio(@json.from_json(value, path~))
-    "file" => File(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" =>
+      ChatCompletionRequestUserMessageContentPart::Text(
+        @json.from_json(value, path~),
+      )
+    "image_url" =>
+      ChatCompletionRequestUserMessageContentPart::ImageUrl(
+        @json.from_json(value, path~),
+      )
+    "input_audio" =>
+      ChatCompletionRequestUserMessageContentPart::InputAudio(
+        @json.from_json(value, path~),
+      )
+    "file" =>
+      ChatCompletionRequestUserMessageContentPart::File(
+        @json.from_json(value, path~),
+      )
+    other => ChatCompletionRequestUserMessageContentPart::Unknown(other, value)
   }
 }
 
@@ -2099,8 +2172,11 @@ pub impl ToJson for ChatCompletionRequestUserMessageContent with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionRequestUserMessageContentPartArray(value) => Json(value)
+    ChatCompletionRequestUserMessageContent::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestUserMessageContent::ChatCompletionRequestUserMessageContentPartArray(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -2116,18 +2192,20 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessageContent with fn from
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ChatCompletionRequestUserMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ChatCompletionRequestUserMessageContentPart] = @json.from_json(
       value,
       path~,
     )
-    return ChatCompletionRequestUserMessageContentPartArray(decoded)
+    return ChatCompletionRequestUserMessageContent::ChatCompletionRequestUserMessageContentPartArray(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ChatCompletionRequestUserMessageContent variant",
     ),
@@ -2224,8 +2302,9 @@ pub impl ToJson for ChatCompletionRequestToolMessageContentPart with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    Unknown(_, value) => value
+    ChatCompletionRequestToolMessageContentPart::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestToolMessageContentPart::Unknown(_, value) => value
   }
 }
 
@@ -2244,8 +2323,11 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessageContentPart with fn 
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" =>
+      ChatCompletionRequestToolMessageContentPart::Text(
+        @json.from_json(value, path~),
+      )
+    other => ChatCompletionRequestToolMessageContentPart::Unknown(other, value)
   }
 }
 
@@ -2277,8 +2359,11 @@ pub impl ToJson for ChatCompletionRequestToolMessageContent with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionRequestToolMessageContentPartArray(value) => Json(value)
+    ChatCompletionRequestToolMessageContent::Text(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestToolMessageContent::ChatCompletionRequestToolMessageContentPartArray(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -2294,18 +2379,20 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessageContent with fn from
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ChatCompletionRequestToolMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ChatCompletionRequestToolMessageContentPart] = @json.from_json(
       value,
       path~,
     )
-    return ChatCompletionRequestToolMessageContentPartArray(decoded)
+    return ChatCompletionRequestToolMessageContent::ChatCompletionRequestToolMessageContentPartArray(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ChatCompletionRequestToolMessageContent variant",
     ),
@@ -2400,13 +2487,13 @@ pub extend ChatCompletionRequestMessage with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionRequestMessage with fn to_json(self) {
   match self {
-    Developer(value) => Json(value)
-    System(value) => Json(value)
-    User(value) => Json(value)
-    Assistant(value) => Json(value)
-    Tool(value) => Json(value)
-    Function(value) => Json(value)
-    Unknown(_, value) => value
+    ChatCompletionRequestMessage::Developer(value) => @json.Json::Json(value)
+    ChatCompletionRequestMessage::System(value) => @json.Json::Json(value)
+    ChatCompletionRequestMessage::User(value) => @json.Json::Json(value)
+    ChatCompletionRequestMessage::Assistant(value) => @json.Json::Json(value)
+    ChatCompletionRequestMessage::Tool(value) => @json.Json::Json(value)
+    ChatCompletionRequestMessage::Function(value) => @json.Json::Json(value)
+    ChatCompletionRequestMessage::Unknown(_, value) => value
   }
 }
 
@@ -2423,13 +2510,17 @@ pub impl @json.FromJson for ChatCompletionRequestMessage with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "role", path)
   match tag {
-    "developer" => Developer(@json.from_json(value, path~))
-    "system" => System(@json.from_json(value, path~))
-    "user" => User(@json.from_json(value, path~))
-    "assistant" => Assistant(@json.from_json(value, path~))
-    "tool" => Tool(@json.from_json(value, path~))
-    "function" => Function(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "developer" =>
+      ChatCompletionRequestMessage::Developer(@json.from_json(value, path~))
+    "system" =>
+      ChatCompletionRequestMessage::System(@json.from_json(value, path~))
+    "user" => ChatCompletionRequestMessage::User(@json.from_json(value, path~))
+    "assistant" =>
+      ChatCompletionRequestMessage::Assistant(@json.from_json(value, path~))
+    "tool" => ChatCompletionRequestMessage::Tool(@json.from_json(value, path~))
+    "function" =>
+      ChatCompletionRequestMessage::Function(@json.from_json(value, path~))
+    other => ChatCompletionRequestMessage::Unknown(other, value)
   }
 }
 
@@ -2908,14 +2999,14 @@ pub extend ChatCompletionStreamResponseDeltaRole with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionStreamResponseDeltaRole with fn to_json(self) {
   let raw = match self {
-    Developer => "developer"
-    System => "system"
-    User => "user"
-    Assistant => "assistant"
-    Tool => "tool"
-    Unknown(raw) => raw
+    ChatCompletionStreamResponseDeltaRole::Developer => "developer"
+    ChatCompletionStreamResponseDeltaRole::System => "system"
+    ChatCompletionStreamResponseDeltaRole::User => "user"
+    ChatCompletionStreamResponseDeltaRole::Assistant => "assistant"
+    ChatCompletionStreamResponseDeltaRole::Tool => "tool"
+    ChatCompletionStreamResponseDeltaRole::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2935,15 +3026,17 @@ pub impl @json.FromJson for ChatCompletionStreamResponseDeltaRole with fn from_j
     path,
     raw => {
       match raw {
-        "developer" => Some(Developer)
-        "system" => Some(System)
-        "user" => Some(User)
-        "assistant" => Some(Assistant)
-        "tool" => Some(Tool)
-        _ => None
+        "developer" =>
+          Option::Some(ChatCompletionStreamResponseDeltaRole::Developer)
+        "system" => Option::Some(ChatCompletionStreamResponseDeltaRole::System)
+        "user" => Option::Some(ChatCompletionStreamResponseDeltaRole::User)
+        "assistant" =>
+          Option::Some(ChatCompletionStreamResponseDeltaRole::Assistant)
+        "tool" => Option::Some(ChatCompletionStreamResponseDeltaRole::Tool)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ChatCompletionStreamResponseDeltaRole::Unknown(raw),
   )
 }
 
@@ -3286,12 +3379,12 @@ pub extend ChatCompletionToolChoiceOptionText with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionToolChoiceOptionText with fn to_json(self) {
   let raw = match self {
-    None => "none"
-    Auto => "auto"
-    Required => "required"
-    Custom(raw) => raw
+    ChatCompletionToolChoiceOptionText::None => "none"
+    ChatCompletionToolChoiceOptionText::Auto => "auto"
+    ChatCompletionToolChoiceOptionText::Required => "required"
+    ChatCompletionToolChoiceOptionText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3309,13 +3402,13 @@ pub impl @json.FromJson for ChatCompletionToolChoiceOptionText with fn from_json
     path,
     raw => {
       match raw {
-        "none" => Some(None)
-        "auto" => Some(Auto)
-        "required" => Some(Required)
-        _ => None
+        "none" => Option::Some(ChatCompletionToolChoiceOptionText::None)
+        "auto" => Option::Some(ChatCompletionToolChoiceOptionText::Auto)
+        "required" => Option::Some(ChatCompletionToolChoiceOptionText::Required)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ChatCompletionToolChoiceOptionText::Custom(raw),
   )
 }
 
@@ -3343,8 +3436,9 @@ pub extend ChatCompletionToolChoiceOption with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionToolChoiceOption with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionNamedToolChoice(value) => Json(value)
+    ChatCompletionToolChoiceOption::Text(value) => @json.Json::Json(value)
+    ChatCompletionToolChoiceOption::ChatCompletionNamedToolChoice(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -3358,18 +3452,20 @@ pub impl @json.FromJson for ChatCompletionToolChoiceOption with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : ChatCompletionToolChoiceOptionText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return ChatCompletionToolChoiceOption::Text(decoded)
   }
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : ChatCompletionNamedToolChoice = @json.from_json(value, path~)
-    return ChatCompletionNamedToolChoice(decoded)
+    return ChatCompletionToolChoiceOption::ChatCompletionNamedToolChoice(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ChatCompletionToolChoiceOption variant",
     ),
@@ -3404,14 +3500,14 @@ pub extend ClickButton with ToJson::{to_json}
 ///|
 pub impl ToJson for ClickButton with fn to_json(self) {
   let raw = match self {
-    Left => "left"
-    Right => "right"
-    Wheel => "wheel"
-    Back => "back"
-    Forward => "forward"
-    Unknown(raw) => raw
+    ClickButton::Left => "left"
+    ClickButton::Right => "right"
+    ClickButton::Wheel => "wheel"
+    ClickButton::Back => "back"
+    ClickButton::Forward => "forward"
+    ClickButton::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3426,15 +3522,15 @@ pub impl @json.FromJson for ClickButton with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "left" => Some(Left)
-        "right" => Some(Right)
-        "wheel" => Some(Wheel)
-        "back" => Some(Back)
-        "forward" => Some(Forward)
-        _ => None
+        "left" => Option::Some(ClickButton::Left)
+        "right" => Option::Some(ClickButton::Right)
+        "wheel" => Option::Some(ClickButton::Wheel)
+        "back" => Option::Some(ClickButton::Back)
+        "forward" => Option::Some(ClickButton::Forward)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ClickButton::Unknown(raw),
   )
 }
 
@@ -3689,12 +3785,12 @@ pub extend CodeInterpreterToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeInterpreterToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Interpreting => "interpreting"
-    Completed => "completed"
-    Unknown(raw) => raw
+    CodeInterpreterToolCallStatus::InProgress => "in_progress"
+    CodeInterpreterToolCallStatus::Interpreting => "interpreting"
+    CodeInterpreterToolCallStatus::Completed => "completed"
+    CodeInterpreterToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3712,13 +3808,14 @@ pub impl @json.FromJson for CodeInterpreterToolCallStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "interpreting" => Some(Interpreting)
-        "completed" => Some(Completed)
-        _ => None
+        "in_progress" => Option::Some(CodeInterpreterToolCallStatus::InProgress)
+        "interpreting" =>
+          Option::Some(CodeInterpreterToolCallStatus::Interpreting)
+        "completed" => Option::Some(CodeInterpreterToolCallStatus::Completed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CodeInterpreterToolCallStatus::Unknown(raw),
   )
 }
 
@@ -3747,9 +3844,9 @@ pub extend CodeInterpreterToolOutput with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeInterpreterToolOutput with fn to_json(self) {
   match self {
-    Logs(value) => Json(value)
-    Files(value) => Json(value)
-    Unknown(_, value) => value
+    CodeInterpreterToolOutput::Logs(value) => @json.Json::Json(value)
+    CodeInterpreterToolOutput::Files(value) => @json.Json::Json(value)
+    CodeInterpreterToolOutput::Unknown(_, value) => value
   }
 }
 
@@ -3766,9 +3863,9 @@ pub impl @json.FromJson for CodeInterpreterToolOutput with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "logs" => Logs(@json.from_json(value, path~))
-    "files" => Files(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "logs" => CodeInterpreterToolOutput::Logs(@json.from_json(value, path~))
+    "files" => CodeInterpreterToolOutput::Files(@json.from_json(value, path~))
+    other => CodeInterpreterToolOutput::Unknown(other, value)
   }
 }
 
@@ -4513,16 +4610,16 @@ pub extend ComputerAction with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerAction with fn to_json(self) {
   match self {
-    Click(value) => Json(value)
-    DoubleClick(value) => Json(value)
-    Drag(value) => Json(value)
-    Keypress(value) => Json(value)
-    Move(value) => Json(value)
-    Screenshot(value) => Json(value)
-    Scroll(value) => Json(value)
-    Type(value) => Json(value)
-    Wait(value) => Json(value)
-    Unknown(_, value) => value
+    ComputerAction::Click(value) => @json.Json::Json(value)
+    ComputerAction::DoubleClick(value) => @json.Json::Json(value)
+    ComputerAction::Drag(value) => @json.Json::Json(value)
+    ComputerAction::Keypress(value) => @json.Json::Json(value)
+    ComputerAction::Move(value) => @json.Json::Json(value)
+    ComputerAction::Screenshot(value) => @json.Json::Json(value)
+    ComputerAction::Scroll(value) => @json.Json::Json(value)
+    ComputerAction::Type(value) => @json.Json::Json(value)
+    ComputerAction::Wait(value) => @json.Json::Json(value)
+    ComputerAction::Unknown(_, value) => value
   }
 }
 
@@ -4536,16 +4633,16 @@ pub impl @json.FromJson for ComputerAction with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "click" => Click(@json.from_json(value, path~))
-    "double_click" => DoubleClick(@json.from_json(value, path~))
-    "drag" => Drag(@json.from_json(value, path~))
-    "keypress" => Keypress(@json.from_json(value, path~))
-    "move" => Move(@json.from_json(value, path~))
-    "screenshot" => Screenshot(@json.from_json(value, path~))
-    "scroll" => Scroll(@json.from_json(value, path~))
-    "type" => Type(@json.from_json(value, path~))
-    "wait" => Wait(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "click" => ComputerAction::Click(@json.from_json(value, path~))
+    "double_click" => ComputerAction::DoubleClick(@json.from_json(value, path~))
+    "drag" => ComputerAction::Drag(@json.from_json(value, path~))
+    "keypress" => ComputerAction::Keypress(@json.from_json(value, path~))
+    "move" => ComputerAction::Move(@json.from_json(value, path~))
+    "screenshot" => ComputerAction::Screenshot(@json.from_json(value, path~))
+    "scroll" => ComputerAction::Scroll(@json.from_json(value, path~))
+    "type" => ComputerAction::Type(@json.from_json(value, path~))
+    "wait" => ComputerAction::Wait(@json.from_json(value, path~))
+    other => ComputerAction::Unknown(other, value)
   }
 }
 
@@ -4690,12 +4787,12 @@ pub extend ComputerToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Unknown(raw) => raw
+    ComputerToolCallStatus::InProgress => "in_progress"
+    ComputerToolCallStatus::Completed => "completed"
+    ComputerToolCallStatus::Incomplete => "incomplete"
+    ComputerToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4713,13 +4810,13 @@ pub impl @json.FromJson for ComputerToolCallStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "in_progress" => Option::Some(ComputerToolCallStatus::InProgress)
+        "completed" => Option::Some(ComputerToolCallStatus::Completed)
+        "incomplete" => Option::Some(ComputerToolCallStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ComputerToolCallStatus::Unknown(raw),
   )
 }
 
@@ -4817,12 +4914,12 @@ pub extend ServiceTier with ToJson::{to_json}
 ///|
 pub impl ToJson for ServiceTier with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Default => "default"
-    Flex => "flex"
-    Unknown(raw) => raw
+    ServiceTier::Auto => "auto"
+    ServiceTier::Default => "default"
+    ServiceTier::Flex => "flex"
+    ServiceTier::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4837,13 +4934,13 @@ pub impl @json.FromJson for ServiceTier with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "default" => Some(Default)
-        "flex" => Some(Flex)
-        _ => None
+        "auto" => Option::Some(ServiceTier::Auto)
+        "default" => Option::Some(ServiceTier::Default)
+        "flex" => Option::Some(ServiceTier::Flex)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ServiceTier::Unknown(raw),
   )
 }
 
@@ -4872,11 +4969,11 @@ pub extend ResponseModalitiesItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseModalitiesItem with fn to_json(self) {
   let raw = match self {
-    Text => "text"
-    Audio => "audio"
-    Custom(raw) => raw
+    ResponseModalitiesItem::Text => "text"
+    ResponseModalitiesItem::Audio => "audio"
+    ResponseModalitiesItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4894,12 +4991,12 @@ pub impl @json.FromJson for ResponseModalitiesItem with fn from_json(
     path,
     raw => {
       match raw {
-        "text" => Some(Text)
-        "audio" => Some(Audio)
-        _ => None
+        "text" => Option::Some(ResponseModalitiesItem::Text)
+        "audio" => Option::Some(ResponseModalitiesItem::Audio)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ResponseModalitiesItem::Custom(raw),
   )
 }
 
@@ -4929,12 +5026,12 @@ pub extend ReasoningEffort with ToJson::{to_json}
 ///|
 pub impl ToJson for ReasoningEffort with fn to_json(self) {
   let raw = match self {
-    Low => "low"
-    Medium => "medium"
-    High => "high"
-    Unknown(raw) => raw
+    ReasoningEffort::Low => "low"
+    ReasoningEffort::Medium => "medium"
+    ReasoningEffort::High => "high"
+    ReasoningEffort::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4949,13 +5046,13 @@ pub impl @json.FromJson for ReasoningEffort with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "low" => Some(Low)
-        "medium" => Some(Medium)
-        "high" => Some(High)
-        _ => None
+        "low" => Option::Some(ReasoningEffort::Low)
+        "medium" => Option::Some(ReasoningEffort::Medium)
+        "high" => Option::Some(ReasoningEffort::High)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ReasoningEffort::Unknown(raw),
   )
 }
 
@@ -5106,12 +5203,12 @@ pub extend WebSearchContextSize with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchContextSize with fn to_json(self) {
   let raw = match self {
-    Low => "low"
-    Medium => "medium"
-    High => "high"
-    Custom(raw) => raw
+    WebSearchContextSize::Low => "low"
+    WebSearchContextSize::Medium => "medium"
+    WebSearchContextSize::High => "high"
+    WebSearchContextSize::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5126,13 +5223,13 @@ pub impl @json.FromJson for WebSearchContextSize with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "low" => Some(Low)
-        "medium" => Some(Medium)
-        "high" => Some(High)
-        _ => None
+        "low" => Option::Some(WebSearchContextSize::Low)
+        "medium" => Option::Some(WebSearchContextSize::Medium)
+        "high" => Option::Some(WebSearchContextSize::High)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => WebSearchContextSize::Custom(raw),
   )
 }
 
@@ -5442,10 +5539,13 @@ pub impl ToJson for CreateChatCompletionRequestResponseFormat with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    JsonSchema(value) => Json(value)
-    JsonObject(value) => Json(value)
-    Unknown(_, value) => value
+    CreateChatCompletionRequestResponseFormat::Text(value) =>
+      @json.Json::Json(value)
+    CreateChatCompletionRequestResponseFormat::JsonSchema(value) =>
+      @json.Json::Json(value)
+    CreateChatCompletionRequestResponseFormat::JsonObject(value) =>
+      @json.Json::Json(value)
+    CreateChatCompletionRequestResponseFormat::Unknown(_, value) => value
   }
 }
 
@@ -5464,10 +5564,19 @@ pub impl @json.FromJson for CreateChatCompletionRequestResponseFormat with fn fr
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    "json_schema" => JsonSchema(@json.from_json(value, path~))
-    "json_object" => JsonObject(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" =>
+      CreateChatCompletionRequestResponseFormat::Text(
+        @json.from_json(value, path~),
+      )
+    "json_schema" =>
+      CreateChatCompletionRequestResponseFormat::JsonSchema(
+        @json.from_json(value, path~),
+      )
+    "json_object" =>
+      CreateChatCompletionRequestResponseFormat::JsonObject(
+        @json.from_json(value, path~),
+      )
+    other => CreateChatCompletionRequestResponseFormat::Unknown(other, value)
   }
 }
 
@@ -5500,15 +5609,15 @@ pub extend CreateChatCompletionRequestAudioFormat with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateChatCompletionRequestAudioFormat with fn to_json(self) {
   let raw = match self {
-    Wav => "wav"
-    Aac => "aac"
-    Mp3 => "mp3"
-    Flac => "flac"
-    Opus => "opus"
-    Pcm16 => "pcm16"
-    Custom(raw) => raw
+    CreateChatCompletionRequestAudioFormat::Wav => "wav"
+    CreateChatCompletionRequestAudioFormat::Aac => "aac"
+    CreateChatCompletionRequestAudioFormat::Mp3 => "mp3"
+    CreateChatCompletionRequestAudioFormat::Flac => "flac"
+    CreateChatCompletionRequestAudioFormat::Opus => "opus"
+    CreateChatCompletionRequestAudioFormat::Pcm16 => "pcm16"
+    CreateChatCompletionRequestAudioFormat::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5528,16 +5637,16 @@ pub impl @json.FromJson for CreateChatCompletionRequestAudioFormat with fn from_
     path,
     raw => {
       match raw {
-        "wav" => Some(Wav)
-        "aac" => Some(Aac)
-        "mp3" => Some(Mp3)
-        "flac" => Some(Flac)
-        "opus" => Some(Opus)
-        "pcm16" => Some(Pcm16)
-        _ => None
+        "wav" => Option::Some(CreateChatCompletionRequestAudioFormat::Wav)
+        "aac" => Option::Some(CreateChatCompletionRequestAudioFormat::Aac)
+        "mp3" => Option::Some(CreateChatCompletionRequestAudioFormat::Mp3)
+        "flac" => Option::Some(CreateChatCompletionRequestAudioFormat::Flac)
+        "opus" => Option::Some(CreateChatCompletionRequestAudioFormat::Opus)
+        "pcm16" => Option::Some(CreateChatCompletionRequestAudioFormat::Pcm16)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CreateChatCompletionRequestAudioFormat::Custom(raw),
   )
 }
 
@@ -5620,8 +5729,8 @@ pub extend StopConfiguration with ToJson::{to_json}
 ///|
 pub impl ToJson for StopConfiguration with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    StopConfiguration::Text(value) => @json.Json::Json(value)
+    StopConfiguration::TextArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -5632,15 +5741,15 @@ pub extend StopConfiguration with @json.FromJson::{from_json}
 
 ///|
 pub impl @json.FromJson for StopConfiguration with fn from_json(value, path) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return StopConfiguration::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[String] = @json.from_json(value, path~)
-    return TextArray(decoded)
+    return StopConfiguration::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any StopConfiguration variant"),
   )
 }
@@ -5671,8 +5780,10 @@ pub extend PredictionContentContent with ToJson::{to_json}
 ///|
 pub impl ToJson for PredictionContentContent with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionRequestMessageContentPartTextArray(value) => Json(value)
+    PredictionContentContent::Text(value) => @json.Json::Json(value)
+    PredictionContentContent::ChatCompletionRequestMessageContentPartTextArray(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -5686,18 +5797,20 @@ pub impl @json.FromJson for PredictionContentContent with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return PredictionContentContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ChatCompletionRequestMessageContentPartText] = @json.from_json(
       value,
       path~,
     )
-    return ChatCompletionRequestMessageContentPartTextArray(decoded)
+    return PredictionContentContent::ChatCompletionRequestMessageContentPartTextArray(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any PredictionContentContent variant"),
   )
 }
@@ -5778,8 +5891,9 @@ pub extend CreateChatCompletionRequestPrediction with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateChatCompletionRequestPrediction with fn to_json(self) {
   match self {
-    Content(value) => Json(value)
-    Unknown(_, value) => value
+    CreateChatCompletionRequestPrediction::Content(value) =>
+      @json.Json::Json(value)
+    CreateChatCompletionRequestPrediction::Unknown(_, value) => value
   }
 }
 
@@ -5798,8 +5912,11 @@ pub impl @json.FromJson for CreateChatCompletionRequestPrediction with fn from_j
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "content" => Content(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "content" =>
+      CreateChatCompletionRequestPrediction::Content(
+        @json.from_json(value, path~),
+      )
+    other => CreateChatCompletionRequestPrediction::Unknown(other, value)
   }
 }
 
@@ -5835,11 +5952,11 @@ pub impl ToJson for CreateChatCompletionRequestFunctionCallText with fn to_json(
   self,
 ) {
   let raw = match self {
-    None => "none"
-    Auto => "auto"
-    Custom(raw) => raw
+    CreateChatCompletionRequestFunctionCallText::None => "none"
+    CreateChatCompletionRequestFunctionCallText::Auto => "auto"
+    CreateChatCompletionRequestFunctionCallText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5859,12 +5976,14 @@ pub impl @json.FromJson for CreateChatCompletionRequestFunctionCallText with fn 
     path,
     raw => {
       match raw {
-        "none" => Some(None)
-        "auto" => Some(Auto)
-        _ => None
+        "none" =>
+          Option::Some(CreateChatCompletionRequestFunctionCallText::None)
+        "auto" =>
+          Option::Some(CreateChatCompletionRequestFunctionCallText::Auto)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CreateChatCompletionRequestFunctionCallText::Custom(raw),
   )
 }
 
@@ -5894,8 +6013,11 @@ pub impl ToJson for CreateChatCompletionRequestFunctionCall with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    ChatCompletionFunctionCallOption(value) => Json(value)
+    CreateChatCompletionRequestFunctionCall::Text(value) =>
+      @json.Json::Json(value)
+    CreateChatCompletionRequestFunctionCall::ChatCompletionFunctionCallOption(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -5911,21 +6033,23 @@ pub impl @json.FromJson for CreateChatCompletionRequestFunctionCall with fn from
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : CreateChatCompletionRequestFunctionCallText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return CreateChatCompletionRequestFunctionCall::Text(decoded)
   }
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : ChatCompletionFunctionCallOption = @json.from_json(
       value,
       path~,
     )
-    return ChatCompletionFunctionCallOption(decoded)
+    return CreateChatCompletionRequestFunctionCall::ChatCompletionFunctionCallOption(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any CreateChatCompletionRequestFunctionCall variant",
     ),
@@ -6174,14 +6298,17 @@ pub impl ToJson for CreateChatCompletionResponseChoicesItemFinishReason with fn 
   self,
 ) {
   let raw = match self {
-    Stop => "stop"
-    Length => "length"
-    ToolCalls => "tool_calls"
-    ContentFilter => "content_filter"
-    FunctionCall => "function_call"
-    Unknown(raw) => raw
+    CreateChatCompletionResponseChoicesItemFinishReason::Stop => "stop"
+    CreateChatCompletionResponseChoicesItemFinishReason::Length => "length"
+    CreateChatCompletionResponseChoicesItemFinishReason::ToolCalls =>
+      "tool_calls"
+    CreateChatCompletionResponseChoicesItemFinishReason::ContentFilter =>
+      "content_filter"
+    CreateChatCompletionResponseChoicesItemFinishReason::FunctionCall =>
+      "function_call"
+    CreateChatCompletionResponseChoicesItemFinishReason::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6201,15 +6328,30 @@ pub impl @json.FromJson for CreateChatCompletionResponseChoicesItemFinishReason 
     path,
     raw => {
       match raw {
-        "stop" => Some(Stop)
-        "length" => Some(Length)
-        "tool_calls" => Some(ToolCalls)
-        "content_filter" => Some(ContentFilter)
-        "function_call" => Some(FunctionCall)
-        _ => None
+        "stop" =>
+          Option::Some(
+            CreateChatCompletionResponseChoicesItemFinishReason::Stop,
+          )
+        "length" =>
+          Option::Some(
+            CreateChatCompletionResponseChoicesItemFinishReason::Length,
+          )
+        "tool_calls" =>
+          Option::Some(
+            CreateChatCompletionResponseChoicesItemFinishReason::ToolCalls,
+          )
+        "content_filter" =>
+          Option::Some(
+            CreateChatCompletionResponseChoicesItemFinishReason::ContentFilter,
+          )
+        "function_call" =>
+          Option::Some(
+            CreateChatCompletionResponseChoicesItemFinishReason::FunctionCall,
+          )
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CreateChatCompletionResponseChoicesItemFinishReason::Unknown(raw),
   )
 }
 
@@ -6538,14 +6680,19 @@ pub impl ToJson for CreateChatCompletionStreamResponseChoicesItemFinishReason wi
   self,
 ) {
   let raw = match self {
-    Stop => "stop"
-    Length => "length"
-    ToolCalls => "tool_calls"
-    ContentFilter => "content_filter"
-    FunctionCall => "function_call"
-    Unknown(raw) => raw
+    CreateChatCompletionStreamResponseChoicesItemFinishReason::Stop => "stop"
+    CreateChatCompletionStreamResponseChoicesItemFinishReason::Length =>
+      "length"
+    CreateChatCompletionStreamResponseChoicesItemFinishReason::ToolCalls =>
+      "tool_calls"
+    CreateChatCompletionStreamResponseChoicesItemFinishReason::ContentFilter =>
+      "content_filter"
+    CreateChatCompletionStreamResponseChoicesItemFinishReason::FunctionCall =>
+      "function_call"
+    CreateChatCompletionStreamResponseChoicesItemFinishReason::Unknown(raw) =>
+      raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6565,15 +6712,32 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItemFinishR
     path,
     raw => {
       match raw {
-        "stop" => Some(Stop)
-        "length" => Some(Length)
-        "tool_calls" => Some(ToolCalls)
-        "content_filter" => Some(ContentFilter)
-        "function_call" => Some(FunctionCall)
-        _ => None
+        "stop" =>
+          Option::Some(
+            CreateChatCompletionStreamResponseChoicesItemFinishReason::Stop,
+          )
+        "length" =>
+          Option::Some(
+            CreateChatCompletionStreamResponseChoicesItemFinishReason::Length,
+          )
+        "tool_calls" =>
+          Option::Some(
+            CreateChatCompletionStreamResponseChoicesItemFinishReason::ToolCalls,
+          )
+        "content_filter" =>
+          Option::Some(
+            CreateChatCompletionStreamResponseChoicesItemFinishReason::ContentFilter,
+          )
+        "function_call" =>
+          Option::Some(
+            CreateChatCompletionStreamResponseChoicesItemFinishReason::FunctionCall,
+          )
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => {
+      CreateChatCompletionStreamResponseChoicesItemFinishReason::Unknown(raw)
+    },
   )
 }
 
@@ -6769,10 +6933,10 @@ pub extend CreateEmbeddingRequestInput with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateEmbeddingRequestInput with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
-    IntArray(value) => Json(value)
-    IntArrayArray(value) => Json(value)
+    CreateEmbeddingRequestInput::Text(value) => @json.Json::Json(value)
+    CreateEmbeddingRequestInput::TextArray(value) => @json.Json::Json(value)
+    CreateEmbeddingRequestInput::IntArray(value) => @json.Json::Json(value)
+    CreateEmbeddingRequestInput::IntArrayArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -6786,25 +6950,25 @@ pub impl @json.FromJson for CreateEmbeddingRequestInput with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return CreateEmbeddingRequestInput::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[String] = @json.from_json(value, path~)
-    return TextArray(decoded)
+    return CreateEmbeddingRequestInput::TextArray(decoded)
   }
-  if json_array_matches(value, item => item is Number(_, ..)) {
+  if json_array_matches(value, item => item is @json.Json::Number(_, ..)) {
     let decoded : Array[Int32] = @json.from_json(value, path~)
-    return IntArray(decoded)
+    return CreateEmbeddingRequestInput::IntArray(decoded)
   }
   if json_array_matches(value, item => {
-      json_array_matches(item, item => item is Number(_, ..))
+      json_array_matches(item, item => item is @json.Json::Number(_, ..))
     }) {
     let decoded : Array[Array[Int32]] = @json.from_json(value, path~)
-    return IntArrayArray(decoded)
+    return CreateEmbeddingRequestInput::IntArrayArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any CreateEmbeddingRequestInput variant"),
   )
 }
@@ -6834,11 +6998,11 @@ pub extend CreateEmbeddingRequestEncodingFormat with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateEmbeddingRequestEncodingFormat with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Custom(raw) => raw
+    CreateEmbeddingRequestEncodingFormat::Float => "float"
+    CreateEmbeddingRequestEncodingFormat::Base64 => "base64"
+    CreateEmbeddingRequestEncodingFormat::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6856,12 +7020,12 @@ pub impl @json.FromJson for CreateEmbeddingRequestEncodingFormat with fn from_js
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        _ => None
+        "float" => Option::Some(CreateEmbeddingRequestEncodingFormat::Float)
+        "base64" => Option::Some(CreateEmbeddingRequestEncodingFormat::Base64)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CreateEmbeddingRequestEncodingFormat::Custom(raw),
   )
 }
 
@@ -7196,12 +7360,12 @@ pub extend ReasoningSummary with ToJson::{to_json}
 ///|
 pub impl ToJson for ReasoningSummary with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Concise => "concise"
-    Detailed => "detailed"
-    Unknown(raw) => raw
+    ReasoningSummary::Auto => "auto"
+    ReasoningSummary::Concise => "concise"
+    ReasoningSummary::Detailed => "detailed"
+    ReasoningSummary::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7216,13 +7380,13 @@ pub impl @json.FromJson for ReasoningSummary with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "concise" => Some(Concise)
-        "detailed" => Some(Detailed)
-        _ => None
+        "auto" => Option::Some(ReasoningSummary::Auto)
+        "concise" => Option::Some(ReasoningSummary::Concise)
+        "detailed" => Option::Some(ReasoningSummary::Detailed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ReasoningSummary::Unknown(raw),
   )
 }
 
@@ -7252,12 +7416,12 @@ pub extend ReasoningGenerateSummary with ToJson::{to_json}
 ///|
 pub impl ToJson for ReasoningGenerateSummary with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Concise => "concise"
-    Detailed => "detailed"
-    Unknown(raw) => raw
+    ReasoningGenerateSummary::Auto => "auto"
+    ReasoningGenerateSummary::Concise => "concise"
+    ReasoningGenerateSummary::Detailed => "detailed"
+    ReasoningGenerateSummary::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7275,13 +7439,13 @@ pub impl @json.FromJson for ReasoningGenerateSummary with fn from_json(
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "concise" => Some(Concise)
-        "detailed" => Some(Detailed)
-        _ => None
+        "auto" => Option::Some(ReasoningGenerateSummary::Auto)
+        "concise" => Option::Some(ReasoningGenerateSummary::Concise)
+        "detailed" => Option::Some(ReasoningGenerateSummary::Detailed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ReasoningGenerateSummary::Unknown(raw),
   )
 }
 
@@ -7444,10 +7608,12 @@ pub extend TextResponseFormatConfiguration with ToJson::{to_json}
 ///|
 pub impl ToJson for TextResponseFormatConfiguration with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    JsonSchema(value) => Json(value)
-    JsonObject(value) => Json(value)
-    Unknown(_, value) => value
+    TextResponseFormatConfiguration::Text(value) => @json.Json::Json(value)
+    TextResponseFormatConfiguration::JsonSchema(value) =>
+      @json.Json::Json(value)
+    TextResponseFormatConfiguration::JsonObject(value) =>
+      @json.Json::Json(value)
+    TextResponseFormatConfiguration::Unknown(_, value) => value
   }
 }
 
@@ -7464,10 +7630,13 @@ pub impl @json.FromJson for TextResponseFormatConfiguration with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    "json_schema" => JsonSchema(@json.from_json(value, path~))
-    "json_object" => JsonObject(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" =>
+      TextResponseFormatConfiguration::Text(@json.from_json(value, path~))
+    "json_schema" =>
+      TextResponseFormatConfiguration::JsonSchema(@json.from_json(value, path~))
+    "json_object" =>
+      TextResponseFormatConfiguration::JsonObject(@json.from_json(value, path~))
+    other => TextResponseFormatConfiguration::Unknown(other, value)
   }
 }
 
@@ -7540,11 +7709,11 @@ pub extend RankingOptionsRanker with ToJson::{to_json}
 ///|
 pub impl ToJson for RankingOptionsRanker with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Default20241115 => "default-2024-11-15"
-    Unknown(raw) => raw
+    RankingOptionsRanker::Auto => "auto"
+    RankingOptionsRanker::Default20241115 => "default-2024-11-15"
+    RankingOptionsRanker::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7559,12 +7728,13 @@ pub impl @json.FromJson for RankingOptionsRanker with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "default-2024-11-15" => Some(Default20241115)
-        _ => None
+        "auto" => Option::Some(RankingOptionsRanker::Auto)
+        "default-2024-11-15" =>
+          Option::Some(RankingOptionsRanker::Default20241115)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => RankingOptionsRanker::Unknown(raw),
   )
 }
 
@@ -7855,12 +8025,12 @@ pub extend WebSearchPreviewToolSearchContextSize with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchPreviewToolSearchContextSize with fn to_json(self) {
   let raw = match self {
-    Low => "low"
-    Medium => "medium"
-    High => "high"
-    Unknown(raw) => raw
+    WebSearchPreviewToolSearchContextSize::Low => "low"
+    WebSearchPreviewToolSearchContextSize::Medium => "medium"
+    WebSearchPreviewToolSearchContextSize::High => "high"
+    WebSearchPreviewToolSearchContextSize::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7880,13 +8050,13 @@ pub impl @json.FromJson for WebSearchPreviewToolSearchContextSize with fn from_j
     path,
     raw => {
       match raw {
-        "low" => Some(Low)
-        "medium" => Some(Medium)
-        "high" => Some(High)
-        _ => None
+        "low" => Option::Some(WebSearchPreviewToolSearchContextSize::Low)
+        "medium" => Option::Some(WebSearchPreviewToolSearchContextSize::Medium)
+        "high" => Option::Some(WebSearchPreviewToolSearchContextSize::High)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => WebSearchPreviewToolSearchContextSize::Unknown(raw),
   )
 }
 
@@ -7978,14 +8148,14 @@ pub extend ComputerUsePreviewToolEnvironment with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerUsePreviewToolEnvironment with fn to_json(self) {
   let raw = match self {
-    Windows => "windows"
-    Mac => "mac"
-    Linux => "linux"
-    Ubuntu => "ubuntu"
-    Browser => "browser"
-    Unknown(raw) => raw
+    ComputerUsePreviewToolEnvironment::Windows => "windows"
+    ComputerUsePreviewToolEnvironment::Mac => "mac"
+    ComputerUsePreviewToolEnvironment::Linux => "linux"
+    ComputerUsePreviewToolEnvironment::Ubuntu => "ubuntu"
+    ComputerUsePreviewToolEnvironment::Browser => "browser"
+    ComputerUsePreviewToolEnvironment::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8003,15 +8173,15 @@ pub impl @json.FromJson for ComputerUsePreviewToolEnvironment with fn from_json(
     path,
     raw => {
       match raw {
-        "windows" => Some(Windows)
-        "mac" => Some(Mac)
-        "linux" => Some(Linux)
-        "ubuntu" => Some(Ubuntu)
-        "browser" => Some(Browser)
-        _ => None
+        "windows" => Option::Some(ComputerUsePreviewToolEnvironment::Windows)
+        "mac" => Option::Some(ComputerUsePreviewToolEnvironment::Mac)
+        "linux" => Option::Some(ComputerUsePreviewToolEnvironment::Linux)
+        "ubuntu" => Option::Some(ComputerUsePreviewToolEnvironment::Ubuntu)
+        "browser" => Option::Some(ComputerUsePreviewToolEnvironment::Browser)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ComputerUsePreviewToolEnvironment::Unknown(raw),
   )
 }
 
@@ -8105,11 +8275,11 @@ pub extend Tool with ToJson::{to_json}
 ///|
 pub impl ToJson for Tool with fn to_json(self) {
   match self {
-    FileSearch(value) => Json(value)
-    Function(value) => Json(value)
-    WebSearchPreview(value) => Json(value)
-    ComputerUsePreview(value) => Json(value)
-    Unknown(_, value) => value
+    Tool::FileSearch(value) => @json.Json::Json(value)
+    Tool::Function(value) => @json.Json::Json(value)
+    Tool::WebSearchPreview(value) => @json.Json::Json(value)
+    Tool::ComputerUsePreview(value) => @json.Json::Json(value)
+    Tool::Unknown(_, value) => value
   }
 }
 
@@ -8123,11 +8293,13 @@ pub impl @json.FromJson for Tool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "file_search" => FileSearch(@json.from_json(value, path~))
-    "function" => Function(@json.from_json(value, path~))
-    "web_search_preview" => WebSearchPreview(@json.from_json(value, path~))
-    "computer_use_preview" => ComputerUsePreview(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "file_search" => Tool::FileSearch(@json.from_json(value, path~))
+    "function" => Tool::Function(@json.from_json(value, path~))
+    "web_search_preview" =>
+      Tool::WebSearchPreview(@json.from_json(value, path~))
+    "computer_use_preview" =>
+      Tool::ComputerUsePreview(@json.from_json(value, path~))
+    other => Tool::Unknown(other, value)
   }
 }
 
@@ -8156,11 +8328,11 @@ pub extend CreateResponseTruncation with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateResponseTruncation with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Disabled => "disabled"
-    Custom(raw) => raw
+    CreateResponseTruncation::Auto => "auto"
+    CreateResponseTruncation::Disabled => "disabled"
+    CreateResponseTruncation::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8178,12 +8350,12 @@ pub impl @json.FromJson for CreateResponseTruncation with fn from_json(
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "disabled" => Some(Disabled)
-        _ => None
+        "auto" => Option::Some(CreateResponseTruncation::Auto)
+        "disabled" => Option::Some(CreateResponseTruncation::Disabled)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CreateResponseTruncation::Custom(raw),
   )
 }
 
@@ -8389,10 +8561,10 @@ pub extend Annotation with ToJson::{to_json}
 ///|
 pub impl ToJson for Annotation with fn to_json(self) {
   match self {
-    FileCitation(value) => Json(value)
-    UrlCitation(value) => Json(value)
-    FilePath(value) => Json(value)
-    Unknown(_, value) => value
+    Annotation::FileCitation(value) => @json.Json::Json(value)
+    Annotation::UrlCitation(value) => @json.Json::Json(value)
+    Annotation::FilePath(value) => @json.Json::Json(value)
+    Annotation::Unknown(_, value) => value
   }
 }
 
@@ -8406,10 +8578,10 @@ pub impl @json.FromJson for Annotation with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "file_citation" => FileCitation(@json.from_json(value, path~))
-    "url_citation" => UrlCitation(@json.from_json(value, path~))
-    "file_path" => FilePath(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "file_citation" => Annotation::FileCitation(@json.from_json(value, path~))
+    "url_citation" => Annotation::UrlCitation(@json.from_json(value, path~))
+    "file_path" => Annotation::FilePath(@json.from_json(value, path~))
+    other => Annotation::Unknown(other, value)
   }
 }
 
@@ -8546,9 +8718,9 @@ pub extend OutputContent with ToJson::{to_json}
 ///|
 pub impl ToJson for OutputContent with fn to_json(self) {
   match self {
-    OutputText(value) => Json(value)
-    Refusal(value) => Json(value)
-    Unknown(_, value) => value
+    OutputContent::OutputText(value) => @json.Json::Json(value)
+    OutputContent::Refusal(value) => @json.Json::Json(value)
+    OutputContent::Unknown(_, value) => value
   }
 }
 
@@ -8562,9 +8734,9 @@ pub impl @json.FromJson for OutputContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "output_text" => OutputText(@json.from_json(value, path~))
-    "refusal" => Refusal(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "output_text" => OutputContent::OutputText(@json.from_json(value, path~))
+    "refusal" => OutputContent::Refusal(@json.from_json(value, path~))
+    other => OutputContent::Unknown(other, value)
   }
 }
 
@@ -8594,12 +8766,12 @@ pub extend OutputMessageStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for OutputMessageStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Unknown(raw) => raw
+    OutputMessageStatus::InProgress => "in_progress"
+    OutputMessageStatus::Completed => "completed"
+    OutputMessageStatus::Incomplete => "incomplete"
+    OutputMessageStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8614,13 +8786,13 @@ pub impl @json.FromJson for OutputMessageStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "in_progress" => Option::Some(OutputMessageStatus::InProgress)
+        "completed" => Option::Some(OutputMessageStatus::Completed)
+        "incomplete" => Option::Some(OutputMessageStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => OutputMessageStatus::Unknown(raw),
   )
 }
 
@@ -8712,13 +8884,13 @@ pub extend EasyInputMessageRole with ToJson::{to_json}
 ///|
 pub impl ToJson for EasyInputMessageRole with fn to_json(self) {
   let raw = match self {
-    User => "user"
-    Assistant => "assistant"
-    System => "system"
-    Developer => "developer"
-    Custom(raw) => raw
+    EasyInputMessageRole::User => "user"
+    EasyInputMessageRole::Assistant => "assistant"
+    EasyInputMessageRole::System => "system"
+    EasyInputMessageRole::Developer => "developer"
+    EasyInputMessageRole::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8733,14 +8905,14 @@ pub impl @json.FromJson for EasyInputMessageRole with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "user" => Some(User)
-        "assistant" => Some(Assistant)
-        "system" => Some(System)
-        "developer" => Some(Developer)
-        _ => None
+        "user" => Option::Some(EasyInputMessageRole::User)
+        "assistant" => Option::Some(EasyInputMessageRole::Assistant)
+        "system" => Option::Some(EasyInputMessageRole::System)
+        "developer" => Option::Some(EasyInputMessageRole::Developer)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EasyInputMessageRole::Custom(raw),
   )
 }
 
@@ -8822,12 +8994,12 @@ pub extend InputImageContentDetail with ToJson::{to_json}
 ///|
 pub impl ToJson for InputImageContentDetail with fn to_json(self) {
   let raw = match self {
-    Low => "low"
-    High => "high"
-    Auto => "auto"
-    Custom(raw) => raw
+    InputImageContentDetail::Low => "low"
+    InputImageContentDetail::High => "high"
+    InputImageContentDetail::Auto => "auto"
+    InputImageContentDetail::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8845,13 +9017,13 @@ pub impl @json.FromJson for InputImageContentDetail with fn from_json(
     path,
     raw => {
       match raw {
-        "low" => Some(Low)
-        "high" => Some(High)
-        "auto" => Some(Auto)
-        _ => None
+        "low" => Option::Some(InputImageContentDetail::Low)
+        "high" => Option::Some(InputImageContentDetail::High)
+        "auto" => Option::Some(InputImageContentDetail::Auto)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => InputImageContentDetail::Custom(raw),
   )
 }
 
@@ -9011,10 +9183,10 @@ pub extend InputContent with ToJson::{to_json}
 ///|
 pub impl ToJson for InputContent with fn to_json(self) {
   match self {
-    InputText(value) => Json(value)
-    InputImage(value) => Json(value)
-    InputFile(value) => Json(value)
-    Unknown(_, value) => value
+    InputContent::InputText(value) => @json.Json::Json(value)
+    InputContent::InputImage(value) => @json.Json::Json(value)
+    InputContent::InputFile(value) => @json.Json::Json(value)
+    InputContent::Unknown(_, value) => value
   }
 }
 
@@ -9028,10 +9200,10 @@ pub impl @json.FromJson for InputContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "input_text" => InputText(@json.from_json(value, path~))
-    "input_image" => InputImage(@json.from_json(value, path~))
-    "input_file" => InputFile(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "input_text" => InputContent::InputText(@json.from_json(value, path~))
+    "input_image" => InputContent::InputImage(@json.from_json(value, path~))
+    "input_file" => InputContent::InputFile(@json.from_json(value, path~))
+    other => InputContent::Unknown(other, value)
   }
 }
 
@@ -9059,8 +9231,9 @@ pub extend EasyInputMessageContent with ToJson::{to_json}
 ///|
 pub impl ToJson for EasyInputMessageContent with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    InputMessageContentList(value) => Json(value)
+    EasyInputMessageContent::Text(value) => @json.Json::Json(value)
+    EasyInputMessageContent::InputMessageContentList(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -9074,15 +9247,15 @@ pub impl @json.FromJson for EasyInputMessageContent with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return EasyInputMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[InputContent] = @json.from_json(value, path~)
-    return InputMessageContentList(decoded)
+    return EasyInputMessageContent::InputMessageContentList(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any EasyInputMessageContent variant"),
   )
 }
@@ -9169,12 +9342,12 @@ pub extend InputMessageRole with ToJson::{to_json}
 ///|
 pub impl ToJson for InputMessageRole with fn to_json(self) {
   let raw = match self {
-    User => "user"
-    System => "system"
-    Developer => "developer"
-    Custom(raw) => raw
+    InputMessageRole::User => "user"
+    InputMessageRole::System => "system"
+    InputMessageRole::Developer => "developer"
+    InputMessageRole::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9189,13 +9362,13 @@ pub impl @json.FromJson for InputMessageRole with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "user" => Some(User)
-        "system" => Some(System)
-        "developer" => Some(Developer)
-        _ => None
+        "user" => Option::Some(InputMessageRole::User)
+        "system" => Option::Some(InputMessageRole::System)
+        "developer" => Option::Some(InputMessageRole::Developer)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => InputMessageRole::Custom(raw),
   )
 }
 
@@ -9225,12 +9398,12 @@ pub extend InputMessageStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for InputMessageStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Custom(raw) => raw
+    InputMessageStatus::InProgress => "in_progress"
+    InputMessageStatus::Completed => "completed"
+    InputMessageStatus::Incomplete => "incomplete"
+    InputMessageStatus::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9245,13 +9418,13 @@ pub impl @json.FromJson for InputMessageStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "in_progress" => Option::Some(InputMessageStatus::InProgress)
+        "completed" => Option::Some(InputMessageStatus::Completed)
+        "incomplete" => Option::Some(InputMessageStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => InputMessageStatus::Custom(raw),
   )
 }
 
@@ -9343,14 +9516,14 @@ pub extend FileSearchToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for FileSearchToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Searching => "searching"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Failed => "failed"
-    Unknown(raw) => raw
+    FileSearchToolCallStatus::InProgress => "in_progress"
+    FileSearchToolCallStatus::Searching => "searching"
+    FileSearchToolCallStatus::Completed => "completed"
+    FileSearchToolCallStatus::Incomplete => "incomplete"
+    FileSearchToolCallStatus::Failed => "failed"
+    FileSearchToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9368,15 +9541,15 @@ pub impl @json.FromJson for FileSearchToolCallStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "searching" => Some(Searching)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        "failed" => Some(Failed)
-        _ => None
+        "in_progress" => Option::Some(FileSearchToolCallStatus::InProgress)
+        "searching" => Option::Some(FileSearchToolCallStatus::Searching)
+        "completed" => Option::Some(FileSearchToolCallStatus::Completed)
+        "incomplete" => Option::Some(FileSearchToolCallStatus::Incomplete)
+        "failed" => Option::Some(FileSearchToolCallStatus::Failed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FileSearchToolCallStatus::Unknown(raw),
   )
 }
 
@@ -9405,9 +9578,9 @@ pub extend VectorStoreFileAttributesValue with ToJson::{to_json}
 ///|
 pub impl ToJson for VectorStoreFileAttributesValue with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    Number(value) => Json(value)
-    Bool(value) => Json(value)
+    VectorStoreFileAttributesValue::Text(value) => @json.Json::Json(value)
+    VectorStoreFileAttributesValue::Number(value) => @json.Json::Json(value)
+    VectorStoreFileAttributesValue::Bool(value) => @json.Json::Json(value)
   }
 }
 
@@ -9421,19 +9594,19 @@ pub impl @json.FromJson for VectorStoreFileAttributesValue with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return VectorStoreFileAttributesValue::Text(decoded)
   }
-  if value is Number(_, ..) {
+  if value is @json.Json::Number(_, ..) {
     let decoded : Double = @json.from_json(value, path~)
-    return Number(decoded)
+    return VectorStoreFileAttributesValue::Number(decoded)
   }
-  if value is True || value is False {
+  if value is @json.Json::True || value is @json.Json::False {
     let decoded : Bool = @json.from_json(value, path~)
-    return Bool(decoded)
+    return VectorStoreFileAttributesValue::Bool(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any VectorStoreFileAttributesValue variant",
     ),
@@ -9672,12 +9845,12 @@ pub extend ComputerCallOutputItemParamStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerCallOutputItemParamStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Custom(raw) => raw
+    ComputerCallOutputItemParamStatus::InProgress => "in_progress"
+    ComputerCallOutputItemParamStatus::Completed => "completed"
+    ComputerCallOutputItemParamStatus::Incomplete => "incomplete"
+    ComputerCallOutputItemParamStatus::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9695,13 +9868,16 @@ pub impl @json.FromJson for ComputerCallOutputItemParamStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "in_progress" =>
+          Option::Some(ComputerCallOutputItemParamStatus::InProgress)
+        "completed" =>
+          Option::Some(ComputerCallOutputItemParamStatus::Completed)
+        "incomplete" =>
+          Option::Some(ComputerCallOutputItemParamStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ComputerCallOutputItemParamStatus::Custom(raw),
   )
 }
 
@@ -9816,13 +9992,13 @@ pub extend WebSearchToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Searching => "searching"
-    Completed => "completed"
-    Failed => "failed"
-    Unknown(raw) => raw
+    WebSearchToolCallStatus::InProgress => "in_progress"
+    WebSearchToolCallStatus::Searching => "searching"
+    WebSearchToolCallStatus::Completed => "completed"
+    WebSearchToolCallStatus::Failed => "failed"
+    WebSearchToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9840,14 +10016,14 @@ pub impl @json.FromJson for WebSearchToolCallStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "searching" => Some(Searching)
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        _ => None
+        "in_progress" => Option::Some(WebSearchToolCallStatus::InProgress)
+        "searching" => Option::Some(WebSearchToolCallStatus::Searching)
+        "completed" => Option::Some(WebSearchToolCallStatus::Completed)
+        "failed" => Option::Some(WebSearchToolCallStatus::Failed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => WebSearchToolCallStatus::Unknown(raw),
   )
 }
 
@@ -9933,12 +10109,12 @@ pub extend FunctionToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Unknown(raw) => raw
+    FunctionToolCallStatus::InProgress => "in_progress"
+    FunctionToolCallStatus::Completed => "completed"
+    FunctionToolCallStatus::Incomplete => "incomplete"
+    FunctionToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9956,13 +10132,13 @@ pub impl @json.FromJson for FunctionToolCallStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "in_progress" => Option::Some(FunctionToolCallStatus::InProgress)
+        "completed" => Option::Some(FunctionToolCallStatus::Completed)
+        "incomplete" => Option::Some(FunctionToolCallStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FunctionToolCallStatus::Unknown(raw),
   )
 }
 
@@ -10060,12 +10236,12 @@ pub extend FunctionCallOutputItemParamStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionCallOutputItemParamStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Custom(raw) => raw
+    FunctionCallOutputItemParamStatus::InProgress => "in_progress"
+    FunctionCallOutputItemParamStatus::Completed => "completed"
+    FunctionCallOutputItemParamStatus::Incomplete => "incomplete"
+    FunctionCallOutputItemParamStatus::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -10083,13 +10259,16 @@ pub impl @json.FromJson for FunctionCallOutputItemParamStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "in_progress" =>
+          Option::Some(FunctionCallOutputItemParamStatus::InProgress)
+        "completed" =>
+          Option::Some(FunctionCallOutputItemParamStatus::Completed)
+        "incomplete" =>
+          Option::Some(FunctionCallOutputItemParamStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => FunctionCallOutputItemParamStatus::Custom(raw),
   )
 }
 
@@ -10242,12 +10421,12 @@ pub extend ReasoningItemStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for ReasoningItemStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Unknown(raw) => raw
+    ReasoningItemStatus::InProgress => "in_progress"
+    ReasoningItemStatus::Completed => "completed"
+    ReasoningItemStatus::Incomplete => "incomplete"
+    ReasoningItemStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -10262,13 +10441,13 @@ pub impl @json.FromJson for ReasoningItemStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "in_progress" => Option::Some(ReasoningItemStatus::InProgress)
+        "completed" => Option::Some(ReasoningItemStatus::Completed)
+        "incomplete" => Option::Some(ReasoningItemStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ReasoningItemStatus::Unknown(raw),
   )
 }
 
@@ -10472,18 +10651,18 @@ pub extend InputItem with ToJson::{to_json}
 ///|
 pub impl ToJson for InputItem with fn to_json(self) {
   match self {
-    OutputMessage(value) => Json(value)
-    EasyInputMessage(value) => Json(value)
-    InputMessage(value) => Json(value)
-    FileSearchCall(value) => Json(value)
-    ComputerCall(value) => Json(value)
-    ComputerCallOutput(value) => Json(value)
-    WebSearchCall(value) => Json(value)
-    FunctionCall(value) => Json(value)
-    FunctionCallOutput(value) => Json(value)
-    Reasoning(value) => Json(value)
-    ItemReference(value) => Json(value)
-    Unknown(_, value) => value
+    InputItem::OutputMessage(value) => @json.Json::Json(value)
+    InputItem::EasyInputMessage(value) => @json.Json::Json(value)
+    InputItem::InputMessage(value) => @json.Json::Json(value)
+    InputItem::FileSearchCall(value) => @json.Json::Json(value)
+    InputItem::ComputerCall(value) => @json.Json::Json(value)
+    InputItem::ComputerCallOutput(value) => @json.Json::Json(value)
+    InputItem::WebSearchCall(value) => @json.Json::Json(value)
+    InputItem::FunctionCall(value) => @json.Json::Json(value)
+    InputItem::FunctionCallOutput(value) => @json.Json::Json(value)
+    InputItem::Reasoning(value) => @json.Json::Json(value)
+    InputItem::ItemReference(value) => @json.Json::Json(value)
+    InputItem::Unknown(_, value) => value
   }
 }
 
@@ -10503,23 +10682,26 @@ pub impl @json.FromJson for InputItem with fn from_json(value, path) {
         obj.contains("role") &&
         obj.contains("status") &&
         obj.contains("type") {
-        OutputMessage(@json.from_json(value, path~))
+        InputItem::OutputMessage(@json.from_json(value, path~))
       } else if obj.contains("content") && obj.contains("role") {
-        EasyInputMessage(@json.from_json(value, path~))
+        InputItem::EasyInputMessage(@json.from_json(value, path~))
       } else if obj.contains("content") && obj.contains("role") {
-        InputMessage(@json.from_json(value, path~))
+        InputItem::InputMessage(@json.from_json(value, path~))
       } else {
-        Unknown(tag, value)
+        InputItem::Unknown(tag, value)
       }
-    "file_search_call" => FileSearchCall(@json.from_json(value, path~))
-    "computer_call" => ComputerCall(@json.from_json(value, path~))
-    "computer_call_output" => ComputerCallOutput(@json.from_json(value, path~))
-    "web_search_call" => WebSearchCall(@json.from_json(value, path~))
-    "function_call" => FunctionCall(@json.from_json(value, path~))
-    "function_call_output" => FunctionCallOutput(@json.from_json(value, path~))
-    "reasoning" => Reasoning(@json.from_json(value, path~))
-    "item_reference" => ItemReference(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "file_search_call" =>
+      InputItem::FileSearchCall(@json.from_json(value, path~))
+    "computer_call" => InputItem::ComputerCall(@json.from_json(value, path~))
+    "computer_call_output" =>
+      InputItem::ComputerCallOutput(@json.from_json(value, path~))
+    "web_search_call" => InputItem::WebSearchCall(@json.from_json(value, path~))
+    "function_call" => InputItem::FunctionCall(@json.from_json(value, path~))
+    "function_call_output" =>
+      InputItem::FunctionCallOutput(@json.from_json(value, path~))
+    "reasoning" => InputItem::Reasoning(@json.from_json(value, path~))
+    "item_reference" => InputItem::ItemReference(@json.from_json(value, path~))
+    other => InputItem::Unknown(other, value)
   }
 }
 
@@ -10547,8 +10729,8 @@ pub extend CreateResponseInput with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateResponseInput with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    InputItemArray(value) => Json(value)
+    CreateResponseInput::Text(value) => @json.Json::Json(value)
+    CreateResponseInput::InputItemArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -10559,15 +10741,15 @@ pub extend CreateResponseInput with @json.FromJson::{from_json}
 
 ///|
 pub impl @json.FromJson for CreateResponseInput with fn from_json(value, path) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return CreateResponseInput::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[InputItem] = @json.from_json(value, path~)
-    return InputItemArray(decoded)
+    return CreateResponseInput::InputItemArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any CreateResponseInput variant"),
   )
 }
@@ -10598,12 +10780,13 @@ pub extend Includable with ToJson::{to_json}
 ///|
 pub impl ToJson for Includable with fn to_json(self) {
   let raw = match self {
-    FileSearchCallResults => "file_search_call.results"
-    MessageInputImageImageUrl => "message.input_image.image_url"
-    ComputerCallOutputOutputImageUrl => "computer_call_output.output.image_url"
-    Custom(raw) => raw
+    Includable::FileSearchCallResults => "file_search_call.results"
+    Includable::MessageInputImageImageUrl => "message.input_image.image_url"
+    Includable::ComputerCallOutputOutputImageUrl =>
+      "computer_call_output.output.image_url"
+    Includable::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -10618,14 +10801,16 @@ pub impl @json.FromJson for Includable with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "file_search_call.results" => Some(FileSearchCallResults)
-        "message.input_image.image_url" => Some(MessageInputImageImageUrl)
+        "file_search_call.results" =>
+          Option::Some(Includable::FileSearchCallResults)
+        "message.input_image.image_url" =>
+          Option::Some(Includable::MessageInputImageImageUrl)
         "computer_call_output.output.image_url" =>
-          Some(ComputerCallOutputOutputImageUrl)
-        _ => None
+          Option::Some(Includable::ComputerCallOutputOutputImageUrl)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Includable::Custom(raw),
   )
 }
 
@@ -10805,16 +10990,16 @@ pub extend Item with ToJson::{to_json}
 ///|
 pub impl ToJson for Item with fn to_json(self) {
   match self {
-    OutputMessage(value) => Json(value)
-    InputMessage(value) => Json(value)
-    FileSearchCall(value) => Json(value)
-    ComputerCall(value) => Json(value)
-    ComputerCallOutput(value) => Json(value)
-    WebSearchCall(value) => Json(value)
-    FunctionCall(value) => Json(value)
-    FunctionCallOutput(value) => Json(value)
-    Reasoning(value) => Json(value)
-    Unknown(_, value) => value
+    Item::OutputMessage(value) => @json.Json::Json(value)
+    Item::InputMessage(value) => @json.Json::Json(value)
+    Item::FileSearchCall(value) => @json.Json::Json(value)
+    Item::ComputerCall(value) => @json.Json::Json(value)
+    Item::ComputerCallOutput(value) => @json.Json::Json(value)
+    Item::WebSearchCall(value) => @json.Json::Json(value)
+    Item::FunctionCall(value) => @json.Json::Json(value)
+    Item::FunctionCallOutput(value) => @json.Json::Json(value)
+    Item::Reasoning(value) => @json.Json::Json(value)
+    Item::Unknown(_, value) => value
   }
 }
 
@@ -10828,8 +11013,8 @@ pub impl @json.FromJson for Item with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   // A missing or null "type" selects InputMessage, the one variant whose payload does not require it.
   let tag : String = match obj.get("type") {
-    None | Some(Null) => "message"
-    Some(raw) => @json.from_json(raw, path=path.add_key("type"))
+    Option::None | Option::Some(@json.Json::Null) => "message"
+    Option::Some(raw) => @json.from_json(raw, path=path.add_key("type"))
   }
   match tag {
     "message" =>
@@ -10838,20 +11023,22 @@ pub impl @json.FromJson for Item with fn from_json(value, path) {
         obj.contains("role") &&
         obj.contains("status") &&
         obj.contains("type") {
-        OutputMessage(@json.from_json(value, path~))
+        Item::OutputMessage(@json.from_json(value, path~))
       } else if obj.contains("content") && obj.contains("role") {
-        InputMessage(@json.from_json(value, path~))
+        Item::InputMessage(@json.from_json(value, path~))
       } else {
-        Unknown(tag, value)
+        Item::Unknown(tag, value)
       }
-    "file_search_call" => FileSearchCall(@json.from_json(value, path~))
-    "computer_call" => ComputerCall(@json.from_json(value, path~))
-    "computer_call_output" => ComputerCallOutput(@json.from_json(value, path~))
-    "web_search_call" => WebSearchCall(@json.from_json(value, path~))
-    "function_call" => FunctionCall(@json.from_json(value, path~))
-    "function_call_output" => FunctionCallOutput(@json.from_json(value, path~))
-    "reasoning" => Reasoning(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "file_search_call" => Item::FileSearchCall(@json.from_json(value, path~))
+    "computer_call" => Item::ComputerCall(@json.from_json(value, path~))
+    "computer_call_output" =>
+      Item::ComputerCallOutput(@json.from_json(value, path~))
+    "web_search_call" => Item::WebSearchCall(@json.from_json(value, path~))
+    "function_call" => Item::FunctionCall(@json.from_json(value, path~))
+    "function_call_output" =>
+      Item::FunctionCallOutput(@json.from_json(value, path~))
+    "reasoning" => Item::Reasoning(@json.from_json(value, path~))
+    other => Item::Unknown(other, value)
   }
 }
 
@@ -10982,13 +11169,13 @@ pub extend OutputItem with ToJson::{to_json}
 ///|
 pub impl ToJson for OutputItem with fn to_json(self) {
   match self {
-    Message(value) => Json(value)
-    FileSearchCall(value) => Json(value)
-    FunctionCall(value) => Json(value)
-    WebSearchCall(value) => Json(value)
-    ComputerCall(value) => Json(value)
-    Reasoning(value) => Json(value)
-    Unknown(_, value) => value
+    OutputItem::Message(value) => @json.Json::Json(value)
+    OutputItem::FileSearchCall(value) => @json.Json::Json(value)
+    OutputItem::FunctionCall(value) => @json.Json::Json(value)
+    OutputItem::WebSearchCall(value) => @json.Json::Json(value)
+    OutputItem::ComputerCall(value) => @json.Json::Json(value)
+    OutputItem::Reasoning(value) => @json.Json::Json(value)
+    OutputItem::Unknown(_, value) => value
   }
 }
 
@@ -11002,13 +11189,15 @@ pub impl @json.FromJson for OutputItem with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "message" => Message(@json.from_json(value, path~))
-    "file_search_call" => FileSearchCall(@json.from_json(value, path~))
-    "function_call" => FunctionCall(@json.from_json(value, path~))
-    "web_search_call" => WebSearchCall(@json.from_json(value, path~))
-    "computer_call" => ComputerCall(@json.from_json(value, path~))
-    "reasoning" => Reasoning(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "message" => OutputItem::Message(@json.from_json(value, path~))
+    "file_search_call" =>
+      OutputItem::FileSearchCall(@json.from_json(value, path~))
+    "function_call" => OutputItem::FunctionCall(@json.from_json(value, path~))
+    "web_search_call" =>
+      OutputItem::WebSearchCall(@json.from_json(value, path~))
+    "computer_call" => OutputItem::ComputerCall(@json.from_json(value, path~))
+    "reasoning" => OutputItem::Reasoning(@json.from_json(value, path~))
+    other => OutputItem::Unknown(other, value)
   }
 }
 
@@ -11081,11 +11270,11 @@ pub extend ResponseTruncation with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseTruncation with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Disabled => "disabled"
-    Unknown(raw) => raw
+    ResponseTruncation::Auto => "auto"
+    ResponseTruncation::Disabled => "disabled"
+    ResponseTruncation::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -11100,12 +11289,12 @@ pub impl @json.FromJson for ResponseTruncation with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "disabled" => Some(Disabled)
-        _ => None
+        "auto" => Option::Some(ResponseTruncation::Auto)
+        "disabled" => Option::Some(ResponseTruncation::Disabled)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ResponseTruncation::Unknown(raw),
   )
 }
 
@@ -11136,13 +11325,13 @@ pub extend ResponseStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseStatus with fn to_json(self) {
   let raw = match self {
-    Completed => "completed"
-    Failed => "failed"
-    InProgress => "in_progress"
-    Incomplete => "incomplete"
-    Unknown(raw) => raw
+    ResponseStatus::Completed => "completed"
+    ResponseStatus::Failed => "failed"
+    ResponseStatus::InProgress => "in_progress"
+    ResponseStatus::Incomplete => "incomplete"
+    ResponseStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -11157,14 +11346,14 @@ pub impl @json.FromJson for ResponseStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        "in_progress" => Some(InProgress)
-        "incomplete" => Some(Incomplete)
-        _ => None
+        "completed" => Option::Some(ResponseStatus::Completed)
+        "failed" => Option::Some(ResponseStatus::Failed)
+        "in_progress" => Option::Some(ResponseStatus::InProgress)
+        "incomplete" => Option::Some(ResponseStatus::Incomplete)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ResponseStatus::Unknown(raw),
   )
 }
 
@@ -11209,27 +11398,29 @@ pub extend ResponseErrorCode with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseErrorCode with fn to_json(self) {
   let raw = match self {
-    ServerError => "server_error"
-    RateLimitExceeded => "rate_limit_exceeded"
-    InvalidPrompt => "invalid_prompt"
-    VectorStoreTimeout => "vector_store_timeout"
-    InvalidImage => "invalid_image"
-    InvalidImageFormat => "invalid_image_format"
-    InvalidBase64Image => "invalid_base64_image"
-    InvalidImageUrl => "invalid_image_url"
-    ImageTooLarge => "image_too_large"
-    ImageTooSmall => "image_too_small"
-    ImageParseError => "image_parse_error"
-    ImageContentPolicyViolation => "image_content_policy_violation"
-    InvalidImageMode => "invalid_image_mode"
-    ImageFileTooLarge => "image_file_too_large"
-    UnsupportedImageMediaType => "unsupported_image_media_type"
-    EmptyImageFile => "empty_image_file"
-    FailedToDownloadImage => "failed_to_download_image"
-    ImageFileNotFound => "image_file_not_found"
-    Unknown(raw) => raw
+    ResponseErrorCode::ServerError => "server_error"
+    ResponseErrorCode::RateLimitExceeded => "rate_limit_exceeded"
+    ResponseErrorCode::InvalidPrompt => "invalid_prompt"
+    ResponseErrorCode::VectorStoreTimeout => "vector_store_timeout"
+    ResponseErrorCode::InvalidImage => "invalid_image"
+    ResponseErrorCode::InvalidImageFormat => "invalid_image_format"
+    ResponseErrorCode::InvalidBase64Image => "invalid_base64_image"
+    ResponseErrorCode::InvalidImageUrl => "invalid_image_url"
+    ResponseErrorCode::ImageTooLarge => "image_too_large"
+    ResponseErrorCode::ImageTooSmall => "image_too_small"
+    ResponseErrorCode::ImageParseError => "image_parse_error"
+    ResponseErrorCode::ImageContentPolicyViolation =>
+      "image_content_policy_violation"
+    ResponseErrorCode::InvalidImageMode => "invalid_image_mode"
+    ResponseErrorCode::ImageFileTooLarge => "image_file_too_large"
+    ResponseErrorCode::UnsupportedImageMediaType =>
+      "unsupported_image_media_type"
+    ResponseErrorCode::EmptyImageFile => "empty_image_file"
+    ResponseErrorCode::FailedToDownloadImage => "failed_to_download_image"
+    ResponseErrorCode::ImageFileNotFound => "image_file_not_found"
+    ResponseErrorCode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -11244,28 +11435,38 @@ pub impl @json.FromJson for ResponseErrorCode with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "server_error" => Some(ServerError)
-        "rate_limit_exceeded" => Some(RateLimitExceeded)
-        "invalid_prompt" => Some(InvalidPrompt)
-        "vector_store_timeout" => Some(VectorStoreTimeout)
-        "invalid_image" => Some(InvalidImage)
-        "invalid_image_format" => Some(InvalidImageFormat)
-        "invalid_base64_image" => Some(InvalidBase64Image)
-        "invalid_image_url" => Some(InvalidImageUrl)
-        "image_too_large" => Some(ImageTooLarge)
-        "image_too_small" => Some(ImageTooSmall)
-        "image_parse_error" => Some(ImageParseError)
-        "image_content_policy_violation" => Some(ImageContentPolicyViolation)
-        "invalid_image_mode" => Some(InvalidImageMode)
-        "image_file_too_large" => Some(ImageFileTooLarge)
-        "unsupported_image_media_type" => Some(UnsupportedImageMediaType)
-        "empty_image_file" => Some(EmptyImageFile)
-        "failed_to_download_image" => Some(FailedToDownloadImage)
-        "image_file_not_found" => Some(ImageFileNotFound)
-        _ => None
+        "server_error" => Option::Some(ResponseErrorCode::ServerError)
+        "rate_limit_exceeded" =>
+          Option::Some(ResponseErrorCode::RateLimitExceeded)
+        "invalid_prompt" => Option::Some(ResponseErrorCode::InvalidPrompt)
+        "vector_store_timeout" =>
+          Option::Some(ResponseErrorCode::VectorStoreTimeout)
+        "invalid_image" => Option::Some(ResponseErrorCode::InvalidImage)
+        "invalid_image_format" =>
+          Option::Some(ResponseErrorCode::InvalidImageFormat)
+        "invalid_base64_image" =>
+          Option::Some(ResponseErrorCode::InvalidBase64Image)
+        "invalid_image_url" => Option::Some(ResponseErrorCode::InvalidImageUrl)
+        "image_too_large" => Option::Some(ResponseErrorCode::ImageTooLarge)
+        "image_too_small" => Option::Some(ResponseErrorCode::ImageTooSmall)
+        "image_parse_error" => Option::Some(ResponseErrorCode::ImageParseError)
+        "image_content_policy_violation" =>
+          Option::Some(ResponseErrorCode::ImageContentPolicyViolation)
+        "invalid_image_mode" =>
+          Option::Some(ResponseErrorCode::InvalidImageMode)
+        "image_file_too_large" =>
+          Option::Some(ResponseErrorCode::ImageFileTooLarge)
+        "unsupported_image_media_type" =>
+          Option::Some(ResponseErrorCode::UnsupportedImageMediaType)
+        "empty_image_file" => Option::Some(ResponseErrorCode::EmptyImageFile)
+        "failed_to_download_image" =>
+          Option::Some(ResponseErrorCode::FailedToDownloadImage)
+        "image_file_not_found" =>
+          Option::Some(ResponseErrorCode::ImageFileNotFound)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ResponseErrorCode::Unknown(raw),
   )
 }
 
@@ -11346,11 +11547,11 @@ pub extend ResponseIncompleteDetailsReason with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseIncompleteDetailsReason with fn to_json(self) {
   let raw = match self {
-    MaxOutputTokens => "max_output_tokens"
-    ContentFilter => "content_filter"
-    Unknown(raw) => raw
+    ResponseIncompleteDetailsReason::MaxOutputTokens => "max_output_tokens"
+    ResponseIncompleteDetailsReason::ContentFilter => "content_filter"
+    ResponseIncompleteDetailsReason::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -11368,12 +11569,14 @@ pub impl @json.FromJson for ResponseIncompleteDetailsReason with fn from_json(
     path,
     raw => {
       match raw {
-        "max_output_tokens" => Some(MaxOutputTokens)
-        "content_filter" => Some(ContentFilter)
-        _ => None
+        "max_output_tokens" =>
+          Option::Some(ResponseIncompleteDetailsReason::MaxOutputTokens)
+        "content_filter" =>
+          Option::Some(ResponseIncompleteDetailsReason::ContentFilter)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ResponseIncompleteDetailsReason::Unknown(raw),
   )
 }
 
@@ -13250,11 +13453,11 @@ pub extend ResponsePropertiesTruncation with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponsePropertiesTruncation with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Disabled => "disabled"
-    Unknown(raw) => raw
+    ResponsePropertiesTruncation::Auto => "auto"
+    ResponsePropertiesTruncation::Disabled => "disabled"
+    ResponsePropertiesTruncation::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -13272,12 +13475,12 @@ pub impl @json.FromJson for ResponsePropertiesTruncation with fn from_json(
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "disabled" => Some(Disabled)
-        _ => None
+        "auto" => Option::Some(ResponsePropertiesTruncation::Auto)
+        "disabled" => Option::Some(ResponsePropertiesTruncation::Disabled)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ResponsePropertiesTruncation::Unknown(raw),
   )
 }
 
@@ -14344,43 +14547,69 @@ pub extend ResponseStreamEvent with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseStreamEvent with fn to_json(self) {
   match self {
-    ResponseAudioDelta(value) => Json(value)
-    ResponseAudioDone(value) => Json(value)
-    ResponseAudioTranscriptDelta(value) => Json(value)
-    ResponseAudioTranscriptDone(value) => Json(value)
-    ResponseCodeInterpreterCallCodeDelta(value) => Json(value)
-    ResponseCodeInterpreterCallCodeDone(value) => Json(value)
-    ResponseCodeInterpreterCallCompleted(value) => Json(value)
-    ResponseCodeInterpreterCallInProgress(value) => Json(value)
-    ResponseCodeInterpreterCallInterpreting(value) => Json(value)
-    ResponseCompleted(value) => Json(value)
-    ResponseContentPartAdded(value) => Json(value)
-    ResponseContentPartDone(value) => Json(value)
-    ResponseCreated(value) => Json(value)
-    Error(value) => Json(value)
-    ResponseFileSearchCallCompleted(value) => Json(value)
-    ResponseFileSearchCallInProgress(value) => Json(value)
-    ResponseFileSearchCallSearching(value) => Json(value)
-    ResponseFunctionCallArgumentsDelta(value) => Json(value)
-    ResponseFunctionCallArgumentsDone(value) => Json(value)
-    ResponseInProgress(value) => Json(value)
-    ResponseFailed(value) => Json(value)
-    ResponseIncomplete(value) => Json(value)
-    ResponseOutputItemAdded(value) => Json(value)
-    ResponseOutputItemDone(value) => Json(value)
-    ResponseReasoningSummaryPartAdded(value) => Json(value)
-    ResponseReasoningSummaryPartDone(value) => Json(value)
-    ResponseReasoningSummaryTextDelta(value) => Json(value)
-    ResponseReasoningSummaryTextDone(value) => Json(value)
-    ResponseRefusalDelta(value) => Json(value)
-    ResponseRefusalDone(value) => Json(value)
-    ResponseOutputTextAnnotationAdded(value) => Json(value)
-    ResponseOutputTextDelta(value) => Json(value)
-    ResponseOutputTextDone(value) => Json(value)
-    ResponseWebSearchCallCompleted(value) => Json(value)
-    ResponseWebSearchCallInProgress(value) => Json(value)
-    ResponseWebSearchCallSearching(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseStreamEvent::ResponseAudioDelta(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseAudioDone(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseAudioTranscriptDelta(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseAudioTranscriptDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseCodeInterpreterCallCodeDelta(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseCodeInterpreterCallCodeDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseCodeInterpreterCallCompleted(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseCodeInterpreterCallInProgress(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseCodeInterpreterCallInterpreting(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseCompleted(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseContentPartAdded(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseContentPartDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseCreated(value) => @json.Json::Json(value)
+    ResponseStreamEvent::Error(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseFileSearchCallCompleted(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseFileSearchCallInProgress(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseFileSearchCallSearching(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseFunctionCallArgumentsDelta(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseFunctionCallArgumentsDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseInProgress(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseFailed(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseIncomplete(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseOutputItemAdded(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseOutputItemDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseReasoningSummaryPartAdded(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseReasoningSummaryPartDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseReasoningSummaryTextDelta(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseReasoningSummaryTextDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseRefusalDelta(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseRefusalDone(value) => @json.Json::Json(value)
+    ResponseStreamEvent::ResponseOutputTextAnnotationAdded(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseOutputTextDelta(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseOutputTextDone(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseWebSearchCallCompleted(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseWebSearchCallInProgress(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::ResponseWebSearchCallSearching(value) =>
+      @json.Json::Json(value)
+    ResponseStreamEvent::Unknown(_, value) => value
   }
 }
 
@@ -14394,70 +14623,125 @@ pub impl @json.FromJson for ResponseStreamEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "response.audio.delta" => ResponseAudioDelta(@json.from_json(value, path~))
-    "response.audio.done" => ResponseAudioDone(@json.from_json(value, path~))
+    "response.audio.delta" =>
+      ResponseStreamEvent::ResponseAudioDelta(@json.from_json(value, path~))
+    "response.audio.done" =>
+      ResponseStreamEvent::ResponseAudioDone(@json.from_json(value, path~))
     "response.audio.transcript.delta" =>
-      ResponseAudioTranscriptDelta(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseAudioTranscriptDelta(
+        @json.from_json(value, path~),
+      )
     "response.audio.transcript.done" =>
-      ResponseAudioTranscriptDone(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseAudioTranscriptDone(
+        @json.from_json(value, path~),
+      )
     "response.code_interpreter_call.code.delta" =>
-      ResponseCodeInterpreterCallCodeDelta(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseCodeInterpreterCallCodeDelta(
+        @json.from_json(value, path~),
+      )
     "response.code_interpreter_call.code.done" =>
-      ResponseCodeInterpreterCallCodeDone(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseCodeInterpreterCallCodeDone(
+        @json.from_json(value, path~),
+      )
     "response.code_interpreter_call.completed" =>
-      ResponseCodeInterpreterCallCompleted(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseCodeInterpreterCallCompleted(
+        @json.from_json(value, path~),
+      )
     "response.code_interpreter_call.in_progress" =>
-      ResponseCodeInterpreterCallInProgress(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseCodeInterpreterCallInProgress(
+        @json.from_json(value, path~),
+      )
     "response.code_interpreter_call.interpreting" =>
-      ResponseCodeInterpreterCallInterpreting(@json.from_json(value, path~))
-    "response.completed" => ResponseCompleted(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseCodeInterpreterCallInterpreting(
+        @json.from_json(value, path~),
+      )
+    "response.completed" =>
+      ResponseStreamEvent::ResponseCompleted(@json.from_json(value, path~))
     "response.content_part.added" =>
-      ResponseContentPartAdded(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseContentPartAdded(
+        @json.from_json(value, path~),
+      )
     "response.content_part.done" =>
-      ResponseContentPartDone(@json.from_json(value, path~))
-    "response.created" => ResponseCreated(@json.from_json(value, path~))
-    "error" => Error(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseContentPartDone(
+        @json.from_json(value, path~),
+      )
+    "response.created" =>
+      ResponseStreamEvent::ResponseCreated(@json.from_json(value, path~))
+    "error" => ResponseStreamEvent::Error(@json.from_json(value, path~))
     "response.file_search_call.completed" =>
-      ResponseFileSearchCallCompleted(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseFileSearchCallCompleted(
+        @json.from_json(value, path~),
+      )
     "response.file_search_call.in_progress" =>
-      ResponseFileSearchCallInProgress(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseFileSearchCallInProgress(
+        @json.from_json(value, path~),
+      )
     "response.file_search_call.searching" =>
-      ResponseFileSearchCallSearching(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseFileSearchCallSearching(
+        @json.from_json(value, path~),
+      )
     "response.function_call_arguments.delta" =>
-      ResponseFunctionCallArgumentsDelta(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseFunctionCallArgumentsDelta(
+        @json.from_json(value, path~),
+      )
     "response.function_call_arguments.done" =>
-      ResponseFunctionCallArgumentsDone(@json.from_json(value, path~))
-    "response.in_progress" => ResponseInProgress(@json.from_json(value, path~))
-    "response.failed" => ResponseFailed(@json.from_json(value, path~))
-    "response.incomplete" => ResponseIncomplete(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseFunctionCallArgumentsDone(
+        @json.from_json(value, path~),
+      )
+    "response.in_progress" =>
+      ResponseStreamEvent::ResponseInProgress(@json.from_json(value, path~))
+    "response.failed" =>
+      ResponseStreamEvent::ResponseFailed(@json.from_json(value, path~))
+    "response.incomplete" =>
+      ResponseStreamEvent::ResponseIncomplete(@json.from_json(value, path~))
     "response.output_item.added" =>
-      ResponseOutputItemAdded(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseOutputItemAdded(
+        @json.from_json(value, path~),
+      )
     "response.output_item.done" =>
-      ResponseOutputItemDone(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseOutputItemDone(@json.from_json(value, path~))
     "response.reasoning_summary_part.added" =>
-      ResponseReasoningSummaryPartAdded(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseReasoningSummaryPartAdded(
+        @json.from_json(value, path~),
+      )
     "response.reasoning_summary_part.done" =>
-      ResponseReasoningSummaryPartDone(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseReasoningSummaryPartDone(
+        @json.from_json(value, path~),
+      )
     "response.reasoning_summary_text.delta" =>
-      ResponseReasoningSummaryTextDelta(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseReasoningSummaryTextDelta(
+        @json.from_json(value, path~),
+      )
     "response.reasoning_summary_text.done" =>
-      ResponseReasoningSummaryTextDone(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseReasoningSummaryTextDone(
+        @json.from_json(value, path~),
+      )
     "response.refusal.delta" =>
-      ResponseRefusalDelta(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseRefusalDelta(@json.from_json(value, path~))
     "response.refusal.done" =>
-      ResponseRefusalDone(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseRefusalDone(@json.from_json(value, path~))
     "response.output_text.annotation.added" =>
-      ResponseOutputTextAnnotationAdded(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseOutputTextAnnotationAdded(
+        @json.from_json(value, path~),
+      )
     "response.output_text.delta" =>
-      ResponseOutputTextDelta(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseOutputTextDelta(
+        @json.from_json(value, path~),
+      )
     "response.output_text.done" =>
-      ResponseOutputTextDone(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseOutputTextDone(@json.from_json(value, path~))
     "response.web_search_call.completed" =>
-      ResponseWebSearchCallCompleted(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseWebSearchCallCompleted(
+        @json.from_json(value, path~),
+      )
     "response.web_search_call.in_progress" =>
-      ResponseWebSearchCallInProgress(@json.from_json(value, path~))
+      ResponseStreamEvent::ResponseWebSearchCallInProgress(
+        @json.from_json(value, path~),
+      )
     "response.web_search_call.searching" =>
-      ResponseWebSearchCallSearching(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseStreamEvent::ResponseWebSearchCallSearching(
+        @json.from_json(value, path~),
+      )
+    other => ResponseStreamEvent::Unknown(other, value)
   }
 }

@@ -20,6 +20,7 @@ from tools.gen.diagnostics import GenerationError
 from tools.gen.emit_moonbit import HEADER, emit
 from tools.gen.ir import ExternalUnion, ExternalVariant, IRBuilder, TypeRef, pascal_case, snake_case
 from tools.gen.main import _differences, _format, _protected_conflicts, _write
+from tools.gen.qualify import qualify
 
 
 def resolve(bundle: dict, ref: str) -> dict:
@@ -244,9 +245,9 @@ pub fn {snake_case(method)}(params : {builder.type_of(params)}) -> Call[{builder
 pub fn Event::decode(name : String, params : Json?) -> Event raise @json.JsonDecodeError {
   match name {''')
     for method, _ in builder.notifications:
-        lines.append(f'    {json.dumps(method)} => {pascal_case(method)}(@json.from_json(params.unwrap_or(Json::null())))')
-    lines.append('    _ => Unknown(name, params)\n  }\n}\n')
-    return "\n".join(lines)
+        lines.append(f'    {json.dumps(method)} => Event::{pascal_case(method)}(@json.from_json(params.unwrap_or(Json::null())))')
+    lines.append('    _ => Event::Unknown(name, params)\n  }\n}\n')
+    return qualify("\n".join(lines))
 
 
 def run(argv: list[str] | None = None) -> int:

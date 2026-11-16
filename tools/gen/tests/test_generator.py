@@ -164,7 +164,7 @@ class IRTests(unittest.TestCase):
         self.assertEqual(enum.fallback, "CustomValue")
         types = emit(ir)["types.mbt"]
         self.assertIn("CustomValue(String)", types)
-        self.assertIn("raw => CustomValue(raw),", types)
+        self.assertIn("raw => TestOperationRequest::CustomValue(raw),", types)
         response_schema = {"type": "string", "enum": ["known", "unknown"]}
         ir = IRBuilder(document(operation(response=response_schema)), "example/gen").build()
         self.assertEqual(declaration(ir, "TestOperationResponse").fallback, "UnknownValue")
@@ -341,7 +341,7 @@ class IRTests(unittest.TestCase):
         self.assertIsInstance(union, TaggedUnion)
         self.assertEqual(union.default_variant, "Custom")
         types = emit(ir)["types.mbt"]
-        self.assertIn('None | Some(Null) => "custom"', types)
+        self.assertIn('Option::None | Option::Some(@json.Json::Null) => "custom"', types)
         # Two payloads without a required discriminator are ambiguous: the tag stays required on decode.
         schemas["Bash"]["required"] = ["name"]
         ir = IRBuilder(document(operation(request={"$ref": "#/components/schemas/Item"}), schemas), "example/gen").build()
@@ -443,7 +443,7 @@ class IRTests(unittest.TestCase):
         self.assertIn("kind", [field.json_name for field in declaration(ir, "Cat").fields if field.constant is None])
         source = emit(ir)["types.mbt"]
         self.assertIn("Unknown(String, Json)", source)
-        self.assertIn('other => Unknown(other, value)', source)
+        self.assertIn('other => Pet::Unknown(other, value)', source)
 
     def test_discriminator_without_mapping_uses_payload_constant_and_notes_inference(self):
         schemas = {
@@ -490,8 +490,8 @@ class IRTests(unittest.TestCase):
             [("Comparison", ("eq", "ne", "gt")), ("Compound", ("and", "or"))],
         )
         source = emit(ir)["types.mbt"]
-        self.assertIn('"ne" => Comparison', source)
-        self.assertIn('"or" => Compound', source)
+        self.assertIn('"ne" => Filter::Comparison', source)
+        self.assertIn('"or" => Filter::Compound', source)
         self.assertIn("Unknown(String, Json)", source)
         cases = [
             ([object_schema("same"), object_schema("same")], "indistinguishable required sets"),
@@ -544,8 +544,8 @@ class IRTests(unittest.TestCase):
         self.assertIn("role", [field.json_name for field in declaration(ir, "UserMessage").fields])
         source = emit(ir)["types.mbt"]
         self.assertIn('match obj.get("role")', source)
-        self.assertIn('Some(String("assistant")) => MessageAssistant', source)
-        self.assertIn("_ => Unknown(tag, value)", source)
+        self.assertIn('Option::Some(@json.Json::String("assistant")) => Item::MessageAssistant', source)
+        self.assertIn("_ => Item::Unknown(tag, value)", source)
 
     def test_rejected_second_discriminator_values_fall_back_to_required_sets(self):
         for roles in [
@@ -978,7 +978,7 @@ class IRTests(unittest.TestCase):
         self.assertIn("boundary : String", source)
         self.assertIn("@multipart.Part::file(\"file\", file_filename, file_content_type, file)", source)
         self.assertIn("@multipart.Part::text(\"title\", parameter_value(title))", source)
-        self.assertIn("@multipart.Part::json(\"metadata\", Json(value))", source)
+        self.assertIn("@multipart.Part::json(\"metadata\", @json.Json::Json(value))", source)
         self.assertIn("@multipart.body(request, parts, boundary~)", source)
         self.assertIn('"gaato/mttp_core/multipart"', generated["moon.pkg"])
 
@@ -1071,8 +1071,8 @@ class IRTests(unittest.TestCase):
         sources = emit(IRBuilder(doc, "example/gen").build())
         self.assertIn('@http.Request::post("/raw").body_json(body)\n', sources["operations.mbt"])
         # A named union body still needs the encode call.
-        self.assertIn('@http.Request::post("/mixed").body_json(Json(body))\n', sources["operations.mbt"])
-        self.assertIn("    Text(value) => Json(value)\n    Object(value) => value\n", sources["types.mbt"])
+        self.assertIn('@http.Request::post("/mixed").body_json(@json.Json::Json(body))\n', sources["operations.mbt"])
+        self.assertIn("    Mixed::Text(value) => @json.Json::Json(value)\n    Mixed::Object(value) => value\n", sources["types.mbt"])
 
 
 class CLITests(unittest.TestCase):

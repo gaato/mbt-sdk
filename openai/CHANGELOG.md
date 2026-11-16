@@ -11,6 +11,10 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+### Changed
+
+- Generated code now qualifies constructor references; no public API change.
+
 ## [0.10.0] - 2026-11-15
 
 ### Changed

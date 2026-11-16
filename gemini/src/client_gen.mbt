@@ -26,7 +26,7 @@ pub impl @debug.Debug for Gemini with fn to_repr(_) {
 pub fn Gemini::new(
   backend : &@http.Backend,
   clock : &@rt.Clock,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://generativelanguage.googleapis.com",
   server_urls~ : Map[String, String] = {},
   retry~ : @client.RetryPolicy = default_retry(),
@@ -58,7 +58,7 @@ pub fn Gemini::new(
 /// Query credentials appear in redirect history and observer URLs.
 pub fn Gemini::from_client(
   client : @client.Client,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://generativelanguage.googleapis.com",
   server_urls~ : Map[String, String] = {},
 ) -> Gemini {
@@ -147,9 +147,14 @@ fn response_failure(
   error : @client.ResponseFailure,
 ) -> Failure {
   match error {
-    @client.UnexpectedStatus(head, body~) =>
-      Http({ operation, head, body, typed: typed_error(operation, head, body), })
-    _ => Decode(error)
+    @client.ResponseFailure::UnexpectedStatus(head, body~) =>
+      Failure::Http({
+        operation,
+        head,
+        body,
+        typed: typed_error(operation, head, body),
+      })
+    _ => Failure::Decode(error)
   }
 }
 
@@ -167,18 +172,19 @@ pub async fn Gemini::send(
       ),
     )
     match reply.body {
-      Ok(body) =>
-        Ok({
+      Result::Ok(body) =>
+        Result::Ok({
           status: reply.status,
           headers: reply.headers,
           body,
           request: reply.request,
           attributes: reply.attributes,
         })
-      Err(error) => Err(response_failure(operation, error))
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -192,12 +198,12 @@ pub async fn[T] Gemini::call(
   operation~ : String = self.infer_operation(request),
 ) -> Result[T, Failure] {
   match self.send(request, operation~) {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode({ status: reply.status, headers: reply.headers, }, reply.body) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -217,8 +223,8 @@ pub async fn Gemini::stream(
     receive,
     stop=(_, event) => {
       match stop {
-        Some(predicate) => predicate(event)
-        None => false
+        Option::Some(predicate) => predicate(event)
+        Option::None => false
       }
     },
     operation~,
@@ -242,11 +248,12 @@ async fn Gemini::stream_with_head(
       ),
     )
     match reply.body {
-      Ok(value) => Ok(value)
-      Err(error) => Err(response_failure(operation, error))
+      Result::Ok(value) => Result::Ok(value)
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -274,10 +281,10 @@ fn Gemini::authenticate(
   request : @http.Request,
 ) -> @http.Request {
   match self.auth {
-    Anonymous => request
-    ApiKey(value) => request.set_header("x-goog-api-key", value)
-    ApiKeyInQuery(value) => request.query("key", value)
-    OAuthToken(value) => request.bearer(value)
+    Auth::Anonymous => request
+    Auth::ApiKey(value) => request.set_header("x-goog-api-key", value)
+    Auth::ApiKeyInQuery(value) => request.query("key", value)
+    Auth::OAuthToken(value) => request.bearer(value)
   }
 }
 
@@ -291,7 +298,7 @@ fn Gemini::operation_config(
     "cached_contents_delete" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -299,7 +306,7 @@ fn Gemini::operation_config(
     "cached_contents_patch" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -307,7 +314,7 @@ fn Gemini::operation_config(
     "cached_contents_get" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -315,7 +322,7 @@ fn Gemini::operation_config(
     "cached_contents_create" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -323,7 +330,7 @@ fn Gemini::operation_config(
     "cached_contents_list" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -331,7 +338,7 @@ fn Gemini::operation_config(
     "media_upload" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -339,7 +346,7 @@ fn Gemini::operation_config(
     "files_list" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -347,7 +354,7 @@ fn Gemini::operation_config(
     "files_get" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -355,7 +362,7 @@ fn Gemini::operation_config(
     "files_delete" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -363,7 +370,7 @@ fn Gemini::operation_config(
     "models_embed_content" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -371,7 +378,7 @@ fn Gemini::operation_config(
     "models_batch_embed_contents" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -379,7 +386,7 @@ fn Gemini::operation_config(
     "models_list" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -387,7 +394,7 @@ fn Gemini::operation_config(
     "models_count_tokens" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -395,7 +402,7 @@ fn Gemini::operation_config(
     "models_generate_content" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -403,7 +410,7 @@ fn Gemini::operation_config(
     "models_stream_generate_content" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -411,7 +418,7 @@ fn Gemini::operation_config(
     "models_get" =>
       (
         match self.auth {
-          ApiKey(_) | ApiKeyInQuery(_) | OAuthToken(_) => true
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
           _ => false
         },
         "",
@@ -567,7 +574,7 @@ fn resource_route_matches(
     } else {
       parsed.path
     }
-    Regex(pattern).execute(path) is Some(_)
+    Regex::Regex(pattern).execute(path) is Option::Some(_)
   } catch {
     _ => false
   }

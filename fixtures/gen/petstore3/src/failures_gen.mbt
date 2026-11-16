@@ -45,8 +45,8 @@ fn typed_error(
   try {
     ignore(operation)
     ignore(head)
-    Some(RawJson(@json.parse(@utf8.decode(body))))
+    Option::Some(ErrorBody::RawJson(@json.parse(@utf8.decode(body))))
   } catch {
-    _ => None
+    _ => Option::None
   }
 }

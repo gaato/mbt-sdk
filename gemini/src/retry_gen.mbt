@@ -6,19 +6,24 @@ pub fn default_retry() -> @client.RetryPolicy {
   {
     rule: {
       max_retries: 4,
-      statuses: [{ statuses: [Code(503)], methods: Any, }],
-      sent_failures: Never,
+      statuses: [
+        {
+          statuses: [@client.StatusMatch::Code(503)],
+          methods: @client.Methods::Any,
+        },
+      ],
+      sent_failures: @client.Methods::Never,
       unsent_failures: true,
-      override_header: None,
+      override_header: Option::None,
       retry_after: {
-        source: Header,
-        cap: StopAbove(60000),
+        source: @client.RetryAfterSource::Header,
+        cap: @client.RetryAfterCap::StopAbove(60000),
         zero_means_backoff: false,
       },
       backoff: {
         base_ms: 1000,
         max_ms: 60000,
-        jitter: Proportional(lo=1000, hi=2000),
+        jitter: @client.Jitter::Proportional(lo=1000, hi=2000),
       },
     },
   }

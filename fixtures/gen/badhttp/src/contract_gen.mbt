@@ -9,25 +9,29 @@ test "generated default URL, bucket, HTTP and transport failures" {
     )
     try! assert_eq(
       request.attributes.get(@client.rate_limit_bucket),
-      Some("badhttp" + ":"),
+      Option::Some("badhttp" + ":"),
     )
     @http.Response::new(
       400,
       headers=@http.Headers::of([("x-test", "retained")]),
-      body=Bytes(b"{\"error\":\"bad\"}"),
+      body=@http.Body::Bytes(b"{\"error\":\"bad\"}"),
     )
   })
   let sdk = Badhttp::new(backend, @sim.FakeClock::new())
   match @driver.run_sync(() => sdk.send(@http.Request::get("/contract-test"))) {
-    Err(Http(error)) => {
+    Result::Err(Failure::Http(error)) => {
       try! assert_eq(error.head.status, 400)
-      try! assert_eq(error.head.headers.get("x-test"), Some("retained"))
+      try! assert_eq(error.head.headers.get("x-test"), Option::Some("retained"))
       try! assert_eq(error.body, b"{\"error\":\"bad\"}")
     }
     _ => fail("expected HTTP failure")
   }
   let failing = @client.from_fn((_, _) => {
-    raise @http.TransportError(kind=Network, phase=Body, detail="offline test")
+    raise @http.TransportError::TransportError(
+      kind=Network,
+      phase=Body,
+      detail="offline test",
+    )
   })
   let sdk = Badhttp::new(
     failing,
@@ -36,7 +40,11 @@ test "generated default URL, bucket, HTTP and transport failures" {
   )
   match
     @driver.run_sync(() => sdk.send(@http.Request::post("/contract-test"))) {
-    Err(Transport(@http.TransportError(kind~, phase~, ..))) => {
+    Result::Err(
+      Failure::Transport(
+        @http.TransportError::TransportError(kind~, phase~, ..)
+      )
+    ) => {
       try! assert_true(kind is Network)
       try! assert_true(phase is Body)
     }
@@ -46,13 +54,13 @@ test "generated default URL, bucket, HTTP and transport failures" {
 
 ///|
 test "generated base override, paginator termination and SSE stop" {
-  let count = Ref(0)
+  let count = Ref::Ref(0)
   let backend = @client.from_fn((request, _) => {
     try! assert_true(request.url.has_prefix("https://override.example/"))
     count.val += 1
     @http.Response::new(
       200,
-      body=Bytes(
+      body=@http.Body::Bytes(
         if count.val == 1 {
           b"{\"results\":[1],\"next\":\"https://override.example/page2\"}"
         } else {
@@ -68,17 +76,17 @@ test "generated base override, paginator termination and SSE stop" {
   )
   let pages : @client.Paginator[Json, Failure] = sdk.paginate(
     @http.Request::get("/page1"),
-    kind=NextUrl,
+    kind=PageKind::NextUrl,
     items="results",
     next="next",
   )
   @driver.run_sync(() => {
-    try! assert_true(pages.next_page() is Ok(Some(_)))
-    try! assert_true(pages.next_page() is Ok(Some(_)))
-    try! assert_true(pages.next_page() is Ok(None))
+    try! assert_true(pages.next_page() is Result::Ok(Option::Some(_)))
+    try! assert_true(pages.next_page() is Result::Ok(Option::Some(_)))
+    try! assert_true(pages.next_page() is Result::Ok(Option::None))
   })
   try! assert_eq(count.val, 2)
-  let seen : Ref[Array[String]] = Ref([])
+  let seen : Ref[Array[String]] = Ref::Ref([])
   let driver = @driver.Driver::new()
   let source = @sim.Feed::bytes(driver, [
     b"data: one\n\n", b"data: stop\n\n", b"data: unreachable\n\n",
@@ -87,7 +95,7 @@ test "generated base override, paginator termination and SSE stop" {
     @http.Response::new(
       200,
       headers=@http.Headers::of([("content-type", "text/event-stream")]),
-      body=Stream(@http.StreamBody::new(source)),
+      body=@http.Body::Stream(@http.StreamBody::new(source)),
     )
   })
   let sdk = Badhttp::new(backend, @sim.FakeClock::new())
@@ -99,7 +107,7 @@ test "generated base override, paginator termination and SSE stop" {
         stop=event => event.data == "stop",
       )
     })
-    is Ok(_),
+    is Result::Ok(_),
   )
   try! assert_eq(seen.val, ["one"])
   try! assert_eq(source.closes(), 1)
@@ -117,20 +125,24 @@ test "generated cursor pages replace the cursor and preserve failures" {
       3 => b"{\"data\":[1],\"next\":\"last\"}"
       _ => b"{\"data\":[2],\"next\":null}"
     }
-    @http.Response::new(200, body=Bytes(body))
+    @http.Response::new(200, body=@http.Body::Bytes(body))
   })
   let sdk = Badhttp::new(backend, @sim.FakeClock::new())
   let pages : @client.Paginator[Json, Failure] = sdk.paginate(
     @http.Request::get("/pages?cursor=old&limit=2"),
-    kind=Cursor("cursor"),
+    kind=PageKind::Cursor("cursor"),
     items="data",
     next="next",
   )
   @driver.run_sync(() => {
-    try! assert_true(pages.next_page() is Err(Decode(_)))
-    try! assert_true(pages.next_page() is Ok(Some([Number(1, ..)])))
-    try! assert_true(pages.next_page() is Ok(Some([Number(2, ..)])))
-    try! assert_true(pages.next_page() is Ok(None))
+    try! assert_true(pages.next_page() is Result::Err(Failure::Decode(_)))
+    try! assert_true(
+      pages.next_page() is Result::Ok(Option::Some([@json.Json::Number(1, ..)])),
+    )
+    try! assert_true(
+      pages.next_page() is Result::Ok(Option::Some([@json.Json::Number(2, ..)])),
+    )
+    try! assert_true(pages.next_page() is Result::Ok(Option::None))
   })
   try! assert_eq(seen.length(), 4)
   try! assert_eq(seen[1], seen[2])
@@ -142,7 +154,7 @@ test "generated cursor pages replace the cursor and preserve failures" {
 ///|
 test "generated default retry reaches the runtime" {
   let clock = @sim.FakeClock::new()
-  let count = Ref(0)
+  let count = Ref::Ref(0)
   let backend = @client.from_fn((_, _) => {
     count.val += 1
     @http.Response::new(
@@ -151,7 +163,7 @@ test "generated default retry reaches the runtime" {
       } else {
         200
       },
-      body=Bytes(b"ok"),
+      body=@http.Body::Bytes(b"ok"),
     )
   })
   let sdk = Badhttp::new(backend, clock)
@@ -163,7 +175,7 @@ test "generated default retry reaches the runtime" {
 
 ///|
 test "generated route and server get_status_code" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -181,7 +193,7 @@ test "generated route and server get_status_code" {
 
 ///|
 test "generated route and server get_delay_seconds" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -197,7 +209,7 @@ test "generated route and server get_delay_seconds" {
 
 ///|
 test "generated route and server get_drip" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -213,7 +225,7 @@ test "generated route and server get_drip" {
 
 ///|
 test "generated route and server get_truncate" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -229,7 +241,7 @@ test "generated route and server get_truncate" {
 
 ///|
 test "generated route and server get_badjson_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -247,7 +259,7 @@ test "generated route and server get_badjson_flavor" {
 
 ///|
 test "generated route and server get_sse" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -263,7 +275,7 @@ test "generated route and server get_sse" {
 
 ///|
 test "generated route and server get_sse_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -279,7 +291,7 @@ test "generated route and server get_sse_flavor" {
 
 ///|
 test "generated route and server get_range" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -295,7 +307,7 @@ test "generated route and server get_range" {
 
 ///|
 test "generated route and server get_range_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -311,7 +323,7 @@ test "generated route and server get_range_flavor" {
 
 ///|
 test "generated route and server get_etag" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -327,7 +339,7 @@ test "generated route and server get_etag" {
 
 ///|
 test "generated route and server get_etag_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -343,7 +355,7 @@ test "generated route and server get_etag_flavor" {
 
 ///|
 test "generated route and server get_cookies" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -359,7 +371,7 @@ test "generated route and server get_cookies" {
 
 ///|
 test "generated route and server get_cookies_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -377,7 +389,7 @@ test "generated route and server get_cookies_flavor" {
 
 ///|
 test "generated route and server get_auth" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -393,7 +405,7 @@ test "generated route and server get_auth" {
 
 ///|
 test "generated route and server get_auth_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -409,7 +421,7 @@ test "generated route and server get_auth_flavor" {
 
 ///|
 test "generated route and server get_crosshost" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -425,7 +437,7 @@ test "generated route and server get_crosshost" {
 
 ///|
 test "generated route and server get_crosshost_land" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -443,7 +455,7 @@ test "generated route and server get_crosshost_land" {
 
 ///|
 test "generated route and server get_crosshost_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -461,7 +473,7 @@ test "generated route and server get_crosshost_flavor" {
 
 ///|
 test "generated route and server get_compress" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -477,7 +489,7 @@ test "generated route and server get_compress" {
 
 ///|
 test "generated route and server get_compress_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -495,7 +507,7 @@ test "generated route and server get_compress_flavor" {
 
 ///|
 test "generated route and server get_flaky_percent" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -511,7 +523,7 @@ test "generated route and server get_flaky_percent" {
 
 ///|
 test "generated route and server get_redirect_hops" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -529,7 +541,7 @@ test "generated route and server get_redirect_hops" {
 
 ///|
 test "generated route and server get_headers" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -545,7 +557,7 @@ test "generated route and server get_headers" {
 
 ///|
 test "generated route and server post_echo" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -561,7 +573,7 @@ test "generated route and server post_echo" {
 
 ///|
 test "generated route and server put_echo" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -577,7 +589,7 @@ test "generated route and server put_echo" {
 
 ///|
 test "generated route and server patch_echo" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -593,7 +605,7 @@ test "generated route and server patch_echo" {
 
 ///|
 test "generated route and server delete_echo" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -609,7 +621,7 @@ test "generated route and server delete_echo" {
 
 ///|
 test "generated route and server get_echo" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -625,7 +637,7 @@ test "generated route and server get_echo" {
 
 ///|
 test "generated route and server head_echo" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -641,7 +653,7 @@ test "generated route and server head_echo" {
 
 ///|
 test "generated route and server get_402" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -657,7 +669,7 @@ test "generated route and server get_402" {
 
 ///|
 test "generated route and server get_402_pay" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -673,7 +685,7 @@ test "generated route and server get_402_pay" {
 
 ///|
 test "generated route and server get_402_pay_base" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -689,7 +701,7 @@ test "generated route and server get_402_pay_base" {
 
 ///|
 test "generated route and server get_402_pay_base_sepolia" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -707,7 +719,7 @@ test "generated route and server get_402_pay_base_sepolia" {
 
 ///|
 test "generated route and server get_402_scenario" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -723,7 +735,7 @@ test "generated route and server get_402_scenario" {
 
 ///|
 test "generated route and server get_402_broken_flavor" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -741,7 +753,7 @@ test "generated route and server get_402_broken_flavor" {
 
 ///|
 test "generated route and server get_books_json" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -757,7 +769,7 @@ test "generated route and server get_books_json" {
 
 ///|
 test "generated route and server get_llms_txt" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -773,7 +785,7 @@ test "generated route and server get_llms_txt" {
 
 ///|
 test "generated route and server get_health" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -789,7 +801,7 @@ test "generated route and server get_health" {
 
 ///|
 test "generated route and server get_corpus" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -805,7 +817,7 @@ test "generated route and server get_corpus" {
 
 ///|
 test "generated route and server get_corpus_jsonl" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -821,7 +833,7 @@ test "generated route and server get_corpus_jsonl" {
 
 ///|
 test "generated route and server get_clients" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -837,7 +849,7 @@ test "generated route and server get_clients" {
 
 ///|
 test "generated route and server get_clients_jsonl" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -853,7 +865,7 @@ test "generated route and server get_clients_jsonl" {
 
 ///|
 test "generated route and server get_funding_json" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -869,7 +881,7 @@ test "generated route and server get_funding_json" {
 
 ///|
 test "generated route and server get_license" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -887,7 +899,7 @@ test "generated route and server get_license" {
 test "generated typed HTTP error body" {
   let body = @utf8.encode("{}")
   let backend = @client.from_fn((_, _) => {
-    @http.Response::new(400, body=Bytes(body))
+    @http.Response::new(400, body=@http.Body::Bytes(body))
   })
   let sdk = Badhttp::new(
     backend,
@@ -901,8 +913,8 @@ test "generated typed HTTP error body" {
         operation="get_status_code",
       )
     }) {
-    Err(Http(failure)) => {
-      try! assert_true(failure.typed is Some(_))
+    Result::Err(Failure::Http(failure)) => {
+      try! assert_true(failure.typed is Option::Some(_))
       try! assert_eq(failure.body, body)
     }
     _ => fail("expected typed HTTP error")

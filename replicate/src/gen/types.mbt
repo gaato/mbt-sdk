@@ -8,19 +8,19 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 
 ///|
 fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
   match value {
-    Some(value) => @sdkjson.Value(value)
-    None => @sdkjson.Null
+    Option::Some(value) => @sdkjson.Presence::Value(value)
+    Option::None => @sdkjson.Presence::Null
   }
 }
 
@@ -32,8 +32,8 @@ fn[T : @json.FromJson] decode_nullable_field(
 ) -> T? raise @json.JsonDecodeError {
   let raw : Json = required_field(obj, key, path)
   match raw {
-    Null => None
-    value => Some(@json.from_json(value, path=path.add_key(key)))
+    @json.Json::Null => Option::None
+    value => Option::Some(@json.from_json(value, path=path.add_key(key)))
   }
 }
 
@@ -121,11 +121,11 @@ pub extend SchemasModelResponseVisibility with ToJson::{to_json}
 ///|
 pub impl ToJson for SchemasModelResponseVisibility with fn to_json(self) {
   let raw = match self {
-    Public => "public"
-    Private => "private"
-    Unknown(raw) => raw
+    SchemasModelResponseVisibility::Public => "public"
+    SchemasModelResponseVisibility::Private => "private"
+    SchemasModelResponseVisibility::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -143,12 +143,12 @@ pub impl @json.FromJson for SchemasModelResponseVisibility with fn from_json(
     path,
     raw => {
       match raw {
-        "public" => Some(Public)
-        "private" => Some(Private)
-        _ => None
+        "public" => Option::Some(SchemasModelResponseVisibility::Public)
+        "private" => Option::Some(SchemasModelResponseVisibility::Private)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SchemasModelResponseVisibility::Unknown(raw),
   )
 }
 
@@ -439,11 +439,12 @@ pub impl ToJson for SchemasDeploymentResponseCurrentReleaseCreatedByType with fn
   self,
 ) {
   let raw = match self {
-    Organization => "organization"
-    User => "user"
-    Unknown(raw) => raw
+    SchemasDeploymentResponseCurrentReleaseCreatedByType::Organization =>
+      "organization"
+    SchemasDeploymentResponseCurrentReleaseCreatedByType::User => "user"
+    SchemasDeploymentResponseCurrentReleaseCreatedByType::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -463,12 +464,18 @@ pub impl @json.FromJson for SchemasDeploymentResponseCurrentReleaseCreatedByType
     path,
     raw => {
       match raw {
-        "organization" => Some(Organization)
-        "user" => Some(User)
-        _ => None
+        "organization" =>
+          Option::Some(
+            SchemasDeploymentResponseCurrentReleaseCreatedByType::Organization,
+          )
+        "user" =>
+          Option::Some(
+            SchemasDeploymentResponseCurrentReleaseCreatedByType::User,
+          )
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SchemasDeploymentResponseCurrentReleaseCreatedByType::Unknown(raw),
   )
 }
 
@@ -1055,11 +1062,11 @@ pub extend SchemasPredictionResponseSource with ToJson::{to_json}
 ///|
 pub impl ToJson for SchemasPredictionResponseSource with fn to_json(self) {
   let raw = match self {
-    Web => "web"
-    Api => "api"
-    Unknown(raw) => raw
+    SchemasPredictionResponseSource::Web => "web"
+    SchemasPredictionResponseSource::Api => "api"
+    SchemasPredictionResponseSource::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1077,12 +1084,12 @@ pub impl @json.FromJson for SchemasPredictionResponseSource with fn from_json(
     path,
     raw => {
       match raw {
-        "web" => Some(Web)
-        "api" => Some(Api)
-        _ => None
+        "web" => Option::Some(SchemasPredictionResponseSource::Web)
+        "api" => Option::Some(SchemasPredictionResponseSource::Api)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SchemasPredictionResponseSource::Unknown(raw),
   )
 }
 
@@ -1115,15 +1122,15 @@ pub extend SchemasPredictionResponseStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for SchemasPredictionResponseStatus with fn to_json(self) {
   let raw = match self {
-    Starting => "starting"
-    Processing => "processing"
-    Succeeded => "succeeded"
-    Failed => "failed"
-    Canceled => "canceled"
-    Aborted => "aborted"
-    Unknown(raw) => raw
+    SchemasPredictionResponseStatus::Starting => "starting"
+    SchemasPredictionResponseStatus::Processing => "processing"
+    SchemasPredictionResponseStatus::Succeeded => "succeeded"
+    SchemasPredictionResponseStatus::Failed => "failed"
+    SchemasPredictionResponseStatus::Canceled => "canceled"
+    SchemasPredictionResponseStatus::Aborted => "aborted"
+    SchemasPredictionResponseStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1141,16 +1148,17 @@ pub impl @json.FromJson for SchemasPredictionResponseStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "starting" => Some(Starting)
-        "processing" => Some(Processing)
-        "succeeded" => Some(Succeeded)
-        "failed" => Some(Failed)
-        "canceled" => Some(Canceled)
-        "aborted" => Some(Aborted)
-        _ => None
+        "starting" => Option::Some(SchemasPredictionResponseStatus::Starting)
+        "processing" =>
+          Option::Some(SchemasPredictionResponseStatus::Processing)
+        "succeeded" => Option::Some(SchemasPredictionResponseStatus::Succeeded)
+        "failed" => Option::Some(SchemasPredictionResponseStatus::Failed)
+        "canceled" => Option::Some(SchemasPredictionResponseStatus::Canceled)
+        "aborted" => Option::Some(SchemasPredictionResponseStatus::Aborted)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SchemasPredictionResponseStatus::Unknown(raw),
   )
 }
 
@@ -1580,13 +1588,13 @@ pub impl ToJson for SchemasPredictionRequestWebhookEventsFilterItem with fn to_j
   self,
 ) {
   let raw = match self {
-    Start => "start"
-    Output => "output"
-    Logs => "logs"
-    Completed => "completed"
-    Custom(raw) => raw
+    SchemasPredictionRequestWebhookEventsFilterItem::Start => "start"
+    SchemasPredictionRequestWebhookEventsFilterItem::Output => "output"
+    SchemasPredictionRequestWebhookEventsFilterItem::Logs => "logs"
+    SchemasPredictionRequestWebhookEventsFilterItem::Completed => "completed"
+    SchemasPredictionRequestWebhookEventsFilterItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1606,14 +1614,20 @@ pub impl @json.FromJson for SchemasPredictionRequestWebhookEventsFilterItem with
     path,
     raw => {
       match raw {
-        "start" => Some(Start)
-        "output" => Some(Output)
-        "logs" => Some(Logs)
-        "completed" => Some(Completed)
-        _ => None
+        "start" =>
+          Option::Some(SchemasPredictionRequestWebhookEventsFilterItem::Start)
+        "output" =>
+          Option::Some(SchemasPredictionRequestWebhookEventsFilterItem::Output)
+        "logs" =>
+          Option::Some(SchemasPredictionRequestWebhookEventsFilterItem::Logs)
+        "completed" =>
+          Option::Some(
+            SchemasPredictionRequestWebhookEventsFilterItem::Completed,
+          )
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => SchemasPredictionRequestWebhookEventsFilterItem::Custom(raw),
   )
 }
 
@@ -1961,13 +1975,13 @@ pub impl ToJson for SchemasTrainingRequestWebhookEventsFilterItem with fn to_jso
   self,
 ) {
   let raw = match self {
-    Start => "start"
-    Output => "output"
-    Logs => "logs"
-    Completed => "completed"
-    Custom(raw) => raw
+    SchemasTrainingRequestWebhookEventsFilterItem::Start => "start"
+    SchemasTrainingRequestWebhookEventsFilterItem::Output => "output"
+    SchemasTrainingRequestWebhookEventsFilterItem::Logs => "logs"
+    SchemasTrainingRequestWebhookEventsFilterItem::Completed => "completed"
+    SchemasTrainingRequestWebhookEventsFilterItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1987,14 +2001,18 @@ pub impl @json.FromJson for SchemasTrainingRequestWebhookEventsFilterItem with f
     path,
     raw => {
       match raw {
-        "start" => Some(Start)
-        "output" => Some(Output)
-        "logs" => Some(Logs)
-        "completed" => Some(Completed)
-        _ => None
+        "start" =>
+          Option::Some(SchemasTrainingRequestWebhookEventsFilterItem::Start)
+        "output" =>
+          Option::Some(SchemasTrainingRequestWebhookEventsFilterItem::Output)
+        "logs" =>
+          Option::Some(SchemasTrainingRequestWebhookEventsFilterItem::Logs)
+        "completed" =>
+          Option::Some(SchemasTrainingRequestWebhookEventsFilterItem::Completed)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => SchemasTrainingRequestWebhookEventsFilterItem::Custom(raw),
   )
 }
 
@@ -2198,11 +2216,11 @@ pub extend SchemasTrainingResponseSource with ToJson::{to_json}
 ///|
 pub impl ToJson for SchemasTrainingResponseSource with fn to_json(self) {
   let raw = match self {
-    Web => "web"
-    Api => "api"
-    Unknown(raw) => raw
+    SchemasTrainingResponseSource::Web => "web"
+    SchemasTrainingResponseSource::Api => "api"
+    SchemasTrainingResponseSource::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2220,12 +2238,12 @@ pub impl @json.FromJson for SchemasTrainingResponseSource with fn from_json(
     path,
     raw => {
       match raw {
-        "web" => Some(Web)
-        "api" => Some(Api)
-        _ => None
+        "web" => Option::Some(SchemasTrainingResponseSource::Web)
+        "api" => Option::Some(SchemasTrainingResponseSource::Api)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SchemasTrainingResponseSource::Unknown(raw),
   )
 }
 
@@ -2258,15 +2276,15 @@ pub extend SchemasTrainingResponseStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for SchemasTrainingResponseStatus with fn to_json(self) {
   let raw = match self {
-    Starting => "starting"
-    Processing => "processing"
-    Succeeded => "succeeded"
-    Failed => "failed"
-    Canceled => "canceled"
-    Aborted => "aborted"
-    Unknown(raw) => raw
+    SchemasTrainingResponseStatus::Starting => "starting"
+    SchemasTrainingResponseStatus::Processing => "processing"
+    SchemasTrainingResponseStatus::Succeeded => "succeeded"
+    SchemasTrainingResponseStatus::Failed => "failed"
+    SchemasTrainingResponseStatus::Canceled => "canceled"
+    SchemasTrainingResponseStatus::Aborted => "aborted"
+    SchemasTrainingResponseStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2284,16 +2302,16 @@ pub impl @json.FromJson for SchemasTrainingResponseStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "starting" => Some(Starting)
-        "processing" => Some(Processing)
-        "succeeded" => Some(Succeeded)
-        "failed" => Some(Failed)
-        "canceled" => Some(Canceled)
-        "aborted" => Some(Aborted)
-        _ => None
+        "starting" => Option::Some(SchemasTrainingResponseStatus::Starting)
+        "processing" => Option::Some(SchemasTrainingResponseStatus::Processing)
+        "succeeded" => Option::Some(SchemasTrainingResponseStatus::Succeeded)
+        "failed" => Option::Some(SchemasTrainingResponseStatus::Failed)
+        "canceled" => Option::Some(SchemasTrainingResponseStatus::Canceled)
+        "aborted" => Option::Some(SchemasTrainingResponseStatus::Aborted)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SchemasTrainingResponseStatus::Unknown(raw),
   )
 }
 
@@ -2506,13 +2524,14 @@ pub impl ToJson for SchemasVersionPredictionRequestWebhookEventsFilterItem with 
   self,
 ) {
   let raw = match self {
-    Start => "start"
-    Output => "output"
-    Logs => "logs"
-    Completed => "completed"
-    Custom(raw) => raw
+    SchemasVersionPredictionRequestWebhookEventsFilterItem::Start => "start"
+    SchemasVersionPredictionRequestWebhookEventsFilterItem::Output => "output"
+    SchemasVersionPredictionRequestWebhookEventsFilterItem::Logs => "logs"
+    SchemasVersionPredictionRequestWebhookEventsFilterItem::Completed =>
+      "completed"
+    SchemasVersionPredictionRequestWebhookEventsFilterItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2532,14 +2551,26 @@ pub impl @json.FromJson for SchemasVersionPredictionRequestWebhookEventsFilterIt
     path,
     raw => {
       match raw {
-        "start" => Some(Start)
-        "output" => Some(Output)
-        "logs" => Some(Logs)
-        "completed" => Some(Completed)
-        _ => None
+        "start" =>
+          Option::Some(
+            SchemasVersionPredictionRequestWebhookEventsFilterItem::Start,
+          )
+        "output" =>
+          Option::Some(
+            SchemasVersionPredictionRequestWebhookEventsFilterItem::Output,
+          )
+        "logs" =>
+          Option::Some(
+            SchemasVersionPredictionRequestWebhookEventsFilterItem::Logs,
+          )
+        "completed" =>
+          Option::Some(
+            SchemasVersionPredictionRequestWebhookEventsFilterItem::Completed,
+          )
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => SchemasVersionPredictionRequestWebhookEventsFilterItem::Custom(raw),
   )
 }
 
@@ -2641,11 +2672,11 @@ pub extend AccountGetResponseType with ToJson::{to_json}
 ///|
 pub impl ToJson for AccountGetResponseType with fn to_json(self) {
   let raw = match self {
-    Organization => "organization"
-    User => "user"
-    Unknown(raw) => raw
+    AccountGetResponseType::Organization => "organization"
+    AccountGetResponseType::User => "user"
+    AccountGetResponseType::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2663,12 +2694,12 @@ pub impl @json.FromJson for AccountGetResponseType with fn from_json(
     path,
     raw => {
       match raw {
-        "organization" => Some(Organization)
-        "user" => Some(User)
-        _ => None
+        "organization" => Option::Some(AccountGetResponseType::Organization)
+        "user" => Option::Some(AccountGetResponseType::User)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => AccountGetResponseType::Unknown(raw),
   )
 }
 
@@ -3070,11 +3101,11 @@ pub extend ModelsListSortBy with ToJson::{to_json}
 ///|
 pub impl ToJson for ModelsListSortBy with fn to_json(self) {
   let raw = match self {
-    ModelCreatedAt => "model_created_at"
-    LatestVersionCreatedAt => "latest_version_created_at"
-    Custom(raw) => raw
+    ModelsListSortBy::ModelCreatedAt => "model_created_at"
+    ModelsListSortBy::LatestVersionCreatedAt => "latest_version_created_at"
+    ModelsListSortBy::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3089,12 +3120,13 @@ pub impl @json.FromJson for ModelsListSortBy with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "model_created_at" => Some(ModelCreatedAt)
-        "latest_version_created_at" => Some(LatestVersionCreatedAt)
-        _ => None
+        "model_created_at" => Option::Some(ModelsListSortBy::ModelCreatedAt)
+        "latest_version_created_at" =>
+          Option::Some(ModelsListSortBy::LatestVersionCreatedAt)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ModelsListSortBy::Custom(raw),
   )
 }
 
@@ -3123,11 +3155,11 @@ pub extend ModelsListSortDirection with ToJson::{to_json}
 ///|
 pub impl ToJson for ModelsListSortDirection with fn to_json(self) {
   let raw = match self {
-    Asc => "asc"
-    Desc => "desc"
-    Custom(raw) => raw
+    ModelsListSortDirection::Asc => "asc"
+    ModelsListSortDirection::Desc => "desc"
+    ModelsListSortDirection::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3145,12 +3177,12 @@ pub impl @json.FromJson for ModelsListSortDirection with fn from_json(
     path,
     raw => {
       match raw {
-        "asc" => Some(Asc)
-        "desc" => Some(Desc)
-        _ => None
+        "asc" => Option::Some(ModelsListSortDirection::Asc)
+        "desc" => Option::Some(ModelsListSortDirection::Desc)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ModelsListSortDirection::Custom(raw),
   )
 }
 
@@ -3179,11 +3211,11 @@ pub extend ModelsCreateRequestVisibility with ToJson::{to_json}
 ///|
 pub impl ToJson for ModelsCreateRequestVisibility with fn to_json(self) {
   let raw = match self {
-    Public => "public"
-    Private => "private"
-    Custom(raw) => raw
+    ModelsCreateRequestVisibility::Public => "public"
+    ModelsCreateRequestVisibility::Private => "private"
+    ModelsCreateRequestVisibility::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3201,12 +3233,12 @@ pub impl @json.FromJson for ModelsCreateRequestVisibility with fn from_json(
     path,
     raw => {
       match raw {
-        "public" => Some(Public)
-        "private" => Some(Private)
-        _ => None
+        "public" => Option::Some(ModelsCreateRequestVisibility::Public)
+        "private" => Option::Some(ModelsCreateRequestVisibility::Private)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ModelsCreateRequestVisibility::Custom(raw),
   )
 }
 

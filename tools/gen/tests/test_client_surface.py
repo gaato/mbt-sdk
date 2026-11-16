@@ -146,7 +146,7 @@ test "operations cannot shadow client helpers" {
         self.assertIn('Sample::list_items_pages(self : Sample, owner_name~ : String, type_~ : String, cursor? : String)', source)
         self.assertIn('-> @client.Paginator[@gen.Item, Failure]', source)
         self.assertIn('let first = @gen.list_items_owners_owner_name_items_get_request(owner_name, type_, cursor?)', source)
-        self.assertIn('kind=Cursor("cursor")', source)
+        self.assertIn('kind=PageKind::Cursor("cursor")', source)
         self.assertIn('kind~ : PageKind', source)
         self.assertEqual(pagination_notes(surface_spec(), ir), [])
         files, _ = build(surface_spec(), operation_wrappers=False)

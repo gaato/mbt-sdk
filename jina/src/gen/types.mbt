@@ -3,7 +3,7 @@
 ///|
 fn json_array_matches(value : Json, predicate : (Json) -> Bool) -> Bool {
   match value {
-    Array(items) => items.length() > 0 && items.all(predicate)
+    @json.Json::Array(items) => items.length() > 0 && items.all(predicate)
     _ => false
   }
 }
@@ -16,11 +16,11 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 
@@ -28,7 +28,7 @@ fn[T : @json.FromJson] required_field(
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = Json(item)
+    result[key] = @json.Json::Json(item)
   }
   Json::object(result)
 }
@@ -53,9 +53,10 @@ fn[T : @json.FromJson] decode_presence_json_map(
   path : @json.JsonPath,
 ) -> @sdkjson.Presence[Map[String, T]] raise @json.JsonDecodeError {
   match obj.get(key) {
-    None => @sdkjson.Absent
-    Some(Null) => @sdkjson.Null
-    Some(value) => @sdkjson.Value(decode_json_map(value, path.add_key(key)))
+    Option::None => @sdkjson.Presence::Absent
+    Option::Some(@json.Json::Null) => @sdkjson.Presence::Null
+    Option::Some(value) =>
+      @sdkjson.Presence::Value(decode_json_map(value, path.add_key(key)))
   }
 }
 
@@ -126,11 +127,13 @@ pub extend BatchEmbeddingRequestModel with ToJson::{to_json}
 ///|
 pub impl ToJson for BatchEmbeddingRequestModel with fn to_json(self) {
   let raw = match self {
-    JinaEmbeddingsV5TextNano => "jina-embeddings-v5-text-nano"
-    JinaEmbeddingsV5TextSmall => "jina-embeddings-v5-text-small"
-    Custom(raw) => raw
+    BatchEmbeddingRequestModel::JinaEmbeddingsV5TextNano =>
+      "jina-embeddings-v5-text-nano"
+    BatchEmbeddingRequestModel::JinaEmbeddingsV5TextSmall =>
+      "jina-embeddings-v5-text-small"
+    BatchEmbeddingRequestModel::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -148,12 +151,14 @@ pub impl @json.FromJson for BatchEmbeddingRequestModel with fn from_json(
     path,
     raw => {
       match raw {
-        "jina-embeddings-v5-text-nano" => Some(JinaEmbeddingsV5TextNano)
-        "jina-embeddings-v5-text-small" => Some(JinaEmbeddingsV5TextSmall)
-        _ => None
+        "jina-embeddings-v5-text-nano" =>
+          Option::Some(BatchEmbeddingRequestModel::JinaEmbeddingsV5TextNano)
+        "jina-embeddings-v5-text-small" =>
+          Option::Some(BatchEmbeddingRequestModel::JinaEmbeddingsV5TextSmall)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => BatchEmbeddingRequestModel::Custom(raw),
   )
 }
 
@@ -326,15 +331,15 @@ pub extend BatchStatusStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for BatchStatusStatus with fn to_json(self) {
   let raw = match self {
-    Pending => "pending"
-    Processing => "processing"
-    Completed => "completed"
-    Failed => "failed"
-    Expired => "expired"
-    Cancelled => "cancelled"
-    Unknown(raw) => raw
+    BatchStatusStatus::Pending => "pending"
+    BatchStatusStatus::Processing => "processing"
+    BatchStatusStatus::Completed => "completed"
+    BatchStatusStatus::Failed => "failed"
+    BatchStatusStatus::Expired => "expired"
+    BatchStatusStatus::Cancelled => "cancelled"
+    BatchStatusStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -349,16 +354,16 @@ pub impl @json.FromJson for BatchStatusStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "pending" => Some(Pending)
-        "processing" => Some(Processing)
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        "expired" => Some(Expired)
-        "cancelled" => Some(Cancelled)
-        _ => None
+        "pending" => Option::Some(BatchStatusStatus::Pending)
+        "processing" => Option::Some(BatchStatusStatus::Processing)
+        "completed" => Option::Some(BatchStatusStatus::Completed)
+        "failed" => Option::Some(BatchStatusStatus::Failed)
+        "expired" => Option::Some(BatchStatusStatus::Expired)
+        "cancelled" => Option::Some(BatchStatusStatus::Cancelled)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => BatchStatusStatus::Unknown(raw),
   )
 }
 
@@ -484,13 +489,13 @@ pub extend ChatMessageRole with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatMessageRole with fn to_json(self) {
   let raw = match self {
-    System => "system"
-    Developer => "developer"
-    User => "user"
-    Assistant => "assistant"
-    Custom(raw) => raw
+    ChatMessageRole::System => "system"
+    ChatMessageRole::Developer => "developer"
+    ChatMessageRole::User => "user"
+    ChatMessageRole::Assistant => "assistant"
+    ChatMessageRole::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -505,14 +510,14 @@ pub impl @json.FromJson for ChatMessageRole with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "system" => Some(System)
-        "developer" => Some(Developer)
-        "user" => Some(User)
-        "assistant" => Some(Assistant)
-        _ => None
+        "system" => Option::Some(ChatMessageRole::System)
+        "developer" => Option::Some(ChatMessageRole::Developer)
+        "user" => Option::Some(ChatMessageRole::User)
+        "assistant" => Option::Some(ChatMessageRole::Assistant)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ChatMessageRole::Custom(raw),
   )
 }
 
@@ -684,9 +689,9 @@ pub extend ChatMessageContentValueArrayItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatMessageContentValueArrayItem with fn to_json(self) {
   match self {
-    ImageUrl(value) => Json(value)
-    Text(value) => Json(value)
-    Unknown(_, value) => value
+    ChatMessageContentValueArrayItem::ImageUrl(value) => @json.Json::Json(value)
+    ChatMessageContentValueArrayItem::Text(value) => @json.Json::Json(value)
+    ChatMessageContentValueArrayItem::Unknown(_, value) => value
   }
 }
 
@@ -703,9 +708,11 @@ pub impl @json.FromJson for ChatMessageContentValueArrayItem with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "image_url" => ImageUrl(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "image_url" =>
+      ChatMessageContentValueArrayItem::ImageUrl(@json.from_json(value, path~))
+    "text" =>
+      ChatMessageContentValueArrayItem::Text(@json.from_json(value, path~))
+    other => ChatMessageContentValueArrayItem::Unknown(other, value)
   }
 }
 
@@ -733,8 +740,8 @@ pub extend ChatMessageContent with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatMessageContent with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    ValueArray(value) => Json(value)
+    ChatMessageContent::Text(value) => @json.Json::Json(value)
+    ChatMessageContent::ValueArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -745,18 +752,18 @@ pub extend ChatMessageContent with @json.FromJson::{from_json}
 
 ///|
 pub impl @json.FromJson for ChatMessageContent with fn from_json(value, path) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ChatMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ChatMessageContentValueArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return ValueArray(decoded)
+    return ChatMessageContent::ValueArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any ChatMessageContent variant"),
   )
 }
@@ -879,8 +886,8 @@ pub extend ChatCompletionRequestStop with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionRequestStop with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    ChatCompletionRequestStop::Text(value) => @json.Json::Json(value)
+    ChatCompletionRequestStop::TextArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -894,15 +901,15 @@ pub impl @json.FromJson for ChatCompletionRequestStop with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ChatCompletionRequestStop::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[String] = @json.from_json(value, path~)
-    return TextArray(decoded)
+    return ChatCompletionRequestStop::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any ChatCompletionRequestStop variant"),
   )
 }
@@ -1126,10 +1133,12 @@ pub extend ChatCompletionRequestResponseFormat with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionRequestResponseFormat with fn to_json(self) {
   match self {
-    JsonObject(value) => Json(value)
-    JsonSchema(value) => Json(value)
-    Text(value) => Json(value)
-    Unknown(_, value) => value
+    ChatCompletionRequestResponseFormat::JsonObject(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestResponseFormat::JsonSchema(value) =>
+      @json.Json::Json(value)
+    ChatCompletionRequestResponseFormat::Text(value) => @json.Json::Json(value)
+    ChatCompletionRequestResponseFormat::Unknown(_, value) => value
   }
 }
 
@@ -1146,10 +1155,17 @@ pub impl @json.FromJson for ChatCompletionRequestResponseFormat with fn from_jso
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "json_object" => JsonObject(@json.from_json(value, path~))
-    "json_schema" => JsonSchema(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "json_object" =>
+      ChatCompletionRequestResponseFormat::JsonObject(
+        @json.from_json(value, path~),
+      )
+    "json_schema" =>
+      ChatCompletionRequestResponseFormat::JsonSchema(
+        @json.from_json(value, path~),
+      )
+    "text" =>
+      ChatCompletionRequestResponseFormat::Text(@json.from_json(value, path~))
+    other => ChatCompletionRequestResponseFormat::Unknown(other, value)
   }
 }
 
@@ -1298,13 +1314,13 @@ pub extend ClipV1RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for ClipV1RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ClipV1RequestEmbeddingTypeText::Float => "float"
+    ClipV1RequestEmbeddingTypeText::Base64 => "base64"
+    ClipV1RequestEmbeddingTypeText::Binary => "binary"
+    ClipV1RequestEmbeddingTypeText::Ubinary => "ubinary"
+    ClipV1RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1322,14 +1338,14 @@ pub impl @json.FromJson for ClipV1RequestEmbeddingTypeText with fn from_json(
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(ClipV1RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(ClipV1RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(ClipV1RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(ClipV1RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ClipV1RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -1362,13 +1378,13 @@ pub impl ToJson for ClipV1RequestEmbeddingTypeTextArrayItem with fn to_json(
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ClipV1RequestEmbeddingTypeTextArrayItem::Float => "float"
+    ClipV1RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    ClipV1RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    ClipV1RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    ClipV1RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1388,14 +1404,17 @@ pub impl @json.FromJson for ClipV1RequestEmbeddingTypeTextArrayItem with fn from
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(ClipV1RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(ClipV1RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(ClipV1RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(ClipV1RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ClipV1RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -1423,8 +1442,8 @@ pub extend ClipV1RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for ClipV1RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    ClipV1RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    ClipV1RequestEmbeddingType::TextArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -1438,18 +1457,18 @@ pub impl @json.FromJson for ClipV1RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : ClipV1RequestEmbeddingTypeText = @json.from_json(value, path~)
-    return Text(decoded)
+    return ClipV1RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[ClipV1RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return ClipV1RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any ClipV1RequestEmbeddingType variant"),
   )
 }
@@ -1547,13 +1566,13 @@ pub extend ClipV2RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for ClipV2RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ClipV2RequestEmbeddingTypeText::Float => "float"
+    ClipV2RequestEmbeddingTypeText::Base64 => "base64"
+    ClipV2RequestEmbeddingTypeText::Binary => "binary"
+    ClipV2RequestEmbeddingTypeText::Ubinary => "ubinary"
+    ClipV2RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1571,14 +1590,14 @@ pub impl @json.FromJson for ClipV2RequestEmbeddingTypeText with fn from_json(
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(ClipV2RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(ClipV2RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(ClipV2RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(ClipV2RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ClipV2RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -1611,13 +1630,13 @@ pub impl ToJson for ClipV2RequestEmbeddingTypeTextArrayItem with fn to_json(
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ClipV2RequestEmbeddingTypeTextArrayItem::Float => "float"
+    ClipV2RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    ClipV2RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    ClipV2RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    ClipV2RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1637,14 +1656,17 @@ pub impl @json.FromJson for ClipV2RequestEmbeddingTypeTextArrayItem with fn from
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(ClipV2RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(ClipV2RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(ClipV2RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(ClipV2RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ClipV2RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -1672,8 +1694,8 @@ pub extend ClipV2RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for ClipV2RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    ClipV2RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    ClipV2RequestEmbeddingType::TextArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -1687,18 +1709,18 @@ pub impl @json.FromJson for ClipV2RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : ClipV2RequestEmbeddingTypeText = @json.from_json(value, path~)
-    return Text(decoded)
+    return ClipV2RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[ClipV2RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return ClipV2RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any ClipV2RequestEmbeddingType variant"),
   )
 }
@@ -1809,13 +1831,13 @@ pub impl ToJson for CodeEmbeddings1500MRequestEmbeddingTypeText with fn to_json(
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    CodeEmbeddings1500MRequestEmbeddingTypeText::Float => "float"
+    CodeEmbeddings1500MRequestEmbeddingTypeText::Base64 => "base64"
+    CodeEmbeddings1500MRequestEmbeddingTypeText::Binary => "binary"
+    CodeEmbeddings1500MRequestEmbeddingTypeText::Ubinary => "ubinary"
+    CodeEmbeddings1500MRequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1835,14 +1857,18 @@ pub impl @json.FromJson for CodeEmbeddings1500MRequestEmbeddingTypeText with fn 
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(CodeEmbeddings1500MRequestEmbeddingTypeText::Float)
+        "base64" =>
+          Option::Some(CodeEmbeddings1500MRequestEmbeddingTypeText::Base64)
+        "binary" =>
+          Option::Some(CodeEmbeddings1500MRequestEmbeddingTypeText::Binary)
+        "ubinary" =>
+          Option::Some(CodeEmbeddings1500MRequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CodeEmbeddings1500MRequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -1882,13 +1908,13 @@ pub impl ToJson for CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem with fn
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Float => "float"
+    CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1908,14 +1934,26 @@ pub impl @json.FromJson for CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(
+            CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Float,
+          )
+        "base64" =>
+          Option::Some(
+            CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Base64,
+          )
+        "binary" =>
+          Option::Some(
+            CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Binary,
+          )
+        "ubinary" =>
+          Option::Some(
+            CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Ubinary,
+          )
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -1945,8 +1983,10 @@ pub impl ToJson for CodeEmbeddings1500MRequestEmbeddingType with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    CodeEmbeddings1500MRequestEmbeddingType::Text(value) =>
+      @json.Json::Json(value)
+    CodeEmbeddings1500MRequestEmbeddingType::TextArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -1962,21 +2002,21 @@ pub impl @json.FromJson for CodeEmbeddings1500MRequestEmbeddingType with fn from
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : CodeEmbeddings1500MRequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return CodeEmbeddings1500MRequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return CodeEmbeddings1500MRequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any CodeEmbeddings1500MRequestEmbeddingType variant",
     ),
@@ -2016,19 +2056,21 @@ pub extend CodeEmbeddings1500MRequestTask with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeEmbeddings1500MRequestTask with fn to_json(self) {
   let raw = match self {
-    Nl2codeQuery => "nl2code.query"
-    Nl2codePassage => "nl2code.passage"
-    QaQuery => "qa.query"
-    QaPassage => "qa.passage"
-    Code2codeQuery => "code2code.query"
-    Code2codePassage => "code2code.passage"
-    Code2nlQuery => "code2nl.query"
-    Code2nlPassage => "code2nl.passage"
-    Code2completionQuery => "code2completion.query"
-    Code2completionPassage => "code2completion.passage"
-    Custom(raw) => raw
+    CodeEmbeddings1500MRequestTask::Nl2codeQuery => "nl2code.query"
+    CodeEmbeddings1500MRequestTask::Nl2codePassage => "nl2code.passage"
+    CodeEmbeddings1500MRequestTask::QaQuery => "qa.query"
+    CodeEmbeddings1500MRequestTask::QaPassage => "qa.passage"
+    CodeEmbeddings1500MRequestTask::Code2codeQuery => "code2code.query"
+    CodeEmbeddings1500MRequestTask::Code2codePassage => "code2code.passage"
+    CodeEmbeddings1500MRequestTask::Code2nlQuery => "code2nl.query"
+    CodeEmbeddings1500MRequestTask::Code2nlPassage => "code2nl.passage"
+    CodeEmbeddings1500MRequestTask::Code2completionQuery =>
+      "code2completion.query"
+    CodeEmbeddings1500MRequestTask::Code2completionPassage =>
+      "code2completion.passage"
+    CodeEmbeddings1500MRequestTask::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2046,20 +2088,28 @@ pub impl @json.FromJson for CodeEmbeddings1500MRequestTask with fn from_json(
     path,
     raw => {
       match raw {
-        "nl2code.query" => Some(Nl2codeQuery)
-        "nl2code.passage" => Some(Nl2codePassage)
-        "qa.query" => Some(QaQuery)
-        "qa.passage" => Some(QaPassage)
-        "code2code.query" => Some(Code2codeQuery)
-        "code2code.passage" => Some(Code2codePassage)
-        "code2nl.query" => Some(Code2nlQuery)
-        "code2nl.passage" => Some(Code2nlPassage)
-        "code2completion.query" => Some(Code2completionQuery)
-        "code2completion.passage" => Some(Code2completionPassage)
-        _ => None
+        "nl2code.query" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Nl2codeQuery)
+        "nl2code.passage" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Nl2codePassage)
+        "qa.query" => Option::Some(CodeEmbeddings1500MRequestTask::QaQuery)
+        "qa.passage" => Option::Some(CodeEmbeddings1500MRequestTask::QaPassage)
+        "code2code.query" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Code2codeQuery)
+        "code2code.passage" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Code2codePassage)
+        "code2nl.query" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Code2nlQuery)
+        "code2nl.passage" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Code2nlPassage)
+        "code2completion.query" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Code2completionQuery)
+        "code2completion.passage" =>
+          Option::Some(CodeEmbeddings1500MRequestTask::Code2completionPassage)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CodeEmbeddings1500MRequestTask::Custom(raw),
   )
 }
 
@@ -2171,13 +2221,13 @@ pub impl ToJson for CodeEmbeddings500MRequestEmbeddingTypeText with fn to_json(
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    CodeEmbeddings500MRequestEmbeddingTypeText::Float => "float"
+    CodeEmbeddings500MRequestEmbeddingTypeText::Base64 => "base64"
+    CodeEmbeddings500MRequestEmbeddingTypeText::Binary => "binary"
+    CodeEmbeddings500MRequestEmbeddingTypeText::Ubinary => "ubinary"
+    CodeEmbeddings500MRequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2197,14 +2247,18 @@ pub impl @json.FromJson for CodeEmbeddings500MRequestEmbeddingTypeText with fn f
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(CodeEmbeddings500MRequestEmbeddingTypeText::Float)
+        "base64" =>
+          Option::Some(CodeEmbeddings500MRequestEmbeddingTypeText::Base64)
+        "binary" =>
+          Option::Some(CodeEmbeddings500MRequestEmbeddingTypeText::Binary)
+        "ubinary" =>
+          Option::Some(CodeEmbeddings500MRequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CodeEmbeddings500MRequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -2244,13 +2298,13 @@ pub impl ToJson for CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem with fn 
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Float => "float"
+    CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2270,14 +2324,26 @@ pub impl @json.FromJson for CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem 
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(
+            CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Float,
+          )
+        "base64" =>
+          Option::Some(
+            CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Base64,
+          )
+        "binary" =>
+          Option::Some(
+            CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Binary,
+          )
+        "ubinary" =>
+          Option::Some(
+            CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Ubinary,
+          )
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -2305,8 +2371,10 @@ pub extend CodeEmbeddings500MRequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeEmbeddings500MRequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    CodeEmbeddings500MRequestEmbeddingType::Text(value) =>
+      @json.Json::Json(value)
+    CodeEmbeddings500MRequestEmbeddingType::TextArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -2322,21 +2390,21 @@ pub impl @json.FromJson for CodeEmbeddings500MRequestEmbeddingType with fn from_
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : CodeEmbeddings500MRequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return CodeEmbeddings500MRequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return CodeEmbeddings500MRequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any CodeEmbeddings500MRequestEmbeddingType variant",
     ),
@@ -2376,19 +2444,21 @@ pub extend CodeEmbeddings500MRequestTask with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeEmbeddings500MRequestTask with fn to_json(self) {
   let raw = match self {
-    Nl2codeQuery => "nl2code.query"
-    Nl2codePassage => "nl2code.passage"
-    QaQuery => "qa.query"
-    QaPassage => "qa.passage"
-    Code2codeQuery => "code2code.query"
-    Code2codePassage => "code2code.passage"
-    Code2nlQuery => "code2nl.query"
-    Code2nlPassage => "code2nl.passage"
-    Code2completionQuery => "code2completion.query"
-    Code2completionPassage => "code2completion.passage"
-    Custom(raw) => raw
+    CodeEmbeddings500MRequestTask::Nl2codeQuery => "nl2code.query"
+    CodeEmbeddings500MRequestTask::Nl2codePassage => "nl2code.passage"
+    CodeEmbeddings500MRequestTask::QaQuery => "qa.query"
+    CodeEmbeddings500MRequestTask::QaPassage => "qa.passage"
+    CodeEmbeddings500MRequestTask::Code2codeQuery => "code2code.query"
+    CodeEmbeddings500MRequestTask::Code2codePassage => "code2code.passage"
+    CodeEmbeddings500MRequestTask::Code2nlQuery => "code2nl.query"
+    CodeEmbeddings500MRequestTask::Code2nlPassage => "code2nl.passage"
+    CodeEmbeddings500MRequestTask::Code2completionQuery =>
+      "code2completion.query"
+    CodeEmbeddings500MRequestTask::Code2completionPassage =>
+      "code2completion.passage"
+    CodeEmbeddings500MRequestTask::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2406,20 +2476,28 @@ pub impl @json.FromJson for CodeEmbeddings500MRequestTask with fn from_json(
     path,
     raw => {
       match raw {
-        "nl2code.query" => Some(Nl2codeQuery)
-        "nl2code.passage" => Some(Nl2codePassage)
-        "qa.query" => Some(QaQuery)
-        "qa.passage" => Some(QaPassage)
-        "code2code.query" => Some(Code2codeQuery)
-        "code2code.passage" => Some(Code2codePassage)
-        "code2nl.query" => Some(Code2nlQuery)
-        "code2nl.passage" => Some(Code2nlPassage)
-        "code2completion.query" => Some(Code2completionQuery)
-        "code2completion.passage" => Some(Code2completionPassage)
-        _ => None
+        "nl2code.query" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Nl2codeQuery)
+        "nl2code.passage" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Nl2codePassage)
+        "qa.query" => Option::Some(CodeEmbeddings500MRequestTask::QaQuery)
+        "qa.passage" => Option::Some(CodeEmbeddings500MRequestTask::QaPassage)
+        "code2code.query" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Code2codeQuery)
+        "code2code.passage" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Code2codePassage)
+        "code2nl.query" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Code2nlQuery)
+        "code2nl.passage" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Code2nlPassage)
+        "code2completion.query" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Code2completionQuery)
+        "code2completion.passage" =>
+          Option::Some(CodeEmbeddings500MRequestTask::Code2completionPassage)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CodeEmbeddings500MRequestTask::Custom(raw),
   )
 }
 
@@ -2524,13 +2602,13 @@ pub extend ColbertV1RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for ColbertV1RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ColbertV1RequestEmbeddingTypeText::Float => "float"
+    ColbertV1RequestEmbeddingTypeText::Base64 => "base64"
+    ColbertV1RequestEmbeddingTypeText::Binary => "binary"
+    ColbertV1RequestEmbeddingTypeText::Ubinary => "ubinary"
+    ColbertV1RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2548,14 +2626,14 @@ pub impl @json.FromJson for ColbertV1RequestEmbeddingTypeText with fn from_json(
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(ColbertV1RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(ColbertV1RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(ColbertV1RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(ColbertV1RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ColbertV1RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -2593,13 +2671,13 @@ pub impl ToJson for ColbertV1RequestEmbeddingTypeTextArrayItem with fn to_json(
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ColbertV1RequestEmbeddingTypeTextArrayItem::Float => "float"
+    ColbertV1RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    ColbertV1RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    ColbertV1RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    ColbertV1RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2619,14 +2697,18 @@ pub impl @json.FromJson for ColbertV1RequestEmbeddingTypeTextArrayItem with fn f
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(ColbertV1RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(ColbertV1RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(ColbertV1RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(ColbertV1RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ColbertV1RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -2654,8 +2736,8 @@ pub extend ColbertV1RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for ColbertV1RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    ColbertV1RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    ColbertV1RequestEmbeddingType::TextArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -2669,21 +2751,21 @@ pub impl @json.FromJson for ColbertV1RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : ColbertV1RequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return ColbertV1RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[ColbertV1RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return ColbertV1RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ColbertV1RequestEmbeddingType variant",
     ),
@@ -2715,11 +2797,11 @@ pub extend ColbertV1RequestInputType with ToJson::{to_json}
 ///|
 pub impl ToJson for ColbertV1RequestInputType with fn to_json(self) {
   let raw = match self {
-    Query => "query"
-    Document => "document"
-    Custom(raw) => raw
+    ColbertV1RequestInputType::Query => "query"
+    ColbertV1RequestInputType::Document => "document"
+    ColbertV1RequestInputType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2737,12 +2819,12 @@ pub impl @json.FromJson for ColbertV1RequestInputType with fn from_json(
     path,
     raw => {
       match raw {
-        "query" => Some(Query)
-        "document" => Some(Document)
-        _ => None
+        "query" => Option::Some(ColbertV1RequestInputType::Query)
+        "document" => Option::Some(ColbertV1RequestInputType::Document)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ColbertV1RequestInputType::Custom(raw),
   )
 }
 
@@ -2834,13 +2916,13 @@ pub extend ColbertV2RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for ColbertV2RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ColbertV2RequestEmbeddingTypeText::Float => "float"
+    ColbertV2RequestEmbeddingTypeText::Base64 => "base64"
+    ColbertV2RequestEmbeddingTypeText::Binary => "binary"
+    ColbertV2RequestEmbeddingTypeText::Ubinary => "ubinary"
+    ColbertV2RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2858,14 +2940,14 @@ pub impl @json.FromJson for ColbertV2RequestEmbeddingTypeText with fn from_json(
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(ColbertV2RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(ColbertV2RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(ColbertV2RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(ColbertV2RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ColbertV2RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -2903,13 +2985,13 @@ pub impl ToJson for ColbertV2RequestEmbeddingTypeTextArrayItem with fn to_json(
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    ColbertV2RequestEmbeddingTypeTextArrayItem::Float => "float"
+    ColbertV2RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    ColbertV2RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    ColbertV2RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    ColbertV2RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2929,14 +3011,18 @@ pub impl @json.FromJson for ColbertV2RequestEmbeddingTypeTextArrayItem with fn f
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(ColbertV2RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(ColbertV2RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(ColbertV2RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(ColbertV2RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ColbertV2RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -2964,8 +3050,8 @@ pub extend ColbertV2RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for ColbertV2RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    ColbertV2RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    ColbertV2RequestEmbeddingType::TextArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -2979,21 +3065,21 @@ pub impl @json.FromJson for ColbertV2RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : ColbertV2RequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return ColbertV2RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[ColbertV2RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return ColbertV2RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ColbertV2RequestEmbeddingType variant",
     ),
@@ -3025,11 +3111,11 @@ pub extend ColbertV2RequestInputType with ToJson::{to_json}
 ///|
 pub impl ToJson for ColbertV2RequestInputType with fn to_json(self) {
   let raw = match self {
-    Query => "query"
-    Document => "document"
-    Custom(raw) => raw
+    ColbertV2RequestInputType::Query => "query"
+    ColbertV2RequestInputType::Document => "document"
+    ColbertV2RequestInputType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3047,12 +3133,12 @@ pub impl @json.FromJson for ColbertV2RequestInputType with fn from_json(
     path,
     raw => {
       match raw {
-        "query" => Some(Query)
-        "document" => Some(Document)
-        _ => None
+        "query" => Option::Some(ColbertV2RequestInputType::Query)
+        "document" => Option::Some(ColbertV2RequestInputType::Document)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ColbertV2RequestInputType::Custom(raw),
   )
 }
 
@@ -3209,13 +3295,13 @@ pub extend EmbeddingsV2RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV2RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV2RequestEmbeddingTypeText::Float => "float"
+    EmbeddingsV2RequestEmbeddingTypeText::Base64 => "base64"
+    EmbeddingsV2RequestEmbeddingTypeText::Binary => "binary"
+    EmbeddingsV2RequestEmbeddingTypeText::Ubinary => "ubinary"
+    EmbeddingsV2RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3233,14 +3319,14 @@ pub impl @json.FromJson for EmbeddingsV2RequestEmbeddingTypeText with fn from_js
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(EmbeddingsV2RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(EmbeddingsV2RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(EmbeddingsV2RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(EmbeddingsV2RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV2RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -3278,13 +3364,13 @@ pub impl ToJson for EmbeddingsV2RequestEmbeddingTypeTextArrayItem with fn to_jso
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Float => "float"
+    EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3304,14 +3390,18 @@ pub impl @json.FromJson for EmbeddingsV2RequestEmbeddingTypeTextArrayItem with f
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV2RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -3339,8 +3429,9 @@ pub extend EmbeddingsV2RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV2RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    EmbeddingsV2RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    EmbeddingsV2RequestEmbeddingType::TextArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -3354,21 +3445,21 @@ pub impl @json.FromJson for EmbeddingsV2RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : EmbeddingsV2RequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return EmbeddingsV2RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[EmbeddingsV2RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return EmbeddingsV2RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any EmbeddingsV2RequestEmbeddingType variant",
     ),
@@ -3403,14 +3494,19 @@ pub extend EmbeddingsV2RequestModel with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV2RequestModel with fn to_json(self) {
   let raw = match self {
-    JinaEmbeddingsV2BaseEn => "jina-embeddings-v2-base-en"
-    JinaEmbeddingsV2BaseZh => "jina-embeddings-v2-base-zh"
-    JinaEmbeddingsV2BaseDe => "jina-embeddings-v2-base-de"
-    JinaEmbeddingsV2BaseEs => "jina-embeddings-v2-base-es"
-    JinaEmbeddingsV2BaseCode => "jina-embeddings-v2-base-code"
-    Custom(raw) => raw
+    EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseEn =>
+      "jina-embeddings-v2-base-en"
+    EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseZh =>
+      "jina-embeddings-v2-base-zh"
+    EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseDe =>
+      "jina-embeddings-v2-base-de"
+    EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseEs =>
+      "jina-embeddings-v2-base-es"
+    EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseCode =>
+      "jina-embeddings-v2-base-code"
+    EmbeddingsV2RequestModel::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3428,15 +3524,20 @@ pub impl @json.FromJson for EmbeddingsV2RequestModel with fn from_json(
     path,
     raw => {
       match raw {
-        "jina-embeddings-v2-base-en" => Some(JinaEmbeddingsV2BaseEn)
-        "jina-embeddings-v2-base-zh" => Some(JinaEmbeddingsV2BaseZh)
-        "jina-embeddings-v2-base-de" => Some(JinaEmbeddingsV2BaseDe)
-        "jina-embeddings-v2-base-es" => Some(JinaEmbeddingsV2BaseEs)
-        "jina-embeddings-v2-base-code" => Some(JinaEmbeddingsV2BaseCode)
-        _ => None
+        "jina-embeddings-v2-base-en" =>
+          Option::Some(EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseEn)
+        "jina-embeddings-v2-base-zh" =>
+          Option::Some(EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseZh)
+        "jina-embeddings-v2-base-de" =>
+          Option::Some(EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseDe)
+        "jina-embeddings-v2-base-es" =>
+          Option::Some(EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseEs)
+        "jina-embeddings-v2-base-code" =>
+          Option::Some(EmbeddingsV2RequestModel::JinaEmbeddingsV2BaseCode)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV2RequestModel::Custom(raw),
   )
 }
 
@@ -3537,13 +3638,13 @@ pub extend EmbeddingsV3RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV3RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV3RequestEmbeddingTypeText::Float => "float"
+    EmbeddingsV3RequestEmbeddingTypeText::Base64 => "base64"
+    EmbeddingsV3RequestEmbeddingTypeText::Binary => "binary"
+    EmbeddingsV3RequestEmbeddingTypeText::Ubinary => "ubinary"
+    EmbeddingsV3RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3561,14 +3662,14 @@ pub impl @json.FromJson for EmbeddingsV3RequestEmbeddingTypeText with fn from_js
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(EmbeddingsV3RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(EmbeddingsV3RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(EmbeddingsV3RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(EmbeddingsV3RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV3RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -3606,13 +3707,13 @@ pub impl ToJson for EmbeddingsV3RequestEmbeddingTypeTextArrayItem with fn to_jso
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Float => "float"
+    EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3632,14 +3733,18 @@ pub impl @json.FromJson for EmbeddingsV3RequestEmbeddingTypeTextArrayItem with f
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV3RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -3667,8 +3772,9 @@ pub extend EmbeddingsV3RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV3RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    EmbeddingsV3RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    EmbeddingsV3RequestEmbeddingType::TextArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -3682,21 +3788,21 @@ pub impl @json.FromJson for EmbeddingsV3RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : EmbeddingsV3RequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return EmbeddingsV3RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[EmbeddingsV3RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return EmbeddingsV3RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any EmbeddingsV3RequestEmbeddingType variant",
     ),
@@ -3731,14 +3837,14 @@ pub extend EmbeddingsV3RequestTask with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV3RequestTask with fn to_json(self) {
   let raw = match self {
-    RetrievalQuery => "retrieval.query"
-    RetrievalPassage => "retrieval.passage"
-    TextMatching => "text-matching"
-    Classification => "classification"
-    Separation => "separation"
-    Custom(raw) => raw
+    EmbeddingsV3RequestTask::RetrievalQuery => "retrieval.query"
+    EmbeddingsV3RequestTask::RetrievalPassage => "retrieval.passage"
+    EmbeddingsV3RequestTask::TextMatching => "text-matching"
+    EmbeddingsV3RequestTask::Classification => "classification"
+    EmbeddingsV3RequestTask::Separation => "separation"
+    EmbeddingsV3RequestTask::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3756,15 +3862,18 @@ pub impl @json.FromJson for EmbeddingsV3RequestTask with fn from_json(
     path,
     raw => {
       match raw {
-        "retrieval.query" => Some(RetrievalQuery)
-        "retrieval.passage" => Some(RetrievalPassage)
-        "text-matching" => Some(TextMatching)
-        "classification" => Some(Classification)
-        "separation" => Some(Separation)
-        _ => None
+        "retrieval.query" =>
+          Option::Some(EmbeddingsV3RequestTask::RetrievalQuery)
+        "retrieval.passage" =>
+          Option::Some(EmbeddingsV3RequestTask::RetrievalPassage)
+        "text-matching" => Option::Some(EmbeddingsV3RequestTask::TextMatching)
+        "classification" =>
+          Option::Some(EmbeddingsV3RequestTask::Classification)
+        "separation" => Option::Some(EmbeddingsV3RequestTask::Separation)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV3RequestTask::Custom(raw),
   )
 }
 
@@ -3876,13 +3985,13 @@ pub extend EmbeddingsV4RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV4RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV4RequestEmbeddingTypeText::Float => "float"
+    EmbeddingsV4RequestEmbeddingTypeText::Base64 => "base64"
+    EmbeddingsV4RequestEmbeddingTypeText::Binary => "binary"
+    EmbeddingsV4RequestEmbeddingTypeText::Ubinary => "ubinary"
+    EmbeddingsV4RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3900,14 +4009,14 @@ pub impl @json.FromJson for EmbeddingsV4RequestEmbeddingTypeText with fn from_js
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(EmbeddingsV4RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(EmbeddingsV4RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(EmbeddingsV4RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(EmbeddingsV4RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV4RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -3945,13 +4054,13 @@ pub impl ToJson for EmbeddingsV4RequestEmbeddingTypeTextArrayItem with fn to_jso
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Float => "float"
+    EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3971,14 +4080,18 @@ pub impl @json.FromJson for EmbeddingsV4RequestEmbeddingTypeTextArrayItem with f
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV4RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -4006,8 +4119,9 @@ pub extend EmbeddingsV4RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV4RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    EmbeddingsV4RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    EmbeddingsV4RequestEmbeddingType::TextArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -4021,21 +4135,21 @@ pub impl @json.FromJson for EmbeddingsV4RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : EmbeddingsV4RequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return EmbeddingsV4RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[EmbeddingsV4RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return EmbeddingsV4RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any EmbeddingsV4RequestEmbeddingType variant",
     ),
@@ -4070,14 +4184,14 @@ pub extend EmbeddingsV4RequestTask with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV4RequestTask with fn to_json(self) {
   let raw = match self {
-    TextMatching => "text-matching"
-    RetrievalQuery => "retrieval.query"
-    RetrievalPassage => "retrieval.passage"
-    CodeQuery => "code.query"
-    CodePassage => "code.passage"
-    Custom(raw) => raw
+    EmbeddingsV4RequestTask::TextMatching => "text-matching"
+    EmbeddingsV4RequestTask::RetrievalQuery => "retrieval.query"
+    EmbeddingsV4RequestTask::RetrievalPassage => "retrieval.passage"
+    EmbeddingsV4RequestTask::CodeQuery => "code.query"
+    EmbeddingsV4RequestTask::CodePassage => "code.passage"
+    EmbeddingsV4RequestTask::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4095,15 +4209,17 @@ pub impl @json.FromJson for EmbeddingsV4RequestTask with fn from_json(
     path,
     raw => {
       match raw {
-        "text-matching" => Some(TextMatching)
-        "retrieval.query" => Some(RetrievalQuery)
-        "retrieval.passage" => Some(RetrievalPassage)
-        "code.query" => Some(CodeQuery)
-        "code.passage" => Some(CodePassage)
-        _ => None
+        "text-matching" => Option::Some(EmbeddingsV4RequestTask::TextMatching)
+        "retrieval.query" =>
+          Option::Some(EmbeddingsV4RequestTask::RetrievalQuery)
+        "retrieval.passage" =>
+          Option::Some(EmbeddingsV4RequestTask::RetrievalPassage)
+        "code.query" => Option::Some(EmbeddingsV4RequestTask::CodeQuery)
+        "code.passage" => Option::Some(EmbeddingsV4RequestTask::CodePassage)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV4RequestTask::Custom(raw),
   )
 }
 
@@ -4224,13 +4340,13 @@ pub extend EmbeddingsV5RequestEmbeddingTypeText with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV5RequestEmbeddingTypeText with fn to_json(self) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV5RequestEmbeddingTypeText::Float => "float"
+    EmbeddingsV5RequestEmbeddingTypeText::Base64 => "base64"
+    EmbeddingsV5RequestEmbeddingTypeText::Binary => "binary"
+    EmbeddingsV5RequestEmbeddingTypeText::Ubinary => "ubinary"
+    EmbeddingsV5RequestEmbeddingTypeText::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4248,14 +4364,14 @@ pub impl @json.FromJson for EmbeddingsV5RequestEmbeddingTypeText with fn from_js
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" => Option::Some(EmbeddingsV5RequestEmbeddingTypeText::Float)
+        "base64" => Option::Some(EmbeddingsV5RequestEmbeddingTypeText::Base64)
+        "binary" => Option::Some(EmbeddingsV5RequestEmbeddingTypeText::Binary)
+        "ubinary" => Option::Some(EmbeddingsV5RequestEmbeddingTypeText::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV5RequestEmbeddingTypeText::Custom(raw),
   )
 }
 
@@ -4293,13 +4409,13 @@ pub impl ToJson for EmbeddingsV5RequestEmbeddingTypeTextArrayItem with fn to_jso
   self,
 ) {
   let raw = match self {
-    Float => "float"
-    Base64 => "base64"
-    Binary => "binary"
-    Ubinary => "ubinary"
-    Custom(raw) => raw
+    EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Float => "float"
+    EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Base64 => "base64"
+    EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Binary => "binary"
+    EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Ubinary => "ubinary"
+    EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4319,14 +4435,18 @@ pub impl @json.FromJson for EmbeddingsV5RequestEmbeddingTypeTextArrayItem with f
     path,
     raw => {
       match raw {
-        "float" => Some(Float)
-        "base64" => Some(Base64)
-        "binary" => Some(Binary)
-        "ubinary" => Some(Ubinary)
-        _ => None
+        "float" =>
+          Option::Some(EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Float)
+        "base64" =>
+          Option::Some(EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Base64)
+        "binary" =>
+          Option::Some(EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Binary)
+        "ubinary" =>
+          Option::Some(EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Ubinary)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV5RequestEmbeddingTypeTextArrayItem::Custom(raw),
   )
 }
 
@@ -4354,8 +4474,9 @@ pub extend EmbeddingsV5RequestEmbeddingType with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV5RequestEmbeddingType with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
+    EmbeddingsV5RequestEmbeddingType::Text(value) => @json.Json::Json(value)
+    EmbeddingsV5RequestEmbeddingType::TextArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -4369,21 +4490,21 @@ pub impl @json.FromJson for EmbeddingsV5RequestEmbeddingType with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : EmbeddingsV5RequestEmbeddingTypeText = @json.from_json(
       value,
       path~,
     )
-    return Text(decoded)
+    return EmbeddingsV5RequestEmbeddingType::Text(decoded)
   }
-  if json_array_matches(value, item => item is String(_)) {
+  if json_array_matches(value, item => item is @json.Json::String(_)) {
     let decoded : Array[EmbeddingsV5RequestEmbeddingTypeTextArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return TextArray(decoded)
+    return EmbeddingsV5RequestEmbeddingType::TextArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any EmbeddingsV5RequestEmbeddingType variant",
     ),
@@ -4417,13 +4538,17 @@ pub extend EmbeddingsV5RequestModel with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV5RequestModel with fn to_json(self) {
   let raw = match self {
-    JinaEmbeddingsV5TextNano => "jina-embeddings-v5-text-nano"
-    JinaEmbeddingsV5TextSmall => "jina-embeddings-v5-text-small"
-    JinaEmbeddingsV5OmniSmall => "jina-embeddings-v5-omni-small"
-    JinaEmbeddingsV5OmniNano => "jina-embeddings-v5-omni-nano"
-    Custom(raw) => raw
+    EmbeddingsV5RequestModel::JinaEmbeddingsV5TextNano =>
+      "jina-embeddings-v5-text-nano"
+    EmbeddingsV5RequestModel::JinaEmbeddingsV5TextSmall =>
+      "jina-embeddings-v5-text-small"
+    EmbeddingsV5RequestModel::JinaEmbeddingsV5OmniSmall =>
+      "jina-embeddings-v5-omni-small"
+    EmbeddingsV5RequestModel::JinaEmbeddingsV5OmniNano =>
+      "jina-embeddings-v5-omni-nano"
+    EmbeddingsV5RequestModel::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4441,14 +4566,18 @@ pub impl @json.FromJson for EmbeddingsV5RequestModel with fn from_json(
     path,
     raw => {
       match raw {
-        "jina-embeddings-v5-text-nano" => Some(JinaEmbeddingsV5TextNano)
-        "jina-embeddings-v5-text-small" => Some(JinaEmbeddingsV5TextSmall)
-        "jina-embeddings-v5-omni-small" => Some(JinaEmbeddingsV5OmniSmall)
-        "jina-embeddings-v5-omni-nano" => Some(JinaEmbeddingsV5OmniNano)
-        _ => None
+        "jina-embeddings-v5-text-nano" =>
+          Option::Some(EmbeddingsV5RequestModel::JinaEmbeddingsV5TextNano)
+        "jina-embeddings-v5-text-small" =>
+          Option::Some(EmbeddingsV5RequestModel::JinaEmbeddingsV5TextSmall)
+        "jina-embeddings-v5-omni-small" =>
+          Option::Some(EmbeddingsV5RequestModel::JinaEmbeddingsV5OmniSmall)
+        "jina-embeddings-v5-omni-nano" =>
+          Option::Some(EmbeddingsV5RequestModel::JinaEmbeddingsV5OmniNano)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV5RequestModel::Custom(raw),
   )
 }
 
@@ -4480,14 +4609,14 @@ pub extend EmbeddingsV5RequestTask with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV5RequestTask with fn to_json(self) {
   let raw = match self {
-    RetrievalQuery => "retrieval.query"
-    RetrievalPassage => "retrieval.passage"
-    TextMatching => "text-matching"
-    Clustering => "clustering"
-    Classification => "classification"
-    Custom(raw) => raw
+    EmbeddingsV5RequestTask::RetrievalQuery => "retrieval.query"
+    EmbeddingsV5RequestTask::RetrievalPassage => "retrieval.passage"
+    EmbeddingsV5RequestTask::TextMatching => "text-matching"
+    EmbeddingsV5RequestTask::Clustering => "clustering"
+    EmbeddingsV5RequestTask::Classification => "classification"
+    EmbeddingsV5RequestTask::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4505,15 +4634,18 @@ pub impl @json.FromJson for EmbeddingsV5RequestTask with fn from_json(
     path,
     raw => {
       match raw {
-        "retrieval.query" => Some(RetrievalQuery)
-        "retrieval.passage" => Some(RetrievalPassage)
-        "text-matching" => Some(TextMatching)
-        "clustering" => Some(Clustering)
-        "classification" => Some(Classification)
-        _ => None
+        "retrieval.query" =>
+          Option::Some(EmbeddingsV5RequestTask::RetrievalQuery)
+        "retrieval.passage" =>
+          Option::Some(EmbeddingsV5RequestTask::RetrievalPassage)
+        "text-matching" => Option::Some(EmbeddingsV5RequestTask::TextMatching)
+        "clustering" => Option::Some(EmbeddingsV5RequestTask::Clustering)
+        "classification" =>
+          Option::Some(EmbeddingsV5RequestTask::Classification)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbeddingsV5RequestTask::Custom(raw),
   )
 }
 
@@ -5169,8 +5301,8 @@ pub extend RerankerM0RequestQuery with ToJson::{to_json}
 ///|
 pub impl ToJson for RerankerM0RequestQuery with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    ImageDoc(value) => Json(value)
+    RerankerM0RequestQuery::Text(value) => @json.Json::Json(value)
+    RerankerM0RequestQuery::ImageDoc(value) => @json.Json::Json(value)
   }
 }
 
@@ -5184,15 +5316,15 @@ pub impl @json.FromJson for RerankerM0RequestQuery with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return RerankerM0RequestQuery::Text(decoded)
   }
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : ImageDoc = @json.from_json(value, path~)
-    return ImageDoc(decoded)
+    return RerankerM0RequestQuery::ImageDoc(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any RerankerM0RequestQuery variant"),
   )
 }
@@ -5288,11 +5420,11 @@ pub extend RerankerV3RequestModel with ToJson::{to_json}
 ///|
 pub impl ToJson for RerankerV3RequestModel with fn to_json(self) {
   let raw = match self {
-    JinaRerankerV3 => "jina-reranker-v3"
-    JinaRerankerV35 => "jina-reranker-v3.5"
-    Custom(raw) => raw
+    RerankerV3RequestModel::JinaRerankerV3 => "jina-reranker-v3"
+    RerankerV3RequestModel::JinaRerankerV35 => "jina-reranker-v3.5"
+    RerankerV3RequestModel::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5310,12 +5442,14 @@ pub impl @json.FromJson for RerankerV3RequestModel with fn from_json(
     path,
     raw => {
       match raw {
-        "jina-reranker-v3" => Some(JinaRerankerV3)
-        "jina-reranker-v3.5" => Some(JinaRerankerV35)
-        _ => None
+        "jina-reranker-v3" =>
+          Option::Some(RerankerV3RequestModel::JinaRerankerV3)
+        "jina-reranker-v3.5" =>
+          Option::Some(RerankerV3RequestModel::JinaRerankerV35)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => RerankerV3RequestModel::Custom(raw),
   )
 }
 
@@ -5385,8 +5519,8 @@ pub extend RerankerV3RequestDocumentsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for RerankerV3RequestDocumentsItem with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextDoc(value) => Json(value)
+    RerankerV3RequestDocumentsItem::Text(value) => @json.Json::Json(value)
+    RerankerV3RequestDocumentsItem::TextDoc(value) => @json.Json::Json(value)
   }
 }
 
@@ -5400,15 +5534,15 @@ pub impl @json.FromJson for RerankerV3RequestDocumentsItem with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return RerankerV3RequestDocumentsItem::Text(decoded)
   }
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : TextDoc = @json.from_json(value, path~)
-    return TextDoc(decoded)
+    return RerankerV3RequestDocumentsItem::TextDoc(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any RerankerV3RequestDocumentsItem variant",
     ),
@@ -5649,15 +5783,17 @@ pub extend TextRerankerRequestModel with ToJson::{to_json}
 ///|
 pub impl ToJson for TextRerankerRequestModel with fn to_json(self) {
   let raw = match self {
-    JinaRerankerV2BaseMultilingual => "jina-reranker-v2-base-multilingual"
-    JinaRerankerV1TinyEn => "jina-reranker-v1-tiny-en"
-    JinaRerankerV1TurboEn => "jina-reranker-v1-turbo-en"
-    JinaRerankerV1BaseEn => "jina-reranker-v1-base-en"
-    JinaColbertV1En => "jina-colbert-v1-en"
-    JinaColbertV2 => "jina-colbert-v2"
-    Custom(raw) => raw
+    TextRerankerRequestModel::JinaRerankerV2BaseMultilingual =>
+      "jina-reranker-v2-base-multilingual"
+    TextRerankerRequestModel::JinaRerankerV1TinyEn => "jina-reranker-v1-tiny-en"
+    TextRerankerRequestModel::JinaRerankerV1TurboEn =>
+      "jina-reranker-v1-turbo-en"
+    TextRerankerRequestModel::JinaRerankerV1BaseEn => "jina-reranker-v1-base-en"
+    TextRerankerRequestModel::JinaColbertV1En => "jina-colbert-v1-en"
+    TextRerankerRequestModel::JinaColbertV2 => "jina-colbert-v2"
+    TextRerankerRequestModel::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5676,16 +5812,21 @@ pub impl @json.FromJson for TextRerankerRequestModel with fn from_json(
     raw => {
       match raw {
         "jina-reranker-v2-base-multilingual" =>
-          Some(JinaRerankerV2BaseMultilingual)
-        "jina-reranker-v1-tiny-en" => Some(JinaRerankerV1TinyEn)
-        "jina-reranker-v1-turbo-en" => Some(JinaRerankerV1TurboEn)
-        "jina-reranker-v1-base-en" => Some(JinaRerankerV1BaseEn)
-        "jina-colbert-v1-en" => Some(JinaColbertV1En)
-        "jina-colbert-v2" => Some(JinaColbertV2)
-        _ => None
+          Option::Some(TextRerankerRequestModel::JinaRerankerV2BaseMultilingual)
+        "jina-reranker-v1-tiny-en" =>
+          Option::Some(TextRerankerRequestModel::JinaRerankerV1TinyEn)
+        "jina-reranker-v1-turbo-en" =>
+          Option::Some(TextRerankerRequestModel::JinaRerankerV1TurboEn)
+        "jina-reranker-v1-base-en" =>
+          Option::Some(TextRerankerRequestModel::JinaRerankerV1BaseEn)
+        "jina-colbert-v1-en" =>
+          Option::Some(TextRerankerRequestModel::JinaColbertV1En)
+        "jina-colbert-v2" =>
+          Option::Some(TextRerankerRequestModel::JinaColbertV2)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => TextRerankerRequestModel::Custom(raw),
   )
 }
 
@@ -5713,8 +5854,8 @@ pub extend TextRerankerRequestDocumentsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for TextRerankerRequestDocumentsItem with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    TextDoc(value) => Json(value)
+    TextRerankerRequestDocumentsItem::Text(value) => @json.Json::Json(value)
+    TextRerankerRequestDocumentsItem::TextDoc(value) => @json.Json::Json(value)
   }
 }
 
@@ -5728,15 +5869,15 @@ pub impl @json.FromJson for TextRerankerRequestDocumentsItem with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return TextRerankerRequestDocumentsItem::Text(decoded)
   }
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : TextDoc = @json.from_json(value, path~)
-    return TextDoc(decoded)
+    return TextRerankerRequestDocumentsItem::TextDoc(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any TextRerankerRequestDocumentsItem variant",
     ),
@@ -5853,24 +5994,41 @@ pub extend EmbeddingsV1EmbeddingsPostRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingsV1EmbeddingsPostRequest with fn to_json(self) {
   match self {
-    JinaEmbeddingsV2BaseEn(value) => Json(value)
-    JinaEmbeddingsV2BaseZh(value) => Json(value)
-    JinaEmbeddingsV2BaseDe(value) => Json(value)
-    JinaEmbeddingsV2BaseEs(value) => Json(value)
-    JinaEmbeddingsV2BaseCode(value) => Json(value)
-    JinaEmbeddingsV3(value) => Json(value)
-    JinaEmbeddingsV4(value) => Json(value)
-    JinaEmbeddingsV5TextNano(value) => Json(value)
-    JinaEmbeddingsV5TextSmall(value) => Json(value)
-    JinaEmbeddingsV5OmniSmall(value) => Json(value)
-    JinaEmbeddingsV5OmniNano(value) => Json(value)
-    JinaCodeEmbeddings05b(value) => Json(value)
-    JinaCodeEmbeddings15b(value) => Json(value)
-    JinaClipV1(value) => Json(value)
-    JinaClipV2(value) => Json(value)
-    JinaColbertV1En(value) => Json(value)
-    JinaColbertV2(value) => Json(value)
-    Unknown(_, value) => value
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseEn(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseZh(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseDe(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseEs(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseCode(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV3(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV4(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5TextNano(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5TextSmall(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5OmniSmall(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5OmniNano(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaCodeEmbeddings05b(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaCodeEmbeddings15b(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaClipV1(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaClipV2(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaColbertV1En(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::JinaColbertV2(value) =>
+      @json.Json::Json(value)
+    EmbeddingsV1EmbeddingsPostRequest::Unknown(_, value) => value
   }
 }
 
@@ -5888,34 +6046,74 @@ pub impl @json.FromJson for EmbeddingsV1EmbeddingsPostRequest with fn from_json(
   let tag : String = required_field(obj, "model", path)
   match tag {
     "jina-embeddings-v2-base-en" =>
-      JinaEmbeddingsV2BaseEn(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseEn(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v2-base-zh" =>
-      JinaEmbeddingsV2BaseZh(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseZh(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v2-base-de" =>
-      JinaEmbeddingsV2BaseDe(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseDe(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v2-base-es" =>
-      JinaEmbeddingsV2BaseEs(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseEs(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v2-base-code" =>
-      JinaEmbeddingsV2BaseCode(@json.from_json(value, path~))
-    "jina-embeddings-v3" => JinaEmbeddingsV3(@json.from_json(value, path~))
-    "jina-embeddings-v4" => JinaEmbeddingsV4(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV2BaseCode(
+        @json.from_json(value, path~),
+      )
+    "jina-embeddings-v3" =>
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV3(
+        @json.from_json(value, path~),
+      )
+    "jina-embeddings-v4" =>
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV4(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v5-text-nano" =>
-      JinaEmbeddingsV5TextNano(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5TextNano(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v5-text-small" =>
-      JinaEmbeddingsV5TextSmall(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5TextSmall(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v5-omni-small" =>
-      JinaEmbeddingsV5OmniSmall(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5OmniSmall(
+        @json.from_json(value, path~),
+      )
     "jina-embeddings-v5-omni-nano" =>
-      JinaEmbeddingsV5OmniNano(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaEmbeddingsV5OmniNano(
+        @json.from_json(value, path~),
+      )
     "jina-code-embeddings-0.5b" =>
-      JinaCodeEmbeddings05b(@json.from_json(value, path~))
+      EmbeddingsV1EmbeddingsPostRequest::JinaCodeEmbeddings05b(
+        @json.from_json(value, path~),
+      )
     "jina-code-embeddings-1.5b" =>
-      JinaCodeEmbeddings15b(@json.from_json(value, path~))
-    "jina-clip-v1" => JinaClipV1(@json.from_json(value, path~))
-    "jina-clip-v2" => JinaClipV2(@json.from_json(value, path~))
-    "jina-colbert-v1-en" => JinaColbertV1En(@json.from_json(value, path~))
-    "jina-colbert-v2" => JinaColbertV2(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      EmbeddingsV1EmbeddingsPostRequest::JinaCodeEmbeddings15b(
+        @json.from_json(value, path~),
+      )
+    "jina-clip-v1" =>
+      EmbeddingsV1EmbeddingsPostRequest::JinaClipV1(
+        @json.from_json(value, path~),
+      )
+    "jina-clip-v2" =>
+      EmbeddingsV1EmbeddingsPostRequest::JinaClipV2(
+        @json.from_json(value, path~),
+      )
+    "jina-colbert-v1-en" =>
+      EmbeddingsV1EmbeddingsPostRequest::JinaColbertV1En(
+        @json.from_json(value, path~),
+      )
+    "jina-colbert-v2" =>
+      EmbeddingsV1EmbeddingsPostRequest::JinaColbertV2(
+        @json.from_json(value, path~),
+      )
+    other => EmbeddingsV1EmbeddingsPostRequest::Unknown(other, value)
   }
 }
 
@@ -5951,16 +6149,20 @@ pub extend RerankV1RerankPostRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for RerankV1RerankPostRequest with fn to_json(self) {
   match self {
-    JinaRerankerV2BaseMultilingual(value) => Json(value)
-    JinaRerankerV1TinyEn(value) => Json(value)
-    JinaRerankerV1TurboEn(value) => Json(value)
-    JinaRerankerV1BaseEn(value) => Json(value)
-    JinaColbertV1En(value) => Json(value)
-    JinaColbertV2(value) => Json(value)
-    JinaRerankerM0(value) => Json(value)
-    JinaRerankerV3(value) => Json(value)
-    JinaRerankerV35(value) => Json(value)
-    Unknown(_, value) => value
+    RerankV1RerankPostRequest::JinaRerankerV2BaseMultilingual(value) =>
+      @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaRerankerV1TinyEn(value) =>
+      @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaRerankerV1TurboEn(value) =>
+      @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaRerankerV1BaseEn(value) =>
+      @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaColbertV1En(value) => @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaColbertV2(value) => @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaRerankerM0(value) => @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaRerankerV3(value) => @json.Json::Json(value)
+    RerankV1RerankPostRequest::JinaRerankerV35(value) => @json.Json::Json(value)
+    RerankV1RerankPostRequest::Unknown(_, value) => value
   }
 }
 
@@ -5978,18 +6180,31 @@ pub impl @json.FromJson for RerankV1RerankPostRequest with fn from_json(
   let tag : String = required_field(obj, "model", path)
   match tag {
     "jina-reranker-v2-base-multilingual" =>
-      JinaRerankerV2BaseMultilingual(@json.from_json(value, path~))
+      RerankV1RerankPostRequest::JinaRerankerV2BaseMultilingual(
+        @json.from_json(value, path~),
+      )
     "jina-reranker-v1-tiny-en" =>
-      JinaRerankerV1TinyEn(@json.from_json(value, path~))
+      RerankV1RerankPostRequest::JinaRerankerV1TinyEn(
+        @json.from_json(value, path~),
+      )
     "jina-reranker-v1-turbo-en" =>
-      JinaRerankerV1TurboEn(@json.from_json(value, path~))
+      RerankV1RerankPostRequest::JinaRerankerV1TurboEn(
+        @json.from_json(value, path~),
+      )
     "jina-reranker-v1-base-en" =>
-      JinaRerankerV1BaseEn(@json.from_json(value, path~))
-    "jina-colbert-v1-en" => JinaColbertV1En(@json.from_json(value, path~))
-    "jina-colbert-v2" => JinaColbertV2(@json.from_json(value, path~))
-    "jina-reranker-m0" => JinaRerankerM0(@json.from_json(value, path~))
-    "jina-reranker-v3" => JinaRerankerV3(@json.from_json(value, path~))
-    "jina-reranker-v3.5" => JinaRerankerV35(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RerankV1RerankPostRequest::JinaRerankerV1BaseEn(
+        @json.from_json(value, path~),
+      )
+    "jina-colbert-v1-en" =>
+      RerankV1RerankPostRequest::JinaColbertV1En(@json.from_json(value, path~))
+    "jina-colbert-v2" =>
+      RerankV1RerankPostRequest::JinaColbertV2(@json.from_json(value, path~))
+    "jina-reranker-m0" =>
+      RerankV1RerankPostRequest::JinaRerankerM0(@json.from_json(value, path~))
+    "jina-reranker-v3" =>
+      RerankV1RerankPostRequest::JinaRerankerV3(@json.from_json(value, path~))
+    "jina-reranker-v3.5" =>
+      RerankV1RerankPostRequest::JinaRerankerV35(@json.from_json(value, path~))
+    other => RerankV1RerankPostRequest::Unknown(other, value)
   }
 }

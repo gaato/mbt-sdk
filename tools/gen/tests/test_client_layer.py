@@ -99,7 +99,7 @@ class ClientLayerTests(unittest.TestCase):
         doc = spec()
         doc['paths']['/items']['get']['x-moonbit-paginate'] = {'kind': 'url', 'items': 'results', 'next': 'next'}
         files, _ = build(doc)
-        self.assertIn('kind=NextUrl', files['paginate_gen.mbt'])
+        self.assertIn('kind=PageKind::NextUrl', files['paginate_gen.mbt'])
 
     def test_retry_table_and_validation(self):
         config = dict(retries=3, methods=['GET', 'POST'], statuses=[429, [500, 599]],
@@ -108,7 +108,7 @@ class ClientLayerTests(unittest.TestCase):
                       backoff_base_ms=500, backoff_max_ms=8000, jitter=[750, 1000])
         sdks.validate_retry(config, 'test')
         source = retry_source(config)
-        for text in ['max_retries: 3', 'Listed([', 'Range(500, 599)', 'sent_failures: Any', 'Some("x-should-retry")', 'source: Header', 'cap: NoCap', 'zero_means_backoff: true', 'max_ms: 8000', 'lo=750, hi=1000']:
+        for text in ['max_retries: 3', '@client.Methods::Listed([', '@client.StatusMatch::Range(500, 599)', 'sent_failures: @client.Methods::Any', 'Option::Some("x-should-retry")', 'source: @client.RetryAfterSource::Header', 'cap: @client.RetryAfterCap::NoCap', 'zero_means_backoff: true', 'max_ms: 8000', 'lo=750, hi=1000']:
             self.assertIn(text, source)
         for invalid in [{'bogus': 3}, {'retries': -1}, {'methods': 'sometimes'}, {'retry_after_cap_ms': -1}, {'statuses': [[599, 500]]}, {'jitter': [1000, 750]}]:
             with self.assertRaises(ValueError):
@@ -154,7 +154,7 @@ class ClientLayerTests(unittest.TestCase):
         sdk['auth'] = {'kind': 'alternatives', 'schemes': choices}
         ir = IRBuilder(doc, 'gaato/sample/gen', auth_headers={'authorization', 'x-api-key'}).build()
         source = emit_client(doc, ir, sdk)['client_gen.mbt']
-        self.assertIn('"items" => (match self.auth { Anonymous | Bearer(_) => true; _ => false }', source)
+        self.assertIn('"items" => (match self.auth { Auth::Anonymous | Auth::Bearer(_) => true; _ => false }', source)
 
     def test_empty_security_array_is_anonymous_in_a_mixed_document(self):
         doc = {
@@ -186,7 +186,7 @@ class ClientLayerTests(unittest.TestCase):
         ir = IRBuilder(doc, 'gaato/sample/gen').build()
         source = emit_client(doc, ir, sdk)['client_gen.mbt']
         self.assertIn(
-            '"protected" => (match self.auth { Bearer(_) => true; _ => false }',
+            '"protected" => (match self.auth { Auth::Bearer(_) => true; _ => false }',
             source,
         )
         self.assertIn('"public" => (false, "")', source)

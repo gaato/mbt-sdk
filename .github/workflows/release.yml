@@ -1,15 +1,14 @@
 name: Release
 
-# Publishes to mooncakes.io after CI is green on main. Idempotent: modules whose
-# version is already in the registry index are skipped, so only a version bump
-# in moon.mod releases anything (scripts/release.sh). spec-watch.yml dispatches
-# this after merging a bump, because its merges start no CI run on main.
-
+# Daily spec merges keep versions unchanged. Scheduled runs batch once per UTC
+# ISO week; dispatch releases now. Explicit human bumps still publish after CI.
 on:
   workflow_run:
     workflows: [CI]
     types: [completed]
     branches: [main]
+  schedule:
+    - cron: "20 0 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -21,27 +20,57 @@ concurrency:
 
 jobs:
   publish:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-26.04
-    timeout-minutes: 20
+    timeout-minutes: 120
+    permissions:
+      contents: write
     environment: mooncakes
     container:
       image: ghcr.io/gaato/moonbit:0.10.20-65efd5b93
     steps:
-      - name: Check out the commit CI validated
+      - name: Check out the validated commit or main for a weekly batch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
-          persist-credentials: false
-
-      - name: Trust the workspace (container runs as a different user)
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-      # The SDK ledger uses stdlib tomllib; the MoonBit image has no Python.
+          ref: ${{ github.event.workflow_run.head_sha || 'main' }}
+      - name: Trust workspace and use the existing automation identity
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Set up uv
         uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-
+      - name: Set up Node for batch validation
+        if: github.event_name != 'workflow_run'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+      - name: Refresh actual published baselines and prepare the batch
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          moon update
+          uv run --with pyyaml --with jsonpath-rfc9535 python tools/weekly_release.py refresh
+          if [ "$EVENT" != workflow_run ]; then moon info; fi
+          if [ "$EVENT" = schedule ]; then
+            uv run --with pyyaml --with jsonpath-rfc9535 python tools/weekly_release.py prepare
+          elif [ "$EVENT" = workflow_dispatch ]; then
+            uv run --with pyyaml --with jsonpath-rfc9535 python tools/weekly_release.py prepare --manual
+          fi
+      - name: Validate the exact batch, including native tests
+        if: github.event_name != 'workflow_run'
+        run: scripts/gates.sh
+      - name: Record the validated version bumps on main
+        if: github.event_name != 'workflow_run'
+        run: |
+          git add -A -- .release-baselines ':(glob)*/moon.mod' ':(glob)*/CHANGELOG.md'
+          if ! git diff --cached --quiet; then
+            git commit -m "Prepare weekly SDK releases"
+            # A concurrent main update aborts before publication; no force push.
+            git push origin HEAD:main
+          fi
       - name: Publish
+        id: publication
         env:
           MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}
           MOONCAKES_USERNAME: ${{ secrets.MOONCAKES_USERNAME }}
@@ -50,8 +79,6 @@ jobs:
             echo "MOONCAKES_TOKEN is not set; nothing published" >&2
             exit 0
           fi
-          # moon reads credentials from MOON_HOME (the toolchain image sets it),
-          # and needs them even for --dry-run.
           moon_home="${MOON_HOME:-$HOME/.moon}"
           mkdir -p "$moon_home"
           umask 077
@@ -59,3 +86,18 @@ jobs:
           trap 'rm -f "$moon_home/credentials.json"' EXIT
           scripts/release.sh publish --dry-run
           scripts/release.sh publish
+          echo "published=true" >> "$GITHUB_OUTPUT"
+      - name: Record interfaces from the actual published artifacts
+        if: steps.publication.outputs.published == 'true'
+        run: |
+          moon update
+          uv run --with pyyaml --with jsonpath-rfc9535 python tools/weekly_release.py refresh
+          git add -A -- .release-baselines
+          if ! git diff --cached --quiet; then
+            git commit -m "Record published SDK interface baselines"
+            # If main moved, the next refresh repairs the missing baseline commit
+            # from immutable registry artifacts. Never record current-main APIs
+            # as the baseline for a different commit's published version.
+            git push origin HEAD:main
+          fi
+

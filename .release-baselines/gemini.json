@@ -1,0 +1,10 @@
+{
+  "api": {
+    "src/gen/pkg.generated.mbti": "ef9e62df57f7494acf0467b18cb03cbe13eb89c22046ad1794c55cbaf9347b9c",
+    "src/pkg.generated.mbti": "8b97ed6be61275b1accab42f5ea5ecc33740de5343b0a6a9cb23660c978f6927"
+  },
+  "artifact_checksum": "2ae8b05718c71e9953a4f89825f66290cb1017c2730a90e2f807e46e26e3603d",
+  "module": "gaato/gemini",
+  "published_at": "2026-11-16T03:08:50.095319+00:00",
+  "version": "0.1.0"
+}

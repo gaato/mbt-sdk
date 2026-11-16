@@ -26,20 +26,26 @@ pub extend UInt64Number with @json.FromJson::{from_json}
 
 ///|
 pub impl @json.FromJson for UInt64Number with fn from_json(value, path) {
-  guard value is Number(raw, repr~) else {
-    raise @json.JsonDecodeError((path, "expected unsigned JSON integer"))
+  guard value is @json.Json::Number(raw, repr~) else {
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected unsigned JSON integer"),
+    )
   }
-  if repr is Some(text) &&
+  if repr is Option::Some(text) &&
     text.length() > 0 &&
     text.iter().all(c => c >= '0' && c <= '9') {
-    return { value: @json.from_json(Json(text), path~), }
+    return { value: @json.from_json(@json.Json::Json(text), path~), }
   }
   if raw.is_nan() || raw < 0.0 || raw >= 18446744073709551616.0 {
-    raise @json.JsonDecodeError((path, "unsigned JSON integer out of range"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "unsigned JSON integer out of range"),
+    )
   }
   let value = raw.to_uint64()
   if value.to_double() != raw {
-    raise @json.JsonDecodeError((path, "expected integral JSON number"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected integral JSON number"),
+    )
   }
   { value, }
 }
@@ -62,31 +68,51 @@ fn[T : @json.FromJson] decode_result(
 ///|
 /// Creates a initialize request from generated protocol types.
 pub fn initialize(params : InitializeParams) -> Call[InitializeResponse] {
-  { name: "initialize", params: Json(params), decode: decode_result, }
+  {
+    name: "initialize",
+    params: @json.Json::Json(params),
+    decode: decode_result,
+  }
 }
 
 ///|
 /// Creates a thread/start request from generated protocol types.
 pub fn thread_start(params : ThreadStartParams) -> Call[ThreadStartResponse] {
-  { name: "thread/start", params: Json(params), decode: decode_result, }
+  {
+    name: "thread/start",
+    params: @json.Json::Json(params),
+    decode: decode_result,
+  }
 }
 
 ///|
 /// Creates a thread/resume request from generated protocol types.
 pub fn thread_resume(params : ThreadResumeParams) -> Call[ThreadResumeResponse] {
-  { name: "thread/resume", params: Json(params), decode: decode_result, }
+  {
+    name: "thread/resume",
+    params: @json.Json::Json(params),
+    decode: decode_result,
+  }
 }
 
 ///|
 /// Creates a turn/start request from generated protocol types.
 pub fn turn_start(params : TurnStartParams) -> Call[TurnStartResponse] {
-  { name: "turn/start", params: Json(params), decode: decode_result, }
+  {
+    name: "turn/start",
+    params: @json.Json::Json(params),
+    decode: decode_result,
+  }
 }
 
 ///|
 /// Creates a turn/interrupt request from generated protocol types.
 pub fn turn_interrupt(params : TurnInterruptParams) -> Call[Json] {
-  { name: "turn/interrupt", params: Json(params), decode: decode_result, }
+  {
+    name: "turn/interrupt",
+    params: @json.Json::Json(params),
+    decode: decode_result,
+  }
 }
 
 ///|
@@ -110,19 +136,21 @@ pub fn Event::decode(
   params : Json?,
 ) -> Event raise @json.JsonDecodeError {
   match name {
-    "error" => Error(@json.from_json(params.unwrap_or(Json::null())))
+    "error" => Event::Error(@json.from_json(params.unwrap_or(Json::null())))
     "thread/started" =>
-      ThreadStarted(@json.from_json(params.unwrap_or(Json::null())))
+      Event::ThreadStarted(@json.from_json(params.unwrap_or(Json::null())))
     "turn/started" =>
-      TurnStarted(@json.from_json(params.unwrap_or(Json::null())))
+      Event::TurnStarted(@json.from_json(params.unwrap_or(Json::null())))
     "turn/completed" =>
-      TurnCompleted(@json.from_json(params.unwrap_or(Json::null())))
+      Event::TurnCompleted(@json.from_json(params.unwrap_or(Json::null())))
     "item/started" =>
-      ItemStarted(@json.from_json(params.unwrap_or(Json::null())))
+      Event::ItemStarted(@json.from_json(params.unwrap_or(Json::null())))
     "item/completed" =>
-      ItemCompleted(@json.from_json(params.unwrap_or(Json::null())))
+      Event::ItemCompleted(@json.from_json(params.unwrap_or(Json::null())))
     "item/agentMessage/delta" =>
-      ItemAgentMessageDelta(@json.from_json(params.unwrap_or(Json::null())))
-    _ => Unknown(name, params)
+      Event::ItemAgentMessageDelta(
+        @json.from_json(params.unwrap_or(Json::null())),
+      )
+    _ => Event::Unknown(name, params)
   }
 }

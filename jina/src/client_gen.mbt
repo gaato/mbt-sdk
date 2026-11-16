@@ -26,7 +26,7 @@ pub impl @debug.Debug for Jina with fn to_repr(_) {
 pub fn Jina::new(
   backend : &@http.Backend,
   clock : &@rt.Clock,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://api.jina.ai",
   server_urls~ : Map[String, String] = {},
   retry~ : @client.RetryPolicy = default_retry(),
@@ -58,7 +58,7 @@ pub fn Jina::new(
 /// Credentials are redacted from Debug output.
 pub fn Jina::from_client(
   client : @client.Client,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://api.jina.ai",
   server_urls~ : Map[String, String] = {},
 ) -> Jina {
@@ -147,9 +147,14 @@ fn response_failure(
   error : @client.ResponseFailure,
 ) -> Failure {
   match error {
-    @client.UnexpectedStatus(head, body~) =>
-      Http({ operation, head, body, typed: typed_error(operation, head, body), })
-    _ => Decode(error)
+    @client.ResponseFailure::UnexpectedStatus(head, body~) =>
+      Failure::Http({
+        operation,
+        head,
+        body,
+        typed: typed_error(operation, head, body),
+      })
+    _ => Failure::Decode(error)
   }
 }
 
@@ -167,18 +172,19 @@ pub async fn Jina::send(
       ),
     )
     match reply.body {
-      Ok(body) =>
-        Ok({
+      Result::Ok(body) =>
+        Result::Ok({
           status: reply.status,
           headers: reply.headers,
           body,
           request: reply.request,
           attributes: reply.attributes,
         })
-      Err(error) => Err(response_failure(operation, error))
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -192,12 +198,12 @@ pub async fn[T] Jina::call(
   operation~ : String = self.infer_operation(request),
 ) -> Result[T, Failure] {
   match self.send(request, operation~) {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode({ status: reply.status, headers: reply.headers, }, reply.body) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -217,8 +223,8 @@ pub async fn Jina::stream(
     receive,
     stop=(_, event) => {
       match stop {
-        Some(predicate) => predicate(event)
-        None => false
+        Option::Some(predicate) => predicate(event)
+        Option::None => false
       }
     },
     operation~,
@@ -242,11 +248,12 @@ async fn Jina::stream_with_head(
       ),
     )
     match reply.body {
-      Ok(value) => Ok(value)
-      Err(error) => Err(response_failure(operation, error))
+      Result::Ok(value) => Result::Ok(value)
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -269,8 +276,8 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
 ///|
 fn Jina::authenticate(self : Jina, request : @http.Request) -> @http.Request {
   match self.auth {
-    Anonymous => request
-    Bearer(value) => request.bearer(value)
+    Auth::Anonymous => request
+    Auth::Bearer(value) => request.bearer(value)
   }
 }
 
@@ -281,7 +288,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "embeddings_v1_embeddings_post" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -289,7 +296,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "rerank_v1_rerank_post" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -297,7 +304,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "list_models_v1_models_get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -305,7 +312,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "get_model_v1_models__model_id__get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -313,7 +320,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "chat_completions_v1_chat_completions_post" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -321,7 +328,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "create_batch_job_v1_batch_embeddings_post" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -329,7 +336,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "get_batch_status_v1_batch__batch_id__get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -337,7 +344,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "cancel_batch_job_v1_batch__batch_id__delete" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -345,7 +352,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "list_batch_jobs_v1_batches_get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -353,7 +360,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "download_batch_output_v1_batch__batch_id__output_get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -361,7 +368,7 @@ fn Jina::operation_config(self : Jina, operation : String) -> (Bool, String) {
     "download_batch_errors_v1_batch__batch_id__errors_get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",

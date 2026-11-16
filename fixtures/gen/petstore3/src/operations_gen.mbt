@@ -70,8 +70,8 @@ pub async fn Petstore3::delete_pet(
 ) -> Result[Unit, Failure] {
   let request = delete_pet_request(pet_id)
   match self.send(request, operation="deletePet") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -128,8 +128,8 @@ pub async fn Petstore3::delete_order(
 ) -> Result[Unit, Failure] {
   let request = delete_order_request(order_id)
   match self.send(request, operation="deleteOrder") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -173,8 +173,8 @@ pub async fn Petstore3::login_user(
 pub async fn Petstore3::logout_user(self : Petstore3) -> Result[Unit, Failure] {
   let request = logout_user_request()
   match self.send(request, operation="logoutUser") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -197,8 +197,8 @@ pub async fn Petstore3::update_user(
 ) -> Result[Unit, Failure] {
   let request = update_user_request(username, body)
   match self.send(request, operation="updateUser") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -210,7 +210,7 @@ pub async fn Petstore3::delete_user(
 ) -> Result[Unit, Failure] {
   let request = delete_user_request(username)
   match self.send(request, operation="deleteUser") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }

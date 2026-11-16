@@ -35,6 +35,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--include-all", action="store_true")
     result.add_argument("--verbose", action="store_true")
     result.add_argument("--client-sdk", help="Opt-in ledger entry for root-package client generation")
+    result.add_argument('--sdk', help='Ledger entry supplying operation selection (also for vocabulary-only SDKs)')
     return result
 
 
@@ -129,6 +130,11 @@ def run(argv: list[str] | None = None) -> int:
         doc = normalize_spec(args.spec, args.overlay)
         if args.include_all:
             include_all_operations(doc)
+        if args.sdk or args.client_sdk:
+            from tools import sdks
+            from tools.gen.selection import apply as select
+            sdk = next(s for s in sdks.load() if s['name'] == (args.sdk or args.client_sdk))
+            select(doc, sdk.get('selection'))
         auth_headers = set()
         if args.client_sdk:
             from tools import sdks

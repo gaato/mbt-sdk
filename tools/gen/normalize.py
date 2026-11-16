@@ -38,6 +38,7 @@ def _merge_objects(
     doc: dict[str, Any],
     diagnostics: list[Diagnostic],
     notes: list[tuple[str, str]] | None = None,
+    active: frozenset[int] = frozenset(),
 ) -> dict[str, Any]:
     result = {key: copy.deepcopy(value) for key, value in base.items() if key != "allOf"}
     properties = copy.deepcopy(result.get("properties", {}))
@@ -49,7 +50,7 @@ def _merge_objects(
         except (KeyError, TypeError):
             diagnostics.append(Diagnostic(part_pointer, f"unresolved local $ref {raw.get('$ref')}", "fix the reference in overlays/fix.yaml"))
             continue
-        part = merge_all_of(part, part_pointer, doc, diagnostics, notes)
+        part = merge_all_of(part, part_pointer, doc, diagnostics, notes, active)
         if not isinstance(part, dict) or not (part.get("type") == "object" or "properties" in part):
             diagnostics.append(Diagnostic(part_pointer, "allOf member is not an object schema", "replace or remove the allOf member in overlays/fix.yaml"))
             continue
@@ -85,16 +86,31 @@ def merge_all_of(
     doc: dict[str, Any],
     diagnostics: list[Diagnostic],
     notes: list[tuple[str, str]] | None = None,
+    _active: frozenset[int] = frozenset(),
 ) -> Any:
     if isinstance(schema, list):
         return [
-            merge_all_of(value, _pointer_join(pointer, index), doc, diagnostics, notes)
+            merge_all_of(value, _pointer_join(pointer, index), doc, diagnostics, notes, _active)
             for index, value in enumerate(schema)
         ]
     if not isinstance(schema, dict):
         return schema
+    if id(schema) in _active:
+        diagnostics.append(Diagnostic(pointer, 'cyclic allOf reference', 'break the allOf cycle in overlays/fix.yaml'))
+        return {'type': 'object'}
+    active = _active | {id(schema)}
     if "allOf" in schema:
-        schema = _merge_objects(schema["allOf"], schema, pointer, doc, diagnostics, notes)
+        parts = schema['allOf']
+        docs = {'description', 'title', 'example', 'examples', 'default', 'nullable'}
+        if isinstance(parts, list) and len(parts) == 1 and isinstance(parts[0], dict) and '$ref' in parts[0] and not (set(schema) - docs - {'allOf'}):
+            try:
+                target = resolve_local(doc, parts[0]['$ref'])
+            except (KeyError, TypeError):
+                target = None
+            if isinstance(target, dict) and isinstance(target.get('type'), str) and target['type'] in {'array', 'string', 'integer', 'number', 'boolean'}:
+                merged = merge_all_of(target, _pointer_join(_pointer_join(pointer, 'allOf'), 0), doc, diagnostics, notes, active)
+                return {**merged, **{key: value for key, value in schema.items() if key != 'allOf'}}
+        schema = _merge_objects(parts, schema, pointer, doc, diagnostics, notes, active)
     result: dict[str, Any] = {}
     for key, value in schema.items():
         if key == "$ref":
@@ -106,6 +122,7 @@ def merge_all_of(
                 doc,
                 diagnostics,
                 notes,
+                active,
             )
     return result
 

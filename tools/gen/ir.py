@@ -24,6 +24,9 @@ class TypeRef:
     item: "TypeRef | None" = None
 
     def moon_type(self) -> str:
+        if self.kind == 'optional':
+            assert self.item is not None
+            return self.item.moon_type() + '?'
         if self.kind == "array":
             assert self.item is not None
             return f"Array[{self.item.moon_type()}]"
@@ -197,6 +200,9 @@ class IR:
 # MoonBit keywords plus the words `moonc` rejects with warning 0035 (reserved_keyword),
 # checked against the compiler: an identifier here is escaped with a trailing underscore.
 RESERVED = {
+    "true",
+    "false",
+    "noraise",
     "abstract",
     "alias",
     "and",
@@ -318,9 +324,16 @@ def _fallback_name(preferred: str, used: set[str]) -> str:
     return candidate
 
 
+# These names produce compiler error 4003 even when all references are qualified.
+# Legal names such as Json, Result, None and Some are deliberately absent.
+RESERVED_TYPES = frozenset({'Option', 'String', 'Unit', 'Bool', 'Bytes', 'FixedArray',
+    'Int', 'Int32', 'Int64', 'UInt', 'UInt32', 'UInt64', 'Double', 'Float', 'Byte',
+    'Char', 'StringView', 'BytesView', 'ReadOnlyArray', 'Error'})
+
+
 def type_name(value: str) -> str:
     result = pascal_case(value)
-    return result + "Value" if result == "Error" else result
+    return result + "Value" if result in RESERVED_TYPES else result
 
 
 def pointer_join(pointer: str, part: str | int) -> str:
@@ -363,9 +376,14 @@ def _split_nullable(schema: dict[str, Any]) -> tuple[dict[str, Any], bool]:
         non_null = [
             item
             for item in choices
-            if not (isinstance(item, dict) and item.get("type") == "null")
+            if not (isinstance(item, dict) and (item.get("type") == "null" or
+                    item.get('nullable') is True and not (set(item) - {'nullable', 'description', 'title'})))
         ]
         if len(non_null) == len(choices):
+            if nullable and 'discriminator' not in result and len(non_null) == 1 and isinstance(non_null[0], dict) and '$ref' in non_null[0]:
+                replacement = dict(non_null[0])
+                replacement.update({k: v for k, v in result.items() if k not in {key, 'discriminator', 'type'}})
+                result = replacement
             continue
         nullable = True
         if len(non_null) == 1:
@@ -1535,7 +1553,9 @@ class IRBuilder:
             else:
                 presence = Presence.PRESENCE if nullable else Presence.OPTIONAL
             field_type = self.compile_type(normalized_field, declaration_name, usage, field_pointer)
-            if field_type.moon_type() == name and field_type.kind != "array" and presence == Presence.REQUIRED:
+            if nullable and field_type.kind == 'optional':
+                field_type = field_type.item
+            if field_type.kind == 'named' and field_type.name == name and presence == Presence.REQUIRED:
                 self.add_diag(
                     field_pointer,
                     "direct recursive struct field must be nullable or optional",
@@ -1584,9 +1604,14 @@ class IRBuilder:
         named_component: bool = False,
         preserve_constants: set[str] | None = None,
     ) -> TypeRef:
-        schema, _ = _split_nullable(schema)
+        original_union = 'anyOf' in schema or 'oneOf' in schema
+        schema, nullable = _split_nullable(schema)
         if schema.get("x-moonbit-json") is True:
             return TypeRef("Json")
+        if nullable and original_union and '$ref' in schema:
+            return TypeRef('optional', item=self.compile_type(
+                schema, name, usage, pointer, named_component=named_component,
+                preserve_constants=preserve_constants))
         if "$ref" in schema:
             ref = schema["$ref"]
             if not ref.startswith("#/components/schemas/"):
@@ -1662,7 +1687,7 @@ class IRBuilder:
             inner_schema = dict(schema)
             inner_schema.pop("x-moonbit-type", None)
             inner = self.compile_type(inner_schema, name + "Value", usage, pointer)
-            newtype_name = pascal_case(str(override)) if override not in ("Int64",) else pascal_case(name)
+            newtype_name = type_name(str(override)) if override not in ("Int64",) else type_name(name)
             self._add_declaration(Newtype(newtype_name, inner, schema.get("description", "")), pointer)
             return TypeRef("named", name=newtype_name)
         if kind == "string":
@@ -1725,8 +1750,8 @@ class IRBuilder:
             if location == "query":
                 style = parameter.get("style", "form")
                 explode = parameter.get("explode", True)
-                if style not in {"form", "deepObject"} or explode is not True:
-                    self.add_diag(parameter_pointer, f"query parameter style={style!r}, explode={explode!r} is not supported", "use style: form or deepObject with explode: true")
+                if style not in {"form", "deepObject"} or type(explode) is not bool or (style == 'deepObject' and not explode):
+                    self.add_diag(parameter_pointer, f"query parameter style={style!r}, explode={explode!r} is not supported", "use form (explode true or false) or deepObject with explode: true")
                     continue
             if location == "header":
                 style = parameter.get("style", "simple")
@@ -1746,6 +1771,8 @@ class IRBuilder:
                 continue
             parameter_names.add(moon_name)
             param_type = self.compile_type(schema, pascal_case(operation_id) + pascal_case(parameter.get("name", "parameter")), {"request"}, pointer_join(parameter_pointer, "schema"))
+            if location == 'query' and parameter.get('style', 'form') == 'form' and parameter.get('explode') is False and param_type.kind in ('map', 'named'):
+                self.add_diag(parameter_pointer, 'form explode=false supports scalar or array query parameters, not objects', 'use a scalar/array or an explicitly supported deepObject map')
             if location == "query" and parameter.get("style", "form") == "deepObject" and param_type.kind != "map":
                 self.add_diag(
                     parameter_pointer,
@@ -1764,7 +1791,7 @@ class IRBuilder:
                     param_type,
                     location,
                     required,
-                    str(parameter.get("style", "")),
+                    'form-comma' if location == 'query' and parameter.get('style', 'form') == 'form' and parameter.get('explode') is False else str(parameter.get("style", "")),
                     parameter.get("description", ""),
                     path_segments,
                     parameter.get("x-moonbit-resource-name") is True,

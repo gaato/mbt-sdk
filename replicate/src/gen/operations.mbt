@@ -2,14 +2,14 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match Json(value) {
-    String(value) => value
-    True => "true"
-    False => "false"
-    Number(value, repr~) =>
+  match @json.Json::Json(value) {
+    @json.Json::String(value) => value
+    @json.Json::True => "true"
+    @json.Json::False => "false"
+    @json.Json::Number(value, repr~) =>
       match repr {
-        Some(text) => text
-        None => value.to_string()
+        Option::Some(text) => text
+        Option::None => value.to_string()
       }
     other => other.stringify()
   }
@@ -25,10 +25,10 @@ fn[T : @json.FromJson] decode_response(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[T, @client.ResponseFailure] {
-  Ok(@json.from_json(parse_json_body(body))) catch {
+  Result::Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message=error.to_string(),
           body=body[:body.length().min(@client.max_error_body)].to_owned(),
@@ -149,7 +149,7 @@ pub fn deployments_list_decode(
 pub fn deployments_create_request(
   body : DeploymentsCreateRequest,
 ) -> @http.Request {
-  @http.Request::post("/deployments").body_json(Json(body))
+  @http.Request::post("/deployments").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -233,7 +233,7 @@ pub fn deployments_update_request(
     @http.percent_encode(parameter_value(deployment_owner)) +
     "/" +
     @http.percent_encode(parameter_value(deployment_name)),
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -271,15 +271,16 @@ pub fn deployments_predictions_create_request(
     "/" +
     @http.percent_encode(parameter_value(deployment_name)) +
     "/predictions",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
   match prefer {
-    Some(value) => request = request.header("Prefer", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("Prefer", parameter_value(value))
+    Option::None => ()
   }
   match cancel_after {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("Cancel-After", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -348,13 +349,13 @@ pub fn files_create_request(
       "content", content_filename, content_content_type, content,
     ),
   )
-  if filename is Some(value) {
+  if filename is Option::Some(value) {
     parts.push(@multipart.Part::text("filename", parameter_value(value)))
   }
-  if metadata is Some(value) {
+  if metadata is Option::Some(value) {
     parts.push(@multipart.Part::json("metadata", value))
   }
-  if type_ is Some(value) {
+  if type_ is Option::Some(value) {
     parts.push(@multipart.Part::text("type", parameter_value(value)))
   }
   @multipart.body(request, parts, boundary~)
@@ -467,14 +468,14 @@ pub fn models_list_request(
 ) -> @http.Request {
   let mut url = "/models"
   match sort_by {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "sort_by", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match sort_direction {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "sort_direction", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -502,7 +503,7 @@ pub fn models_list_decode(
 ///
 /// Create a model
 pub fn models_create_request(body : ModelsCreateRequest) -> @http.Request {
-  @http.Request::post("/models").body_json(Json(body))
+  @http.Request::post("/models").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -586,7 +587,7 @@ pub fn models_update_request(
     @http.percent_encode(parameter_value(model_owner)) +
     "/" +
     @http.percent_encode(parameter_value(model_name)),
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -659,15 +660,16 @@ pub fn models_predictions_create_request(
     "/" +
     @http.percent_encode(parameter_value(model_name)) +
     "/predictions",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
   match prefer {
-    Some(value) => request = request.header("Prefer", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("Prefer", parameter_value(value))
+    Option::None => ()
   }
   match cancel_after {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("Cancel-After", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -814,7 +816,7 @@ pub fn trainings_create_request(
     "/versions/" +
     @http.percent_encode(parameter_value(version_id)) +
     "/trainings",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -846,19 +848,19 @@ pub fn predictions_list_request(
 ) -> @http.Request {
   let mut url = "/predictions"
   match created_after {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "created_after", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match created_before {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "created_before", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match source {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "source", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -890,15 +892,18 @@ pub fn predictions_create_request(
   prefer? : String,
   cancel_after? : String,
 ) -> @http.Request {
-  let mut request = @http.Request::post("/predictions").body_json(Json(body))
+  let mut request = @http.Request::post("/predictions").body_json(
+    @json.Json::Json(body),
+  )
   match prefer {
-    Some(value) => request = request.header("Prefer", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("Prefer", parameter_value(value))
+    Option::None => ()
   }
   match cancel_after {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("Cancel-After", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -987,9 +992,9 @@ pub fn search_request(query : String, limit? : Int32) -> @http.Request {
   let mut url = "/search"
   url = @http.append_query(url, "query", parameter_value(query))
   match limit {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "limit", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }

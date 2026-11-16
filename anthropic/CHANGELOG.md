@@ -15,6 +15,10 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+### Changed
+
+- Generated code now qualifies constructor references; no public API change.
+
 ## [0.17.0] - 2026-11-12
 
 ### Changed

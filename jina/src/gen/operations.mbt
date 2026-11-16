@@ -2,14 +2,14 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match Json(value) {
-    String(value) => value
-    True => "true"
-    False => "false"
-    Number(value, repr~) =>
+  match @json.Json::Json(value) {
+    @json.Json::String(value) => value
+    @json.Json::True => "true"
+    @json.Json::False => "false"
+    @json.Json::Number(value, repr~) =>
       match repr {
-        Some(text) => text
-        None => value.to_string()
+        Option::Some(text) => text
+        Option::None => value.to_string()
       }
     other => other.stringify()
   }
@@ -25,10 +25,10 @@ fn[T : @json.FromJson] decode_response(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[T, @client.ResponseFailure] {
-  Ok(@json.from_json(parse_json_body(body))) catch {
+  Result::Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message=error.to_string(),
           body=body[:body.length().min(@client.max_error_body)].to_owned(),
@@ -43,7 +43,7 @@ fn[T : @json.FromJson] decode_response(
 pub fn embeddings_v1_embeddings_post_request(
   body : EmbeddingsV1EmbeddingsPostRequest,
 ) -> @http.Request {
-  @http.Request::post("/v1/embeddings").body_json(Json(body))
+  @http.Request::post("/v1/embeddings").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -71,7 +71,7 @@ pub fn embeddings_v1_embeddings_post_decode(
 pub fn rerank_v1_rerank_post_request(
   body : RerankV1RerankPostRequest,
 ) -> @http.Request {
-  @http.Request::post("/v1/rerank").body_json(Json(body))
+  @http.Request::post("/v1/rerank").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -155,7 +155,7 @@ pub fn get_model_v1_models_model_id_get_decode(
 pub fn chat_completions_v1_chat_completions_post_request(
   body : ChatCompletionRequest,
 ) -> @http.Request {
-  @http.Request::post("/v1/chat/completions").body_json(Json(body))
+  @http.Request::post("/v1/chat/completions").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -183,7 +183,7 @@ pub fn chat_completions_v1_chat_completions_post_decode(
 pub fn create_batch_job_v1_batch_embeddings_post_request(
   body : BatchEmbeddingRequest,
 ) -> @http.Request {
-  @http.Request::post("/v1/batch/embeddings").body_json(Json(body))
+  @http.Request::post("/v1/batch/embeddings").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -271,9 +271,9 @@ pub fn cancel_batch_job_v1_batch_batch_id_delete_decode(
 pub fn list_batch_jobs_v1_batches_get_request(limit? : Int32) -> @http.Request {
   let mut url = "/v1/batches"
   match limit {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "limit", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }

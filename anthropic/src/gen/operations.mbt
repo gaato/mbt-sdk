@@ -2,14 +2,14 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match Json(value) {
-    String(value) => value
-    True => "true"
-    False => "false"
-    Number(value, repr~) =>
+  match @json.Json::Json(value) {
+    @json.Json::String(value) => value
+    @json.Json::True => "true"
+    @json.Json::False => "false"
+    @json.Json::Number(value, repr~) =>
       match repr {
-        Some(text) => text
-        None => value.to_string()
+        Option::Some(text) => text
+        Option::None => value.to_string()
       }
     other => other.stringify()
   }
@@ -25,10 +25,10 @@ fn[T : @json.FromJson] decode_response(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[T, @client.ResponseFailure] {
-  Ok(@json.from_json(parse_json_body(body))) catch {
+  Result::Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message=error.to_string(),
           body=body[:body.length().min(@client.max_error_body)].to_owned(),
@@ -46,24 +46,26 @@ pub fn messages_post_request(
   anthropic_user_profile_id? : String,
   anthropic_workspace_id? : String,
 ) -> @http.Request {
-  let mut request = @http.Request::post("/v1/messages").body_json(Json(body))
+  let mut request = @http.Request::post("/v1/messages").body_json(
+    @json.Json::Json(body),
+  )
   match anthropic_version {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match anthropic_user_profile_id {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header(
         "anthropic-user-profile-id",
         parameter_value(value),
       )
-    None => ()
+    Option::None => ()
   }
   match anthropic_workspace_id {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-workspace-id", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -100,37 +102,37 @@ pub fn models_list_request(
 ) -> @http.Request {
   let mut url = "/v1/models"
   match before_id {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "before_id", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match after_id {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "after_id", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match limit {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "limit", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match lifecycle {
-    Some(values) =>
+    Option::Some(values) =>
       for value in values {
         url = @http.append_query(url, "lifecycle[]", parameter_value(value))
       }
-    None => ()
+    Option::None => ()
   }
   let mut request = @http.Request::get(url)
   match anthropic_version {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match anthropic_workspace_id {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-workspace-id", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -166,14 +168,14 @@ pub fn models_get_request(
     "/v1/models/" + @http.percent_encode(parameter_value(model_id)),
   )
   match anthropic_version {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match anthropic_workspace_id {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-workspace-id", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -207,25 +209,25 @@ pub fn messages_count_tokens_post_request(
   anthropic_workspace_id? : String,
 ) -> @http.Request {
   let mut request = @http.Request::post("/v1/messages/count_tokens").body_json(
-    Json(body),
+    @json.Json::Json(body),
   )
   match anthropic_version {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match anthropic_user_profile_id {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header(
         "anthropic-user-profile-id",
         parameter_value(value),
       )
-    None => ()
+    Option::None => ()
   }
   match anthropic_workspace_id {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("anthropic-workspace-id", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }

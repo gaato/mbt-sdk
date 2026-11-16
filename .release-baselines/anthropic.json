@@ -1,0 +1,10 @@
+{
+  "api": {
+    "src/gen/pkg.generated.mbti": "45b2d33c1b677f82370db5839c09b9bb4fd47fe30ec0448ff36da2411cf55853",
+    "src/pkg.generated.mbti": "cb6edff05dd6904be2d1ef28d299c9b4658bb4f9afe021feeeee20280f923d75"
+  },
+  "artifact_checksum": "06f93d150714a33889c6dde3354b3e608db5f1a89acfd35c063c83716a57c6f2",
+  "module": "gaato/anthropic",
+  "published_at": "2026-11-12T09:37:59.329523+00:00",
+  "version": "0.17.0"
+}

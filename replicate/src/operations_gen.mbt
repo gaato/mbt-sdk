@@ -62,8 +62,8 @@ pub async fn Replicate::deployments_delete(
     deployment_owner, deployment_name,
   )
   match self.send(request, operation="deployments.delete") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -161,8 +161,8 @@ pub async fn Replicate::files_delete(
 ) -> Result[Unit, Failure] {
   let request = @gen.files_delete_request(file_id)
   match self.send(request, operation="files.delete") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -228,8 +228,8 @@ pub async fn Replicate::models_delete(
 ) -> Result[Unit, Failure] {
   let request = @gen.models_delete_request(model_owner, model_name)
   match self.send(request, operation="models.delete") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -304,15 +304,15 @@ pub async fn Replicate::models_readme_get(
 ) -> Result[String, Failure] {
   let request = @gen.models_readme_get_request(model_owner, model_name)
   match self.send(request, operation="models.readme.get") {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode_text(
           { status: reply.status, headers: reply.headers, },
           reply.body,
         ) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -344,8 +344,8 @@ pub async fn Replicate::models_versions_delete(
     model_owner, model_name, version_id,
   )
   match self.send(request, operation="models.versions.delete") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -496,10 +496,10 @@ fn decode_text(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[String, @client.ResponseFailure] {
-  Ok(@utf8.decode(body)) catch {
+  Result::Ok(@utf8.decode(body)) catch {
     _ =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message="invalid UTF-8 response body",
           body=body[:body.length().min(@client.max_error_body)].to_owned(),

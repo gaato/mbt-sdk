@@ -47,507 +47,507 @@ fn typed_error(
     let json = @json.parse(@utf8.decode(body))
     if operation == "embeddings_v1_embeddings_post" && head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "embeddings_v1_embeddings_post" && head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "rerank_v1_rerank_post" && head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_models_v1_models_get" && head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_model_v1_models__model_id__get" && head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 400 {
       let value : OpenAIErrorResponse = @json.from_json(json)
-      return Some(OpenAIErrorResponse(value))
+      return Option::Some(ErrorBody::OpenAIErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 404 {
       let value : OpenAIErrorResponse = @json.from_json(json)
-      return Some(OpenAIErrorResponse(value))
+      return Option::Some(ErrorBody::OpenAIErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 409 {
       let value : OpenAIErrorResponse = @json.from_json(json)
-      return Some(OpenAIErrorResponse(value))
+      return Option::Some(ErrorBody::OpenAIErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 500 {
       let value : OpenAIErrorResponse = @json.from_json(json)
-      return Some(OpenAIErrorResponse(value))
+      return Option::Some(ErrorBody::OpenAIErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 503 {
       let value : OpenAIErrorResponse = @json.from_json(json)
-      return Some(OpenAIErrorResponse(value))
+      return Option::Some(ErrorBody::OpenAIErrorResponse(value))
     }
     if operation == "chat_completions_v1_chat_completions_post" &&
       head.status == 504 {
       let value : OpenAIErrorResponse = @json.from_json(json)
-      return Some(OpenAIErrorResponse(value))
+      return Option::Some(ErrorBody::OpenAIErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "create_batch_job_v1_batch_embeddings_post" &&
       head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "get_batch_status_v1_batch__batch_id__get" &&
       head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "cancel_batch_job_v1_batch__batch_id__delete" &&
       head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "list_batch_jobs_v1_batches_get" && head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_output_v1_batch__batch_id__output_get" &&
       head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 400 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 401 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 403 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 404 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 409 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 422 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 429 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 500 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 503 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
     if operation == "download_batch_errors_v1_batch__batch_id__errors_get" &&
       head.status == 504 {
       let value : ErrorResponse = @json.from_json(json)
-      return Some(ErrorResponse(value))
+      return Option::Some(ErrorBody::ErrorResponse(value))
     }
-    None
+    Option::None
   } catch {
-    _ => None
+    _ => Option::None
   }
 }
 
@@ -559,11 +559,11 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 

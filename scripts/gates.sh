@@ -107,11 +107,10 @@ fi
 fmt_check "${local_packages[@]}"
 run moon info "${local_packages[@]}"
 for sdk in "${sdks[@]}"; do
-  [ "$("${py[@]}" tools/sdks.py get "$sdk" generator)" = openapi ] || continue
   flags=$("${py[@]}" tools/sdks.py get "$sdk" census_args)
   args=(); [ -z "$flags" ] || mapfile -t args <<< "$flags"
   [ "$("${py[@]}" tools/sdks.py get "$sdk" client_layer)" = false ] || args+=(--client-layer)
-  run "${py[@]}" tools/gen/census.py "$("${py[@]}" tools/sdks.py get "$sdk" spec_file)" "$sdk" "${args[@]}" --expect-zero
+  run "${py[@]}" tools/gen/census.py "$("${py[@]}" tools/sdks.py get "$sdk" spec_file)" "$sdk" --sdk "$sdk" --compile --expect-zero
 done
 # Only meaningful in CI: in a jj working copy `git diff` compares against the parent change,
 # so uncommitted edits would look stale. Set MBT_SDK_CHECK_MBTI=1 to enforce locally.

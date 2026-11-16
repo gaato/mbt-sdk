@@ -27,7 +27,7 @@ for sdk in "${sdks[@]}"; do
       ;;
     openapi|discovery) ;;
   esac
-  args+=(--package "$(get package)")
+  args+=(--package "$(get package)" --sdk "$sdk")
   [ "$(get client_layer)" = false ] || args+=(--client-sdk "$sdk")
   [ "$(get include_all)" = false ] || args+=(--include-all)
   [ "$(get derive_operation_ids)" = false ] || args+=(--derive-operation-ids)

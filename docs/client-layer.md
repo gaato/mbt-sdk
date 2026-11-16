@@ -101,6 +101,36 @@ operations have an additional `_stream` method. The generic `stream` uses
 
 ## Safety and defaults
 
+Generated constructor references carry their owning type, including in matches
+and shared helpers: `TheEnum::None`, `TheEnum::Json(value)`, `Option::Some`,
+`Result::Ok`, and `@json.Json::Json(value)`. Legal wire constructors retain
+their existing names and public API. Qualification avoids ambiguity when two
+enums export `Json`, or when a variant shares a prelude name.
+
+Identifier normalization retains the existing snake/Pascal case and sign rules.
+Empty or punctuation-only field/parameter names (including `~`) become `value`;
+leading digits receive `value_` (`Value` for types/variants). MoonBit keywords
+and compiler-reserved lowercase words receive a trailing underscore; the
+boolean literals `true` and `false`, and `noraise`, are included. Builtin
+constructor names are not a rename table. Existing normalization collision
+checks still apply; field normalization collisions retain their existing
+numbered-name note. JSON names and discriminator values remain unchanged.
+
+Types that the pinned compiler rejects with error 4003 receive `Value`:
+`Option`, `String`, `Unit`, `Bool`, `Bytes`, `FixedArray`, `Int`, `Int32`,
+`Int64`, `UInt`, `UInt32`, `UInt64`, `Double`, `Float`, `Byte`, `Char`,
+`StringView`, `BytesView`, `ReadOnlyArray`, and `Error`. This is a type-only
+table: legal types and constructors such as `Json`, `Result`, `None`, `Some`,
+`Ok` and `Err` retain their names. Helpers also qualify builtin types when a
+legal schema name would shadow one. Normalized type collisions retain the
+existing declaration diagnostic.
+
+Generated request locals/formals `url`, `request`, `parts`, `body`, and
+`boundary` acquire trailing underscores only when they collide with API
+parameters or multipart formals. The allocator checks each candidate again,
+so the choice is deterministic. It moves generated names aside without
+changing an API parameter's label.
+
 Header API keys are added, lowercased, to the constructor's redirect credential
 list. `from_client` cannot enforce this: configure those headers in its
 `RedirectConfig` yourself. Supply credentials through `Auth`, keeping default

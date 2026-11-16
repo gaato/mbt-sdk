@@ -26,7 +26,7 @@ pub impl @debug.Debug for Badhttp with fn to_repr(_) {
 pub fn Badhttp::new(
   backend : &@http.Backend,
   clock : &@rt.Clock,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://badhttp.dev",
   server_urls~ : Map[String, String] = {},
   retry~ : @client.RetryPolicy = default_retry(),
@@ -58,7 +58,7 @@ pub fn Badhttp::new(
 /// Credentials are redacted from Debug output.
 pub fn Badhttp::from_client(
   client : @client.Client,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://badhttp.dev",
   server_urls~ : Map[String, String] = {},
 ) -> Badhttp {
@@ -147,9 +147,14 @@ fn response_failure(
   error : @client.ResponseFailure,
 ) -> Failure {
   match error {
-    @client.UnexpectedStatus(head, body~) =>
-      Http({ operation, head, body, typed: typed_error(operation, head, body), })
-    _ => Decode(error)
+    @client.ResponseFailure::UnexpectedStatus(head, body~) =>
+      Failure::Http({
+        operation,
+        head,
+        body,
+        typed: typed_error(operation, head, body),
+      })
+    _ => Failure::Decode(error)
   }
 }
 
@@ -167,18 +172,19 @@ pub async fn Badhttp::send(
       ),
     )
     match reply.body {
-      Ok(body) =>
-        Ok({
+      Result::Ok(body) =>
+        Result::Ok({
           status: reply.status,
           headers: reply.headers,
           body,
           request: reply.request,
           attributes: reply.attributes,
         })
-      Err(error) => Err(response_failure(operation, error))
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -192,12 +198,12 @@ pub async fn[T] Badhttp::call(
   operation~ : String = self.infer_operation(request),
 ) -> Result[T, Failure] {
   match self.send(request, operation~) {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode({ status: reply.status, headers: reply.headers, }, reply.body) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -217,8 +223,8 @@ pub async fn Badhttp::stream(
     receive,
     stop=(_, event) => {
       match stop {
-        Some(predicate) => predicate(event)
-        None => false
+        Option::Some(predicate) => predicate(event)
+        Option::None => false
       }
     },
     operation~,
@@ -242,11 +248,12 @@ async fn Badhttp::stream_with_head(
       ),
     )
     match reply.body {
-      Ok(value) => Ok(value)
-      Err(error) => Err(response_failure(operation, error))
+      Result::Ok(value) => Result::Ok(value)
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -271,7 +278,7 @@ fn Badhttp::authenticate(
   request : @http.Request,
 ) -> @http.Request {
   match self.auth {
-    Anonymous => request
+    Auth::Anonymous => request
   }
 }
 

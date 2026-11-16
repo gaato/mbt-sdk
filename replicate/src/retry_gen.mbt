@@ -8,8 +8,8 @@ pub fn default_retry() -> @client.RetryPolicy {
       max_retries: 5,
       statuses: [
         {
-          statuses: [Code(429)],
-          methods: Listed([
+          statuses: [@client.StatusMatch::Code(429)],
+          methods: @client.Methods::Listed([
             @http.Method::parse("DELETE"),
             @http.Method::parse("GET"),
             @http.Method::parse("HEAD"),
@@ -19,8 +19,13 @@ pub fn default_retry() -> @client.RetryPolicy {
           ]),
         },
         {
-          statuses: [Code(500), Code(502), Code(503), Code(504)],
-          methods: Listed([
+          statuses: [
+            @client.StatusMatch::Code(500),
+            @client.StatusMatch::Code(502),
+            @client.StatusMatch::Code(503),
+            @client.StatusMatch::Code(504),
+          ],
+          methods: @client.Methods::Listed([
             @http.Method::parse("DELETE"),
             @http.Method::parse("GET"),
             @http.Method::parse("HEAD"),
@@ -29,18 +34,18 @@ pub fn default_retry() -> @client.RetryPolicy {
           ]),
         },
       ],
-      sent_failures: Never,
+      sent_failures: @client.Methods::Never,
       unsent_failures: false,
-      override_header: None,
+      override_header: Option::None,
       retry_after: {
-        source: Header,
-        cap: BackoffAbove(60000),
+        source: @client.RetryAfterSource::Header,
+        cap: @client.RetryAfterCap::BackoffAbove(60000),
         zero_means_backoff: false,
       },
       backoff: {
         base_ms: 500,
         max_ms: 60000,
-        jitter: Proportional(lo=900, hi=1100),
+        jitter: @client.Jitter::Proportional(lo=900, hi=1100),
       },
     },
   }

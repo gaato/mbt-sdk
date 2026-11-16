@@ -20,7 +20,7 @@ ARRAYS = 'census_args offline_packages'.split()
 OPTIONAL = {'command', 'report_census_args', 'base_url', 'auth', 'base_url_reason',
             'base_url_spec', 'auth_reason', 'auth_spec', 'client_layer', 'extra_imports',
             'operation_wrappers', 'retry', 'idempotency_headers', 'behavior_note', 'server_urls',
-            'timeout_ms', 'total_timeout_ms'}
+            'timeout_ms', 'total_timeout_ms', 'selection'}
 
 
 def require(ok, message):
@@ -51,6 +51,9 @@ def validate_sdk(sdk, seen=None):
     if sdk['client_layer']:
         require('base_url' in sdk and 'auth' in sdk, f'{label}: client_layer needs base_url and auth pins')
     validate_retry(sdk.get('retry'), label)
+    from tools.gen.selection import validate as validate_selection
+    validate_selection(sdk.get('selection'))
+    require('selection' not in sdk or sdk['generator'] != 'custom', f'{label}: custom generators do not support HTTP selections')
     for key in ('timeout_ms', 'total_timeout_ms'):
         if key in sdk:
             require(type(sdk[key]) is int and 0 < sdk[key] <= 2147483647, f'{label}: invalid {key}')
@@ -83,14 +86,43 @@ def load():
     for sdk in data['sdk']:
         label = validate_sdk(sdk, seen)
         for key in ('dir', 'out', 'spec_file'):
+            relative = Path(sdk[key])
+            require(not relative.is_absolute() and '..' not in relative.parts and str(relative) == sdk[key],
+                    f'{label}: {key} must be a canonical repository-relative path')
             path = ROOT / sdk[key]
             require(path.resolve().is_relative_to(ROOT) and (key == 'out' or path.exists()), f'{label}: missing or invalid {key}: {sdk[key]}')
+        # All consumers, including symlink spellings, must group on the same
+        # physical vendored source and its single adjacent provenance file.
+        sdk['spec_file'] = str((ROOT / sdk['spec_file']).resolve().relative_to(ROOT))
         require((ROOT / sdk['dir']).is_dir(), f'{label}: dir must be a directory')
         mod = (ROOT / sdk['dir'] / 'moon.mod').read_bytes().decode()
         require(re.search(r'^name = "' + re.escape(sdk['module']) + '"$', mod, re.M), f'{label}: moon.mod name mismatch')
         if sdk['generator'] == 'custom':
             require(isinstance(sdk.get('command'), str) and (ROOT / sdk['command']).is_file(), f'{label}: missing custom command')
+    sources = {}
+    locations = {}
+    for sdk in data['sdk']:
+        source = str((ROOT / sdk['spec_file']).resolve())
+        metadata = tuple(sdk[key] for key in ('spec_url', 'spec_fetch', 'generator'))
+        require(source not in sources or sources[source] == metadata,
+                f'{sdk["name"]}: shared spec has contradictory source metadata')
+        sources[source] = metadata
+        if sdk['generator'] != 'custom':
+            require(sdk['spec_url'] not in locations or locations[sdk['spec_url']] == source,
+                    f'{sdk["name"]}: duplicate vendored source; share one spec_file instead')
+            locations[sdk['spec_url']] = source
     return data['sdk']
+
+
+def spec_groups(sdks):
+    groups = {}
+    for sdk in sdks:
+        group = groups.setdefault(sdk['spec_file'], [])
+        group.append(sdk)
+    return [dict(provider=members[0]['name'], generator=members[0]['generator'],
+                 spec_file=Path(path).name, spec_path=path, spec_url=members[0]['spec_url'],
+                 spec_fetch=members[0]['spec_fetch'], modules=[s['name'] for s in members], dirs=[s['dir'] for s in members])
+            for path, members in groups.items() if any(s['spec_watch'] for s in members)]
 
 
 def validate_auth(auth, label):
@@ -296,6 +328,13 @@ def pins(sdks):
                 print(error.stderr, file=sys.stderr, end='')
                 raise
             doc = json.loads(output)
+        from tools.gen.selection import selected_document
+        identities = None
+        if sdk.get('selection') is not None:
+            from tools.gen.normalize import normalize_spec
+            overlays = sorted((ROOT / sdk['dir'] / 'overlays').glob('*.yaml'))
+            identities = normalize_spec(spec, overlays)
+        doc = selected_document(doc, sdk.get('selection'), identities=identities)
         if 'base_url' in sdk:
             servers = doc.get('servers') or [{}]
             actual = servers[0].get('url')
@@ -333,6 +372,10 @@ def main():
     get.add_argument('name')
     get.add_argument('field')
     sub.add_parser('matrix')
+    census_parser = sub.add_parser('census')
+    census_parser.add_argument('names', nargs='*')
+    census_parser.add_argument('--compile', action='store_true')
+    census_parser.add_argument('--json', action='store_true')
     syncing = sub.add_parser('sync')
     syncing.add_argument('--check', action='store_true')
     sub.add_parser('behavior-check')
@@ -347,9 +390,21 @@ def main():
         value = sdk[args.field]
         print('\n'.join(value) if isinstance(value, list) else json.dumps(value) if isinstance(value, (bool, dict)) else value)
     elif args.cmd == 'matrix':
-        print(json.dumps({'include': [dict(provider=s['name'], dir=s['dir'], generator=s['generator'], spec_file=Path(s['spec_file']).name, spec_path=s['spec_file'], spec_url=s['spec_url'], spec_fetch=s['spec_fetch']) for s in sdks if s['spec_watch']]}))
+        print(json.dumps({'include': spec_groups(sdks)}))
     elif args.cmd == 'behavior-check':
         behavior_notes(sdks)
+    elif args.cmd == 'census':
+        from tools.gen.census import ledger_census
+        require(not set(args.names) - {s['name'] for s in sdks}, 'unknown census SDK name')
+        results = [ledger_census(sdk, ROOT, compile=args.compile) for sdk in sdks if not args.names or sdk['name'] in args.names]
+        if args.json:
+            print(json.dumps([result.to_dict() for result in results]))
+        else:
+            for result in results:
+                print(f'{result.name}: operations={result.operations} diagnostics={result.diagnostics} compilation={result.compilation}')
+                for diagnostic in result.details:
+                    print(f'  {diagnostic["pointer"]}: {diagnostic["reason"]}; {diagnostic["overlay_hint"]}')
+        return int(any(result.diagnostics for result in results))
     else:
         return int(sync(sdks, args.check))
     return 0

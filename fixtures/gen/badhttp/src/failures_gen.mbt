@@ -46,98 +46,98 @@ fn typed_error(
     let json = @json.parse(@utf8.decode(body))
     if operation == "get_sse_flavor" && head.status == 400 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_sse_flavor" && head.status == 404 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_range_flavor" && head.status == 400 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_range_flavor" && head.status == 404 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_range_flavor" && head.status == 412 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_etag_flavor" && head.status == 404 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_cookies_flavor" && head.status == 400 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_cookies_flavor" && head.status == 404 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_auth_flavor" && head.status == 400 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_auth_flavor" && head.status == 401 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_auth_flavor" && head.status == 403 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_auth_flavor" && head.status == 404 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_auth_flavor" && head.status == 407 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_crosshost_flavor" && head.status == 404 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_crosshost_flavor" && head.status == 500 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_compress_flavor" && head.status == 400 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_compress_flavor" && head.status == 404 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_compress_flavor" && head.status == 405 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_compress_flavor" && head.status == 406 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_echo" && head.status == 405 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "head_echo" && head.status == 405 {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_status_code" && true {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
     if operation == "get_flaky_percent" && true {
       let value : Json = @json.from_json(json)
-      return Some(RawJson(value))
+      return Option::Some(ErrorBody::RawJson(value))
     }
-    None
+    Option::None
   } catch {
-    _ => None
+    _ => Option::None
   }
 }

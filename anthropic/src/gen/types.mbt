@@ -3,7 +3,7 @@
 ///|
 fn json_array_matches(value : Json, predicate : (Json) -> Bool) -> Bool {
   match value {
-    Array(items) => items.length() > 0 && items.all(predicate)
+    @json.Json::Array(items) => items.length() > 0 && items.all(predicate)
     _ => false
   }
 }
@@ -16,19 +16,19 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 
 ///|
 fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
   match value {
-    Some(value) => @sdkjson.Value(value)
-    None => @sdkjson.Null
+    Option::Some(value) => @sdkjson.Presence::Value(value)
+    Option::None => @sdkjson.Presence::Null
   }
 }
 
@@ -40,8 +40,8 @@ fn[T : @json.FromJson] decode_nullable_field(
 ) -> T? raise @json.JsonDecodeError {
   let raw : Json = required_field(obj, key, path)
   match raw {
-    Null => None
-    value => Some(@json.from_json(value, path=path.add_key(key)))
+    @json.Json::Null => Option::None
+    value => Option::Some(@json.from_json(value, path=path.add_key(key)))
   }
 }
 
@@ -54,8 +54,8 @@ fn[T : @json.FromJson] decode_defaulted_field(
   default : Json,
 ) -> T raise @json.JsonDecodeError {
   match obj.get(key) {
-    Some(value) => @json.from_json(value, path=path.add_key(key))
-    None => @json.from_json(default, path=path.add_key(key))
+    Option::Some(value) => @json.from_json(value, path=path.add_key(key))
+    Option::None => @json.from_json(default, path=path.add_key(key))
   }
 }
 
@@ -135,13 +135,13 @@ pub extend AllowedCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for AllowedCaller with fn to_json(self) {
   let raw = match self {
-    Direct => "direct"
-    CodeExecution20250825 => "code_execution_20250825"
-    CodeExecution20260120 => "code_execution_20260120"
-    CodeExecution20260521 => "code_execution_20260521"
-    Custom(raw) => raw
+    AllowedCaller::Direct => "direct"
+    AllowedCaller::CodeExecution20250825 => "code_execution_20250825"
+    AllowedCaller::CodeExecution20260120 => "code_execution_20260120"
+    AllowedCaller::CodeExecution20260521 => "code_execution_20260521"
+    AllowedCaller::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -156,14 +156,17 @@ pub impl @json.FromJson for AllowedCaller with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "direct" => Some(Direct)
-        "code_execution_20250825" => Some(CodeExecution20250825)
-        "code_execution_20260120" => Some(CodeExecution20260120)
-        "code_execution_20260521" => Some(CodeExecution20260521)
-        _ => None
+        "direct" => Option::Some(AllowedCaller::Direct)
+        "code_execution_20250825" =>
+          Option::Some(AllowedCaller::CodeExecution20250825)
+        "code_execution_20260120" =>
+          Option::Some(AllowedCaller::CodeExecution20260120)
+        "code_execution_20260521" =>
+          Option::Some(AllowedCaller::CodeExecution20260521)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => AllowedCaller::Custom(raw),
   )
 }
 
@@ -192,11 +195,11 @@ pub extend CacheControlEphemeralTtl with ToJson::{to_json}
 ///|
 pub impl ToJson for CacheControlEphemeralTtl with fn to_json(self) {
   let raw = match self {
-    Value5m => "5m"
-    Value1h => "1h"
-    Custom(raw) => raw
+    CacheControlEphemeralTtl::Value5m => "5m"
+    CacheControlEphemeralTtl::Value1h => "1h"
+    CacheControlEphemeralTtl::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -214,12 +217,12 @@ pub impl @json.FromJson for CacheControlEphemeralTtl with fn from_json(
     path,
     raw => {
       match raw {
-        "5m" => Some(Value5m)
-        "1h" => Some(Value1h)
-        _ => None
+        "5m" => Option::Some(CacheControlEphemeralTtl::Value5m)
+        "1h" => Option::Some(CacheControlEphemeralTtl::Value1h)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CacheControlEphemeralTtl::Custom(raw),
   )
 }
 
@@ -308,8 +311,10 @@ pub impl ToJson for RequestBashCodeExecutionToolResultBlockCacheControl with fn 
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestBashCodeExecutionToolResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestBashCodeExecutionToolResultBlockCacheControl::Unknown(_, value) =>
+      value
   }
 }
 
@@ -328,8 +333,12 @@ pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlockCacheControl 
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestBashCodeExecutionToolResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other =>
+      RequestBashCodeExecutionToolResultBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -361,14 +370,17 @@ pub extend BashCodeExecutionToolResultErrorCode with ToJson::{to_json}
 ///|
 pub impl ToJson for BashCodeExecutionToolResultErrorCode with fn to_json(self) {
   let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    TooManyRequests => "too_many_requests"
-    ExecutionTimeExceeded => "execution_time_exceeded"
-    OutputFileTooLarge => "output_file_too_large"
-    Unknown(raw) => raw
+    BashCodeExecutionToolResultErrorCode::InvalidToolInput =>
+      "invalid_tool_input"
+    BashCodeExecutionToolResultErrorCode::Unavailable => "unavailable"
+    BashCodeExecutionToolResultErrorCode::TooManyRequests => "too_many_requests"
+    BashCodeExecutionToolResultErrorCode::ExecutionTimeExceeded =>
+      "execution_time_exceeded"
+    BashCodeExecutionToolResultErrorCode::OutputFileTooLarge =>
+      "output_file_too_large"
+    BashCodeExecutionToolResultErrorCode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -386,15 +398,22 @@ pub impl @json.FromJson for BashCodeExecutionToolResultErrorCode with fn from_js
     path,
     raw => {
       match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "too_many_requests" => Some(TooManyRequests)
-        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        "output_file_too_large" => Some(OutputFileTooLarge)
-        _ => None
+        "invalid_tool_input" =>
+          Option::Some(BashCodeExecutionToolResultErrorCode::InvalidToolInput)
+        "unavailable" =>
+          Option::Some(BashCodeExecutionToolResultErrorCode::Unavailable)
+        "too_many_requests" =>
+          Option::Some(BashCodeExecutionToolResultErrorCode::TooManyRequests)
+        "execution_time_exceeded" =>
+          Option::Some(
+            BashCodeExecutionToolResultErrorCode::ExecutionTimeExceeded,
+          )
+        "output_file_too_large" =>
+          Option::Some(BashCodeExecutionToolResultErrorCode::OutputFileTooLarge)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => BashCodeExecutionToolResultErrorCode::Unknown(raw),
   )
 }
 
@@ -606,9 +625,13 @@ pub impl ToJson for RequestBashCodeExecutionToolResultBlockContent with fn to_js
   self,
 ) {
   match self {
-    BashCodeExecutionToolResultError(value) => Json(value)
-    BashCodeExecutionResult(value) => Json(value)
-    Unknown(_, value) => value
+    RequestBashCodeExecutionToolResultBlockContent::BashCodeExecutionToolResultError(
+      value
+    ) => @json.Json::Json(value)
+    RequestBashCodeExecutionToolResultBlockContent::BashCodeExecutionResult(
+      value
+    ) => @json.Json::Json(value)
+    RequestBashCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -628,10 +651,15 @@ pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlockContent with 
   let tag : String = required_field(obj, "type", path)
   match tag {
     "bash_code_execution_tool_result_error" =>
-      BashCodeExecutionToolResultError(@json.from_json(value, path~))
+      RequestBashCodeExecutionToolResultBlockContent::BashCodeExecutionToolResultError(
+        @json.from_json(value, path~),
+      )
     "bash_code_execution_result" =>
-      BashCodeExecutionResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestBashCodeExecutionToolResultBlockContent::BashCodeExecutionResult(
+        @json.from_json(value, path~),
+      )
+    other =>
+      RequestBashCodeExecutionToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -742,8 +770,9 @@ pub impl ToJson for RequestCodeExecutionToolResultBlockCacheControl with fn to_j
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestCodeExecutionToolResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestCodeExecutionToolResultBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -762,8 +791,12 @@ pub impl @json.FromJson for RequestCodeExecutionToolResultBlockCacheControl with
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestCodeExecutionToolResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other =>
+      RequestCodeExecutionToolResultBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -794,13 +827,14 @@ pub extend CodeExecutionToolResultErrorCode with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionToolResultErrorCode with fn to_json(self) {
   let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    TooManyRequests => "too_many_requests"
-    ExecutionTimeExceeded => "execution_time_exceeded"
-    Unknown(raw) => raw
+    CodeExecutionToolResultErrorCode::InvalidToolInput => "invalid_tool_input"
+    CodeExecutionToolResultErrorCode::Unavailable => "unavailable"
+    CodeExecutionToolResultErrorCode::TooManyRequests => "too_many_requests"
+    CodeExecutionToolResultErrorCode::ExecutionTimeExceeded =>
+      "execution_time_exceeded"
+    CodeExecutionToolResultErrorCode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -818,14 +852,18 @@ pub impl @json.FromJson for CodeExecutionToolResultErrorCode with fn from_json(
     path,
     raw => {
       match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "too_many_requests" => Some(TooManyRequests)
-        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        _ => None
+        "invalid_tool_input" =>
+          Option::Some(CodeExecutionToolResultErrorCode::InvalidToolInput)
+        "unavailable" =>
+          Option::Some(CodeExecutionToolResultErrorCode::Unavailable)
+        "too_many_requests" =>
+          Option::Some(CodeExecutionToolResultErrorCode::TooManyRequests)
+        "execution_time_exceeded" =>
+          Option::Some(CodeExecutionToolResultErrorCode::ExecutionTimeExceeded)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CodeExecutionToolResultErrorCode::Unknown(raw),
   )
 }
 
@@ -1105,10 +1143,15 @@ pub impl ToJson for RequestCodeExecutionToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    CodeExecutionToolResultError(value) => Json(value)
-    CodeExecutionResult(value) => Json(value)
-    EncryptedCodeExecutionResult(value) => Json(value)
-    Unknown(_, value) => value
+    RequestCodeExecutionToolResultBlockContent::CodeExecutionToolResultError(
+      value
+    ) => @json.Json::Json(value)
+    RequestCodeExecutionToolResultBlockContent::CodeExecutionResult(value) =>
+      @json.Json::Json(value)
+    RequestCodeExecutionToolResultBlockContent::EncryptedCodeExecutionResult(
+      value
+    ) => @json.Json::Json(value)
+    RequestCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -1128,12 +1171,18 @@ pub impl @json.FromJson for RequestCodeExecutionToolResultBlockContent with fn f
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_tool_result_error" =>
-      CodeExecutionToolResultError(@json.from_json(value, path~))
+      RequestCodeExecutionToolResultBlockContent::CodeExecutionToolResultError(
+        @json.from_json(value, path~),
+      )
     "code_execution_result" =>
-      CodeExecutionResult(@json.from_json(value, path~))
+      RequestCodeExecutionToolResultBlockContent::CodeExecutionResult(
+        @json.from_json(value, path~),
+      )
     "encrypted_code_execution_result" =>
-      EncryptedCodeExecutionResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestCodeExecutionToolResultBlockContent::EncryptedCodeExecutionResult(
+        @json.from_json(value, path~),
+      )
+    other => RequestCodeExecutionToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -1233,8 +1282,9 @@ pub impl ToJson for RequestContainerUploadBlockCacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestContainerUploadBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestContainerUploadBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -1253,8 +1303,11 @@ pub impl @json.FromJson for RequestContainerUploadBlockCacheControl with fn from
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestContainerUploadBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestContainerUploadBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -1345,8 +1398,9 @@ pub extend RequestDocumentBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestDocumentBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestDocumentBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestDocumentBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -1363,8 +1417,9 @@ pub impl @json.FromJson for RequestDocumentBlockCacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestDocumentBlockCacheControl::Ephemeral(@json.from_json(value, path~))
+    other => RequestDocumentBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -1487,8 +1542,8 @@ pub extend RequestImageBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestImageBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestImageBlockCacheControl::Ephemeral(value) => @json.Json::Json(value)
+    RequestImageBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -1505,8 +1560,9 @@ pub impl @json.FromJson for RequestImageBlockCacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestImageBlockCacheControl::Ephemeral(@json.from_json(value, path~))
+    other => RequestImageBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -1537,13 +1593,13 @@ pub extend Base64ImageSourceMediaType with ToJson::{to_json}
 ///|
 pub impl ToJson for Base64ImageSourceMediaType with fn to_json(self) {
   let raw = match self {
-    ImageJpeg => "image/jpeg"
-    ImagePng => "image/png"
-    ImageGif => "image/gif"
-    ImageWebp => "image/webp"
-    Custom(raw) => raw
+    Base64ImageSourceMediaType::ImageJpeg => "image/jpeg"
+    Base64ImageSourceMediaType::ImagePng => "image/png"
+    Base64ImageSourceMediaType::ImageGif => "image/gif"
+    Base64ImageSourceMediaType::ImageWebp => "image/webp"
+    Base64ImageSourceMediaType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1561,14 +1617,14 @@ pub impl @json.FromJson for Base64ImageSourceMediaType with fn from_json(
     path,
     raw => {
       match raw {
-        "image/jpeg" => Some(ImageJpeg)
-        "image/png" => Some(ImagePng)
-        "image/gif" => Some(ImageGif)
-        "image/webp" => Some(ImageWebp)
-        _ => None
+        "image/jpeg" => Option::Some(Base64ImageSourceMediaType::ImageJpeg)
+        "image/png" => Option::Some(Base64ImageSourceMediaType::ImagePng)
+        "image/gif" => Option::Some(Base64ImageSourceMediaType::ImageGif)
+        "image/webp" => Option::Some(Base64ImageSourceMediaType::ImageWebp)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Base64ImageSourceMediaType::Custom(raw),
   )
 }
 
@@ -1755,10 +1811,10 @@ pub extend RequestImageBlockSource with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestImageBlockSource with fn to_json(self) {
   match self {
-    Base64(value) => Json(value)
-    File(value) => Json(value)
-    Url(value) => Json(value)
-    Unknown(_, value) => value
+    RequestImageBlockSource::Base64(value) => @json.Json::Json(value)
+    RequestImageBlockSource::File(value) => @json.Json::Json(value)
+    RequestImageBlockSource::Url(value) => @json.Json::Json(value)
+    RequestImageBlockSource::Unknown(_, value) => value
   }
 }
 
@@ -1775,10 +1831,10 @@ pub impl @json.FromJson for RequestImageBlockSource with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "base64" => Base64(@json.from_json(value, path~))
-    "file" => File(@json.from_json(value, path~))
-    "url" => Url(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "base64" => RequestImageBlockSource::Base64(@json.from_json(value, path~))
+    "file" => RequestImageBlockSource::File(@json.from_json(value, path~))
+    "url" => RequestImageBlockSource::Url(@json.from_json(value, path~))
+    other => RequestImageBlockSource::Unknown(other, value)
   }
 }
 
@@ -1811,11 +1867,11 @@ pub impl ToJson for RequestImageTransformationsOversizedImage with fn to_json(
   self,
 ) {
   let raw = match self {
-    Downsize => "downsize"
-    Error => "error"
-    Custom(raw) => raw
+    RequestImageTransformationsOversizedImage::Downsize => "downsize"
+    RequestImageTransformationsOversizedImage::Error => "error"
+    RequestImageTransformationsOversizedImage::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1835,12 +1891,14 @@ pub impl @json.FromJson for RequestImageTransformationsOversizedImage with fn fr
     path,
     raw => {
       match raw {
-        "downsize" => Some(Downsize)
-        "error" => Some(Error)
-        _ => None
+        "downsize" =>
+          Option::Some(RequestImageTransformationsOversizedImage::Downsize)
+        "error" =>
+          Option::Some(RequestImageTransformationsOversizedImage::Error)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => RequestImageTransformationsOversizedImage::Custom(raw),
   )
 }
 
@@ -1982,8 +2040,8 @@ pub extend RequestTextBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestTextBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestTextBlockCacheControl::Ephemeral(value) => @json.Json::Json(value)
+    RequestTextBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -2000,8 +2058,9 @@ pub impl @json.FromJson for RequestTextBlockCacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestTextBlockCacheControl::Ephemeral(@json.from_json(value, path~))
+    other => RequestTextBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -2428,12 +2487,17 @@ pub extend RequestTextBlockCitationsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestTextBlockCitationsItem with fn to_json(self) {
   match self {
-    CharLocation(value) => Json(value)
-    ContentBlockLocation(value) => Json(value)
-    PageLocation(value) => Json(value)
-    SearchResultLocation(value) => Json(value)
-    WebSearchResultLocation(value) => Json(value)
-    Unknown(_, value) => value
+    RequestTextBlockCitationsItem::CharLocation(value) =>
+      @json.Json::Json(value)
+    RequestTextBlockCitationsItem::ContentBlockLocation(value) =>
+      @json.Json::Json(value)
+    RequestTextBlockCitationsItem::PageLocation(value) =>
+      @json.Json::Json(value)
+    RequestTextBlockCitationsItem::SearchResultLocation(value) =>
+      @json.Json::Json(value)
+    RequestTextBlockCitationsItem::WebSearchResultLocation(value) =>
+      @json.Json::Json(value)
+    RequestTextBlockCitationsItem::Unknown(_, value) => value
   }
 }
 
@@ -2450,15 +2514,23 @@ pub impl @json.FromJson for RequestTextBlockCitationsItem with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "char_location" => CharLocation(@json.from_json(value, path~))
+    "char_location" =>
+      RequestTextBlockCitationsItem::CharLocation(@json.from_json(value, path~))
     "content_block_location" =>
-      ContentBlockLocation(@json.from_json(value, path~))
-    "page_location" => PageLocation(@json.from_json(value, path~))
+      RequestTextBlockCitationsItem::ContentBlockLocation(
+        @json.from_json(value, path~),
+      )
+    "page_location" =>
+      RequestTextBlockCitationsItem::PageLocation(@json.from_json(value, path~))
     "search_result_location" =>
-      SearchResultLocation(@json.from_json(value, path~))
+      RequestTextBlockCitationsItem::SearchResultLocation(
+        @json.from_json(value, path~),
+      )
     "web_search_result_location" =>
-      WebSearchResultLocation(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestTextBlockCitationsItem::WebSearchResultLocation(
+        @json.from_json(value, path~),
+      )
+    other => RequestTextBlockCitationsItem::Unknown(other, value)
   }
 }
 
@@ -2554,9 +2626,11 @@ pub impl ToJson for ContentBlockSourceContentValueArrayItem with fn to_json(
   self,
 ) {
   match self {
-    Image(value) => Json(value)
-    Text(value) => Json(value)
-    Unknown(_, value) => value
+    ContentBlockSourceContentValueArrayItem::Image(value) =>
+      @json.Json::Json(value)
+    ContentBlockSourceContentValueArrayItem::Text(value) =>
+      @json.Json::Json(value)
+    ContentBlockSourceContentValueArrayItem::Unknown(_, value) => value
   }
 }
 
@@ -2575,9 +2649,15 @@ pub impl @json.FromJson for ContentBlockSourceContentValueArrayItem with fn from
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "image" => Image(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "image" =>
+      ContentBlockSourceContentValueArrayItem::Image(
+        @json.from_json(value, path~),
+      )
+    "text" =>
+      ContentBlockSourceContentValueArrayItem::Text(
+        @json.from_json(value, path~),
+      )
+    other => ContentBlockSourceContentValueArrayItem::Unknown(other, value)
   }
 }
 
@@ -2605,8 +2685,8 @@ pub extend ContentBlockSourceContent with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlockSourceContent with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    ValueArray(value) => Json(value)
+    ContentBlockSourceContent::Text(value) => @json.Json::Json(value)
+    ContentBlockSourceContent::ValueArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -2620,18 +2700,18 @@ pub impl @json.FromJson for ContentBlockSourceContent with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return ContentBlockSourceContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ContentBlockSourceContentValueArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return ValueArray(decoded)
+    return ContentBlockSourceContent::ValueArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any ContentBlockSourceContent variant"),
   )
 }
@@ -2867,12 +2947,12 @@ pub extend RequestDocumentBlockSource with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestDocumentBlockSource with fn to_json(self) {
   match self {
-    Base64(value) => Json(value)
-    Content(value) => Json(value)
-    File(value) => Json(value)
-    Text(value) => Json(value)
-    Url(value) => Json(value)
-    Unknown(_, value) => value
+    RequestDocumentBlockSource::Base64(value) => @json.Json::Json(value)
+    RequestDocumentBlockSource::Content(value) => @json.Json::Json(value)
+    RequestDocumentBlockSource::File(value) => @json.Json::Json(value)
+    RequestDocumentBlockSource::Text(value) => @json.Json::Json(value)
+    RequestDocumentBlockSource::Url(value) => @json.Json::Json(value)
+    RequestDocumentBlockSource::Unknown(_, value) => value
   }
 }
 
@@ -2889,12 +2969,14 @@ pub impl @json.FromJson for RequestDocumentBlockSource with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "base64" => Base64(@json.from_json(value, path~))
-    "content" => Content(@json.from_json(value, path~))
-    "file" => File(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    "url" => Url(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "base64" =>
+      RequestDocumentBlockSource::Base64(@json.from_json(value, path~))
+    "content" =>
+      RequestDocumentBlockSource::Content(@json.from_json(value, path~))
+    "file" => RequestDocumentBlockSource::File(@json.from_json(value, path~))
+    "text" => RequestDocumentBlockSource::Text(@json.from_json(value, path~))
+    "url" => RequestDocumentBlockSource::Url(@json.from_json(value, path~))
+    other => RequestDocumentBlockSource::Unknown(other, value)
   }
 }
 
@@ -3052,8 +3134,9 @@ pub extend RequestSearchResultBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestSearchResultBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestSearchResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestSearchResultBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -3070,8 +3153,11 @@ pub impl @json.FromJson for RequestSearchResultBlockCacheControl with fn from_js
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestSearchResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestSearchResultBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -3177,8 +3263,9 @@ pub extend RequestServerToolUseBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestServerToolUseBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestServerToolUseBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestServerToolUseBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -3197,8 +3284,11 @@ pub impl @json.FromJson for RequestServerToolUseBlockCacheControl with fn from_j
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestServerToolUseBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestServerToolUseBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -3377,10 +3467,12 @@ pub extend RequestServerToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestServerToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    RequestServerToolUseBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    RequestServerToolUseBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    RequestServerToolUseBlockCaller::Direct(value) => @json.Json::Json(value)
+    RequestServerToolUseBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -3398,11 +3490,16 @@ pub impl @json.FromJson for RequestServerToolUseBlockCaller with fn from_json(
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      RequestServerToolUseBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestServerToolUseBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" =>
+      RequestServerToolUseBlockCaller::Direct(@json.from_json(value, path~))
+    other => RequestServerToolUseBlockCaller::Unknown(other, value)
   }
 }
 
@@ -3436,16 +3533,18 @@ pub extend RequestServerToolUseBlockName with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestServerToolUseBlockName with fn to_json(self) {
   let raw = match self {
-    WebSearch => "web_search"
-    WebFetch => "web_fetch"
-    CodeExecution => "code_execution"
-    BashCodeExecution => "bash_code_execution"
-    TextEditorCodeExecution => "text_editor_code_execution"
-    ToolSearchToolRegex => "tool_search_tool_regex"
-    ToolSearchToolBm25 => "tool_search_tool_bm25"
-    Custom(raw) => raw
+    RequestServerToolUseBlockName::WebSearch => "web_search"
+    RequestServerToolUseBlockName::WebFetch => "web_fetch"
+    RequestServerToolUseBlockName::CodeExecution => "code_execution"
+    RequestServerToolUseBlockName::BashCodeExecution => "bash_code_execution"
+    RequestServerToolUseBlockName::TextEditorCodeExecution =>
+      "text_editor_code_execution"
+    RequestServerToolUseBlockName::ToolSearchToolRegex =>
+      "tool_search_tool_regex"
+    RequestServerToolUseBlockName::ToolSearchToolBm25 => "tool_search_tool_bm25"
+    RequestServerToolUseBlockName::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3463,17 +3562,22 @@ pub impl @json.FromJson for RequestServerToolUseBlockName with fn from_json(
     path,
     raw => {
       match raw {
-        "web_search" => Some(WebSearch)
-        "web_fetch" => Some(WebFetch)
-        "code_execution" => Some(CodeExecution)
-        "bash_code_execution" => Some(BashCodeExecution)
-        "text_editor_code_execution" => Some(TextEditorCodeExecution)
-        "tool_search_tool_regex" => Some(ToolSearchToolRegex)
-        "tool_search_tool_bm25" => Some(ToolSearchToolBm25)
-        _ => None
+        "web_search" => Option::Some(RequestServerToolUseBlockName::WebSearch)
+        "web_fetch" => Option::Some(RequestServerToolUseBlockName::WebFetch)
+        "code_execution" =>
+          Option::Some(RequestServerToolUseBlockName::CodeExecution)
+        "bash_code_execution" =>
+          Option::Some(RequestServerToolUseBlockName::BashCodeExecution)
+        "text_editor_code_execution" =>
+          Option::Some(RequestServerToolUseBlockName::TextEditorCodeExecution)
+        "tool_search_tool_regex" =>
+          Option::Some(RequestServerToolUseBlockName::ToolSearchToolRegex)
+        "tool_search_tool_bm25" =>
+          Option::Some(RequestServerToolUseBlockName::ToolSearchToolBm25)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => RequestServerToolUseBlockName::Custom(raw),
   )
 }
 
@@ -3588,8 +3692,10 @@ pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl wi
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestTextEditorCodeExecutionToolResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestTextEditorCodeExecutionToolResultBlockCacheControl::Unknown(_, value) =>
+      value
   }
 }
 
@@ -3608,8 +3714,14 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlockCacheCo
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestTextEditorCodeExecutionToolResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other =>
+      RequestTextEditorCodeExecutionToolResultBlockCacheControl::Unknown(
+        other, value,
+      )
   }
 }
 
@@ -3648,14 +3760,17 @@ pub impl ToJson for TextEditorCodeExecutionToolResultErrorCode with fn to_json(
   self,
 ) {
   let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    TooManyRequests => "too_many_requests"
-    ExecutionTimeExceeded => "execution_time_exceeded"
-    FileNotFound => "file_not_found"
-    Unknown(raw) => raw
+    TextEditorCodeExecutionToolResultErrorCode::InvalidToolInput =>
+      "invalid_tool_input"
+    TextEditorCodeExecutionToolResultErrorCode::Unavailable => "unavailable"
+    TextEditorCodeExecutionToolResultErrorCode::TooManyRequests =>
+      "too_many_requests"
+    TextEditorCodeExecutionToolResultErrorCode::ExecutionTimeExceeded =>
+      "execution_time_exceeded"
+    TextEditorCodeExecutionToolResultErrorCode::FileNotFound => "file_not_found"
+    TextEditorCodeExecutionToolResultErrorCode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3675,15 +3790,26 @@ pub impl @json.FromJson for TextEditorCodeExecutionToolResultErrorCode with fn f
     path,
     raw => {
       match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "too_many_requests" => Some(TooManyRequests)
-        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        "file_not_found" => Some(FileNotFound)
-        _ => None
+        "invalid_tool_input" =>
+          Option::Some(
+            TextEditorCodeExecutionToolResultErrorCode::InvalidToolInput,
+          )
+        "unavailable" =>
+          Option::Some(TextEditorCodeExecutionToolResultErrorCode::Unavailable)
+        "too_many_requests" =>
+          Option::Some(
+            TextEditorCodeExecutionToolResultErrorCode::TooManyRequests,
+          )
+        "execution_time_exceeded" =>
+          Option::Some(
+            TextEditorCodeExecutionToolResultErrorCode::ExecutionTimeExceeded,
+          )
+        "file_not_found" =>
+          Option::Some(TextEditorCodeExecutionToolResultErrorCode::FileNotFound)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => TextEditorCodeExecutionToolResultErrorCode::Unknown(raw),
   )
 }
 
@@ -3794,12 +3920,12 @@ pub impl ToJson for RequestTextEditorCodeExecutionViewResultBlockFileType with f
   self,
 ) {
   let raw = match self {
-    Text => "text"
-    Image => "image"
-    Pdf => "pdf"
-    Custom(raw) => raw
+    RequestTextEditorCodeExecutionViewResultBlockFileType::Text => "text"
+    RequestTextEditorCodeExecutionViewResultBlockFileType::Image => "image"
+    RequestTextEditorCodeExecutionViewResultBlockFileType::Pdf => "pdf"
+    RequestTextEditorCodeExecutionViewResultBlockFileType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3819,13 +3945,22 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionViewResultBlockFileTyp
     path,
     raw => {
       match raw {
-        "text" => Some(Text)
-        "image" => Some(Image)
-        "pdf" => Some(Pdf)
-        _ => None
+        "text" =>
+          Option::Some(
+            RequestTextEditorCodeExecutionViewResultBlockFileType::Text,
+          )
+        "image" =>
+          Option::Some(
+            RequestTextEditorCodeExecutionViewResultBlockFileType::Image,
+          )
+        "pdf" =>
+          Option::Some(
+            RequestTextEditorCodeExecutionViewResultBlockFileType::Pdf,
+          )
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => RequestTextEditorCodeExecutionViewResultBlockFileType::Custom(raw),
   )
 }
 
@@ -4115,11 +4250,20 @@ pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockContent with fn
   self,
 ) {
   match self {
-    TextEditorCodeExecutionToolResultError(value) => Json(value)
-    TextEditorCodeExecutionViewResult(value) => Json(value)
-    TextEditorCodeExecutionCreateResult(value) => Json(value)
-    TextEditorCodeExecutionStrReplaceResult(value) => Json(value)
-    Unknown(_, value) => value
+    RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionToolResultError(
+      value
+    ) => @json.Json::Json(value)
+    RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionViewResult(
+      value
+    ) => @json.Json::Json(value)
+    RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionCreateResult(
+      value
+    ) => @json.Json::Json(value)
+    RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionStrReplaceResult(
+      value
+    ) => @json.Json::Json(value)
+    RequestTextEditorCodeExecutionToolResultBlockContent::Unknown(_, value) =>
+      value
   }
 }
 
@@ -4139,14 +4283,25 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlockContent
   let tag : String = required_field(obj, "type", path)
   match tag {
     "text_editor_code_execution_tool_result_error" =>
-      TextEditorCodeExecutionToolResultError(@json.from_json(value, path~))
+      RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionToolResultError(
+        @json.from_json(value, path~),
+      )
     "text_editor_code_execution_view_result" =>
-      TextEditorCodeExecutionViewResult(@json.from_json(value, path~))
+      RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionViewResult(
+        @json.from_json(value, path~),
+      )
     "text_editor_code_execution_create_result" =>
-      TextEditorCodeExecutionCreateResult(@json.from_json(value, path~))
+      RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionCreateResult(
+        @json.from_json(value, path~),
+      )
     "text_editor_code_execution_str_replace_result" =>
-      TextEditorCodeExecutionStrReplaceResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionStrReplaceResult(
+        @json.from_json(value, path~),
+      )
+    other =>
+      RequestTextEditorCodeExecutionToolResultBlockContent::Unknown(
+        other, value,
+      )
   }
 }
 
@@ -4309,8 +4464,9 @@ pub extend RequestToolResultBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolResultBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestToolResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestToolResultBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -4327,8 +4483,11 @@ pub impl @json.FromJson for RequestToolResultBlockCacheControl with fn from_json
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestToolResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestToolResultBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -4356,8 +4515,9 @@ pub extend RequestBrowserStateBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestBrowserStateBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestBrowserStateBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestBrowserStateBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -4374,8 +4534,11 @@ pub impl @json.FromJson for RequestBrowserStateBlockCacheControl with fn from_js
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestBrowserStateBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestBrowserStateBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -4658,11 +4821,15 @@ pub impl ToJson for RequestBrowserStateBlockStateChangesItem with fn to_json(
   self,
 ) {
   match self {
-    DownloadCompleted(value) => Json(value)
-    DownloadFailed(value) => Json(value)
-    DownloadStarted(value) => Json(value)
-    TabOpened(value) => Json(value)
-    Unknown(_, value) => value
+    RequestBrowserStateBlockStateChangesItem::DownloadCompleted(value) =>
+      @json.Json::Json(value)
+    RequestBrowserStateBlockStateChangesItem::DownloadFailed(value) =>
+      @json.Json::Json(value)
+    RequestBrowserStateBlockStateChangesItem::DownloadStarted(value) =>
+      @json.Json::Json(value)
+    RequestBrowserStateBlockStateChangesItem::TabOpened(value) =>
+      @json.Json::Json(value)
+    RequestBrowserStateBlockStateChangesItem::Unknown(_, value) => value
   }
 }
 
@@ -4681,11 +4848,23 @@ pub impl @json.FromJson for RequestBrowserStateBlockStateChangesItem with fn fro
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "download_completed" => DownloadCompleted(@json.from_json(value, path~))
-    "download_failed" => DownloadFailed(@json.from_json(value, path~))
-    "download_started" => DownloadStarted(@json.from_json(value, path~))
-    "tab_opened" => TabOpened(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "download_completed" =>
+      RequestBrowserStateBlockStateChangesItem::DownloadCompleted(
+        @json.from_json(value, path~),
+      )
+    "download_failed" =>
+      RequestBrowserStateBlockStateChangesItem::DownloadFailed(
+        @json.from_json(value, path~),
+      )
+    "download_started" =>
+      RequestBrowserStateBlockStateChangesItem::DownloadStarted(
+        @json.from_json(value, path~),
+      )
+    "tab_opened" =>
+      RequestBrowserStateBlockStateChangesItem::TabOpened(
+        @json.from_json(value, path~),
+      )
+    other => RequestBrowserStateBlockStateChangesItem::Unknown(other, value)
   }
 }
 
@@ -4843,8 +5022,9 @@ pub extend RequestToolReferenceBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolReferenceBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestToolReferenceBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestToolReferenceBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -4863,8 +5043,11 @@ pub impl @json.FromJson for RequestToolReferenceBlockCacheControl with fn from_j
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestToolReferenceBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestToolReferenceBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -4967,13 +5150,19 @@ pub impl ToJson for RequestToolResultBlockContentValueArrayItem with fn to_json(
   self,
 ) {
   match self {
-    BrowserState(value) => Json(value)
-    Document(value) => Json(value)
-    Image(value) => Json(value)
-    SearchResult(value) => Json(value)
-    Text(value) => Json(value)
-    ToolReference(value) => Json(value)
-    Unknown(_, value) => value
+    RequestToolResultBlockContentValueArrayItem::BrowserState(value) =>
+      @json.Json::Json(value)
+    RequestToolResultBlockContentValueArrayItem::Document(value) =>
+      @json.Json::Json(value)
+    RequestToolResultBlockContentValueArrayItem::Image(value) =>
+      @json.Json::Json(value)
+    RequestToolResultBlockContentValueArrayItem::SearchResult(value) =>
+      @json.Json::Json(value)
+    RequestToolResultBlockContentValueArrayItem::Text(value) =>
+      @json.Json::Json(value)
+    RequestToolResultBlockContentValueArrayItem::ToolReference(value) =>
+      @json.Json::Json(value)
+    RequestToolResultBlockContentValueArrayItem::Unknown(_, value) => value
   }
 }
 
@@ -4992,13 +5181,31 @@ pub impl @json.FromJson for RequestToolResultBlockContentValueArrayItem with fn 
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "browser_state" => BrowserState(@json.from_json(value, path~))
-    "document" => Document(@json.from_json(value, path~))
-    "image" => Image(@json.from_json(value, path~))
-    "search_result" => SearchResult(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    "tool_reference" => ToolReference(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "browser_state" =>
+      RequestToolResultBlockContentValueArrayItem::BrowserState(
+        @json.from_json(value, path~),
+      )
+    "document" =>
+      RequestToolResultBlockContentValueArrayItem::Document(
+        @json.from_json(value, path~),
+      )
+    "image" =>
+      RequestToolResultBlockContentValueArrayItem::Image(
+        @json.from_json(value, path~),
+      )
+    "search_result" =>
+      RequestToolResultBlockContentValueArrayItem::SearchResult(
+        @json.from_json(value, path~),
+      )
+    "text" =>
+      RequestToolResultBlockContentValueArrayItem::Text(
+        @json.from_json(value, path~),
+      )
+    "tool_reference" =>
+      RequestToolResultBlockContentValueArrayItem::ToolReference(
+        @json.from_json(value, path~),
+      )
+    other => RequestToolResultBlockContentValueArrayItem::Unknown(other, value)
   }
 }
 
@@ -5026,8 +5233,8 @@ pub extend RequestToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolResultBlockContent with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    ValueArray(value) => Json(value)
+    RequestToolResultBlockContent::Text(value) => @json.Json::Json(value)
+    RequestToolResultBlockContent::ValueArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -5041,18 +5248,18 @@ pub impl @json.FromJson for RequestToolResultBlockContent with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return RequestToolResultBlockContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[RequestToolResultBlockContentValueArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return ValueArray(decoded)
+    return RequestToolResultBlockContent::ValueArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any RequestToolResultBlockContent variant",
     ),
@@ -5168,8 +5375,9 @@ pub impl ToJson for RequestToolSearchToolResultBlockCacheControl with fn to_json
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestToolSearchToolResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestToolSearchToolResultBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -5188,8 +5396,11 @@ pub impl @json.FromJson for RequestToolSearchToolResultBlockCacheControl with fn
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestToolSearchToolResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestToolSearchToolResultBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -5220,13 +5431,14 @@ pub extend ToolSearchToolResultErrorCode with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolSearchToolResultErrorCode with fn to_json(self) {
   let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    TooManyRequests => "too_many_requests"
-    ExecutionTimeExceeded => "execution_time_exceeded"
-    Unknown(raw) => raw
+    ToolSearchToolResultErrorCode::InvalidToolInput => "invalid_tool_input"
+    ToolSearchToolResultErrorCode::Unavailable => "unavailable"
+    ToolSearchToolResultErrorCode::TooManyRequests => "too_many_requests"
+    ToolSearchToolResultErrorCode::ExecutionTimeExceeded =>
+      "execution_time_exceeded"
+    ToolSearchToolResultErrorCode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5244,14 +5456,18 @@ pub impl @json.FromJson for ToolSearchToolResultErrorCode with fn from_json(
     path,
     raw => {
       match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "too_many_requests" => Some(TooManyRequests)
-        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        _ => None
+        "invalid_tool_input" =>
+          Option::Some(ToolSearchToolResultErrorCode::InvalidToolInput)
+        "unavailable" =>
+          Option::Some(ToolSearchToolResultErrorCode::Unavailable)
+        "too_many_requests" =>
+          Option::Some(ToolSearchToolResultErrorCode::TooManyRequests)
+        "execution_time_exceeded" =>
+          Option::Some(ToolSearchToolResultErrorCode::ExecutionTimeExceeded)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ToolSearchToolResultErrorCode::Unknown(raw),
   )
 }
 
@@ -5402,9 +5618,11 @@ pub impl ToJson for RequestToolSearchToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    ToolSearchToolResultError(value) => Json(value)
-    ToolSearchToolSearchResult(value) => Json(value)
-    Unknown(_, value) => value
+    RequestToolSearchToolResultBlockContent::ToolSearchToolResultError(value) =>
+      @json.Json::Json(value)
+    RequestToolSearchToolResultBlockContent::ToolSearchToolSearchResult(value) =>
+      @json.Json::Json(value)
+    RequestToolSearchToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -5424,10 +5642,14 @@ pub impl @json.FromJson for RequestToolSearchToolResultBlockContent with fn from
   let tag : String = required_field(obj, "type", path)
   match tag {
     "tool_search_tool_result_error" =>
-      ToolSearchToolResultError(@json.from_json(value, path~))
+      RequestToolSearchToolResultBlockContent::ToolSearchToolResultError(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_search_result" =>
-      ToolSearchToolSearchResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestToolSearchToolResultBlockContent::ToolSearchToolSearchResult(
+        @json.from_json(value, path~),
+      )
+    other => RequestToolSearchToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -5525,8 +5747,8 @@ pub extend RequestToolUseBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolUseBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestToolUseBlockCacheControl::Ephemeral(value) => @json.Json::Json(value)
+    RequestToolUseBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -5543,8 +5765,9 @@ pub impl @json.FromJson for RequestToolUseBlockCacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestToolUseBlockCacheControl::Ephemeral(@json.from_json(value, path~))
+    other => RequestToolUseBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -5574,10 +5797,12 @@ pub extend RequestToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    RequestToolUseBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    RequestToolUseBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    RequestToolUseBlockCaller::Direct(value) => @json.Json::Json(value)
+    RequestToolUseBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -5595,11 +5820,15 @@ pub impl @json.FromJson for RequestToolUseBlockCaller with fn from_json(
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      RequestToolUseBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestToolUseBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" => RequestToolUseBlockCaller::Direct(@json.from_json(value, path~))
+    other => RequestToolUseBlockCaller::Unknown(other, value)
   }
 }
 
@@ -5714,8 +5943,9 @@ pub impl ToJson for RequestWebFetchToolResultBlockCacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestWebFetchToolResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestWebFetchToolResultBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -5734,8 +5964,11 @@ pub impl @json.FromJson for RequestWebFetchToolResultBlockCacheControl with fn f
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestWebFetchToolResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestWebFetchToolResultBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -5765,10 +5998,13 @@ pub extend RequestWebFetchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebFetchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    RequestWebFetchToolResultBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    RequestWebFetchToolResultBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    RequestWebFetchToolResultBlockCaller::Direct(value) =>
+      @json.Json::Json(value)
+    RequestWebFetchToolResultBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -5786,11 +6022,18 @@ pub impl @json.FromJson for RequestWebFetchToolResultBlockCaller with fn from_js
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      RequestWebFetchToolResultBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestWebFetchToolResultBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" =>
+      RequestWebFetchToolResultBlockCaller::Direct(
+        @json.from_json(value, path~),
+      )
+    other => RequestWebFetchToolResultBlockCaller::Unknown(other, value)
   }
 }
 
@@ -5827,19 +6070,21 @@ pub extend WebFetchToolResultErrorCode with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchToolResultErrorCode with fn to_json(self) {
   let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    UrlTooLong => "url_too_long"
-    UrlNotAllowed => "url_not_allowed"
-    UrlNotInPriorContext => "url_not_in_prior_context"
-    UrlNotAccessible => "url_not_accessible"
-    UnsupportedContentType => "unsupported_content_type"
-    TooManyRequests => "too_many_requests"
-    MaxUsesExceeded => "max_uses_exceeded"
-    Unavailable => "unavailable"
-    ContentTooLarge => "content_too_large"
-    Unknown(raw) => raw
+    WebFetchToolResultErrorCode::InvalidToolInput => "invalid_tool_input"
+    WebFetchToolResultErrorCode::UrlTooLong => "url_too_long"
+    WebFetchToolResultErrorCode::UrlNotAllowed => "url_not_allowed"
+    WebFetchToolResultErrorCode::UrlNotInPriorContext =>
+      "url_not_in_prior_context"
+    WebFetchToolResultErrorCode::UrlNotAccessible => "url_not_accessible"
+    WebFetchToolResultErrorCode::UnsupportedContentType =>
+      "unsupported_content_type"
+    WebFetchToolResultErrorCode::TooManyRequests => "too_many_requests"
+    WebFetchToolResultErrorCode::MaxUsesExceeded => "max_uses_exceeded"
+    WebFetchToolResultErrorCode::Unavailable => "unavailable"
+    WebFetchToolResultErrorCode::ContentTooLarge => "content_too_large"
+    WebFetchToolResultErrorCode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5857,20 +6102,28 @@ pub impl @json.FromJson for WebFetchToolResultErrorCode with fn from_json(
     path,
     raw => {
       match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "url_too_long" => Some(UrlTooLong)
-        "url_not_allowed" => Some(UrlNotAllowed)
-        "url_not_in_prior_context" => Some(UrlNotInPriorContext)
-        "url_not_accessible" => Some(UrlNotAccessible)
-        "unsupported_content_type" => Some(UnsupportedContentType)
-        "too_many_requests" => Some(TooManyRequests)
-        "max_uses_exceeded" => Some(MaxUsesExceeded)
-        "unavailable" => Some(Unavailable)
-        "content_too_large" => Some(ContentTooLarge)
-        _ => None
+        "invalid_tool_input" =>
+          Option::Some(WebFetchToolResultErrorCode::InvalidToolInput)
+        "url_too_long" => Option::Some(WebFetchToolResultErrorCode::UrlTooLong)
+        "url_not_allowed" =>
+          Option::Some(WebFetchToolResultErrorCode::UrlNotAllowed)
+        "url_not_in_prior_context" =>
+          Option::Some(WebFetchToolResultErrorCode::UrlNotInPriorContext)
+        "url_not_accessible" =>
+          Option::Some(WebFetchToolResultErrorCode::UrlNotAccessible)
+        "unsupported_content_type" =>
+          Option::Some(WebFetchToolResultErrorCode::UnsupportedContentType)
+        "too_many_requests" =>
+          Option::Some(WebFetchToolResultErrorCode::TooManyRequests)
+        "max_uses_exceeded" =>
+          Option::Some(WebFetchToolResultErrorCode::MaxUsesExceeded)
+        "unavailable" => Option::Some(WebFetchToolResultErrorCode::Unavailable)
+        "content_too_large" =>
+          Option::Some(WebFetchToolResultErrorCode::ContentTooLarge)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => WebFetchToolResultErrorCode::Unknown(raw),
   )
 }
 
@@ -6022,9 +6275,11 @@ pub extend RequestWebFetchToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebFetchToolResultBlockContent with fn to_json(self) {
   match self {
-    WebFetchToolResultError(value) => Json(value)
-    WebFetchResult(value) => Json(value)
-    Unknown(_, value) => value
+    RequestWebFetchToolResultBlockContent::WebFetchToolResultError(value) =>
+      @json.Json::Json(value)
+    RequestWebFetchToolResultBlockContent::WebFetchResult(value) =>
+      @json.Json::Json(value)
+    RequestWebFetchToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -6044,9 +6299,14 @@ pub impl @json.FromJson for RequestWebFetchToolResultBlockContent with fn from_j
   let tag : String = required_field(obj, "type", path)
   match tag {
     "web_fetch_tool_result_error" =>
-      WebFetchToolResultError(@json.from_json(value, path~))
-    "web_fetch_result" => WebFetchResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestWebFetchToolResultBlockContent::WebFetchToolResultError(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_result" =>
+      RequestWebFetchToolResultBlockContent::WebFetchResult(
+        @json.from_json(value, path~),
+      )
+    other => RequestWebFetchToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -6154,8 +6414,9 @@ pub impl ToJson for RequestWebSearchToolResultBlockCacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    RequestWebSearchToolResultBlockCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    RequestWebSearchToolResultBlockCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -6174,8 +6435,11 @@ pub impl @json.FromJson for RequestWebSearchToolResultBlockCacheControl with fn 
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      RequestWebSearchToolResultBlockCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => RequestWebSearchToolResultBlockCacheControl::Unknown(other, value)
   }
 }
 
@@ -6205,10 +6469,13 @@ pub extend RequestWebSearchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebSearchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    RequestWebSearchToolResultBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    RequestWebSearchToolResultBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    RequestWebSearchToolResultBlockCaller::Direct(value) =>
+      @json.Json::Json(value)
+    RequestWebSearchToolResultBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -6228,11 +6495,18 @@ pub impl @json.FromJson for RequestWebSearchToolResultBlockCaller with fn from_j
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      RequestWebSearchToolResultBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      RequestWebSearchToolResultBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" =>
+      RequestWebSearchToolResultBlockCaller::Direct(
+        @json.from_json(value, path~),
+      )
+    other => RequestWebSearchToolResultBlockCaller::Unknown(other, value)
   }
 }
 
@@ -6334,15 +6608,15 @@ pub extend WebSearchToolResultErrorCode with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchToolResultErrorCode with fn to_json(self) {
   let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    MaxUsesExceeded => "max_uses_exceeded"
-    TooManyRequests => "too_many_requests"
-    QueryTooLong => "query_too_long"
-    RequestTooLarge => "request_too_large"
-    Unknown(raw) => raw
+    WebSearchToolResultErrorCode::InvalidToolInput => "invalid_tool_input"
+    WebSearchToolResultErrorCode::Unavailable => "unavailable"
+    WebSearchToolResultErrorCode::MaxUsesExceeded => "max_uses_exceeded"
+    WebSearchToolResultErrorCode::TooManyRequests => "too_many_requests"
+    WebSearchToolResultErrorCode::QueryTooLong => "query_too_long"
+    WebSearchToolResultErrorCode::RequestTooLarge => "request_too_large"
+    WebSearchToolResultErrorCode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6360,16 +6634,21 @@ pub impl @json.FromJson for WebSearchToolResultErrorCode with fn from_json(
     path,
     raw => {
       match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "max_uses_exceeded" => Some(MaxUsesExceeded)
-        "too_many_requests" => Some(TooManyRequests)
-        "query_too_long" => Some(QueryTooLong)
-        "request_too_large" => Some(RequestTooLarge)
-        _ => None
+        "invalid_tool_input" =>
+          Option::Some(WebSearchToolResultErrorCode::InvalidToolInput)
+        "unavailable" => Option::Some(WebSearchToolResultErrorCode::Unavailable)
+        "max_uses_exceeded" =>
+          Option::Some(WebSearchToolResultErrorCode::MaxUsesExceeded)
+        "too_many_requests" =>
+          Option::Some(WebSearchToolResultErrorCode::TooManyRequests)
+        "query_too_long" =>
+          Option::Some(WebSearchToolResultErrorCode::QueryTooLong)
+        "request_too_large" =>
+          Option::Some(WebSearchToolResultErrorCode::RequestTooLarge)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => WebSearchToolResultErrorCode::Unknown(raw),
   )
 }
 
@@ -6447,8 +6726,12 @@ pub extend RequestWebSearchToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebSearchToolResultBlockContent with fn to_json(self) {
   match self {
-    RequestWebSearchResultBlockArray(value) => Json(value)
-    RequestWebSearchToolResultError(value) => Json(value)
+    RequestWebSearchToolResultBlockContent::RequestWebSearchResultBlockArray(
+      value
+    ) => @json.Json::Json(value)
+    RequestWebSearchToolResultBlockContent::RequestWebSearchToolResultError(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -6464,21 +6747,25 @@ pub impl @json.FromJson for RequestWebSearchToolResultBlockContent with fn from_
   value,
   path,
 ) {
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[RequestWebSearchResultBlock] = @json.from_json(
       value,
       path~,
     )
-    return RequestWebSearchResultBlockArray(decoded)
+    return RequestWebSearchToolResultBlockContent::RequestWebSearchResultBlockArray(
+      decoded,
+    )
   }
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : RequestWebSearchToolResultError = @json.from_json(
       value,
       path~,
     )
-    return RequestWebSearchToolResultError(decoded)
+    return RequestWebSearchToolResultBlockContent::RequestWebSearchToolResultError(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any RequestWebSearchToolResultBlockContent variant",
     ),
@@ -6599,23 +6886,25 @@ pub extend InputContentBlock with ToJson::{to_json}
 ///|
 pub impl ToJson for InputContentBlock with fn to_json(self) {
   match self {
-    BashCodeExecutionToolResult(value) => Json(value)
-    CodeExecutionToolResult(value) => Json(value)
-    ContainerUpload(value) => Json(value)
-    Document(value) => Json(value)
-    Image(value) => Json(value)
-    RedactedThinking(value) => Json(value)
-    SearchResult(value) => Json(value)
-    ServerToolUse(value) => Json(value)
-    Text(value) => Json(value)
-    TextEditorCodeExecutionToolResult(value) => Json(value)
-    Thinking(value) => Json(value)
-    ToolResult(value) => Json(value)
-    ToolSearchToolResult(value) => Json(value)
-    ToolUse(value) => Json(value)
-    WebFetchToolResult(value) => Json(value)
-    WebSearchToolResult(value) => Json(value)
-    Unknown(_, value) => value
+    InputContentBlock::BashCodeExecutionToolResult(value) =>
+      @json.Json::Json(value)
+    InputContentBlock::CodeExecutionToolResult(value) => @json.Json::Json(value)
+    InputContentBlock::ContainerUpload(value) => @json.Json::Json(value)
+    InputContentBlock::Document(value) => @json.Json::Json(value)
+    InputContentBlock::Image(value) => @json.Json::Json(value)
+    InputContentBlock::RedactedThinking(value) => @json.Json::Json(value)
+    InputContentBlock::SearchResult(value) => @json.Json::Json(value)
+    InputContentBlock::ServerToolUse(value) => @json.Json::Json(value)
+    InputContentBlock::Text(value) => @json.Json::Json(value)
+    InputContentBlock::TextEditorCodeExecutionToolResult(value) =>
+      @json.Json::Json(value)
+    InputContentBlock::Thinking(value) => @json.Json::Json(value)
+    InputContentBlock::ToolResult(value) => @json.Json::Json(value)
+    InputContentBlock::ToolSearchToolResult(value) => @json.Json::Json(value)
+    InputContentBlock::ToolUse(value) => @json.Json::Json(value)
+    InputContentBlock::WebFetchToolResult(value) => @json.Json::Json(value)
+    InputContentBlock::WebSearchToolResult(value) => @json.Json::Json(value)
+    InputContentBlock::Unknown(_, value) => value
   }
 }
 
@@ -6630,27 +6919,37 @@ pub impl @json.FromJson for InputContentBlock with fn from_json(value, path) {
   let tag : String = required_field(obj, "type", path)
   match tag {
     "bash_code_execution_tool_result" =>
-      BashCodeExecutionToolResult(@json.from_json(value, path~))
+      InputContentBlock::BashCodeExecutionToolResult(
+        @json.from_json(value, path~),
+      )
     "code_execution_tool_result" =>
-      CodeExecutionToolResult(@json.from_json(value, path~))
-    "container_upload" => ContainerUpload(@json.from_json(value, path~))
-    "document" => Document(@json.from_json(value, path~))
-    "image" => Image(@json.from_json(value, path~))
-    "redacted_thinking" => RedactedThinking(@json.from_json(value, path~))
-    "search_result" => SearchResult(@json.from_json(value, path~))
-    "server_tool_use" => ServerToolUse(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
+      InputContentBlock::CodeExecutionToolResult(@json.from_json(value, path~))
+    "container_upload" =>
+      InputContentBlock::ContainerUpload(@json.from_json(value, path~))
+    "document" => InputContentBlock::Document(@json.from_json(value, path~))
+    "image" => InputContentBlock::Image(@json.from_json(value, path~))
+    "redacted_thinking" =>
+      InputContentBlock::RedactedThinking(@json.from_json(value, path~))
+    "search_result" =>
+      InputContentBlock::SearchResult(@json.from_json(value, path~))
+    "server_tool_use" =>
+      InputContentBlock::ServerToolUse(@json.from_json(value, path~))
+    "text" => InputContentBlock::Text(@json.from_json(value, path~))
     "text_editor_code_execution_tool_result" =>
-      TextEditorCodeExecutionToolResult(@json.from_json(value, path~))
-    "thinking" => Thinking(@json.from_json(value, path~))
-    "tool_result" => ToolResult(@json.from_json(value, path~))
+      InputContentBlock::TextEditorCodeExecutionToolResult(
+        @json.from_json(value, path~),
+      )
+    "thinking" => InputContentBlock::Thinking(@json.from_json(value, path~))
+    "tool_result" =>
+      InputContentBlock::ToolResult(@json.from_json(value, path~))
     "tool_search_tool_result" =>
-      ToolSearchToolResult(@json.from_json(value, path~))
-    "tool_use" => ToolUse(@json.from_json(value, path~))
-    "web_fetch_tool_result" => WebFetchToolResult(@json.from_json(value, path~))
+      InputContentBlock::ToolSearchToolResult(@json.from_json(value, path~))
+    "tool_use" => InputContentBlock::ToolUse(@json.from_json(value, path~))
+    "web_fetch_tool_result" =>
+      InputContentBlock::WebFetchToolResult(@json.from_json(value, path~))
     "web_search_tool_result" =>
-      WebSearchToolResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      InputContentBlock::WebSearchToolResult(@json.from_json(value, path~))
+    other => InputContentBlock::Unknown(other, value)
   }
 }
 
@@ -6678,8 +6977,9 @@ pub extend InputMessageContent with ToJson::{to_json}
 ///|
 pub impl ToJson for InputMessageContent with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    InputContentBlockArray(value) => Json(value)
+    InputMessageContent::Text(value) => @json.Json::Json(value)
+    InputMessageContent::InputContentBlockArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -6690,15 +6990,15 @@ pub extend InputMessageContent with @json.FromJson::{from_json}
 
 ///|
 pub impl @json.FromJson for InputMessageContent with fn from_json(value, path) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return InputMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[InputContentBlock] = @json.from_json(value, path~)
-    return InputContentBlockArray(decoded)
+    return InputMessageContent::InputContentBlockArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any InputMessageContent variant"),
   )
 }
@@ -6873,8 +7173,8 @@ pub extend BashTool20250124CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for BashTool20250124CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    BashTool20250124CacheControl::Ephemeral(value) => @json.Json::Json(value)
+    BashTool20250124CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -6891,8 +7191,9 @@ pub impl @json.FromJson for BashTool20250124CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      BashTool20250124CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => BashTool20250124CacheControl::Unknown(other, value)
   }
 }
 
@@ -9001,8 +9302,9 @@ pub extend BrowserToolset20260801CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for BrowserToolset20260801CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    BrowserToolset20260801CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    BrowserToolset20260801CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -9019,8 +9321,11 @@ pub impl @json.FromJson for BrowserToolset20260801CacheControl with fn from_json
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      BrowserToolset20260801CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => BrowserToolset20260801CacheControl::Unknown(other, value)
   }
 }
 
@@ -9483,13 +9788,13 @@ pub extend CacheMissReason with ToJson::{to_json}
 ///|
 pub impl ToJson for CacheMissReason with fn to_json(self) {
   match self {
-    MessagesChanged(value) => Json(value)
-    ModelChanged(value) => Json(value)
-    PreviousMessageNotFound(value) => Json(value)
-    SystemChanged(value) => Json(value)
-    ToolsChanged(value) => Json(value)
-    Unavailable(value) => Json(value)
-    Unknown(_, value) => value
+    CacheMissReason::MessagesChanged(value) => @json.Json::Json(value)
+    CacheMissReason::ModelChanged(value) => @json.Json::Json(value)
+    CacheMissReason::PreviousMessageNotFound(value) => @json.Json::Json(value)
+    CacheMissReason::SystemChanged(value) => @json.Json::Json(value)
+    CacheMissReason::ToolsChanged(value) => @json.Json::Json(value)
+    CacheMissReason::Unavailable(value) => @json.Json::Json(value)
+    CacheMissReason::Unknown(_, value) => value
   }
 }
 
@@ -9503,14 +9808,18 @@ pub impl @json.FromJson for CacheMissReason with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "messages_changed" => MessagesChanged(@json.from_json(value, path~))
-    "model_changed" => ModelChanged(@json.from_json(value, path~))
+    "messages_changed" =>
+      CacheMissReason::MessagesChanged(@json.from_json(value, path~))
+    "model_changed" =>
+      CacheMissReason::ModelChanged(@json.from_json(value, path~))
     "previous_message_not_found" =>
-      PreviousMessageNotFound(@json.from_json(value, path~))
-    "system_changed" => SystemChanged(@json.from_json(value, path~))
-    "tools_changed" => ToolsChanged(@json.from_json(value, path~))
-    "unavailable" => Unavailable(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      CacheMissReason::PreviousMessageNotFound(@json.from_json(value, path~))
+    "system_changed" =>
+      CacheMissReason::SystemChanged(@json.from_json(value, path~))
+    "tools_changed" =>
+      CacheMissReason::ToolsChanged(@json.from_json(value, path~))
+    "unavailable" => CacheMissReason::Unavailable(@json.from_json(value, path~))
+    other => CacheMissReason::Unknown(other, value)
   }
 }
 
@@ -9996,12 +10305,15 @@ pub extend CitationsDeltaCitation with ToJson::{to_json}
 ///|
 pub impl ToJson for CitationsDeltaCitation with fn to_json(self) {
   match self {
-    CharLocation(value) => Json(value)
-    ContentBlockLocation(value) => Json(value)
-    PageLocation(value) => Json(value)
-    SearchResultLocation(value) => Json(value)
-    WebSearchResultLocation(value) => Json(value)
-    Unknown(_, value) => value
+    CitationsDeltaCitation::CharLocation(value) => @json.Json::Json(value)
+    CitationsDeltaCitation::ContentBlockLocation(value) =>
+      @json.Json::Json(value)
+    CitationsDeltaCitation::PageLocation(value) => @json.Json::Json(value)
+    CitationsDeltaCitation::SearchResultLocation(value) =>
+      @json.Json::Json(value)
+    CitationsDeltaCitation::WebSearchResultLocation(value) =>
+      @json.Json::Json(value)
+    CitationsDeltaCitation::Unknown(_, value) => value
   }
 }
 
@@ -10018,15 +10330,23 @@ pub impl @json.FromJson for CitationsDeltaCitation with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "char_location" => CharLocation(@json.from_json(value, path~))
+    "char_location" =>
+      CitationsDeltaCitation::CharLocation(@json.from_json(value, path~))
     "content_block_location" =>
-      ContentBlockLocation(@json.from_json(value, path~))
-    "page_location" => PageLocation(@json.from_json(value, path~))
+      CitationsDeltaCitation::ContentBlockLocation(
+        @json.from_json(value, path~),
+      )
+    "page_location" =>
+      CitationsDeltaCitation::PageLocation(@json.from_json(value, path~))
     "search_result_location" =>
-      SearchResultLocation(@json.from_json(value, path~))
+      CitationsDeltaCitation::SearchResultLocation(
+        @json.from_json(value, path~),
+      )
     "web_search_result_location" =>
-      WebSearchResultLocation(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      CitationsDeltaCitation::WebSearchResultLocation(
+        @json.from_json(value, path~),
+      )
+    other => CitationsDeltaCitation::Unknown(other, value)
   }
 }
 
@@ -10298,8 +10618,9 @@ pub extend CodeExecutionTool20250522CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20250522CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    CodeExecutionTool20250522CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    CodeExecutionTool20250522CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -10318,8 +10639,11 @@ pub impl @json.FromJson for CodeExecutionTool20250522CacheControl with fn from_j
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      CodeExecutionTool20250522CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => CodeExecutionTool20250522CacheControl::Unknown(other, value)
   }
 }
 
@@ -10421,8 +10745,9 @@ pub extend CodeExecutionTool20250825CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20250825CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    CodeExecutionTool20250825CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    CodeExecutionTool20250825CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -10441,8 +10766,11 @@ pub impl @json.FromJson for CodeExecutionTool20250825CacheControl with fn from_j
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      CodeExecutionTool20250825CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => CodeExecutionTool20250825CacheControl::Unknown(other, value)
   }
 }
 
@@ -10544,8 +10872,9 @@ pub extend CodeExecutionTool20260120CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20260120CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    CodeExecutionTool20260120CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    CodeExecutionTool20260120CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -10564,8 +10893,11 @@ pub impl @json.FromJson for CodeExecutionTool20260120CacheControl with fn from_j
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      CodeExecutionTool20260120CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => CodeExecutionTool20260120CacheControl::Unknown(other, value)
   }
 }
 
@@ -10667,8 +10999,9 @@ pub extend CodeExecutionTool20260521CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20260521CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    CodeExecutionTool20260521CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    CodeExecutionTool20260521CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -10687,8 +11020,11 @@ pub impl @json.FromJson for CodeExecutionTool20260521CacheControl with fn from_j
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      CodeExecutionTool20260521CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => CodeExecutionTool20260521CacheControl::Unknown(other, value)
   }
 }
 
@@ -12258,8 +12594,9 @@ pub extend ComputerToolset20260801CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerToolset20260801CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    ComputerToolset20260801CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    ComputerToolset20260801CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -12276,8 +12613,11 @@ pub impl @json.FromJson for ComputerToolset20260801CacheControl with fn from_jso
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      ComputerToolset20260801CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => ComputerToolset20260801CacheControl::Unknown(other, value)
   }
 }
 
@@ -12369,11 +12709,11 @@ pub extend ContainerSkillType with ToJson::{to_json}
 ///|
 pub impl ToJson for ContainerSkillType with fn to_json(self) {
   let raw = match self {
-    Anthropic => "anthropic"
-    Custom => "custom"
-    Unknown(raw) => raw
+    ContainerSkillType::Anthropic => "anthropic"
+    ContainerSkillType::Custom => "custom"
+    ContainerSkillType::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -12388,12 +12728,12 @@ pub impl @json.FromJson for ContainerSkillType with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "anthropic" => Some(Anthropic)
-        "custom" => Some(Custom)
-        _ => None
+        "anthropic" => Option::Some(ContainerSkillType::Anthropic)
+        "custom" => Option::Some(ContainerSkillType::Custom)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ContainerSkillType::Unknown(raw),
   )
 }
 
@@ -12534,11 +12874,11 @@ pub extend SkillParamsType with ToJson::{to_json}
 ///|
 pub impl ToJson for SkillParamsType with fn to_json(self) {
   let raw = match self {
-    Anthropic => "anthropic"
-    CustomSkill => "custom"
-    Custom(raw) => raw
+    SkillParamsType::Anthropic => "anthropic"
+    SkillParamsType::CustomSkill => "custom"
+    SkillParamsType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -12553,12 +12893,12 @@ pub impl @json.FromJson for SkillParamsType with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "anthropic" => Some(Anthropic)
-        "custom" => Some(CustomSkill)
-        _ => None
+        "anthropic" => Option::Some(SkillParamsType::Anthropic)
+        "custom" => Option::Some(SkillParamsType::CustomSkill)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => SkillParamsType::Custom(raw),
   )
 }
 
@@ -12883,9 +13223,13 @@ pub impl ToJson for ResponseBashCodeExecutionToolResultBlockContent with fn to_j
   self,
 ) {
   match self {
-    BashCodeExecutionToolResultError(value) => Json(value)
-    BashCodeExecutionResult(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseBashCodeExecutionToolResultBlockContent::BashCodeExecutionToolResultError(
+      value
+    ) => @json.Json::Json(value)
+    ResponseBashCodeExecutionToolResultBlockContent::BashCodeExecutionResult(
+      value
+    ) => @json.Json::Json(value)
+    ResponseBashCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -12905,10 +13249,15 @@ pub impl @json.FromJson for ResponseBashCodeExecutionToolResultBlockContent with
   let tag : String = required_field(obj, "type", path)
   match tag {
     "bash_code_execution_tool_result_error" =>
-      BashCodeExecutionToolResultError(@json.from_json(value, path~))
+      ResponseBashCodeExecutionToolResultBlockContent::BashCodeExecutionToolResultError(
+        @json.from_json(value, path~),
+      )
     "bash_code_execution_result" =>
-      BashCodeExecutionResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseBashCodeExecutionToolResultBlockContent::BashCodeExecutionResult(
+        @json.from_json(value, path~),
+      )
+    other =>
+      ResponseBashCodeExecutionToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -13253,10 +13602,15 @@ pub impl ToJson for ResponseCodeExecutionToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    CodeExecutionToolResultError(value) => Json(value)
-    CodeExecutionResult(value) => Json(value)
-    EncryptedCodeExecutionResult(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseCodeExecutionToolResultBlockContent::CodeExecutionToolResultError(
+      value
+    ) => @json.Json::Json(value)
+    ResponseCodeExecutionToolResultBlockContent::CodeExecutionResult(value) =>
+      @json.Json::Json(value)
+    ResponseCodeExecutionToolResultBlockContent::EncryptedCodeExecutionResult(
+      value
+    ) => @json.Json::Json(value)
+    ResponseCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -13276,12 +13630,18 @@ pub impl @json.FromJson for ResponseCodeExecutionToolResultBlockContent with fn 
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_tool_result_error" =>
-      CodeExecutionToolResultError(@json.from_json(value, path~))
+      ResponseCodeExecutionToolResultBlockContent::CodeExecutionToolResultError(
+        @json.from_json(value, path~),
+      )
     "code_execution_result" =>
-      CodeExecutionResult(@json.from_json(value, path~))
+      ResponseCodeExecutionToolResultBlockContent::CodeExecutionResult(
+        @json.from_json(value, path~),
+      )
     "encrypted_code_execution_result" =>
-      EncryptedCodeExecutionResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseCodeExecutionToolResultBlockContent::EncryptedCodeExecutionResult(
+        @json.from_json(value, path~),
+      )
+    other => ResponseCodeExecutionToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -13480,10 +13840,12 @@ pub extend ResponseServerToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseServerToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseServerToolUseBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    ResponseServerToolUseBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    ResponseServerToolUseBlockCaller::Direct(value) => @json.Json::Json(value)
+    ResponseServerToolUseBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -13501,11 +13863,16 @@ pub impl @json.FromJson for ResponseServerToolUseBlockCaller with fn from_json(
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      ResponseServerToolUseBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseServerToolUseBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" =>
+      ResponseServerToolUseBlockCaller::Direct(@json.from_json(value, path~))
+    other => ResponseServerToolUseBlockCaller::Unknown(other, value)
   }
 }
 
@@ -13539,16 +13906,19 @@ pub extend ResponseServerToolUseBlockName with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseServerToolUseBlockName with fn to_json(self) {
   let raw = match self {
-    WebSearch => "web_search"
-    WebFetch => "web_fetch"
-    CodeExecution => "code_execution"
-    BashCodeExecution => "bash_code_execution"
-    TextEditorCodeExecution => "text_editor_code_execution"
-    ToolSearchToolRegex => "tool_search_tool_regex"
-    ToolSearchToolBm25 => "tool_search_tool_bm25"
-    Unknown(raw) => raw
+    ResponseServerToolUseBlockName::WebSearch => "web_search"
+    ResponseServerToolUseBlockName::WebFetch => "web_fetch"
+    ResponseServerToolUseBlockName::CodeExecution => "code_execution"
+    ResponseServerToolUseBlockName::BashCodeExecution => "bash_code_execution"
+    ResponseServerToolUseBlockName::TextEditorCodeExecution =>
+      "text_editor_code_execution"
+    ResponseServerToolUseBlockName::ToolSearchToolRegex =>
+      "tool_search_tool_regex"
+    ResponseServerToolUseBlockName::ToolSearchToolBm25 =>
+      "tool_search_tool_bm25"
+    ResponseServerToolUseBlockName::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -13566,17 +13936,22 @@ pub impl @json.FromJson for ResponseServerToolUseBlockName with fn from_json(
     path,
     raw => {
       match raw {
-        "web_search" => Some(WebSearch)
-        "web_fetch" => Some(WebFetch)
-        "code_execution" => Some(CodeExecution)
-        "bash_code_execution" => Some(BashCodeExecution)
-        "text_editor_code_execution" => Some(TextEditorCodeExecution)
-        "tool_search_tool_regex" => Some(ToolSearchToolRegex)
-        "tool_search_tool_bm25" => Some(ToolSearchToolBm25)
-        _ => None
+        "web_search" => Option::Some(ResponseServerToolUseBlockName::WebSearch)
+        "web_fetch" => Option::Some(ResponseServerToolUseBlockName::WebFetch)
+        "code_execution" =>
+          Option::Some(ResponseServerToolUseBlockName::CodeExecution)
+        "bash_code_execution" =>
+          Option::Some(ResponseServerToolUseBlockName::BashCodeExecution)
+        "text_editor_code_execution" =>
+          Option::Some(ResponseServerToolUseBlockName::TextEditorCodeExecution)
+        "tool_search_tool_regex" =>
+          Option::Some(ResponseServerToolUseBlockName::ToolSearchToolRegex)
+        "tool_search_tool_bm25" =>
+          Option::Some(ResponseServerToolUseBlockName::ToolSearchToolBm25)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ResponseServerToolUseBlockName::Unknown(raw),
   )
 }
 
@@ -13675,12 +14050,17 @@ pub extend ResponseTextBlockCitationsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseTextBlockCitationsItem with fn to_json(self) {
   match self {
-    CharLocation(value) => Json(value)
-    ContentBlockLocation(value) => Json(value)
-    PageLocation(value) => Json(value)
-    SearchResultLocation(value) => Json(value)
-    WebSearchResultLocation(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseTextBlockCitationsItem::CharLocation(value) =>
+      @json.Json::Json(value)
+    ResponseTextBlockCitationsItem::ContentBlockLocation(value) =>
+      @json.Json::Json(value)
+    ResponseTextBlockCitationsItem::PageLocation(value) =>
+      @json.Json::Json(value)
+    ResponseTextBlockCitationsItem::SearchResultLocation(value) =>
+      @json.Json::Json(value)
+    ResponseTextBlockCitationsItem::WebSearchResultLocation(value) =>
+      @json.Json::Json(value)
+    ResponseTextBlockCitationsItem::Unknown(_, value) => value
   }
 }
 
@@ -13697,15 +14077,27 @@ pub impl @json.FromJson for ResponseTextBlockCitationsItem with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "char_location" => CharLocation(@json.from_json(value, path~))
+    "char_location" =>
+      ResponseTextBlockCitationsItem::CharLocation(
+        @json.from_json(value, path~),
+      )
     "content_block_location" =>
-      ContentBlockLocation(@json.from_json(value, path~))
-    "page_location" => PageLocation(@json.from_json(value, path~))
+      ResponseTextBlockCitationsItem::ContentBlockLocation(
+        @json.from_json(value, path~),
+      )
+    "page_location" =>
+      ResponseTextBlockCitationsItem::PageLocation(
+        @json.from_json(value, path~),
+      )
     "search_result_location" =>
-      SearchResultLocation(@json.from_json(value, path~))
+      ResponseTextBlockCitationsItem::SearchResultLocation(
+        @json.from_json(value, path~),
+      )
     "web_search_result_location" =>
-      WebSearchResultLocation(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseTextBlockCitationsItem::WebSearchResultLocation(
+        @json.from_json(value, path~),
+      )
+    other => ResponseTextBlockCitationsItem::Unknown(other, value)
   }
 }
 
@@ -13871,12 +14263,12 @@ pub impl ToJson for ResponseTextEditorCodeExecutionViewResultBlockFileType with 
   self,
 ) {
   let raw = match self {
-    Text => "text"
-    Image => "image"
-    Pdf => "pdf"
-    Unknown(raw) => raw
+    ResponseTextEditorCodeExecutionViewResultBlockFileType::Text => "text"
+    ResponseTextEditorCodeExecutionViewResultBlockFileType::Image => "image"
+    ResponseTextEditorCodeExecutionViewResultBlockFileType::Pdf => "pdf"
+    ResponseTextEditorCodeExecutionViewResultBlockFileType::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -13896,13 +14288,22 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionViewResultBlockFileTy
     path,
     raw => {
       match raw {
-        "text" => Some(Text)
-        "image" => Some(Image)
-        "pdf" => Some(Pdf)
-        _ => None
+        "text" =>
+          Option::Some(
+            ResponseTextEditorCodeExecutionViewResultBlockFileType::Text,
+          )
+        "image" =>
+          Option::Some(
+            ResponseTextEditorCodeExecutionViewResultBlockFileType::Image,
+          )
+        "pdf" =>
+          Option::Some(
+            ResponseTextEditorCodeExecutionViewResultBlockFileType::Pdf,
+          )
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ResponseTextEditorCodeExecutionViewResultBlockFileType::Unknown(raw),
   )
 }
 
@@ -14184,11 +14585,20 @@ pub impl ToJson for ResponseTextEditorCodeExecutionToolResultBlockContent with f
   self,
 ) {
   match self {
-    TextEditorCodeExecutionToolResultError(value) => Json(value)
-    TextEditorCodeExecutionViewResult(value) => Json(value)
-    TextEditorCodeExecutionCreateResult(value) => Json(value)
-    TextEditorCodeExecutionStrReplaceResult(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionToolResultError(
+      value
+    ) => @json.Json::Json(value)
+    ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionViewResult(
+      value
+    ) => @json.Json::Json(value)
+    ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionCreateResult(
+      value
+    ) => @json.Json::Json(value)
+    ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionStrReplaceResult(
+      value
+    ) => @json.Json::Json(value)
+    ResponseTextEditorCodeExecutionToolResultBlockContent::Unknown(_, value) =>
+      value
   }
 }
 
@@ -14208,14 +14618,25 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionToolResultBlockConten
   let tag : String = required_field(obj, "type", path)
   match tag {
     "text_editor_code_execution_tool_result_error" =>
-      TextEditorCodeExecutionToolResultError(@json.from_json(value, path~))
+      ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionToolResultError(
+        @json.from_json(value, path~),
+      )
     "text_editor_code_execution_view_result" =>
-      TextEditorCodeExecutionViewResult(@json.from_json(value, path~))
+      ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionViewResult(
+        @json.from_json(value, path~),
+      )
     "text_editor_code_execution_create_result" =>
-      TextEditorCodeExecutionCreateResult(@json.from_json(value, path~))
+      ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionCreateResult(
+        @json.from_json(value, path~),
+      )
     "text_editor_code_execution_str_replace_result" =>
-      TextEditorCodeExecutionStrReplaceResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionStrReplaceResult(
+        @json.from_json(value, path~),
+      )
+    other =>
+      ResponseTextEditorCodeExecutionToolResultBlockContent::Unknown(
+        other, value,
+      )
   }
 }
 
@@ -14541,9 +14962,11 @@ pub impl ToJson for ResponseToolSearchToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    ToolSearchToolResultError(value) => Json(value)
-    ToolSearchToolSearchResult(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseToolSearchToolResultBlockContent::ToolSearchToolResultError(value) =>
+      @json.Json::Json(value)
+    ResponseToolSearchToolResultBlockContent::ToolSearchToolSearchResult(value) =>
+      @json.Json::Json(value)
+    ResponseToolSearchToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -14563,10 +14986,14 @@ pub impl @json.FromJson for ResponseToolSearchToolResultBlockContent with fn fro
   let tag : String = required_field(obj, "type", path)
   match tag {
     "tool_search_tool_result_error" =>
-      ToolSearchToolResultError(@json.from_json(value, path~))
+      ResponseToolSearchToolResultBlockContent::ToolSearchToolResultError(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_search_result" =>
-      ToolSearchToolSearchResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseToolSearchToolResultBlockContent::ToolSearchToolSearchResult(
+        @json.from_json(value, path~),
+      )
+    other => ResponseToolSearchToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -14655,10 +15082,12 @@ pub extend ResponseToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseToolUseBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    ResponseToolUseBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    ResponseToolUseBlockCaller::Direct(value) => @json.Json::Json(value)
+    ResponseToolUseBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -14676,11 +15105,16 @@ pub impl @json.FromJson for ResponseToolUseBlockCaller with fn from_json(
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      ResponseToolUseBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseToolUseBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" =>
+      ResponseToolUseBlockCaller::Direct(@json.from_json(value, path~))
+    other => ResponseToolUseBlockCaller::Unknown(other, value)
   }
 }
 
@@ -14785,10 +15219,13 @@ pub extend ResponseWebFetchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseWebFetchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseWebFetchToolResultBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    ResponseWebFetchToolResultBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    ResponseWebFetchToolResultBlockCaller::Direct(value) =>
+      @json.Json::Json(value)
+    ResponseWebFetchToolResultBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -14808,11 +15245,18 @@ pub impl @json.FromJson for ResponseWebFetchToolResultBlockCaller with fn from_j
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      ResponseWebFetchToolResultBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseWebFetchToolResultBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" =>
+      ResponseWebFetchToolResultBlockCaller::Direct(
+        @json.from_json(value, path~),
+      )
+    other => ResponseWebFetchToolResultBlockCaller::Unknown(other, value)
   }
 }
 
@@ -14941,9 +15385,9 @@ pub extend ResponseDocumentBlockSource with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseDocumentBlockSource with fn to_json(self) {
   match self {
-    Base64(value) => Json(value)
-    Text(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseDocumentBlockSource::Base64(value) => @json.Json::Json(value)
+    ResponseDocumentBlockSource::Text(value) => @json.Json::Json(value)
+    ResponseDocumentBlockSource::Unknown(_, value) => value
   }
 }
 
@@ -14960,9 +15404,10 @@ pub impl @json.FromJson for ResponseDocumentBlockSource with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "base64" => Base64(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "base64" =>
+      ResponseDocumentBlockSource::Base64(@json.from_json(value, path~))
+    "text" => ResponseDocumentBlockSource::Text(@json.from_json(value, path~))
+    other => ResponseDocumentBlockSource::Unknown(other, value)
   }
 }
 
@@ -15114,9 +15559,11 @@ pub extend ResponseWebFetchToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseWebFetchToolResultBlockContent with fn to_json(self) {
   match self {
-    WebFetchToolResultError(value) => Json(value)
-    WebFetchResult(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseWebFetchToolResultBlockContent::WebFetchToolResultError(value) =>
+      @json.Json::Json(value)
+    ResponseWebFetchToolResultBlockContent::WebFetchResult(value) =>
+      @json.Json::Json(value)
+    ResponseWebFetchToolResultBlockContent::Unknown(_, value) => value
   }
 }
 
@@ -15136,9 +15583,14 @@ pub impl @json.FromJson for ResponseWebFetchToolResultBlockContent with fn from_
   let tag : String = required_field(obj, "type", path)
   match tag {
     "web_fetch_tool_result_error" =>
-      WebFetchToolResultError(@json.from_json(value, path~))
-    "web_fetch_result" => WebFetchResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseWebFetchToolResultBlockContent::WebFetchToolResultError(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_result" =>
+      ResponseWebFetchToolResultBlockContent::WebFetchResult(
+        @json.from_json(value, path~),
+      )
+    other => ResponseWebFetchToolResultBlockContent::Unknown(other, value)
   }
 }
 
@@ -15231,10 +15683,13 @@ pub extend ResponseWebSearchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseWebSearchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
+    ResponseWebSearchToolResultBlockCaller::CodeExecution20250825(value) =>
+      @json.Json::Json(value)
+    ResponseWebSearchToolResultBlockCaller::CodeExecution20260120(value) =>
+      @json.Json::Json(value)
+    ResponseWebSearchToolResultBlockCaller::Direct(value) =>
+      @json.Json::Json(value)
+    ResponseWebSearchToolResultBlockCaller::Unknown(_, value) => value
   }
 }
 
@@ -15254,11 +15709,18 @@ pub impl @json.FromJson for ResponseWebSearchToolResultBlockCaller with fn from_
   let tag : String = required_field(obj, "type", path)
   match tag {
     "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
+      ResponseWebSearchToolResultBlockCaller::CodeExecution20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ResponseWebSearchToolResultBlockCaller::CodeExecution20260120(
+        @json.from_json(value, path~),
+      )
+    "direct" =>
+      ResponseWebSearchToolResultBlockCaller::Direct(
+        @json.from_json(value, path~),
+      )
+    other => ResponseWebSearchToolResultBlockCaller::Unknown(other, value)
   }
 }
 
@@ -15402,8 +15864,12 @@ pub impl ToJson for ResponseWebSearchToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    ResponseWebSearchToolResultError(value) => Json(value)
-    ResponseWebSearchResultBlockArray(value) => Json(value)
+    ResponseWebSearchToolResultBlockContent::ResponseWebSearchToolResultError(
+      value
+    ) => @json.Json::Json(value)
+    ResponseWebSearchToolResultBlockContent::ResponseWebSearchResultBlockArray(
+      value
+    ) => @json.Json::Json(value)
   }
 }
 
@@ -15419,21 +15885,25 @@ pub impl @json.FromJson for ResponseWebSearchToolResultBlockContent with fn from
   value,
   path,
 ) {
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : ResponseWebSearchToolResultError = @json.from_json(
       value,
       path~,
     )
-    return ResponseWebSearchToolResultError(decoded)
+    return ResponseWebSearchToolResultBlockContent::ResponseWebSearchToolResultError(
+      decoded,
+    )
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[ResponseWebSearchResultBlock] = @json.from_json(
       value,
       path~,
     )
-    return ResponseWebSearchResultBlockArray(decoded)
+    return ResponseWebSearchToolResultBlockContent::ResponseWebSearchResultBlockArray(
+      decoded,
+    )
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any ResponseWebSearchToolResultBlockContent variant",
     ),
@@ -15540,19 +16010,20 @@ pub extend ContentBlock with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlock with fn to_json(self) {
   match self {
-    BashCodeExecutionToolResult(value) => Json(value)
-    CodeExecutionToolResult(value) => Json(value)
-    ContainerUpload(value) => Json(value)
-    RedactedThinking(value) => Json(value)
-    ServerToolUse(value) => Json(value)
-    Text(value) => Json(value)
-    TextEditorCodeExecutionToolResult(value) => Json(value)
-    Thinking(value) => Json(value)
-    ToolSearchToolResult(value) => Json(value)
-    ToolUse(value) => Json(value)
-    WebFetchToolResult(value) => Json(value)
-    WebSearchToolResult(value) => Json(value)
-    Unknown(_, value) => value
+    ContentBlock::BashCodeExecutionToolResult(value) => @json.Json::Json(value)
+    ContentBlock::CodeExecutionToolResult(value) => @json.Json::Json(value)
+    ContentBlock::ContainerUpload(value) => @json.Json::Json(value)
+    ContentBlock::RedactedThinking(value) => @json.Json::Json(value)
+    ContentBlock::ServerToolUse(value) => @json.Json::Json(value)
+    ContentBlock::Text(value) => @json.Json::Json(value)
+    ContentBlock::TextEditorCodeExecutionToolResult(value) =>
+      @json.Json::Json(value)
+    ContentBlock::Thinking(value) => @json.Json::Json(value)
+    ContentBlock::ToolSearchToolResult(value) => @json.Json::Json(value)
+    ContentBlock::ToolUse(value) => @json.Json::Json(value)
+    ContentBlock::WebFetchToolResult(value) => @json.Json::Json(value)
+    ContentBlock::WebSearchToolResult(value) => @json.Json::Json(value)
+    ContentBlock::Unknown(_, value) => value
   }
 }
 
@@ -15567,23 +16038,29 @@ pub impl @json.FromJson for ContentBlock with fn from_json(value, path) {
   let tag : String = required_field(obj, "type", path)
   match tag {
     "bash_code_execution_tool_result" =>
-      BashCodeExecutionToolResult(@json.from_json(value, path~))
+      ContentBlock::BashCodeExecutionToolResult(@json.from_json(value, path~))
     "code_execution_tool_result" =>
-      CodeExecutionToolResult(@json.from_json(value, path~))
-    "container_upload" => ContainerUpload(@json.from_json(value, path~))
-    "redacted_thinking" => RedactedThinking(@json.from_json(value, path~))
-    "server_tool_use" => ServerToolUse(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
+      ContentBlock::CodeExecutionToolResult(@json.from_json(value, path~))
+    "container_upload" =>
+      ContentBlock::ContainerUpload(@json.from_json(value, path~))
+    "redacted_thinking" =>
+      ContentBlock::RedactedThinking(@json.from_json(value, path~))
+    "server_tool_use" =>
+      ContentBlock::ServerToolUse(@json.from_json(value, path~))
+    "text" => ContentBlock::Text(@json.from_json(value, path~))
     "text_editor_code_execution_tool_result" =>
-      TextEditorCodeExecutionToolResult(@json.from_json(value, path~))
-    "thinking" => Thinking(@json.from_json(value, path~))
+      ContentBlock::TextEditorCodeExecutionToolResult(
+        @json.from_json(value, path~),
+      )
+    "thinking" => ContentBlock::Thinking(@json.from_json(value, path~))
     "tool_search_tool_result" =>
-      ToolSearchToolResult(@json.from_json(value, path~))
-    "tool_use" => ToolUse(@json.from_json(value, path~))
-    "web_fetch_tool_result" => WebFetchToolResult(@json.from_json(value, path~))
+      ContentBlock::ToolSearchToolResult(@json.from_json(value, path~))
+    "tool_use" => ContentBlock::ToolUse(@json.from_json(value, path~))
+    "web_fetch_tool_result" =>
+      ContentBlock::WebFetchToolResult(@json.from_json(value, path~))
     "web_search_tool_result" =>
-      WebSearchToolResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ContentBlock::WebSearchToolResult(@json.from_json(value, path~))
+    other => ContentBlock::Unknown(other, value)
   }
 }
 
@@ -15832,12 +16309,15 @@ pub extend ContentBlockDeltaEventDelta with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlockDeltaEventDelta with fn to_json(self) {
   match self {
-    CitationsDelta(value) => Json(value)
-    InputJsonDelta(value) => Json(value)
-    SignatureDelta(value) => Json(value)
-    TextDelta(value) => Json(value)
-    ThinkingDelta(value) => Json(value)
-    Unknown(_, value) => value
+    ContentBlockDeltaEventDelta::CitationsDelta(value) =>
+      @json.Json::Json(value)
+    ContentBlockDeltaEventDelta::InputJsonDelta(value) =>
+      @json.Json::Json(value)
+    ContentBlockDeltaEventDelta::SignatureDelta(value) =>
+      @json.Json::Json(value)
+    ContentBlockDeltaEventDelta::TextDelta(value) => @json.Json::Json(value)
+    ContentBlockDeltaEventDelta::ThinkingDelta(value) => @json.Json::Json(value)
+    ContentBlockDeltaEventDelta::Unknown(_, value) => value
   }
 }
 
@@ -15854,12 +16334,17 @@ pub impl @json.FromJson for ContentBlockDeltaEventDelta with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "citations_delta" => CitationsDelta(@json.from_json(value, path~))
-    "input_json_delta" => InputJsonDelta(@json.from_json(value, path~))
-    "signature_delta" => SignatureDelta(@json.from_json(value, path~))
-    "text_delta" => TextDelta(@json.from_json(value, path~))
-    "thinking_delta" => ThinkingDelta(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "citations_delta" =>
+      ContentBlockDeltaEventDelta::CitationsDelta(@json.from_json(value, path~))
+    "input_json_delta" =>
+      ContentBlockDeltaEventDelta::InputJsonDelta(@json.from_json(value, path~))
+    "signature_delta" =>
+      ContentBlockDeltaEventDelta::SignatureDelta(@json.from_json(value, path~))
+    "text_delta" =>
+      ContentBlockDeltaEventDelta::TextDelta(@json.from_json(value, path~))
+    "thinking_delta" =>
+      ContentBlockDeltaEventDelta::ThinkingDelta(@json.from_json(value, path~))
+    other => ContentBlockDeltaEventDelta::Unknown(other, value)
   }
 }
 
@@ -15959,19 +16444,30 @@ pub extend ContentBlockStartEventContentBlock with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlockStartEventContentBlock with fn to_json(self) {
   match self {
-    BashCodeExecutionToolResult(value) => Json(value)
-    CodeExecutionToolResult(value) => Json(value)
-    ContainerUpload(value) => Json(value)
-    RedactedThinking(value) => Json(value)
-    ServerToolUse(value) => Json(value)
-    Text(value) => Json(value)
-    TextEditorCodeExecutionToolResult(value) => Json(value)
-    Thinking(value) => Json(value)
-    ToolSearchToolResult(value) => Json(value)
-    ToolUse(value) => Json(value)
-    WebFetchToolResult(value) => Json(value)
-    WebSearchToolResult(value) => Json(value)
-    Unknown(_, value) => value
+    ContentBlockStartEventContentBlock::BashCodeExecutionToolResult(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::CodeExecutionToolResult(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::ContainerUpload(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::RedactedThinking(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::ServerToolUse(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::Text(value) => @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::TextEditorCodeExecutionToolResult(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::Thinking(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::ToolSearchToolResult(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::ToolUse(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::WebFetchToolResult(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::WebSearchToolResult(value) =>
+      @json.Json::Json(value)
+    ContentBlockStartEventContentBlock::Unknown(_, value) => value
   }
 }
 
@@ -15989,23 +16485,50 @@ pub impl @json.FromJson for ContentBlockStartEventContentBlock with fn from_json
   let tag : String = required_field(obj, "type", path)
   match tag {
     "bash_code_execution_tool_result" =>
-      BashCodeExecutionToolResult(@json.from_json(value, path~))
+      ContentBlockStartEventContentBlock::BashCodeExecutionToolResult(
+        @json.from_json(value, path~),
+      )
     "code_execution_tool_result" =>
-      CodeExecutionToolResult(@json.from_json(value, path~))
-    "container_upload" => ContainerUpload(@json.from_json(value, path~))
-    "redacted_thinking" => RedactedThinking(@json.from_json(value, path~))
-    "server_tool_use" => ServerToolUse(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
+      ContentBlockStartEventContentBlock::CodeExecutionToolResult(
+        @json.from_json(value, path~),
+      )
+    "container_upload" =>
+      ContentBlockStartEventContentBlock::ContainerUpload(
+        @json.from_json(value, path~),
+      )
+    "redacted_thinking" =>
+      ContentBlockStartEventContentBlock::RedactedThinking(
+        @json.from_json(value, path~),
+      )
+    "server_tool_use" =>
+      ContentBlockStartEventContentBlock::ServerToolUse(
+        @json.from_json(value, path~),
+      )
+    "text" =>
+      ContentBlockStartEventContentBlock::Text(@json.from_json(value, path~))
     "text_editor_code_execution_tool_result" =>
-      TextEditorCodeExecutionToolResult(@json.from_json(value, path~))
-    "thinking" => Thinking(@json.from_json(value, path~))
+      ContentBlockStartEventContentBlock::TextEditorCodeExecutionToolResult(
+        @json.from_json(value, path~),
+      )
+    "thinking" =>
+      ContentBlockStartEventContentBlock::Thinking(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_result" =>
-      ToolSearchToolResult(@json.from_json(value, path~))
-    "tool_use" => ToolUse(@json.from_json(value, path~))
-    "web_fetch_tool_result" => WebFetchToolResult(@json.from_json(value, path~))
+      ContentBlockStartEventContentBlock::ToolSearchToolResult(
+        @json.from_json(value, path~),
+      )
+    "tool_use" =>
+      ContentBlockStartEventContentBlock::ToolUse(@json.from_json(value, path~))
+    "web_fetch_tool_result" =>
+      ContentBlockStartEventContentBlock::WebFetchToolResult(
+        @json.from_json(value, path~),
+      )
     "web_search_tool_result" =>
-      WebSearchToolResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ContentBlockStartEventContentBlock::WebSearchToolResult(
+        @json.from_json(value, path~),
+      )
+    other => ContentBlockStartEventContentBlock::Unknown(other, value)
   }
 }
 
@@ -16225,8 +16748,9 @@ pub extend CountMessageTokensParamsCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CountMessageTokensParamsCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    CountMessageTokensParamsCacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -16243,8 +16767,11 @@ pub impl @json.FromJson for CountMessageTokensParamsCacheControl with fn from_js
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      CountMessageTokensParamsCacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => CountMessageTokensParamsCacheControl::Unknown(other, value)
   }
 }
 
@@ -16274,8 +16801,9 @@ pub impl ToJson for SystemInputMessageContentValueArrayItem with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => Json(value)
-    Unknown(_, value) => value
+    SystemInputMessageContentValueArrayItem::Text(value) =>
+      @json.Json::Json(value)
+    SystemInputMessageContentValueArrayItem::Unknown(_, value) => value
   }
 }
 
@@ -16294,8 +16822,11 @@ pub impl @json.FromJson for SystemInputMessageContentValueArrayItem with fn from
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" =>
+      SystemInputMessageContentValueArrayItem::Text(
+        @json.from_json(value, path~),
+      )
+    other => SystemInputMessageContentValueArrayItem::Unknown(other, value)
   }
 }
 
@@ -16323,8 +16854,8 @@ pub extend SystemInputMessageContent with ToJson::{to_json}
 ///|
 pub impl ToJson for SystemInputMessageContent with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    ValueArray(value) => Json(value)
+    SystemInputMessageContent::Text(value) => @json.Json::Json(value)
+    SystemInputMessageContent::ValueArray(value) => @json.Json::Json(value)
   }
 }
 
@@ -16338,18 +16869,18 @@ pub impl @json.FromJson for SystemInputMessageContent with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return SystemInputMessageContent::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[SystemInputMessageContentValueArrayItem] = @json.from_json(
       value,
       path~,
     )
-    return ValueArray(decoded)
+    return SystemInputMessageContent::ValueArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any SystemInputMessageContent variant"),
   )
 }
@@ -16484,10 +17015,10 @@ pub extend InputMessageUnion with ToJson::{to_json}
 ///|
 pub impl ToJson for InputMessageUnion with fn to_json(self) {
   match self {
-    Assistant(value) => Json(value)
-    System(value) => Json(value)
-    User(value) => Json(value)
-    Unknown(_, value) => value
+    InputMessageUnion::Assistant(value) => @json.Json::Json(value)
+    InputMessageUnion::System(value) => @json.Json::Json(value)
+    InputMessageUnion::User(value) => @json.Json::Json(value)
+    InputMessageUnion::Unknown(_, value) => value
   }
 }
 
@@ -16501,10 +17032,10 @@ pub impl @json.FromJson for InputMessageUnion with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "role", path)
   match tag {
-    "assistant" => Assistant(@json.from_json(value, path~))
-    "system" => System(@json.from_json(value, path~))
-    "user" => User(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "assistant" => InputMessageUnion::Assistant(@json.from_json(value, path~))
+    "system" => InputMessageUnion::System(@json.from_json(value, path~))
+    "user" => InputMessageUnion::User(@json.from_json(value, path~))
+    other => InputMessageUnion::Unknown(other, value)
   }
 }
 
@@ -16536,14 +17067,14 @@ pub extend EffortLevel with ToJson::{to_json}
 ///|
 pub impl ToJson for EffortLevel with fn to_json(self) {
   let raw = match self {
-    Low => "low"
-    Medium => "medium"
-    High => "high"
-    Xhigh => "xhigh"
-    Max => "max"
-    Custom(raw) => raw
+    EffortLevel::Low => "low"
+    EffortLevel::Medium => "medium"
+    EffortLevel::High => "high"
+    EffortLevel::Xhigh => "xhigh"
+    EffortLevel::Max => "max"
+    EffortLevel::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -16558,15 +17089,15 @@ pub impl @json.FromJson for EffortLevel with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "low" => Some(Low)
-        "medium" => Some(Medium)
-        "high" => Some(High)
-        "xhigh" => Some(Xhigh)
-        "max" => Some(Max)
-        _ => None
+        "low" => Option::Some(EffortLevel::Low)
+        "medium" => Option::Some(EffortLevel::Medium)
+        "high" => Option::Some(EffortLevel::High)
+        "xhigh" => Option::Some(EffortLevel::Xhigh)
+        "max" => Option::Some(EffortLevel::Max)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EffortLevel::Custom(raw),
   )
 }
 
@@ -16695,11 +17226,11 @@ pub extend Speed with ToJson::{to_json}
 ///|
 pub impl ToJson for Speed with fn to_json(self) {
   let raw = match self {
-    Standard => "standard"
-    Fast => "fast"
-    Unknown(raw) => raw
+    Speed::Standard => "standard"
+    Speed::Fast => "fast"
+    Speed::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -16714,12 +17245,12 @@ pub impl @json.FromJson for Speed with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "standard" => Some(Standard)
-        "fast" => Some(Fast)
-        _ => None
+        "standard" => Option::Some(Speed::Standard)
+        "fast" => Option::Some(Speed::Fast)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => Speed::Unknown(raw),
   )
 }
 
@@ -16747,8 +17278,9 @@ pub extend CountMessageTokensParamsSystem with ToJson::{to_json}
 ///|
 pub impl ToJson for CountMessageTokensParamsSystem with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    RequestTextBlockArray(value) => Json(value)
+    CountMessageTokensParamsSystem::Text(value) => @json.Json::Json(value)
+    CountMessageTokensParamsSystem::RequestTextBlockArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -16762,15 +17294,15 @@ pub impl @json.FromJson for CountMessageTokensParamsSystem with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return CountMessageTokensParamsSystem::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[RequestTextBlock] = @json.from_json(value, path~)
-    return RequestTextBlockArray(decoded)
+    return CountMessageTokensParamsSystem::RequestTextBlockArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (
       path, "JSON shape does not match any CountMessageTokensParamsSystem variant",
     ),
@@ -16802,11 +17334,11 @@ pub extend ThinkingDisplayMode with ToJson::{to_json}
 ///|
 pub impl ToJson for ThinkingDisplayMode with fn to_json(self) {
   let raw = match self {
-    Summarized => "summarized"
-    Omitted => "omitted"
-    Custom(raw) => raw
+    ThinkingDisplayMode::Summarized => "summarized"
+    ThinkingDisplayMode::Omitted => "omitted"
+    ThinkingDisplayMode::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -16821,12 +17353,12 @@ pub impl @json.FromJson for ThinkingDisplayMode with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "summarized" => Some(Summarized)
-        "omitted" => Some(Omitted)
-        _ => None
+        "summarized" => Option::Some(ThinkingDisplayMode::Summarized)
+        "omitted" => Option::Some(ThinkingDisplayMode::Omitted)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ThinkingDisplayMode::Custom(raw),
   )
 }
 
@@ -17060,11 +17592,11 @@ pub extend ThinkingConfigParam with ToJson::{to_json}
 ///|
 pub impl ToJson for ThinkingConfigParam with fn to_json(self) {
   match self {
-    Adaptive(value) => Json(value)
-    BetweenTools(value) => Json(value)
-    Disabled(value) => Json(value)
-    Enabled(value) => Json(value)
-    Unknown(_, value) => value
+    ThinkingConfigParam::Adaptive(value) => @json.Json::Json(value)
+    ThinkingConfigParam::BetweenTools(value) => @json.Json::Json(value)
+    ThinkingConfigParam::Disabled(value) => @json.Json::Json(value)
+    ThinkingConfigParam::Enabled(value) => @json.Json::Json(value)
+    ThinkingConfigParam::Unknown(_, value) => value
   }
 }
 
@@ -17078,11 +17610,12 @@ pub impl @json.FromJson for ThinkingConfigParam with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "adaptive" => Adaptive(@json.from_json(value, path~))
-    "between_tools" => BetweenTools(@json.from_json(value, path~))
-    "disabled" => Disabled(@json.from_json(value, path~))
-    "enabled" => Enabled(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "adaptive" => ThinkingConfigParam::Adaptive(@json.from_json(value, path~))
+    "between_tools" =>
+      ThinkingConfigParam::BetweenTools(@json.from_json(value, path~))
+    "disabled" => ThinkingConfigParam::Disabled(@json.from_json(value, path~))
+    "enabled" => ThinkingConfigParam::Enabled(@json.from_json(value, path~))
+    other => ThinkingConfigParam::Unknown(other, value)
   }
 }
 
@@ -17321,11 +17854,11 @@ pub extend ToolChoice with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolChoice with fn to_json(self) {
   match self {
-    Any(value) => Json(value)
-    Auto(value) => Json(value)
-    None(value) => Json(value)
-    Tool(value) => Json(value)
-    Unknown(_, value) => value
+    ToolChoice::Any(value) => @json.Json::Json(value)
+    ToolChoice::Auto(value) => @json.Json::Json(value)
+    ToolChoice::None(value) => @json.Json::Json(value)
+    ToolChoice::Tool(value) => @json.Json::Json(value)
+    ToolChoice::Unknown(_, value) => value
   }
 }
 
@@ -17339,11 +17872,11 @@ pub impl @json.FromJson for ToolChoice with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "any" => Any(@json.from_json(value, path~))
-    "auto" => Auto(@json.from_json(value, path~))
-    "none" => None(@json.from_json(value, path~))
-    "tool" => Tool(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "any" => ToolChoice::Any(@json.from_json(value, path~))
+    "auto" => ToolChoice::Auto(@json.from_json(value, path~))
+    "none" => ToolChoice::None(@json.from_json(value, path~))
+    "tool" => ToolChoice::Tool(@json.from_json(value, path~))
+    other => ToolChoice::Unknown(other, value)
   }
 }
 
@@ -17371,8 +17904,8 @@ pub extend ToolCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    ToolCacheControl::Ephemeral(value) => @json.Json::Json(value)
+    ToolCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -17386,8 +17919,8 @@ pub impl @json.FromJson for ToolCacheControl with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" => ToolCacheControl::Ephemeral(@json.from_json(value, path~))
+    other => ToolCacheControl::Unknown(other, value)
   }
 }
 
@@ -17512,8 +18045,8 @@ pub extend MemoryTool20250818CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for MemoryTool20250818CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    MemoryTool20250818CacheControl::Ephemeral(value) => @json.Json::Json(value)
+    MemoryTool20250818CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -17530,8 +18063,9 @@ pub impl @json.FromJson for MemoryTool20250818CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      MemoryTool20250818CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => MemoryTool20250818CacheControl::Unknown(other, value)
   }
 }
 
@@ -17635,8 +18169,8 @@ pub extend TextEditor20250124CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for TextEditor20250124CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    TextEditor20250124CacheControl::Ephemeral(value) => @json.Json::Json(value)
+    TextEditor20250124CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -17653,8 +18187,9 @@ pub impl @json.FromJson for TextEditor20250124CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      TextEditor20250124CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => TextEditor20250124CacheControl::Unknown(other, value)
   }
 }
 
@@ -17758,8 +18293,8 @@ pub extend TextEditor20250429CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for TextEditor20250429CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    TextEditor20250429CacheControl::Ephemeral(value) => @json.Json::Json(value)
+    TextEditor20250429CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -17776,8 +18311,9 @@ pub impl @json.FromJson for TextEditor20250429CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      TextEditor20250429CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => TextEditor20250429CacheControl::Unknown(other, value)
   }
 }
 
@@ -17881,8 +18417,8 @@ pub extend TextEditor20250728CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for TextEditor20250728CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    TextEditor20250728CacheControl::Ephemeral(value) => @json.Json::Json(value)
+    TextEditor20250728CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -17899,8 +18435,9 @@ pub impl @json.FromJson for TextEditor20250728CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      TextEditor20250728CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => TextEditor20250728CacheControl::Unknown(other, value)
   }
 }
 
@@ -18009,8 +18546,9 @@ pub extend WebSearchTool20250305CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchTool20250305CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    WebSearchTool20250305CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    WebSearchTool20250305CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -18027,8 +18565,11 @@ pub impl @json.FromJson for WebSearchTool20250305CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      WebSearchTool20250305CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => WebSearchTool20250305CacheControl::Unknown(other, value)
   }
 }
 
@@ -18213,8 +18754,9 @@ pub extend WebFetchTool20250910CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20250910CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    WebFetchTool20250910CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    WebFetchTool20250910CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -18231,8 +18773,9 @@ pub impl @json.FromJson for WebFetchTool20250910CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      WebFetchTool20250910CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => WebFetchTool20250910CacheControl::Unknown(other, value)
   }
 }
 
@@ -18504,11 +19047,12 @@ pub extend WebFetchUrlSourcesClientToolResults with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchUrlSourcesClientToolResults with fn to_json(self) {
   match self {
-    All(value) => Json(value)
-    Except(value) => Json(value)
-    None(value) => Json(value)
-    Only(value) => Json(value)
-    Unknown(_, value) => value
+    WebFetchUrlSourcesClientToolResults::All(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesClientToolResults::Except(value) =>
+      @json.Json::Json(value)
+    WebFetchUrlSourcesClientToolResults::None(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesClientToolResults::Only(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesClientToolResults::Unknown(_, value) => value
   }
 }
 
@@ -18525,11 +19069,15 @@ pub impl @json.FromJson for WebFetchUrlSourcesClientToolResults with fn from_jso
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "all" => All(@json.from_json(value, path~))
-    "except" => Except(@json.from_json(value, path~))
-    "none" => None(@json.from_json(value, path~))
-    "only" => Only(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "all" =>
+      WebFetchUrlSourcesClientToolResults::All(@json.from_json(value, path~))
+    "except" =>
+      WebFetchUrlSourcesClientToolResults::Except(@json.from_json(value, path~))
+    "none" =>
+      WebFetchUrlSourcesClientToolResults::None(@json.from_json(value, path~))
+    "only" =>
+      WebFetchUrlSourcesClientToolResults::Only(@json.from_json(value, path~))
+    other => WebFetchUrlSourcesClientToolResults::Unknown(other, value)
   }
 }
 
@@ -18560,11 +19108,12 @@ pub extend WebFetchUrlSourcesServerToolResults with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchUrlSourcesServerToolResults with fn to_json(self) {
   match self {
-    All(value) => Json(value)
-    Except(value) => Json(value)
-    None(value) => Json(value)
-    Only(value) => Json(value)
-    Unknown(_, value) => value
+    WebFetchUrlSourcesServerToolResults::All(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesServerToolResults::Except(value) =>
+      @json.Json::Json(value)
+    WebFetchUrlSourcesServerToolResults::None(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesServerToolResults::Only(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesServerToolResults::Unknown(_, value) => value
   }
 }
 
@@ -18581,11 +19130,15 @@ pub impl @json.FromJson for WebFetchUrlSourcesServerToolResults with fn from_jso
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "all" => All(@json.from_json(value, path~))
-    "except" => Except(@json.from_json(value, path~))
-    "none" => None(@json.from_json(value, path~))
-    "only" => Only(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "all" =>
+      WebFetchUrlSourcesServerToolResults::All(@json.from_json(value, path~))
+    "except" =>
+      WebFetchUrlSourcesServerToolResults::Except(@json.from_json(value, path~))
+    "none" =>
+      WebFetchUrlSourcesServerToolResults::None(@json.from_json(value, path~))
+    "only" =>
+      WebFetchUrlSourcesServerToolResults::Only(@json.from_json(value, path~))
+    other => WebFetchUrlSourcesServerToolResults::Unknown(other, value)
   }
 }
 
@@ -18614,9 +19167,9 @@ pub extend WebFetchUrlSourcesUserInput with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchUrlSourcesUserInput with fn to_json(self) {
   match self {
-    All(value) => Json(value)
-    None(value) => Json(value)
-    Unknown(_, value) => value
+    WebFetchUrlSourcesUserInput::All(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesUserInput::None(value) => @json.Json::Json(value)
+    WebFetchUrlSourcesUserInput::Unknown(_, value) => value
   }
 }
 
@@ -18633,9 +19186,9 @@ pub impl @json.FromJson for WebFetchUrlSourcesUserInput with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "all" => All(@json.from_json(value, path~))
-    "none" => None(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "all" => WebFetchUrlSourcesUserInput::All(@json.from_json(value, path~))
+    "none" => WebFetchUrlSourcesUserInput::None(@json.from_json(value, path~))
+    other => WebFetchUrlSourcesUserInput::Unknown(other, value)
   }
 }
 
@@ -18820,8 +19373,9 @@ pub extend WebSearchTool20260209CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchTool20260209CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    WebSearchTool20260209CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    WebSearchTool20260209CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -18838,8 +19392,11 @@ pub impl @json.FromJson for WebSearchTool20260209CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      WebSearchTool20260209CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => WebSearchTool20260209CacheControl::Unknown(other, value)
   }
 }
 
@@ -18958,8 +19515,9 @@ pub extend WebFetchTool20260209CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20260209CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    WebFetchTool20260209CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    WebFetchTool20260209CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -18976,8 +19534,9 @@ pub impl @json.FromJson for WebFetchTool20260209CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      WebFetchTool20260209CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => WebFetchTool20260209CacheControl::Unknown(other, value)
   }
 }
 
@@ -19106,8 +19665,9 @@ pub extend WebFetchTool20260309CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20260309CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    WebFetchTool20260309CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    WebFetchTool20260309CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -19124,8 +19684,9 @@ pub impl @json.FromJson for WebFetchTool20260309CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      WebFetchTool20260309CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => WebFetchTool20260309CacheControl::Unknown(other, value)
   }
 }
 
@@ -19259,8 +19820,9 @@ pub extend WebSearchTool20260318CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchTool20260318CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    WebSearchTool20260318CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    WebSearchTool20260318CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -19277,8 +19839,11 @@ pub impl @json.FromJson for WebSearchTool20260318CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      WebSearchTool20260318CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => WebSearchTool20260318CacheControl::Unknown(other, value)
   }
 }
 
@@ -19307,11 +19872,11 @@ pub extend WebSearchTool20260318ResponseInclusion with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchTool20260318ResponseInclusion with fn to_json(self) {
   let raw = match self {
-    Full => "full"
-    Excluded => "excluded"
-    Custom(raw) => raw
+    WebSearchTool20260318ResponseInclusion::Full => "full"
+    WebSearchTool20260318ResponseInclusion::Excluded => "excluded"
+    WebSearchTool20260318ResponseInclusion::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -19331,12 +19896,13 @@ pub impl @json.FromJson for WebSearchTool20260318ResponseInclusion with fn from_
     path,
     raw => {
       match raw {
-        "full" => Some(Full)
-        "excluded" => Some(Excluded)
-        _ => None
+        "full" => Option::Some(WebSearchTool20260318ResponseInclusion::Full)
+        "excluded" =>
+          Option::Some(WebSearchTool20260318ResponseInclusion::Excluded)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => WebSearchTool20260318ResponseInclusion::Custom(raw),
   )
 }
 
@@ -19460,8 +20026,9 @@ pub extend WebFetchTool20260318CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20260318CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    WebFetchTool20260318CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    WebFetchTool20260318CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -19478,8 +20045,9 @@ pub impl @json.FromJson for WebFetchTool20260318CacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      WebFetchTool20260318CacheControl::Ephemeral(@json.from_json(value, path~))
+    other => WebFetchTool20260318CacheControl::Unknown(other, value)
   }
 }
 
@@ -19508,11 +20076,11 @@ pub extend WebFetchTool20260318ResponseInclusion with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20260318ResponseInclusion with fn to_json(self) {
   let raw = match self {
-    Full => "full"
-    Excluded => "excluded"
-    Custom(raw) => raw
+    WebFetchTool20260318ResponseInclusion::Full => "full"
+    WebFetchTool20260318ResponseInclusion::Excluded => "excluded"
+    WebFetchTool20260318ResponseInclusion::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -19532,12 +20100,13 @@ pub impl @json.FromJson for WebFetchTool20260318ResponseInclusion with fn from_j
     path,
     raw => {
       match raw {
-        "full" => Some(Full)
-        "excluded" => Some(Excluded)
-        _ => None
+        "full" => Option::Some(WebFetchTool20260318ResponseInclusion::Full)
+        "excluded" =>
+          Option::Some(WebFetchTool20260318ResponseInclusion::Excluded)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => WebFetchTool20260318ResponseInclusion::Custom(raw),
   )
 }
 
@@ -19676,8 +20245,9 @@ pub extend ToolSearchToolBM2520251119CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolSearchToolBM2520251119CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    ToolSearchToolBM2520251119CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    ToolSearchToolBM2520251119CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -19696,8 +20266,11 @@ pub impl @json.FromJson for ToolSearchToolBM2520251119CacheControl with fn from_
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      ToolSearchToolBM2520251119CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => ToolSearchToolBM2520251119CacheControl::Unknown(other, value)
   }
 }
 
@@ -19726,11 +20299,13 @@ pub extend ToolSearchToolBM2520251119Type with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolSearchToolBM2520251119Type with fn to_json(self) {
   let raw = match self {
-    ToolSearchToolBm2520251119 => "tool_search_tool_bm25_20251119"
-    ToolSearchToolBm25 => "tool_search_tool_bm25"
-    Custom(raw) => raw
+    ToolSearchToolBM2520251119Type::ToolSearchToolBm2520251119 =>
+      "tool_search_tool_bm25_20251119"
+    ToolSearchToolBM2520251119Type::ToolSearchToolBm25 =>
+      "tool_search_tool_bm25"
+    ToolSearchToolBM2520251119Type::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -19748,12 +20323,16 @@ pub impl @json.FromJson for ToolSearchToolBM2520251119Type with fn from_json(
     path,
     raw => {
       match raw {
-        "tool_search_tool_bm25_20251119" => Some(ToolSearchToolBm2520251119)
-        "tool_search_tool_bm25" => Some(ToolSearchToolBm25)
-        _ => None
+        "tool_search_tool_bm25_20251119" =>
+          Option::Some(
+            ToolSearchToolBM2520251119Type::ToolSearchToolBm2520251119,
+          )
+        "tool_search_tool_bm25" =>
+          Option::Some(ToolSearchToolBM2520251119Type::ToolSearchToolBm25)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ToolSearchToolBM2520251119Type::Custom(raw),
   )
 }
 
@@ -19857,8 +20436,9 @@ pub impl ToJson for ToolSearchToolRegex20251119CacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    ToolSearchToolRegex20251119CacheControl::Ephemeral(value) =>
+      @json.Json::Json(value)
+    ToolSearchToolRegex20251119CacheControl::Unknown(_, value) => value
   }
 }
 
@@ -19877,8 +20457,11 @@ pub impl @json.FromJson for ToolSearchToolRegex20251119CacheControl with fn from
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      ToolSearchToolRegex20251119CacheControl::Ephemeral(
+        @json.from_json(value, path~),
+      )
+    other => ToolSearchToolRegex20251119CacheControl::Unknown(other, value)
   }
 }
 
@@ -19907,11 +20490,13 @@ pub extend ToolSearchToolRegex20251119Type with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolSearchToolRegex20251119Type with fn to_json(self) {
   let raw = match self {
-    ToolSearchToolRegex20251119 => "tool_search_tool_regex_20251119"
-    ToolSearchToolRegex => "tool_search_tool_regex"
-    Custom(raw) => raw
+    ToolSearchToolRegex20251119Type::ToolSearchToolRegex20251119 =>
+      "tool_search_tool_regex_20251119"
+    ToolSearchToolRegex20251119Type::ToolSearchToolRegex =>
+      "tool_search_tool_regex"
+    ToolSearchToolRegex20251119Type::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -19929,12 +20514,16 @@ pub impl @json.FromJson for ToolSearchToolRegex20251119Type with fn from_json(
     path,
     raw => {
       match raw {
-        "tool_search_tool_regex_20251119" => Some(ToolSearchToolRegex20251119)
-        "tool_search_tool_regex" => Some(ToolSearchToolRegex)
-        _ => None
+        "tool_search_tool_regex_20251119" =>
+          Option::Some(
+            ToolSearchToolRegex20251119Type::ToolSearchToolRegex20251119,
+          )
+        "tool_search_tool_regex" =>
+          Option::Some(ToolSearchToolRegex20251119Type::ToolSearchToolRegex)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ToolSearchToolRegex20251119Type::Custom(raw),
   )
 }
 
@@ -20056,28 +20645,48 @@ pub extend CountMessageTokensParamsToolsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for CountMessageTokensParamsToolsItem with fn to_json(self) {
   match self {
-    Tool(value) => Json(value)
-    BashTool20250124(value) => Json(value)
-    CodeExecutionTool20250522(value) => Json(value)
-    CodeExecutionTool20250825(value) => Json(value)
-    CodeExecutionTool20260120(value) => Json(value)
-    CodeExecutionTool20260521(value) => Json(value)
-    BrowserToolset20260801(value) => Json(value)
-    MemoryTool20250818(value) => Json(value)
-    ComputerToolset20260801(value) => Json(value)
-    TextEditor20250124(value) => Json(value)
-    TextEditor20250429(value) => Json(value)
-    TextEditor20250728(value) => Json(value)
-    WebSearchTool20250305(value) => Json(value)
-    WebFetchTool20250910(value) => Json(value)
-    WebSearchTool20260209(value) => Json(value)
-    WebFetchTool20260209(value) => Json(value)
-    WebFetchTool20260309(value) => Json(value)
-    WebSearchTool20260318(value) => Json(value)
-    WebFetchTool20260318(value) => Json(value)
-    ToolSearchToolBM2520251119(value) => Json(value)
-    ToolSearchToolRegex20251119(value) => Json(value)
-    Unknown(_, value) => value
+    CountMessageTokensParamsToolsItem::Tool(value) => @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::BashTool20250124(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::CodeExecutionTool20250522(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::CodeExecutionTool20250825(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::CodeExecutionTool20260120(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::CodeExecutionTool20260521(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::BrowserToolset20260801(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::MemoryTool20250818(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::ComputerToolset20260801(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::TextEditor20250124(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::TextEditor20250429(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::TextEditor20250728(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::WebSearchTool20250305(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::WebFetchTool20250910(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::WebSearchTool20260209(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::WebFetchTool20260209(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::WebFetchTool20260309(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::WebSearchTool20260318(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::WebFetchTool20260318(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::ToolSearchToolBM2520251119(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::ToolSearchToolRegex20251119(value) =>
+      @json.Json::Json(value)
+    CountMessageTokensParamsToolsItem::Unknown(_, value) => value
   }
 }
 
@@ -20094,47 +20703,101 @@ pub impl @json.FromJson for CountMessageTokensParamsToolsItem with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   // A missing or null "type" selects Tool, the one variant whose payload does not require it.
   let tag : String = match obj.get("type") {
-    None | Some(Null) => "custom"
-    Some(raw) => @json.from_json(raw, path=path.add_key("type"))
+    Option::None | Option::Some(@json.Json::Null) => "custom"
+    Option::Some(raw) => @json.from_json(raw, path=path.add_key("type"))
   }
   match tag {
-    "custom" => Tool(@json.from_json(value, path~))
-    "bash_20250124" => BashTool20250124(@json.from_json(value, path~))
+    "custom" =>
+      CountMessageTokensParamsToolsItem::Tool(@json.from_json(value, path~))
+    "bash_20250124" =>
+      CountMessageTokensParamsToolsItem::BashTool20250124(
+        @json.from_json(value, path~),
+      )
     "code_execution_20250522" =>
-      CodeExecutionTool20250522(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::CodeExecutionTool20250522(
+        @json.from_json(value, path~),
+      )
     "code_execution_20250825" =>
-      CodeExecutionTool20250825(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::CodeExecutionTool20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecutionTool20260120(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::CodeExecutionTool20260120(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260521" =>
-      CodeExecutionTool20260521(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::CodeExecutionTool20260521(
+        @json.from_json(value, path~),
+      )
     "browser_toolset_20260801" =>
-      BrowserToolset20260801(@json.from_json(value, path~))
-    "memory_20250818" => MemoryTool20250818(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::BrowserToolset20260801(
+        @json.from_json(value, path~),
+      )
+    "memory_20250818" =>
+      CountMessageTokensParamsToolsItem::MemoryTool20250818(
+        @json.from_json(value, path~),
+      )
     "computer_toolset_20260801" =>
-      ComputerToolset20260801(@json.from_json(value, path~))
-    "text_editor_20250124" => TextEditor20250124(@json.from_json(value, path~))
-    "text_editor_20250429" => TextEditor20250429(@json.from_json(value, path~))
-    "text_editor_20250728" => TextEditor20250728(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::ComputerToolset20260801(
+        @json.from_json(value, path~),
+      )
+    "text_editor_20250124" =>
+      CountMessageTokensParamsToolsItem::TextEditor20250124(
+        @json.from_json(value, path~),
+      )
+    "text_editor_20250429" =>
+      CountMessageTokensParamsToolsItem::TextEditor20250429(
+        @json.from_json(value, path~),
+      )
+    "text_editor_20250728" =>
+      CountMessageTokensParamsToolsItem::TextEditor20250728(
+        @json.from_json(value, path~),
+      )
     "web_search_20250305" =>
-      WebSearchTool20250305(@json.from_json(value, path~))
-    "web_fetch_20250910" => WebFetchTool20250910(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::WebSearchTool20250305(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20250910" =>
+      CountMessageTokensParamsToolsItem::WebFetchTool20250910(
+        @json.from_json(value, path~),
+      )
     "web_search_20260209" =>
-      WebSearchTool20260209(@json.from_json(value, path~))
-    "web_fetch_20260209" => WebFetchTool20260209(@json.from_json(value, path~))
-    "web_fetch_20260309" => WebFetchTool20260309(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::WebSearchTool20260209(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20260209" =>
+      CountMessageTokensParamsToolsItem::WebFetchTool20260209(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20260309" =>
+      CountMessageTokensParamsToolsItem::WebFetchTool20260309(
+        @json.from_json(value, path~),
+      )
     "web_search_20260318" =>
-      WebSearchTool20260318(@json.from_json(value, path~))
-    "web_fetch_20260318" => WebFetchTool20260318(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::WebSearchTool20260318(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20260318" =>
+      CountMessageTokensParamsToolsItem::WebFetchTool20260318(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_bm25_20251119" =>
-      ToolSearchToolBM2520251119(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::ToolSearchToolBM2520251119(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_bm25" =>
-      ToolSearchToolBM2520251119(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::ToolSearchToolBM2520251119(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_regex_20251119" =>
-      ToolSearchToolRegex20251119(@json.from_json(value, path~))
+      CountMessageTokensParamsToolsItem::ToolSearchToolRegex20251119(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_regex" =>
-      ToolSearchToolRegex20251119(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      CountMessageTokensParamsToolsItem::ToolSearchToolRegex20251119(
+        @json.from_json(value, path~),
+      )
+    other => CountMessageTokensParamsToolsItem::Unknown(other, value)
   }
 }
 
@@ -20302,8 +20965,8 @@ pub extend CreateMessageParamsCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
+    CreateMessageParamsCacheControl::Ephemeral(value) => @json.Json::Json(value)
+    CreateMessageParamsCacheControl::Unknown(_, value) => value
   }
 }
 
@@ -20320,8 +20983,9 @@ pub impl @json.FromJson for CreateMessageParamsCacheControl with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "ephemeral" =>
+      CreateMessageParamsCacheControl::Ephemeral(@json.from_json(value, path~))
+    other => CreateMessageParamsCacheControl::Unknown(other, value)
   }
 }
 
@@ -20349,8 +21013,9 @@ pub extend CreateMessageParamsContainer with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsContainer with fn to_json(self) {
   match self {
-    ContainerParams(value) => Json(value)
-    Text(value) => Json(value)
+    CreateMessageParamsContainer::ContainerParams(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsContainer::Text(value) => @json.Json::Json(value)
   }
 }
 
@@ -20364,15 +21029,15 @@ pub impl @json.FromJson for CreateMessageParamsContainer with fn from_json(
   value,
   path,
 ) {
-  if value is Object(_) {
+  if value is @json.Json::Object(_) {
     let decoded : ContainerParams = @json.from_json(value, path~)
-    return ContainerParams(decoded)
+    return CreateMessageParamsContainer::ContainerParams(decoded)
   }
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return CreateMessageParamsContainer::Text(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any CreateMessageParamsContainer variant"),
   )
 }
@@ -20492,11 +21157,11 @@ pub extend CreateMessageParamsServiceTier with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsServiceTier with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    StandardOnly => "standard_only"
-    Custom(raw) => raw
+    CreateMessageParamsServiceTier::Auto => "auto"
+    CreateMessageParamsServiceTier::StandardOnly => "standard_only"
+    CreateMessageParamsServiceTier::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -20514,12 +21179,13 @@ pub impl @json.FromJson for CreateMessageParamsServiceTier with fn from_json(
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "standard_only" => Some(StandardOnly)
-        _ => None
+        "auto" => Option::Some(CreateMessageParamsServiceTier::Auto)
+        "standard_only" =>
+          Option::Some(CreateMessageParamsServiceTier::StandardOnly)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => CreateMessageParamsServiceTier::Custom(raw),
   )
 }
 
@@ -20547,8 +21213,9 @@ pub extend CreateMessageParamsSystem with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsSystem with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    RequestTextBlockArray(value) => Json(value)
+    CreateMessageParamsSystem::Text(value) => @json.Json::Json(value)
+    CreateMessageParamsSystem::RequestTextBlockArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -20562,15 +21229,15 @@ pub impl @json.FromJson for CreateMessageParamsSystem with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return CreateMessageParamsSystem::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[RequestTextBlock] = @json.from_json(value, path~)
-    return RequestTextBlockArray(decoded)
+    return CreateMessageParamsSystem::RequestTextBlockArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any CreateMessageParamsSystem variant"),
   )
 }
@@ -20619,28 +21286,48 @@ pub extend CreateMessageParamsToolsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsToolsItem with fn to_json(self) {
   match self {
-    Tool(value) => Json(value)
-    BashTool20250124(value) => Json(value)
-    CodeExecutionTool20250522(value) => Json(value)
-    CodeExecutionTool20250825(value) => Json(value)
-    CodeExecutionTool20260120(value) => Json(value)
-    CodeExecutionTool20260521(value) => Json(value)
-    BrowserToolset20260801(value) => Json(value)
-    MemoryTool20250818(value) => Json(value)
-    ComputerToolset20260801(value) => Json(value)
-    TextEditor20250124(value) => Json(value)
-    TextEditor20250429(value) => Json(value)
-    TextEditor20250728(value) => Json(value)
-    WebSearchTool20250305(value) => Json(value)
-    WebFetchTool20250910(value) => Json(value)
-    WebSearchTool20260209(value) => Json(value)
-    WebFetchTool20260209(value) => Json(value)
-    WebFetchTool20260309(value) => Json(value)
-    WebSearchTool20260318(value) => Json(value)
-    WebFetchTool20260318(value) => Json(value)
-    ToolSearchToolBM2520251119(value) => Json(value)
-    ToolSearchToolRegex20251119(value) => Json(value)
-    Unknown(_, value) => value
+    CreateMessageParamsToolsItem::Tool(value) => @json.Json::Json(value)
+    CreateMessageParamsToolsItem::BashTool20250124(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::CodeExecutionTool20250522(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::CodeExecutionTool20250825(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::CodeExecutionTool20260120(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::CodeExecutionTool20260521(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::BrowserToolset20260801(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::MemoryTool20250818(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::ComputerToolset20260801(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::TextEditor20250124(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::TextEditor20250429(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::TextEditor20250728(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::WebSearchTool20250305(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::WebFetchTool20250910(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::WebSearchTool20260209(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::WebFetchTool20260209(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::WebFetchTool20260309(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::WebSearchTool20260318(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::WebFetchTool20260318(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::ToolSearchToolBM2520251119(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::ToolSearchToolRegex20251119(value) =>
+      @json.Json::Json(value)
+    CreateMessageParamsToolsItem::Unknown(_, value) => value
   }
 }
 
@@ -20657,47 +21344,101 @@ pub impl @json.FromJson for CreateMessageParamsToolsItem with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   // A missing or null "type" selects Tool, the one variant whose payload does not require it.
   let tag : String = match obj.get("type") {
-    None | Some(Null) => "custom"
-    Some(raw) => @json.from_json(raw, path=path.add_key("type"))
+    Option::None | Option::Some(@json.Json::Null) => "custom"
+    Option::Some(raw) => @json.from_json(raw, path=path.add_key("type"))
   }
   match tag {
-    "custom" => Tool(@json.from_json(value, path~))
-    "bash_20250124" => BashTool20250124(@json.from_json(value, path~))
+    "custom" =>
+      CreateMessageParamsToolsItem::Tool(@json.from_json(value, path~))
+    "bash_20250124" =>
+      CreateMessageParamsToolsItem::BashTool20250124(
+        @json.from_json(value, path~),
+      )
     "code_execution_20250522" =>
-      CodeExecutionTool20250522(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::CodeExecutionTool20250522(
+        @json.from_json(value, path~),
+      )
     "code_execution_20250825" =>
-      CodeExecutionTool20250825(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::CodeExecutionTool20250825(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260120" =>
-      CodeExecutionTool20260120(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::CodeExecutionTool20260120(
+        @json.from_json(value, path~),
+      )
     "code_execution_20260521" =>
-      CodeExecutionTool20260521(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::CodeExecutionTool20260521(
+        @json.from_json(value, path~),
+      )
     "browser_toolset_20260801" =>
-      BrowserToolset20260801(@json.from_json(value, path~))
-    "memory_20250818" => MemoryTool20250818(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::BrowserToolset20260801(
+        @json.from_json(value, path~),
+      )
+    "memory_20250818" =>
+      CreateMessageParamsToolsItem::MemoryTool20250818(
+        @json.from_json(value, path~),
+      )
     "computer_toolset_20260801" =>
-      ComputerToolset20260801(@json.from_json(value, path~))
-    "text_editor_20250124" => TextEditor20250124(@json.from_json(value, path~))
-    "text_editor_20250429" => TextEditor20250429(@json.from_json(value, path~))
-    "text_editor_20250728" => TextEditor20250728(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::ComputerToolset20260801(
+        @json.from_json(value, path~),
+      )
+    "text_editor_20250124" =>
+      CreateMessageParamsToolsItem::TextEditor20250124(
+        @json.from_json(value, path~),
+      )
+    "text_editor_20250429" =>
+      CreateMessageParamsToolsItem::TextEditor20250429(
+        @json.from_json(value, path~),
+      )
+    "text_editor_20250728" =>
+      CreateMessageParamsToolsItem::TextEditor20250728(
+        @json.from_json(value, path~),
+      )
     "web_search_20250305" =>
-      WebSearchTool20250305(@json.from_json(value, path~))
-    "web_fetch_20250910" => WebFetchTool20250910(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::WebSearchTool20250305(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20250910" =>
+      CreateMessageParamsToolsItem::WebFetchTool20250910(
+        @json.from_json(value, path~),
+      )
     "web_search_20260209" =>
-      WebSearchTool20260209(@json.from_json(value, path~))
-    "web_fetch_20260209" => WebFetchTool20260209(@json.from_json(value, path~))
-    "web_fetch_20260309" => WebFetchTool20260309(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::WebSearchTool20260209(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20260209" =>
+      CreateMessageParamsToolsItem::WebFetchTool20260209(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20260309" =>
+      CreateMessageParamsToolsItem::WebFetchTool20260309(
+        @json.from_json(value, path~),
+      )
     "web_search_20260318" =>
-      WebSearchTool20260318(@json.from_json(value, path~))
-    "web_fetch_20260318" => WebFetchTool20260318(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::WebSearchTool20260318(
+        @json.from_json(value, path~),
+      )
+    "web_fetch_20260318" =>
+      CreateMessageParamsToolsItem::WebFetchTool20260318(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_bm25_20251119" =>
-      ToolSearchToolBM2520251119(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::ToolSearchToolBM2520251119(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_bm25" =>
-      ToolSearchToolBM2520251119(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::ToolSearchToolBM2520251119(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_regex_20251119" =>
-      ToolSearchToolRegex20251119(@json.from_json(value, path~))
+      CreateMessageParamsToolsItem::ToolSearchToolRegex20251119(
+        @json.from_json(value, path~),
+      )
     "tool_search_tool_regex" =>
-      ToolSearchToolRegex20251119(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      CreateMessageParamsToolsItem::ToolSearchToolRegex20251119(
+        @json.from_json(value, path~),
+      )
+    other => CreateMessageParamsToolsItem::Unknown(other, value)
   }
 }
 
@@ -21327,16 +22068,16 @@ pub extend ErrorResponseError with ToJson::{to_json}
 ///|
 pub impl ToJson for ErrorResponseError with fn to_json(self) {
   match self {
-    ApiError(value) => Json(value)
-    AuthenticationError(value) => Json(value)
-    BillingError(value) => Json(value)
-    InvalidRequestError(value) => Json(value)
-    NotFoundError(value) => Json(value)
-    OverloadedError(value) => Json(value)
-    PermissionError(value) => Json(value)
-    RateLimitError(value) => Json(value)
-    TimeoutError(value) => Json(value)
-    Unknown(_, value) => value
+    ErrorResponseError::ApiError(value) => @json.Json::Json(value)
+    ErrorResponseError::AuthenticationError(value) => @json.Json::Json(value)
+    ErrorResponseError::BillingError(value) => @json.Json::Json(value)
+    ErrorResponseError::InvalidRequestError(value) => @json.Json::Json(value)
+    ErrorResponseError::NotFoundError(value) => @json.Json::Json(value)
+    ErrorResponseError::OverloadedError(value) => @json.Json::Json(value)
+    ErrorResponseError::PermissionError(value) => @json.Json::Json(value)
+    ErrorResponseError::RateLimitError(value) => @json.Json::Json(value)
+    ErrorResponseError::TimeoutError(value) => @json.Json::Json(value)
+    ErrorResponseError::Unknown(_, value) => value
   }
 }
 
@@ -21350,17 +22091,24 @@ pub impl @json.FromJson for ErrorResponseError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "api_error" => ApiError(@json.from_json(value, path~))
-    "authentication_error" => AuthenticationError(@json.from_json(value, path~))
-    "billing_error" => BillingError(@json.from_json(value, path~))
+    "api_error" => ErrorResponseError::ApiError(@json.from_json(value, path~))
+    "authentication_error" =>
+      ErrorResponseError::AuthenticationError(@json.from_json(value, path~))
+    "billing_error" =>
+      ErrorResponseError::BillingError(@json.from_json(value, path~))
     "invalid_request_error" =>
-      InvalidRequestError(@json.from_json(value, path~))
-    "not_found_error" => NotFoundError(@json.from_json(value, path~))
-    "overloaded_error" => OverloadedError(@json.from_json(value, path~))
-    "permission_error" => PermissionError(@json.from_json(value, path~))
-    "rate_limit_error" => RateLimitError(@json.from_json(value, path~))
-    "timeout_error" => TimeoutError(@json.from_json(value, path~))
-    other => Unknown(other, value)
+      ErrorResponseError::InvalidRequestError(@json.from_json(value, path~))
+    "not_found_error" =>
+      ErrorResponseError::NotFoundError(@json.from_json(value, path~))
+    "overloaded_error" =>
+      ErrorResponseError::OverloadedError(@json.from_json(value, path~))
+    "permission_error" =>
+      ErrorResponseError::PermissionError(@json.from_json(value, path~))
+    "rate_limit_error" =>
+      ErrorResponseError::RateLimitError(@json.from_json(value, path~))
+    "timeout_error" =>
+      ErrorResponseError::TimeoutError(@json.from_json(value, path~))
+    other => ErrorResponseError::Unknown(other, value)
   }
 }
 
@@ -21709,12 +22457,12 @@ pub extend ModelInfoLifecycle with ToJson::{to_json}
 ///|
 pub impl ToJson for ModelInfoLifecycle with fn to_json(self) {
   let raw = match self {
-    Active => "active"
-    Deprecated => "deprecated"
-    Retired => "retired"
-    Unknown(raw) => raw
+    ModelInfoLifecycle::Active => "active"
+    ModelInfoLifecycle::Deprecated => "deprecated"
+    ModelInfoLifecycle::Retired => "retired"
+    ModelInfoLifecycle::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -21729,13 +22477,13 @@ pub impl @json.FromJson for ModelInfoLifecycle with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "active" => Some(Active)
-        "deprecated" => Some(Deprecated)
-        "retired" => Some(Retired)
-        _ => None
+        "active" => Option::Some(ModelInfoLifecycle::Active)
+        "deprecated" => Option::Some(ModelInfoLifecycle::Deprecated)
+        "retired" => Option::Some(ModelInfoLifecycle::Retired)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ModelInfoLifecycle::Unknown(raw),
   )
 }
 
@@ -21767,14 +22515,14 @@ pub extend ModelLine with ToJson::{to_json}
 ///|
 pub impl ToJson for ModelLine with fn to_json(self) {
   let raw = match self {
-    Haiku => "haiku"
-    Sonnet => "sonnet"
-    Opus => "opus"
-    Fable => "fable"
-    Mythos => "mythos"
-    Unknown(raw) => raw
+    ModelLine::Haiku => "haiku"
+    ModelLine::Sonnet => "sonnet"
+    ModelLine::Opus => "opus"
+    ModelLine::Fable => "fable"
+    ModelLine::Mythos => "mythos"
+    ModelLine::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -21789,15 +22537,15 @@ pub impl @json.FromJson for ModelLine with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "haiku" => Some(Haiku)
-        "sonnet" => Some(Sonnet)
-        "opus" => Some(Opus)
-        "fable" => Some(Fable)
-        "mythos" => Some(Mythos)
-        _ => None
+        "haiku" => Option::Some(ModelLine::Haiku)
+        "sonnet" => Option::Some(ModelLine::Sonnet)
+        "opus" => Option::Some(ModelLine::Opus)
+        "fable" => Option::Some(ModelLine::Fable)
+        "mythos" => Option::Some(ModelLine::Mythos)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ModelLine::Unknown(raw),
   )
 }
 
@@ -22002,16 +22750,16 @@ pub extend StopReason with ToJson::{to_json}
 ///|
 pub impl ToJson for StopReason with fn to_json(self) {
   let raw = match self {
-    EndTurn => "end_turn"
-    MaxTokens => "max_tokens"
-    StopSequence => "stop_sequence"
-    ToolUse => "tool_use"
-    PauseTurn => "pause_turn"
-    Refusal => "refusal"
-    ModelContextWindowExceeded => "model_context_window_exceeded"
-    Unknown(raw) => raw
+    StopReason::EndTurn => "end_turn"
+    StopReason::MaxTokens => "max_tokens"
+    StopReason::StopSequence => "stop_sequence"
+    StopReason::ToolUse => "tool_use"
+    StopReason::PauseTurn => "pause_turn"
+    StopReason::Refusal => "refusal"
+    StopReason::ModelContextWindowExceeded => "model_context_window_exceeded"
+    StopReason::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -22026,17 +22774,18 @@ pub impl @json.FromJson for StopReason with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "end_turn" => Some(EndTurn)
-        "max_tokens" => Some(MaxTokens)
-        "stop_sequence" => Some(StopSequence)
-        "tool_use" => Some(ToolUse)
-        "pause_turn" => Some(PauseTurn)
-        "refusal" => Some(Refusal)
-        "model_context_window_exceeded" => Some(ModelContextWindowExceeded)
-        _ => None
+        "end_turn" => Option::Some(StopReason::EndTurn)
+        "max_tokens" => Option::Some(StopReason::MaxTokens)
+        "stop_sequence" => Option::Some(StopReason::StopSequence)
+        "tool_use" => Option::Some(StopReason::ToolUse)
+        "pause_turn" => Option::Some(StopReason::PauseTurn)
+        "refusal" => Option::Some(StopReason::Refusal)
+        "model_context_window_exceeded" =>
+          Option::Some(StopReason::ModelContextWindowExceeded)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => StopReason::Unknown(raw),
   )
 }
 
@@ -22068,14 +22817,14 @@ pub extend RefusalCategory with ToJson::{to_json}
 ///|
 pub impl ToJson for RefusalCategory with fn to_json(self) {
   let raw = match self {
-    Cyber => "cyber"
-    Bio => "bio"
-    FrontierLlm => "frontier_llm"
-    ReasoningExtraction => "reasoning_extraction"
-    GeneralHarms => "general_harms"
-    Unknown(raw) => raw
+    RefusalCategory::Cyber => "cyber"
+    RefusalCategory::Bio => "bio"
+    RefusalCategory::FrontierLlm => "frontier_llm"
+    RefusalCategory::ReasoningExtraction => "reasoning_extraction"
+    RefusalCategory::GeneralHarms => "general_harms"
+    RefusalCategory::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -22090,15 +22839,16 @@ pub impl @json.FromJson for RefusalCategory with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "cyber" => Some(Cyber)
-        "bio" => Some(Bio)
-        "frontier_llm" => Some(FrontierLlm)
-        "reasoning_extraction" => Some(ReasoningExtraction)
-        "general_harms" => Some(GeneralHarms)
-        _ => None
+        "cyber" => Option::Some(RefusalCategory::Cyber)
+        "bio" => Option::Some(RefusalCategory::Bio)
+        "frontier_llm" => Option::Some(RefusalCategory::FrontierLlm)
+        "reasoning_extraction" =>
+          Option::Some(RefusalCategory::ReasoningExtraction)
+        "general_harms" => Option::Some(RefusalCategory::GeneralHarms)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => RefusalCategory::Unknown(raw),
   )
 }
 
@@ -22282,12 +23032,12 @@ pub extend UsageServiceTier with ToJson::{to_json}
 ///|
 pub impl ToJson for UsageServiceTier with fn to_json(self) {
   let raw = match self {
-    Standard => "standard"
-    Priority => "priority"
-    Batch => "batch"
-    Unknown(raw) => raw
+    UsageServiceTier::Standard => "standard"
+    UsageServiceTier::Priority => "priority"
+    UsageServiceTier::Batch => "batch"
+    UsageServiceTier::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -22302,13 +23052,13 @@ pub impl @json.FromJson for UsageServiceTier with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "standard" => Some(Standard)
-        "priority" => Some(Priority)
-        "batch" => Some(Batch)
-        _ => None
+        "standard" => Option::Some(UsageServiceTier::Standard)
+        "priority" => Option::Some(UsageServiceTier::Priority)
+        "batch" => Option::Some(UsageServiceTier::Batch)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => UsageServiceTier::Unknown(raw),
   )
 }
 
@@ -22844,13 +23594,13 @@ pub extend MessageStreamEvent with ToJson::{to_json}
 ///|
 pub impl ToJson for MessageStreamEvent with fn to_json(self) {
   match self {
-    ContentBlockDelta(value) => Json(value)
-    ContentBlockStart(value) => Json(value)
-    ContentBlockStop(value) => Json(value)
-    MessageDelta(value) => Json(value)
-    MessageStart(value) => Json(value)
-    MessageStop(value) => Json(value)
-    Unknown(_, value) => value
+    MessageStreamEvent::ContentBlockDelta(value) => @json.Json::Json(value)
+    MessageStreamEvent::ContentBlockStart(value) => @json.Json::Json(value)
+    MessageStreamEvent::ContentBlockStop(value) => @json.Json::Json(value)
+    MessageStreamEvent::MessageDelta(value) => @json.Json::Json(value)
+    MessageStreamEvent::MessageStart(value) => @json.Json::Json(value)
+    MessageStreamEvent::MessageStop(value) => @json.Json::Json(value)
+    MessageStreamEvent::Unknown(_, value) => value
   }
 }
 
@@ -22864,13 +23614,19 @@ pub impl @json.FromJson for MessageStreamEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "content_block_delta" => ContentBlockDelta(@json.from_json(value, path~))
-    "content_block_start" => ContentBlockStart(@json.from_json(value, path~))
-    "content_block_stop" => ContentBlockStop(@json.from_json(value, path~))
-    "message_delta" => MessageDelta(@json.from_json(value, path~))
-    "message_start" => MessageStart(@json.from_json(value, path~))
-    "message_stop" => MessageStop(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "content_block_delta" =>
+      MessageStreamEvent::ContentBlockDelta(@json.from_json(value, path~))
+    "content_block_start" =>
+      MessageStreamEvent::ContentBlockStart(@json.from_json(value, path~))
+    "content_block_stop" =>
+      MessageStreamEvent::ContentBlockStop(@json.from_json(value, path~))
+    "message_delta" =>
+      MessageStreamEvent::MessageDelta(@json.from_json(value, path~))
+    "message_start" =>
+      MessageStreamEvent::MessageStart(@json.from_json(value, path~))
+    "message_stop" =>
+      MessageStreamEvent::MessageStop(@json.from_json(value, path~))
+    other => MessageStreamEvent::Unknown(other, value)
   }
 }
 
@@ -23330,15 +24086,19 @@ pub impl ToJson for ThreadUnsupportedRequestErrorDetailsUnsupportedItem with fn 
   self,
 ) {
   let raw = match self {
-    CacheControl => "cache_control"
-    ContextManagement => "context_management"
-    Fallbacks => "fallbacks"
-    Hipaa => "hipaa"
-    InferenceHooks => "inference_hooks"
-    Thinking => "thinking"
-    Unknown(raw) => raw
+    ThreadUnsupportedRequestErrorDetailsUnsupportedItem::CacheControl =>
+      "cache_control"
+    ThreadUnsupportedRequestErrorDetailsUnsupportedItem::ContextManagement =>
+      "context_management"
+    ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Fallbacks =>
+      "fallbacks"
+    ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Hipaa => "hipaa"
+    ThreadUnsupportedRequestErrorDetailsUnsupportedItem::InferenceHooks =>
+      "inference_hooks"
+    ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Thinking => "thinking"
+    ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -23358,16 +24118,34 @@ pub impl @json.FromJson for ThreadUnsupportedRequestErrorDetailsUnsupportedItem 
     path,
     raw => {
       match raw {
-        "cache_control" => Some(CacheControl)
-        "context_management" => Some(ContextManagement)
-        "fallbacks" => Some(Fallbacks)
-        "hipaa" => Some(Hipaa)
-        "inference_hooks" => Some(InferenceHooks)
-        "thinking" => Some(Thinking)
-        _ => None
+        "cache_control" =>
+          Option::Some(
+            ThreadUnsupportedRequestErrorDetailsUnsupportedItem::CacheControl,
+          )
+        "context_management" =>
+          Option::Some(
+            ThreadUnsupportedRequestErrorDetailsUnsupportedItem::ContextManagement,
+          )
+        "fallbacks" =>
+          Option::Some(
+            ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Fallbacks,
+          )
+        "hipaa" =>
+          Option::Some(
+            ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Hipaa,
+          )
+        "inference_hooks" =>
+          Option::Some(
+            ThreadUnsupportedRequestErrorDetailsUnsupportedItem::InferenceHooks,
+          )
+        "thinking" =>
+          Option::Some(
+            ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Thinking,
+          )
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ThreadUnsupportedRequestErrorDetailsUnsupportedItem::Unknown(raw),
   )
 }
 
@@ -23523,12 +24301,12 @@ pub extend ModelsListLifecycleItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ModelsListLifecycleItem with fn to_json(self) {
   let raw = match self {
-    Active => "active"
-    Deprecated => "deprecated"
-    Retired => "retired"
-    Custom(raw) => raw
+    ModelsListLifecycleItem::Active => "active"
+    ModelsListLifecycleItem::Deprecated => "deprecated"
+    ModelsListLifecycleItem::Retired => "retired"
+    ModelsListLifecycleItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -23546,12 +24324,12 @@ pub impl @json.FromJson for ModelsListLifecycleItem with fn from_json(
     path,
     raw => {
       match raw {
-        "active" => Some(Active)
-        "deprecated" => Some(Deprecated)
-        "retired" => Some(Retired)
-        _ => None
+        "active" => Option::Some(ModelsListLifecycleItem::Active)
+        "deprecated" => Option::Some(ModelsListLifecycleItem::Deprecated)
+        "retired" => Option::Some(ModelsListLifecycleItem::Retired)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ModelsListLifecycleItem::Custom(raw),
   )
 }

@@ -47,15 +47,15 @@ fn typed_error(
     let json = @json.parse(@utf8.decode(body))
     if operation == "search" && head.status == 400 {
       let value : ErrorSearch400Response = @json.from_json(json)
-      return Some(ErrorSearch400Response(value))
+      return Option::Some(ErrorBody::ErrorSearch400Response(value))
     }
     if operation == "search" && head.status == 500 {
       let value : ErrorSearch500Response = @json.from_json(json)
-      return Some(ErrorSearch500Response(value))
+      return Option::Some(ErrorBody::ErrorSearch500Response(value))
     }
-    None
+    Option::None
   } catch {
-    _ => None
+    _ => Option::None
   }
 }
 

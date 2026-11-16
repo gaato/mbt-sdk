@@ -8,6 +8,11 @@ Register the generated module once in root `sdks.toml` (including its spec,
 generation/census flags, package list, publication choice and host/auth pins),
 then run `uv run --with pyyaml --with jsonpath-rfc9535 python tools/sdks.py sync`. Check it with `scripts/generate.sh <name> --check`
 and `scripts/gates.sh --sdk <name>`; gates reject stale derived registration.
+New sources use `specs/<provider>/` with one `SOURCE.md`. To split an existing
+source, use `tools/new_sdk.py <name> --from-spec <entry-or-spec-path> --paths ...`
+and a ledger selection rather than copying the spec. Scaffolding compiles a
+scratch module before writing; see [the factory](sdk-factory.md) for the schema
+and [releasing](release.md) for daily detection and weekly publication.
 
 ## 1. Classify every source
 

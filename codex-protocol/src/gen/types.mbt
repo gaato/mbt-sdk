@@ -3,7 +3,7 @@
 ///|
 fn json_array_matches(value : Json, predicate : (Json) -> Bool) -> Bool {
   match value {
-    Array(items) => items.length() > 0 && items.all(predicate)
+    @json.Json::Array(items) => items.length() > 0 && items.all(predicate)
     _ => false
   }
 }
@@ -16,27 +16,27 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 
 ///|
 fn parse_plain_int64(text : String) -> Int64? {
   if text.length() == 0 {
-    return None
+    return Option::None
   }
   let negative = text[0] == '-'
   let digits_start = if negative { 1 } else { 0 }
   if digits_start == text.length() {
-    return None
+    return Option::None
   }
   for index in digits_start..<text.length() {
     if text[index] < '0' || text[index] > '9' {
-      return None
+      return Option::None
     }
   }
   let mut significant_start = digits_start
@@ -44,7 +44,7 @@ fn parse_plain_int64(text : String) -> Int64? {
     significant_start += 1
   }
   if significant_start == text.length() {
-    return Some(0L)
+    return Option::Some(0L)
   }
   let significant_length = text.length() - significant_start
   let limit = if negative {
@@ -53,14 +53,14 @@ fn parse_plain_int64(text : String) -> Int64? {
     "9223372036854775807"
   }
   if significant_length > limit.length() {
-    return None
+    return Option::None
   }
   if significant_length == limit.length() {
     for offset in 0..<significant_length {
       let digit = text[significant_start + offset]
       let boundary = limit[offset]
       if digit > boundary {
-        return None
+        return Option::None
       }
       if digit < boundary {
         break
@@ -76,7 +76,7 @@ fn parse_plain_int64(text : String) -> Int64? {
       result = result * 10L + digit
     }
   }
-  Some(result)
+  Option::Some(result)
 }
 
 ///|
@@ -101,14 +101,16 @@ fn json_int64(
   value : Json,
   path : @json.JsonPath,
 ) -> Int64 raise @json.JsonDecodeError {
-  guard value is Number(raw, repr~) else {
-    raise @json.JsonDecodeError((path, "expected JSON number for Int64"))
+  guard value is @json.Json::Number(raw, repr~) else {
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected JSON number for Int64"),
+    )
   }
-  if repr is Some(text) && is_plain_integer(text) {
+  if repr is Option::Some(text) && is_plain_integer(text) {
     match parse_plain_int64(text) {
-      Some(value) => return value
-      None =>
-        raise @json.JsonDecodeError(
+      Option::Some(value) => return value
+      Option::None =>
+        raise @json.JsonDecodeError::JsonDecodeError(
           (path, "JSON number is outside Int64 range"),
         )
     }
@@ -116,11 +118,15 @@ fn json_int64(
   if raw.is_nan() ||
     raw < -9223372036854775808.0 ||
     raw >= 9223372036854775808.0 {
-    raise @json.JsonDecodeError((path, "JSON number is outside Int64 range"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "JSON number is outside Int64 range"),
+    )
   }
   let result = raw.to_int64()
   if result.to_double() != raw {
-    raise @json.JsonDecodeError((path, "expected integral JSON number"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected integral JSON number"),
+    )
   }
   result
 }
@@ -138,18 +144,18 @@ fn decode_presence_int64(
 ) -> @sdkjson.Presence[Int64] raise @json.JsonDecodeError {
   let raw : @sdkjson.Presence[Json] = @sdkjson.presence_field(obj, key, path)
   match raw {
-    @sdkjson.Value(value) =>
-      @sdkjson.Value(json_int64(value, path.add_key(key)))
-    @sdkjson.Absent => @sdkjson.Absent
-    @sdkjson.Null => @sdkjson.Null
+    @sdkjson.Presence::Value(value) =>
+      @sdkjson.Presence::Value(json_int64(value, path.add_key(key)))
+    @sdkjson.Presence::Absent => @sdkjson.Presence::Absent
+    @sdkjson.Presence::Null => @sdkjson.Presence::Null
   }
 }
 
 ///|
 fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
   match value {
-    Some(value) => @sdkjson.Value(value)
-    None => @sdkjson.Null
+    Option::Some(value) => @sdkjson.Presence::Value(value)
+    Option::None => @sdkjson.Presence::Null
   }
 }
 
@@ -161,8 +167,8 @@ fn[T : @json.FromJson] decode_nullable_field(
 ) -> T? raise @json.JsonDecodeError {
   let raw : Json = required_field(obj, key, path)
   match raw {
-    Null => None
-    value => Some(@json.from_json(value, path=path.add_key(key)))
+    @json.Json::Null => Option::None
+    value => Option::Some(@json.from_json(value, path=path.add_key(key)))
   }
 }
 
@@ -170,7 +176,7 @@ fn[T : @json.FromJson] decode_nullable_field(
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = Json(item)
+    result[key] = @json.Json::Json(item)
   }
   Json::object(result)
 }
@@ -538,12 +544,12 @@ pub extend AskForApproval with ToJson::{to_json}
 ///|
 pub impl ToJson for AskForApproval with fn to_json(self) {
   match self {
-    Untrusted => Json("untrusted")
-    OnRequest => Json("on-request")
-    Never => Json("never")
-    Granular(value) =>
+    AskForApproval::Untrusted => @json.Json::Json("untrusted")
+    AskForApproval::OnRequest => @json.Json::Json("on-request")
+    AskForApproval::Never => @json.Json::Json("never")
+    AskForApproval::Granular(value) =>
       @sdkjson.ObjBuilder::new().field("granular", value).build()
-    UnknownValue(value) => value
+    AskForApproval::UnknownValue(value) => value
   }
 }
 
@@ -555,21 +561,25 @@ pub extend AskForApproval with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for AskForApproval with fn from_json(value, path) {
   match value {
-    String("untrusted") => Untrusted
-    String("on-request") => OnRequest
-    String("never") => Never
-    Object(obj) => {
+    @json.Json::String("untrusted") => AskForApproval::Untrusted
+    @json.Json::String("on-request") => AskForApproval::OnRequest
+    @json.Json::String("never") => AskForApproval::Never
+    @json.Json::Object(obj) => {
       if obj.length() != 1 {
-        raise @json.JsonDecodeError((path, "expected exactly one enum tag"))
+        raise @json.JsonDecodeError::JsonDecodeError(
+          (path, "expected exactly one enum tag"),
+        )
       }
-      if obj.get("granular") is Some(payload) {
-        return Granular(@json.from_json(payload, path=path.add_key("granular")))
+      if obj.get("granular") is Option::Some(payload) {
+        return AskForApproval::Granular(
+          @json.from_json(payload, path=path.add_key("granular")),
+        )
       }
-      UnknownValue(value)
+      AskForApproval::UnknownValue(value)
     }
-    String(_) => UnknownValue(value)
+    @json.Json::String(_) => AskForApproval::UnknownValue(value)
     _ =>
-      raise @json.JsonDecodeError(
+      raise @json.JsonDecodeError::JsonDecodeError(
         (path, "expected string or single-key object enum"),
       )
   }
@@ -601,12 +611,12 @@ pub extend ApprovalsReviewer with ToJson::{to_json}
 ///|
 pub impl ToJson for ApprovalsReviewer with fn to_json(self) {
   let raw = match self {
-    User => "user"
-    AutoReview => "auto_review"
-    GuardianSubagent => "guardian_subagent"
-    Unknown(raw) => raw
+    ApprovalsReviewer::User => "user"
+    ApprovalsReviewer::AutoReview => "auto_review"
+    ApprovalsReviewer::GuardianSubagent => "guardian_subagent"
+    ApprovalsReviewer::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -621,13 +631,13 @@ pub impl @json.FromJson for ApprovalsReviewer with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "user" => Some(User)
-        "auto_review" => Some(AutoReview)
-        "guardian_subagent" => Some(GuardianSubagent)
-        _ => None
+        "user" => Option::Some(ApprovalsReviewer::User)
+        "auto_review" => Option::Some(ApprovalsReviewer::AutoReview)
+        "guardian_subagent" => Option::Some(ApprovalsReviewer::GuardianSubagent)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ApprovalsReviewer::Unknown(raw),
   )
 }
 
@@ -657,12 +667,12 @@ pub extend Personality with ToJson::{to_json}
 ///|
 pub impl ToJson for Personality with fn to_json(self) {
   let raw = match self {
-    None => "none"
-    Friendly => "friendly"
-    Pragmatic => "pragmatic"
-    Custom(raw) => raw
+    Personality::None => "none"
+    Personality::Friendly => "friendly"
+    Personality::Pragmatic => "pragmatic"
+    Personality::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -677,13 +687,13 @@ pub impl @json.FromJson for Personality with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "none" => Some(None)
-        "friendly" => Some(Friendly)
-        "pragmatic" => Some(Pragmatic)
-        _ => None
+        "none" => Option::Some(Personality::None)
+        "friendly" => Option::Some(Personality::Friendly)
+        "pragmatic" => Option::Some(Personality::Pragmatic)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Personality::Custom(raw),
   )
 }
 
@@ -713,12 +723,12 @@ pub extend SandboxMode with ToJson::{to_json}
 ///|
 pub impl ToJson for SandboxMode with fn to_json(self) {
   let raw = match self {
-    ReadOnly => "read-only"
-    WorkspaceWrite => "workspace-write"
-    DangerFullAccess => "danger-full-access"
-    Custom(raw) => raw
+    SandboxMode::ReadOnly => "read-only"
+    SandboxMode::WorkspaceWrite => "workspace-write"
+    SandboxMode::DangerFullAccess => "danger-full-access"
+    SandboxMode::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -733,13 +743,13 @@ pub impl @json.FromJson for SandboxMode with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "read-only" => Some(ReadOnly)
-        "workspace-write" => Some(WorkspaceWrite)
-        "danger-full-access" => Some(DangerFullAccess)
-        _ => None
+        "read-only" => Option::Some(SandboxMode::ReadOnly)
+        "workspace-write" => Option::Some(SandboxMode::WorkspaceWrite)
+        "danger-full-access" => Option::Some(SandboxMode::DangerFullAccess)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => SandboxMode::Custom(raw),
   )
 }
 
@@ -768,11 +778,11 @@ pub extend ThreadStartSource with ToJson::{to_json}
 ///|
 pub impl ToJson for ThreadStartSource with fn to_json(self) {
   let raw = match self {
-    Startup => "startup"
-    Clear => "clear"
-    Custom(raw) => raw
+    ThreadStartSource::Startup => "startup"
+    ThreadStartSource::Clear => "clear"
+    ThreadStartSource::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -787,12 +797,12 @@ pub impl @json.FromJson for ThreadStartSource with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "startup" => Some(Startup)
-        "clear" => Some(Clear)
-        _ => None
+        "startup" => Option::Some(ThreadStartSource::Startup)
+        "clear" => Option::Some(ThreadStartSource::Clear)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ThreadStartSource::Custom(raw),
   )
 }
 
@@ -1046,11 +1056,11 @@ pub extend NetworkAccess with ToJson::{to_json}
 ///|
 pub impl ToJson for NetworkAccess with fn to_json(self) {
   let raw = match self {
-    Restricted => "restricted"
-    Enabled => "enabled"
-    Unknown(raw) => raw
+    NetworkAccess::Restricted => "restricted"
+    NetworkAccess::Enabled => "enabled"
+    NetworkAccess::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1065,12 +1075,12 @@ pub impl @json.FromJson for NetworkAccess with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "restricted" => Some(Restricted)
-        "enabled" => Some(Enabled)
-        _ => None
+        "restricted" => Option::Some(NetworkAccess::Restricted)
+        "enabled" => Option::Some(NetworkAccess::Enabled)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => NetworkAccess::Unknown(raw),
   )
 }
 
@@ -1229,11 +1239,11 @@ pub extend SandboxPolicy with ToJson::{to_json}
 ///|
 pub impl ToJson for SandboxPolicy with fn to_json(self) {
   match self {
-    DangerFullAccess(value) => Json(value)
-    ReadOnly(value) => Json(value)
-    ExternalSandbox(value) => Json(value)
-    WorkspaceWrite(value) => Json(value)
-    Unknown(_, value) => value
+    SandboxPolicy::DangerFullAccess(value) => @json.Json::Json(value)
+    SandboxPolicy::ReadOnly(value) => @json.Json::Json(value)
+    SandboxPolicy::ExternalSandbox(value) => @json.Json::Json(value)
+    SandboxPolicy::WorkspaceWrite(value) => @json.Json::Json(value)
+    SandboxPolicy::Unknown(_, value) => value
   }
 }
 
@@ -1247,11 +1257,14 @@ pub impl @json.FromJson for SandboxPolicy with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "dangerFullAccess" => DangerFullAccess(@json.from_json(value, path~))
-    "readOnly" => ReadOnly(@json.from_json(value, path~))
-    "externalSandbox" => ExternalSandbox(@json.from_json(value, path~))
-    "workspaceWrite" => WorkspaceWrite(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "dangerFullAccess" =>
+      SandboxPolicy::DangerFullAccess(@json.from_json(value, path~))
+    "readOnly" => SandboxPolicy::ReadOnly(@json.from_json(value, path~))
+    "externalSandbox" =>
+      SandboxPolicy::ExternalSandbox(@json.from_json(value, path~))
+    "workspaceWrite" =>
+      SandboxPolicy::WorkspaceWrite(@json.from_json(value, path~))
+    other => SandboxPolicy::Unknown(other, value)
   }
 }
 
@@ -1340,11 +1353,11 @@ pub extend ThreadHistoryMode with ToJson::{to_json}
 ///|
 pub impl ToJson for ThreadHistoryMode with fn to_json(self) {
   let raw = match self {
-    Legacy => "legacy"
-    Paginated => "paginated"
-    Unknown(raw) => raw
+    ThreadHistoryMode::Legacy => "legacy"
+    ThreadHistoryMode::Paginated => "paginated"
+    ThreadHistoryMode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1359,12 +1372,12 @@ pub impl @json.FromJson for ThreadHistoryMode with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "legacy" => Some(Legacy)
-        "paginated" => Some(Paginated)
-        _ => None
+        "legacy" => Option::Some(ThreadHistoryMode::Legacy)
+        "paginated" => Option::Some(ThreadHistoryMode::Paginated)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ThreadHistoryMode::Unknown(raw),
   )
 }
 
@@ -1583,13 +1596,15 @@ pub extend SubAgentSource with ToJson::{to_json}
 ///|
 pub impl ToJson for SubAgentSource with fn to_json(self) {
   match self {
-    Review => Json("review")
-    Compact => Json("compact")
-    MemoryConsolidation => Json("memory_consolidation")
-    ThreadSpawn(value) =>
+    SubAgentSource::Review => @json.Json::Json("review")
+    SubAgentSource::Compact => @json.Json::Json("compact")
+    SubAgentSource::MemoryConsolidation =>
+      @json.Json::Json("memory_consolidation")
+    SubAgentSource::ThreadSpawn(value) =>
       @sdkjson.ObjBuilder::new().field("thread_spawn", value).build()
-    Other(value) => @sdkjson.ObjBuilder::new().field("other", value).build()
-    UnknownValue(value) => value
+    SubAgentSource::Other(value) =>
+      @sdkjson.ObjBuilder::new().field("other", value).build()
+    SubAgentSource::UnknownValue(value) => value
   }
 }
 
@@ -1601,26 +1616,31 @@ pub extend SubAgentSource with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for SubAgentSource with fn from_json(value, path) {
   match value {
-    String("review") => Review
-    String("compact") => Compact
-    String("memory_consolidation") => MemoryConsolidation
-    Object(obj) => {
+    @json.Json::String("review") => SubAgentSource::Review
+    @json.Json::String("compact") => SubAgentSource::Compact
+    @json.Json::String("memory_consolidation") =>
+      SubAgentSource::MemoryConsolidation
+    @json.Json::Object(obj) => {
       if obj.length() != 1 {
-        raise @json.JsonDecodeError((path, "expected exactly one enum tag"))
+        raise @json.JsonDecodeError::JsonDecodeError(
+          (path, "expected exactly one enum tag"),
+        )
       }
-      if obj.get("thread_spawn") is Some(payload) {
-        return ThreadSpawn(
+      if obj.get("thread_spawn") is Option::Some(payload) {
+        return SubAgentSource::ThreadSpawn(
           @json.from_json(payload, path=path.add_key("thread_spawn")),
         )
       }
-      if obj.get("other") is Some(payload) {
-        return Other(@json.from_json(payload, path=path.add_key("other")))
+      if obj.get("other") is Option::Some(payload) {
+        return SubAgentSource::Other(
+          @json.from_json(payload, path=path.add_key("other")),
+        )
       }
-      UnknownValue(value)
+      SubAgentSource::UnknownValue(value)
     }
-    String(_) => UnknownValue(value)
+    @json.Json::String(_) => SubAgentSource::UnknownValue(value)
     _ =>
-      raise @json.JsonDecodeError(
+      raise @json.JsonDecodeError::JsonDecodeError(
         (path, "expected string or single-key object enum"),
       )
   }
@@ -1656,15 +1676,16 @@ pub extend SessionSource with ToJson::{to_json}
 ///|
 pub impl ToJson for SessionSource with fn to_json(self) {
   match self {
-    Cli => Json("cli")
-    Vscode => Json("vscode")
-    Exec => Json("exec")
-    AppServer => Json("appServer")
-    Unknown => Json("unknown")
-    Custom(value) => @sdkjson.ObjBuilder::new().field("custom", value).build()
-    SubAgent(value) =>
+    SessionSource::Cli => @json.Json::Json("cli")
+    SessionSource::Vscode => @json.Json::Json("vscode")
+    SessionSource::Exec => @json.Json::Json("exec")
+    SessionSource::AppServer => @json.Json::Json("appServer")
+    SessionSource::Unknown => @json.Json::Json("unknown")
+    SessionSource::Custom(value) =>
+      @sdkjson.ObjBuilder::new().field("custom", value).build()
+    SessionSource::SubAgent(value) =>
       @sdkjson.ObjBuilder::new().field("subAgent", value).build()
-    UnknownValue(value) => value
+    SessionSource::UnknownValue(value) => value
   }
 }
 
@@ -1676,26 +1697,32 @@ pub extend SessionSource with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for SessionSource with fn from_json(value, path) {
   match value {
-    String("cli") => Cli
-    String("vscode") => Vscode
-    String("exec") => Exec
-    String("appServer") => AppServer
-    String("unknown") => Unknown
-    Object(obj) => {
+    @json.Json::String("cli") => SessionSource::Cli
+    @json.Json::String("vscode") => SessionSource::Vscode
+    @json.Json::String("exec") => SessionSource::Exec
+    @json.Json::String("appServer") => SessionSource::AppServer
+    @json.Json::String("unknown") => SessionSource::Unknown
+    @json.Json::Object(obj) => {
       if obj.length() != 1 {
-        raise @json.JsonDecodeError((path, "expected exactly one enum tag"))
+        raise @json.JsonDecodeError::JsonDecodeError(
+          (path, "expected exactly one enum tag"),
+        )
       }
-      if obj.get("custom") is Some(payload) {
-        return Custom(@json.from_json(payload, path=path.add_key("custom")))
+      if obj.get("custom") is Option::Some(payload) {
+        return SessionSource::Custom(
+          @json.from_json(payload, path=path.add_key("custom")),
+        )
       }
-      if obj.get("subAgent") is Some(payload) {
-        return SubAgent(@json.from_json(payload, path=path.add_key("subAgent")))
+      if obj.get("subAgent") is Option::Some(payload) {
+        return SessionSource::SubAgent(
+          @json.from_json(payload, path=path.add_key("subAgent")),
+        )
       }
-      UnknownValue(value)
+      SessionSource::UnknownValue(value)
     }
-    String(_) => UnknownValue(value)
+    @json.Json::String(_) => SessionSource::UnknownValue(value)
     _ =>
-      raise @json.JsonDecodeError(
+      raise @json.JsonDecodeError::JsonDecodeError(
         (path, "expected string or single-key object enum"),
       )
   }
@@ -1855,11 +1882,11 @@ pub extend ThreadActiveFlag with ToJson::{to_json}
 ///|
 pub impl ToJson for ThreadActiveFlag with fn to_json(self) {
   let raw = match self {
-    WaitingOnApproval => "waitingOnApproval"
-    WaitingOnUserInput => "waitingOnUserInput"
-    Unknown(raw) => raw
+    ThreadActiveFlag::WaitingOnApproval => "waitingOnApproval"
+    ThreadActiveFlag::WaitingOnUserInput => "waitingOnUserInput"
+    ThreadActiveFlag::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1874,12 +1901,13 @@ pub impl @json.FromJson for ThreadActiveFlag with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "waitingOnApproval" => Some(WaitingOnApproval)
-        "waitingOnUserInput" => Some(WaitingOnUserInput)
-        _ => None
+        "waitingOnApproval" => Option::Some(ThreadActiveFlag::WaitingOnApproval)
+        "waitingOnUserInput" =>
+          Option::Some(ThreadActiveFlag::WaitingOnUserInput)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ThreadActiveFlag::Unknown(raw),
   )
 }
 
@@ -1962,11 +1990,11 @@ pub extend ThreadStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for ThreadStatus with fn to_json(self) {
   match self {
-    NotLoaded(value) => Json(value)
-    Idle(value) => Json(value)
-    SystemError(value) => Json(value)
-    Active(value) => Json(value)
-    Unknown(_, value) => value
+    ThreadStatus::NotLoaded(value) => @json.Json::Json(value)
+    ThreadStatus::Idle(value) => @json.Json::Json(value)
+    ThreadStatus::SystemError(value) => @json.Json::Json(value)
+    ThreadStatus::Active(value) => @json.Json::Json(value)
+    ThreadStatus::Unknown(_, value) => value
   }
 }
 
@@ -1980,11 +2008,11 @@ pub impl @json.FromJson for ThreadStatus with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "notLoaded" => NotLoaded(@json.from_json(value, path~))
-    "idle" => Idle(@json.from_json(value, path~))
-    "systemError" => SystemError(@json.from_json(value, path~))
-    "active" => Active(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "notLoaded" => ThreadStatus::NotLoaded(@json.from_json(value, path~))
+    "idle" => ThreadStatus::Idle(@json.from_json(value, path~))
+    "systemError" => ThreadStatus::SystemError(@json.from_json(value, path~))
+    "active" => ThreadStatus::Active(@json.from_json(value, path~))
+    other => ThreadStatus::Unknown(other, value)
   }
 }
 
@@ -2231,11 +2259,11 @@ pub extend NonSteerableTurnKind with ToJson::{to_json}
 ///|
 pub impl ToJson for NonSteerableTurnKind with fn to_json(self) {
   let raw = match self {
-    Review => "review"
-    Compact => "compact"
-    Unknown(raw) => raw
+    NonSteerableTurnKind::Review => "review"
+    NonSteerableTurnKind::Compact => "compact"
+    NonSteerableTurnKind::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2250,12 +2278,12 @@ pub impl @json.FromJson for NonSteerableTurnKind with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "review" => Some(Review)
-        "compact" => Some(Compact)
-        _ => None
+        "review" => Option::Some(NonSteerableTurnKind::Review)
+        "compact" => Option::Some(NonSteerableTurnKind::Compact)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => NonSteerableTurnKind::Unknown(raw),
   )
 }
 
@@ -2347,36 +2375,41 @@ pub extend CodexErrorInfo with ToJson::{to_json}
 ///|
 pub impl ToJson for CodexErrorInfo with fn to_json(self) {
   match self {
-    ContextWindowExceeded => Json("contextWindowExceeded")
-    SessionBudgetExceeded => Json("sessionBudgetExceeded")
-    UsageLimitExceeded => Json("usageLimitExceeded")
-    RateLimitExceeded => Json("rateLimitExceeded")
-    ServerOverloaded => Json("serverOverloaded")
-    CyberPolicy => Json("cyberPolicy")
-    MisalignmentPolicyViolation => Json("misalignmentPolicyViolation")
-    InternalServerError => Json("internalServerError")
-    Unauthorized => Json("unauthorized")
-    BadRequest => Json("badRequest")
-    ThreadRollbackFailed => Json("threadRollbackFailed")
-    SandboxError => Json("sandboxError")
-    Other => Json("other")
-    HttpConnectionFailed(value) =>
+    CodexErrorInfo::ContextWindowExceeded =>
+      @json.Json::Json("contextWindowExceeded")
+    CodexErrorInfo::SessionBudgetExceeded =>
+      @json.Json::Json("sessionBudgetExceeded")
+    CodexErrorInfo::UsageLimitExceeded => @json.Json::Json("usageLimitExceeded")
+    CodexErrorInfo::RateLimitExceeded => @json.Json::Json("rateLimitExceeded")
+    CodexErrorInfo::ServerOverloaded => @json.Json::Json("serverOverloaded")
+    CodexErrorInfo::CyberPolicy => @json.Json::Json("cyberPolicy")
+    CodexErrorInfo::MisalignmentPolicyViolation =>
+      @json.Json::Json("misalignmentPolicyViolation")
+    CodexErrorInfo::InternalServerError =>
+      @json.Json::Json("internalServerError")
+    CodexErrorInfo::Unauthorized => @json.Json::Json("unauthorized")
+    CodexErrorInfo::BadRequest => @json.Json::Json("badRequest")
+    CodexErrorInfo::ThreadRollbackFailed =>
+      @json.Json::Json("threadRollbackFailed")
+    CodexErrorInfo::SandboxError => @json.Json::Json("sandboxError")
+    CodexErrorInfo::Other => @json.Json::Json("other")
+    CodexErrorInfo::HttpConnectionFailed(value) =>
       @sdkjson.ObjBuilder::new().field("httpConnectionFailed", value).build()
-    ResponseStreamConnectionFailed(value) =>
+    CodexErrorInfo::ResponseStreamConnectionFailed(value) =>
       @sdkjson.ObjBuilder::new()
       .field("responseStreamConnectionFailed", value)
       .build()
-    ResponseStreamDisconnected(value) =>
+    CodexErrorInfo::ResponseStreamDisconnected(value) =>
       @sdkjson.ObjBuilder::new()
       .field("responseStreamDisconnected", value)
       .build()
-    ResponseTooManyFailedAttempts(value) =>
+    CodexErrorInfo::ResponseTooManyFailedAttempts(value) =>
       @sdkjson.ObjBuilder::new()
       .field("responseTooManyFailedAttempts", value)
       .build()
-    ActiveTurnNotSteerable(value) =>
+    CodexErrorInfo::ActiveTurnNotSteerable(value) =>
       @sdkjson.ObjBuilder::new().field("activeTurnNotSteerable", value).build()
-    UnknownValue(value) => value
+    CodexErrorInfo::UnknownValue(value) => value
   }
 }
 
@@ -2388,62 +2421,70 @@ pub extend CodexErrorInfo with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for CodexErrorInfo with fn from_json(value, path) {
   match value {
-    String("contextWindowExceeded") => ContextWindowExceeded
-    String("sessionBudgetExceeded") => SessionBudgetExceeded
-    String("usageLimitExceeded") => UsageLimitExceeded
-    String("rateLimitExceeded") => RateLimitExceeded
-    String("serverOverloaded") => ServerOverloaded
-    String("cyberPolicy") => CyberPolicy
-    String("misalignmentPolicyViolation") => MisalignmentPolicyViolation
-    String("internalServerError") => InternalServerError
-    String("unauthorized") => Unauthorized
-    String("badRequest") => BadRequest
-    String("threadRollbackFailed") => ThreadRollbackFailed
-    String("sandboxError") => SandboxError
-    String("other") => Other
-    Object(obj) => {
+    @json.Json::String("contextWindowExceeded") =>
+      CodexErrorInfo::ContextWindowExceeded
+    @json.Json::String("sessionBudgetExceeded") =>
+      CodexErrorInfo::SessionBudgetExceeded
+    @json.Json::String("usageLimitExceeded") =>
+      CodexErrorInfo::UsageLimitExceeded
+    @json.Json::String("rateLimitExceeded") => CodexErrorInfo::RateLimitExceeded
+    @json.Json::String("serverOverloaded") => CodexErrorInfo::ServerOverloaded
+    @json.Json::String("cyberPolicy") => CodexErrorInfo::CyberPolicy
+    @json.Json::String("misalignmentPolicyViolation") =>
+      CodexErrorInfo::MisalignmentPolicyViolation
+    @json.Json::String("internalServerError") =>
+      CodexErrorInfo::InternalServerError
+    @json.Json::String("unauthorized") => CodexErrorInfo::Unauthorized
+    @json.Json::String("badRequest") => CodexErrorInfo::BadRequest
+    @json.Json::String("threadRollbackFailed") =>
+      CodexErrorInfo::ThreadRollbackFailed
+    @json.Json::String("sandboxError") => CodexErrorInfo::SandboxError
+    @json.Json::String("other") => CodexErrorInfo::Other
+    @json.Json::Object(obj) => {
       if obj.length() != 1 {
-        raise @json.JsonDecodeError((path, "expected exactly one enum tag"))
+        raise @json.JsonDecodeError::JsonDecodeError(
+          (path, "expected exactly one enum tag"),
+        )
       }
-      if obj.get("httpConnectionFailed") is Some(payload) {
-        return HttpConnectionFailed(
+      if obj.get("httpConnectionFailed") is Option::Some(payload) {
+        return CodexErrorInfo::HttpConnectionFailed(
           @json.from_json(payload, path=path.add_key("httpConnectionFailed")),
         )
       }
-      if obj.get("responseStreamConnectionFailed") is Some(payload) {
-        return ResponseStreamConnectionFailed(
+      if obj.get("responseStreamConnectionFailed") is Option::Some(payload) {
+        return CodexErrorInfo::ResponseStreamConnectionFailed(
           @json.from_json(
             payload,
             path=path.add_key("responseStreamConnectionFailed"),
           ),
         )
       }
-      if obj.get("responseStreamDisconnected") is Some(payload) {
-        return ResponseStreamDisconnected(
+      if obj.get("responseStreamDisconnected") is Option::Some(payload) {
+        return CodexErrorInfo::ResponseStreamDisconnected(
           @json.from_json(
             payload,
             path=path.add_key("responseStreamDisconnected"),
           ),
         )
       }
-      if obj.get("responseTooManyFailedAttempts") is Some(payload) {
-        return ResponseTooManyFailedAttempts(
+      if obj.get("responseTooManyFailedAttempts") is Option::Some(payload) {
+        return CodexErrorInfo::ResponseTooManyFailedAttempts(
           @json.from_json(
             payload,
             path=path.add_key("responseTooManyFailedAttempts"),
           ),
         )
       }
-      if obj.get("activeTurnNotSteerable") is Some(payload) {
-        return ActiveTurnNotSteerable(
+      if obj.get("activeTurnNotSteerable") is Option::Some(payload) {
+        return CodexErrorInfo::ActiveTurnNotSteerable(
           @json.from_json(payload, path=path.add_key("activeTurnNotSteerable")),
         )
       }
-      UnknownValue(value)
+      CodexErrorInfo::UnknownValue(value)
     }
-    String(_) => UnknownValue(value)
+    @json.Json::String(_) => CodexErrorInfo::UnknownValue(value)
     _ =>
-      raise @json.JsonDecodeError(
+      raise @json.JsonDecodeError::JsonDecodeError(
         (path, "expected string or single-key object enum"),
       )
   }
@@ -2805,13 +2846,13 @@ pub extend ImageDetail with ToJson::{to_json}
 ///|
 pub impl ToJson for ImageDetail with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Low => "low"
-    High => "high"
-    Original => "original"
-    Unknown(raw) => raw
+    ImageDetail::Auto => "auto"
+    ImageDetail::Low => "low"
+    ImageDetail::High => "high"
+    ImageDetail::Original => "original"
+    ImageDetail::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2826,14 +2867,14 @@ pub impl @json.FromJson for ImageDetail with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "low" => Some(Low)
-        "high" => Some(High)
-        "original" => Some(Original)
-        _ => None
+        "auto" => Option::Some(ImageDetail::Auto)
+        "low" => Option::Some(ImageDetail::Low)
+        "high" => Option::Some(ImageDetail::High)
+        "original" => Option::Some(ImageDetail::Original)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ImageDetail::Unknown(raw),
   )
 }
 
@@ -3192,14 +3233,14 @@ pub extend UserInput with ToJson::{to_json}
 ///|
 pub impl ToJson for UserInput with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    Image(value) => Json(value)
-    LocalImage(value) => Json(value)
-    Audio(value) => Json(value)
-    LocalAudio(value) => Json(value)
-    Skill(value) => Json(value)
-    Mention(value) => Json(value)
-    Unknown(_, value) => value
+    UserInput::Text(value) => @json.Json::Json(value)
+    UserInput::Image(value) => @json.Json::Json(value)
+    UserInput::LocalImage(value) => @json.Json::Json(value)
+    UserInput::Audio(value) => @json.Json::Json(value)
+    UserInput::LocalAudio(value) => @json.Json::Json(value)
+    UserInput::Skill(value) => @json.Json::Json(value)
+    UserInput::Mention(value) => @json.Json::Json(value)
+    UserInput::Unknown(_, value) => value
   }
 }
 
@@ -3213,14 +3254,14 @@ pub impl @json.FromJson for UserInput with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "text" => Text(@json.from_json(value, path~))
-    "image" => Image(@json.from_json(value, path~))
-    "localImage" => LocalImage(@json.from_json(value, path~))
-    "audio" => Audio(@json.from_json(value, path~))
-    "localAudio" => LocalAudio(@json.from_json(value, path~))
-    "skill" => Skill(@json.from_json(value, path~))
-    "mention" => Mention(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "text" => UserInput::Text(@json.from_json(value, path~))
+    "image" => UserInput::Image(@json.from_json(value, path~))
+    "localImage" => UserInput::LocalImage(@json.from_json(value, path~))
+    "audio" => UserInput::Audio(@json.from_json(value, path~))
+    "localAudio" => UserInput::LocalAudio(@json.from_json(value, path~))
+    "skill" => UserInput::Skill(@json.from_json(value, path~))
+    "mention" => UserInput::Mention(@json.from_json(value, path~))
+    other => UserInput::Unknown(other, value)
   }
 }
 
@@ -3529,11 +3570,11 @@ pub extend MessagePhase with ToJson::{to_json}
 ///|
 pub impl ToJson for MessagePhase with fn to_json(self) {
   let raw = match self {
-    Commentary => "commentary"
-    FinalAnswer => "final_answer"
-    Unknown(raw) => raw
+    MessagePhase::Commentary => "commentary"
+    MessagePhase::FinalAnswer => "final_answer"
+    MessagePhase::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3548,12 +3589,12 @@ pub impl @json.FromJson for MessagePhase with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "commentary" => Some(Commentary)
-        "final_answer" => Some(FinalAnswer)
-        _ => None
+        "commentary" => Option::Some(MessagePhase::Commentary)
+        "final_answer" => Option::Some(MessagePhase::FinalAnswer)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => MessagePhase::Unknown(raw),
   )
 }
 
@@ -3965,11 +4006,12 @@ pub extend FunctionCallOutputContentItem with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionCallOutputContentItem with fn to_json(self) {
   match self {
-    InputText(value) => Json(value)
-    InputImage(value) => Json(value)
-    InputAudio(value) => Json(value)
-    EncryptedContent(value) => Json(value)
-    Unknown(_, value) => value
+    FunctionCallOutputContentItem::InputText(value) => @json.Json::Json(value)
+    FunctionCallOutputContentItem::InputImage(value) => @json.Json::Json(value)
+    FunctionCallOutputContentItem::InputAudio(value) => @json.Json::Json(value)
+    FunctionCallOutputContentItem::EncryptedContent(value) =>
+      @json.Json::Json(value)
+    FunctionCallOutputContentItem::Unknown(_, value) => value
   }
 }
 
@@ -3986,11 +4028,17 @@ pub impl @json.FromJson for FunctionCallOutputContentItem with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "input_text" => InputText(@json.from_json(value, path~))
-    "input_image" => InputImage(@json.from_json(value, path~))
-    "input_audio" => InputAudio(@json.from_json(value, path~))
-    "encrypted_content" => EncryptedContent(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "input_text" =>
+      FunctionCallOutputContentItem::InputText(@json.from_json(value, path~))
+    "input_image" =>
+      FunctionCallOutputContentItem::InputImage(@json.from_json(value, path~))
+    "input_audio" =>
+      FunctionCallOutputContentItem::InputAudio(@json.from_json(value, path~))
+    "encrypted_content" =>
+      FunctionCallOutputContentItem::EncryptedContent(
+        @json.from_json(value, path~),
+      )
+    other => FunctionCallOutputContentItem::Unknown(other, value)
   }
 }
 
@@ -4018,8 +4066,9 @@ pub extend FunctionCallOutputBody with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionCallOutputBody with fn to_json(self) {
   match self {
-    Text(value) => Json(value)
-    FunctionCallOutputContentItemArray(value) => Json(value)
+    FunctionCallOutputBody::Text(value) => @json.Json::Json(value)
+    FunctionCallOutputBody::FunctionCallOutputContentItemArray(value) =>
+      @json.Json::Json(value)
   }
 }
 
@@ -4033,18 +4082,18 @@ pub impl @json.FromJson for FunctionCallOutputBody with fn from_json(
   value,
   path,
 ) {
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return FunctionCallOutputBody::Text(decoded)
   }
-  if json_array_matches(value, item => item is Object(_)) {
+  if json_array_matches(value, item => item is @json.Json::Object(_)) {
     let decoded : Array[FunctionCallOutputContentItem] = @json.from_json(
       value,
       path~,
     )
-    return FunctionCallOutputContentItemArray(decoded)
+    return FunctionCallOutputBody::FunctionCallOutputContentItemArray(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any FunctionCallOutputBody variant"),
   )
 }
@@ -4504,11 +4553,11 @@ pub extend CommandAction with ToJson::{to_json}
 ///|
 pub impl ToJson for CommandAction with fn to_json(self) {
   match self {
-    Read(value) => Json(value)
-    ListFiles(value) => Json(value)
-    Search(value) => Json(value)
-    KnownUnknown(value) => Json(value)
-    Unknown(_, value) => value
+    CommandAction::Read(value) => @json.Json::Json(value)
+    CommandAction::ListFiles(value) => @json.Json::Json(value)
+    CommandAction::Search(value) => @json.Json::Json(value)
+    CommandAction::KnownUnknown(value) => @json.Json::Json(value)
+    CommandAction::Unknown(_, value) => value
   }
 }
 
@@ -4522,11 +4571,11 @@ pub impl @json.FromJson for CommandAction with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "read" => Read(@json.from_json(value, path~))
-    "listFiles" => ListFiles(@json.from_json(value, path~))
-    "search" => Search(@json.from_json(value, path~))
-    "unknown" => KnownUnknown(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "read" => CommandAction::Read(@json.from_json(value, path~))
+    "listFiles" => CommandAction::ListFiles(@json.from_json(value, path~))
+    "search" => CommandAction::Search(@json.from_json(value, path~))
+    "unknown" => CommandAction::KnownUnknown(@json.from_json(value, path~))
+    other => CommandAction::Unknown(other, value)
   }
 }
 
@@ -4557,13 +4606,13 @@ pub extend CommandExecutionSource with ToJson::{to_json}
 ///|
 pub impl ToJson for CommandExecutionSource with fn to_json(self) {
   let raw = match self {
-    Agent => "agent"
-    UserShell => "userShell"
-    UnifiedExecStartup => "unifiedExecStartup"
-    UnifiedExecInteraction => "unifiedExecInteraction"
-    Unknown(raw) => raw
+    CommandExecutionSource::Agent => "agent"
+    CommandExecutionSource::UserShell => "userShell"
+    CommandExecutionSource::UnifiedExecStartup => "unifiedExecStartup"
+    CommandExecutionSource::UnifiedExecInteraction => "unifiedExecInteraction"
+    CommandExecutionSource::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4581,14 +4630,16 @@ pub impl @json.FromJson for CommandExecutionSource with fn from_json(
     path,
     raw => {
       match raw {
-        "agent" => Some(Agent)
-        "userShell" => Some(UserShell)
-        "unifiedExecStartup" => Some(UnifiedExecStartup)
-        "unifiedExecInteraction" => Some(UnifiedExecInteraction)
-        _ => None
+        "agent" => Option::Some(CommandExecutionSource::Agent)
+        "userShell" => Option::Some(CommandExecutionSource::UserShell)
+        "unifiedExecStartup" =>
+          Option::Some(CommandExecutionSource::UnifiedExecStartup)
+        "unifiedExecInteraction" =>
+          Option::Some(CommandExecutionSource::UnifiedExecInteraction)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CommandExecutionSource::Unknown(raw),
   )
 }
 
@@ -4619,13 +4670,13 @@ pub extend CommandExecutionStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for CommandExecutionStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "inProgress"
-    Completed => "completed"
-    Failed => "failed"
-    Declined => "declined"
-    Unknown(raw) => raw
+    CommandExecutionStatus::InProgress => "inProgress"
+    CommandExecutionStatus::Completed => "completed"
+    CommandExecutionStatus::Failed => "failed"
+    CommandExecutionStatus::Declined => "declined"
+    CommandExecutionStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4643,14 +4694,14 @@ pub impl @json.FromJson for CommandExecutionStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "inProgress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        "declined" => Some(Declined)
-        _ => None
+        "inProgress" => Option::Some(CommandExecutionStatus::InProgress)
+        "completed" => Option::Some(CommandExecutionStatus::Completed)
+        "failed" => Option::Some(CommandExecutionStatus::Failed)
+        "declined" => Option::Some(CommandExecutionStatus::Declined)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CommandExecutionStatus::Unknown(raw),
   )
 }
 
@@ -4932,10 +4983,10 @@ pub extend PatchChangeKind with ToJson::{to_json}
 ///|
 pub impl ToJson for PatchChangeKind with fn to_json(self) {
   match self {
-    Add(value) => Json(value)
-    Delete(value) => Json(value)
-    Update(value) => Json(value)
-    Unknown(_, value) => value
+    PatchChangeKind::Add(value) => @json.Json::Json(value)
+    PatchChangeKind::Delete(value) => @json.Json::Json(value)
+    PatchChangeKind::Update(value) => @json.Json::Json(value)
+    PatchChangeKind::Unknown(_, value) => value
   }
 }
 
@@ -4949,10 +5000,10 @@ pub impl @json.FromJson for PatchChangeKind with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "add" => Add(@json.from_json(value, path~))
-    "delete" => Delete(@json.from_json(value, path~))
-    "update" => Update(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "add" => PatchChangeKind::Add(@json.from_json(value, path~))
+    "delete" => PatchChangeKind::Delete(@json.from_json(value, path~))
+    "update" => PatchChangeKind::Update(@json.from_json(value, path~))
+    other => PatchChangeKind::Unknown(other, value)
   }
 }
 
@@ -5039,13 +5090,13 @@ pub extend PatchApplyStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for PatchApplyStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "inProgress"
-    Completed => "completed"
-    Failed => "failed"
-    Declined => "declined"
-    Unknown(raw) => raw
+    PatchApplyStatus::InProgress => "inProgress"
+    PatchApplyStatus::Completed => "completed"
+    PatchApplyStatus::Failed => "failed"
+    PatchApplyStatus::Declined => "declined"
+    PatchApplyStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5060,14 +5111,14 @@ pub impl @json.FromJson for PatchApplyStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "inProgress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        "declined" => Some(Declined)
-        _ => None
+        "inProgress" => Option::Some(PatchApplyStatus::InProgress)
+        "completed" => Option::Some(PatchApplyStatus::Completed)
+        "failed" => Option::Some(PatchApplyStatus::Failed)
+        "declined" => Option::Some(PatchApplyStatus::Declined)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PatchApplyStatus::Unknown(raw),
   )
 }
 
@@ -5329,12 +5380,12 @@ pub extend McpToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for McpToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "inProgress"
-    Completed => "completed"
-    Failed => "failed"
-    Unknown(raw) => raw
+    McpToolCallStatus::InProgress => "inProgress"
+    McpToolCallStatus::Completed => "completed"
+    McpToolCallStatus::Failed => "failed"
+    McpToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5349,13 +5400,13 @@ pub impl @json.FromJson for McpToolCallStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "inProgress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        _ => None
+        "inProgress" => Option::Some(McpToolCallStatus::InProgress)
+        "completed" => Option::Some(McpToolCallStatus::Completed)
+        "failed" => Option::Some(McpToolCallStatus::Failed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => McpToolCallStatus::Unknown(raw),
   )
 }
 
@@ -5689,10 +5740,13 @@ pub extend DynamicToolCallOutputContentItem with ToJson::{to_json}
 ///|
 pub impl ToJson for DynamicToolCallOutputContentItem with fn to_json(self) {
   match self {
-    InputText(value) => Json(value)
-    InputImage(value) => Json(value)
-    InputAudio(value) => Json(value)
-    Unknown(_, value) => value
+    DynamicToolCallOutputContentItem::InputText(value) =>
+      @json.Json::Json(value)
+    DynamicToolCallOutputContentItem::InputImage(value) =>
+      @json.Json::Json(value)
+    DynamicToolCallOutputContentItem::InputAudio(value) =>
+      @json.Json::Json(value)
+    DynamicToolCallOutputContentItem::Unknown(_, value) => value
   }
 }
 
@@ -5709,10 +5763,17 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItem with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "inputText" => InputText(@json.from_json(value, path~))
-    "inputImage" => InputImage(@json.from_json(value, path~))
-    "inputAudio" => InputAudio(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "inputText" =>
+      DynamicToolCallOutputContentItem::InputText(@json.from_json(value, path~))
+    "inputImage" =>
+      DynamicToolCallOutputContentItem::InputImage(
+        @json.from_json(value, path~),
+      )
+    "inputAudio" =>
+      DynamicToolCallOutputContentItem::InputAudio(
+        @json.from_json(value, path~),
+      )
+    other => DynamicToolCallOutputContentItem::Unknown(other, value)
   }
 }
 
@@ -5742,12 +5803,12 @@ pub extend DynamicToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for DynamicToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "inProgress"
-    Completed => "completed"
-    Failed => "failed"
-    Unknown(raw) => raw
+    DynamicToolCallStatus::InProgress => "inProgress"
+    DynamicToolCallStatus::Completed => "completed"
+    DynamicToolCallStatus::Failed => "failed"
+    DynamicToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5762,13 +5823,13 @@ pub impl @json.FromJson for DynamicToolCallStatus with fn from_json(value, path)
     path,
     raw => {
       match raw {
-        "inProgress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        _ => None
+        "inProgress" => Option::Some(DynamicToolCallStatus::InProgress)
+        "completed" => Option::Some(DynamicToolCallStatus::Completed)
+        "failed" => Option::Some(DynamicToolCallStatus::Failed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => DynamicToolCallStatus::Unknown(raw),
   )
 }
 
@@ -5898,16 +5959,16 @@ pub extend CollabAgentStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for CollabAgentStatus with fn to_json(self) {
   let raw = match self {
-    PendingInit => "pendingInit"
-    Running => "running"
-    Interrupted => "interrupted"
-    Completed => "completed"
-    Errored => "errored"
-    Shutdown => "shutdown"
-    NotFound => "notFound"
-    Unknown(raw) => raw
+    CollabAgentStatus::PendingInit => "pendingInit"
+    CollabAgentStatus::Running => "running"
+    CollabAgentStatus::Interrupted => "interrupted"
+    CollabAgentStatus::Completed => "completed"
+    CollabAgentStatus::Errored => "errored"
+    CollabAgentStatus::Shutdown => "shutdown"
+    CollabAgentStatus::NotFound => "notFound"
+    CollabAgentStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -5922,17 +5983,17 @@ pub impl @json.FromJson for CollabAgentStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "pendingInit" => Some(PendingInit)
-        "running" => Some(Running)
-        "interrupted" => Some(Interrupted)
-        "completed" => Some(Completed)
-        "errored" => Some(Errored)
-        "shutdown" => Some(Shutdown)
-        "notFound" => Some(NotFound)
-        _ => None
+        "pendingInit" => Option::Some(CollabAgentStatus::PendingInit)
+        "running" => Option::Some(CollabAgentStatus::Running)
+        "interrupted" => Option::Some(CollabAgentStatus::Interrupted)
+        "completed" => Option::Some(CollabAgentStatus::Completed)
+        "errored" => Option::Some(CollabAgentStatus::Errored)
+        "shutdown" => Option::Some(CollabAgentStatus::Shutdown)
+        "notFound" => Option::Some(CollabAgentStatus::NotFound)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CollabAgentStatus::Unknown(raw),
   )
 }
 
@@ -6015,13 +6076,13 @@ pub extend CollabAgentToolCallStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for CollabAgentToolCallStatus with fn to_json(self) {
   let raw = match self {
-    InProgress => "inProgress"
-    Completed => "completed"
-    Failed => "failed"
-    Interrupted => "interrupted"
-    Unknown(raw) => raw
+    CollabAgentToolCallStatus::InProgress => "inProgress"
+    CollabAgentToolCallStatus::Completed => "completed"
+    CollabAgentToolCallStatus::Failed => "failed"
+    CollabAgentToolCallStatus::Interrupted => "interrupted"
+    CollabAgentToolCallStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6039,14 +6100,14 @@ pub impl @json.FromJson for CollabAgentToolCallStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "inProgress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        "interrupted" => Some(Interrupted)
-        _ => None
+        "inProgress" => Option::Some(CollabAgentToolCallStatus::InProgress)
+        "completed" => Option::Some(CollabAgentToolCallStatus::Completed)
+        "failed" => Option::Some(CollabAgentToolCallStatus::Failed)
+        "interrupted" => Option::Some(CollabAgentToolCallStatus::Interrupted)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CollabAgentToolCallStatus::Unknown(raw),
   )
 }
 
@@ -6082,18 +6143,18 @@ pub extend CollabAgentTool with ToJson::{to_json}
 ///|
 pub impl ToJson for CollabAgentTool with fn to_json(self) {
   let raw = match self {
-    SpawnAgent => "spawnAgent"
-    SendInput => "sendInput"
-    ResumeAgent => "resumeAgent"
-    Wait => "wait"
-    CloseAgent => "closeAgent"
-    SendMessage => "sendMessage"
-    FollowupTask => "followupTask"
-    InterruptAgent => "interruptAgent"
-    ListAgents => "listAgents"
-    Unknown(raw) => raw
+    CollabAgentTool::SpawnAgent => "spawnAgent"
+    CollabAgentTool::SendInput => "sendInput"
+    CollabAgentTool::ResumeAgent => "resumeAgent"
+    CollabAgentTool::Wait => "wait"
+    CollabAgentTool::CloseAgent => "closeAgent"
+    CollabAgentTool::SendMessage => "sendMessage"
+    CollabAgentTool::FollowupTask => "followupTask"
+    CollabAgentTool::InterruptAgent => "interruptAgent"
+    CollabAgentTool::ListAgents => "listAgents"
+    CollabAgentTool::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6108,19 +6169,19 @@ pub impl @json.FromJson for CollabAgentTool with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "spawnAgent" => Some(SpawnAgent)
-        "sendInput" => Some(SendInput)
-        "resumeAgent" => Some(ResumeAgent)
-        "wait" => Some(Wait)
-        "closeAgent" => Some(CloseAgent)
-        "sendMessage" => Some(SendMessage)
-        "followupTask" => Some(FollowupTask)
-        "interruptAgent" => Some(InterruptAgent)
-        "listAgents" => Some(ListAgents)
-        _ => None
+        "spawnAgent" => Option::Some(CollabAgentTool::SpawnAgent)
+        "sendInput" => Option::Some(CollabAgentTool::SendInput)
+        "resumeAgent" => Option::Some(CollabAgentTool::ResumeAgent)
+        "wait" => Option::Some(CollabAgentTool::Wait)
+        "closeAgent" => Option::Some(CollabAgentTool::CloseAgent)
+        "sendMessage" => Option::Some(CollabAgentTool::SendMessage)
+        "followupTask" => Option::Some(CollabAgentTool::FollowupTask)
+        "interruptAgent" => Option::Some(CollabAgentTool::InterruptAgent)
+        "listAgents" => Option::Some(CollabAgentTool::ListAgents)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CollabAgentTool::Unknown(raw),
   )
 }
 
@@ -6252,13 +6313,13 @@ pub extend SubAgentActivityKind with ToJson::{to_json}
 ///|
 pub impl ToJson for SubAgentActivityKind with fn to_json(self) {
   let raw = match self {
-    Started => "started"
-    Interacted => "interacted"
-    Interrupted => "interrupted"
-    Completed => "completed"
-    Unknown(raw) => raw
+    SubAgentActivityKind::Started => "started"
+    SubAgentActivityKind::Interacted => "interacted"
+    SubAgentActivityKind::Interrupted => "interrupted"
+    SubAgentActivityKind::Completed => "completed"
+    SubAgentActivityKind::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6273,14 +6334,14 @@ pub impl @json.FromJson for SubAgentActivityKind with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "started" => Some(Started)
-        "interacted" => Some(Interacted)
-        "interrupted" => Some(Interrupted)
-        "completed" => Some(Completed)
-        _ => None
+        "started" => Option::Some(SubAgentActivityKind::Started)
+        "interacted" => Option::Some(SubAgentActivityKind::Interacted)
+        "interrupted" => Option::Some(SubAgentActivityKind::Interrupted)
+        "completed" => Option::Some(SubAgentActivityKind::Completed)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SubAgentActivityKind::Unknown(raw),
   )
 }
 
@@ -6598,11 +6659,11 @@ pub extend WebSearchAction with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchAction with fn to_json(self) {
   match self {
-    Search(value) => Json(value)
-    OpenPage(value) => Json(value)
-    FindInPage(value) => Json(value)
-    Other(value) => Json(value)
-    Unknown(_, value) => value
+    WebSearchAction::Search(value) => @json.Json::Json(value)
+    WebSearchAction::OpenPage(value) => @json.Json::Json(value)
+    WebSearchAction::FindInPage(value) => @json.Json::Json(value)
+    WebSearchAction::Other(value) => @json.Json::Json(value)
+    WebSearchAction::Unknown(_, value) => value
   }
 }
 
@@ -6616,11 +6677,11 @@ pub impl @json.FromJson for WebSearchAction with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "search" => Search(@json.from_json(value, path~))
-    "openPage" => OpenPage(@json.from_json(value, path~))
-    "findInPage" => FindInPage(@json.from_json(value, path~))
-    "other" => Other(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "search" => WebSearchAction::Search(@json.from_json(value, path~))
+    "openPage" => WebSearchAction::OpenPage(@json.from_json(value, path~))
+    "findInPage" => WebSearchAction::FindInPage(@json.from_json(value, path~))
+    "other" => WebSearchAction::Other(@json.from_json(value, path~))
+    other => WebSearchAction::Unknown(other, value)
   }
 }
 
@@ -6893,8 +6954,8 @@ pub extend ImageGenerationFailure with ToJson::{to_json}
 ///|
 pub impl ToJson for ImageGenerationFailure with fn to_json(self) {
   match self {
-    UsageLimitExceeded(value) => Json(value)
-    Unknown(_, value) => value
+    ImageGenerationFailure::UsageLimitExceeded(value) => @json.Json::Json(value)
+    ImageGenerationFailure::Unknown(_, value) => value
   }
 }
 
@@ -6911,8 +6972,9 @@ pub impl @json.FromJson for ImageGenerationFailure with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "usageLimitExceeded" => UsageLimitExceeded(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "usageLimitExceeded" =>
+      ImageGenerationFailure::UsageLimitExceeded(@json.from_json(value, path~))
+    other => ImageGenerationFailure::Unknown(other, value)
   }
 }
 
@@ -7223,26 +7285,26 @@ pub extend ThreadItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ThreadItem with fn to_json(self) {
   match self {
-    UserMessage(value) => Json(value)
-    HookPrompt(value) => Json(value)
-    AgentMessage(value) => Json(value)
-    FunctionCallOutput(value) => Json(value)
-    Plan(value) => Json(value)
-    Reasoning(value) => Json(value)
-    CommandExecution(value) => Json(value)
-    FileChange(value) => Json(value)
-    McpToolCall(value) => Json(value)
-    DynamicToolCall(value) => Json(value)
-    CollabAgentToolCall(value) => Json(value)
-    SubAgentActivity(value) => Json(value)
-    WebSearch(value) => Json(value)
-    ImageView(value) => Json(value)
-    Sleep(value) => Json(value)
-    ImageGeneration(value) => Json(value)
-    EnteredReviewMode(value) => Json(value)
-    ExitedReviewMode(value) => Json(value)
-    ContextCompaction(value) => Json(value)
-    Unknown(_, value) => value
+    ThreadItem::UserMessage(value) => @json.Json::Json(value)
+    ThreadItem::HookPrompt(value) => @json.Json::Json(value)
+    ThreadItem::AgentMessage(value) => @json.Json::Json(value)
+    ThreadItem::FunctionCallOutput(value) => @json.Json::Json(value)
+    ThreadItem::Plan(value) => @json.Json::Json(value)
+    ThreadItem::Reasoning(value) => @json.Json::Json(value)
+    ThreadItem::CommandExecution(value) => @json.Json::Json(value)
+    ThreadItem::FileChange(value) => @json.Json::Json(value)
+    ThreadItem::McpToolCall(value) => @json.Json::Json(value)
+    ThreadItem::DynamicToolCall(value) => @json.Json::Json(value)
+    ThreadItem::CollabAgentToolCall(value) => @json.Json::Json(value)
+    ThreadItem::SubAgentActivity(value) => @json.Json::Json(value)
+    ThreadItem::WebSearch(value) => @json.Json::Json(value)
+    ThreadItem::ImageView(value) => @json.Json::Json(value)
+    ThreadItem::Sleep(value) => @json.Json::Json(value)
+    ThreadItem::ImageGeneration(value) => @json.Json::Json(value)
+    ThreadItem::EnteredReviewMode(value) => @json.Json::Json(value)
+    ThreadItem::ExitedReviewMode(value) => @json.Json::Json(value)
+    ThreadItem::ContextCompaction(value) => @json.Json::Json(value)
+    ThreadItem::Unknown(_, value) => value
   }
 }
 
@@ -7256,26 +7318,35 @@ pub impl @json.FromJson for ThreadItem with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "userMessage" => UserMessage(@json.from_json(value, path~))
-    "hookPrompt" => HookPrompt(@json.from_json(value, path~))
-    "agentMessage" => AgentMessage(@json.from_json(value, path~))
-    "functionCallOutput" => FunctionCallOutput(@json.from_json(value, path~))
-    "plan" => Plan(@json.from_json(value, path~))
-    "reasoning" => Reasoning(@json.from_json(value, path~))
-    "commandExecution" => CommandExecution(@json.from_json(value, path~))
-    "fileChange" => FileChange(@json.from_json(value, path~))
-    "mcpToolCall" => McpToolCall(@json.from_json(value, path~))
-    "dynamicToolCall" => DynamicToolCall(@json.from_json(value, path~))
-    "collabAgentToolCall" => CollabAgentToolCall(@json.from_json(value, path~))
-    "subAgentActivity" => SubAgentActivity(@json.from_json(value, path~))
-    "webSearch" => WebSearch(@json.from_json(value, path~))
-    "imageView" => ImageView(@json.from_json(value, path~))
-    "sleep" => Sleep(@json.from_json(value, path~))
-    "imageGeneration" => ImageGeneration(@json.from_json(value, path~))
-    "enteredReviewMode" => EnteredReviewMode(@json.from_json(value, path~))
-    "exitedReviewMode" => ExitedReviewMode(@json.from_json(value, path~))
-    "contextCompaction" => ContextCompaction(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "userMessage" => ThreadItem::UserMessage(@json.from_json(value, path~))
+    "hookPrompt" => ThreadItem::HookPrompt(@json.from_json(value, path~))
+    "agentMessage" => ThreadItem::AgentMessage(@json.from_json(value, path~))
+    "functionCallOutput" =>
+      ThreadItem::FunctionCallOutput(@json.from_json(value, path~))
+    "plan" => ThreadItem::Plan(@json.from_json(value, path~))
+    "reasoning" => ThreadItem::Reasoning(@json.from_json(value, path~))
+    "commandExecution" =>
+      ThreadItem::CommandExecution(@json.from_json(value, path~))
+    "fileChange" => ThreadItem::FileChange(@json.from_json(value, path~))
+    "mcpToolCall" => ThreadItem::McpToolCall(@json.from_json(value, path~))
+    "dynamicToolCall" =>
+      ThreadItem::DynamicToolCall(@json.from_json(value, path~))
+    "collabAgentToolCall" =>
+      ThreadItem::CollabAgentToolCall(@json.from_json(value, path~))
+    "subAgentActivity" =>
+      ThreadItem::SubAgentActivity(@json.from_json(value, path~))
+    "webSearch" => ThreadItem::WebSearch(@json.from_json(value, path~))
+    "imageView" => ThreadItem::ImageView(@json.from_json(value, path~))
+    "sleep" => ThreadItem::Sleep(@json.from_json(value, path~))
+    "imageGeneration" =>
+      ThreadItem::ImageGeneration(@json.from_json(value, path~))
+    "enteredReviewMode" =>
+      ThreadItem::EnteredReviewMode(@json.from_json(value, path~))
+    "exitedReviewMode" =>
+      ThreadItem::ExitedReviewMode(@json.from_json(value, path~))
+    "contextCompaction" =>
+      ThreadItem::ContextCompaction(@json.from_json(value, path~))
+    other => ThreadItem::Unknown(other, value)
   }
 }
 
@@ -7305,12 +7376,12 @@ pub extend TurnItemsView with ToJson::{to_json}
 ///|
 pub impl ToJson for TurnItemsView with fn to_json(self) {
   let raw = match self {
-    NotLoaded => "notLoaded"
-    Summary => "summary"
-    Full => "full"
-    Unknown(raw) => raw
+    TurnItemsView::NotLoaded => "notLoaded"
+    TurnItemsView::Summary => "summary"
+    TurnItemsView::Full => "full"
+    TurnItemsView::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7325,13 +7396,13 @@ pub impl @json.FromJson for TurnItemsView with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "notLoaded" => Some(NotLoaded)
-        "summary" => Some(Summary)
-        "full" => Some(Full)
-        _ => None
+        "notLoaded" => Option::Some(TurnItemsView::NotLoaded)
+        "summary" => Option::Some(TurnItemsView::Summary)
+        "full" => Option::Some(TurnItemsView::Full)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => TurnItemsView::Unknown(raw),
   )
 }
 
@@ -7362,13 +7433,13 @@ pub extend TurnStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for TurnStatus with fn to_json(self) {
   let raw = match self {
-    Completed => "completed"
-    Interrupted => "interrupted"
-    Failed => "failed"
-    InProgress => "inProgress"
-    Unknown(raw) => raw
+    TurnStatus::Completed => "completed"
+    TurnStatus::Interrupted => "interrupted"
+    TurnStatus::Failed => "failed"
+    TurnStatus::InProgress => "inProgress"
+    TurnStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7383,14 +7454,14 @@ pub impl @json.FromJson for TurnStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "completed" => Some(Completed)
-        "interrupted" => Some(Interrupted)
-        "failed" => Some(Failed)
-        "inProgress" => Some(InProgress)
-        _ => None
+        "completed" => Option::Some(TurnStatus::Completed)
+        "interrupted" => Option::Some(TurnStatus::Interrupted)
+        "failed" => Option::Some(TurnStatus::Failed)
+        "inProgress" => Option::Some(TurnStatus::InProgress)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => TurnStatus::Unknown(raw),
   )
 }
 
@@ -8034,13 +8105,13 @@ pub extend ReasoningSummary with ToJson::{to_json}
 ///|
 pub impl ToJson for ReasoningSummary with fn to_json(self) {
   let raw = match self {
-    Auto => "auto"
-    Concise => "concise"
-    Detailed => "detailed"
-    None => "none"
-    Custom(raw) => raw
+    ReasoningSummary::Auto => "auto"
+    ReasoningSummary::Concise => "concise"
+    ReasoningSummary::Detailed => "detailed"
+    ReasoningSummary::None => "none"
+    ReasoningSummary::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8055,14 +8126,14 @@ pub impl @json.FromJson for ReasoningSummary with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "auto" => Some(Auto)
-        "concise" => Some(Concise)
-        "detailed" => Some(Detailed)
-        "none" => Some(None)
-        _ => None
+        "auto" => Option::Some(ReasoningSummary::Auto)
+        "concise" => Option::Some(ReasoningSummary::Concise)
+        "detailed" => Option::Some(ReasoningSummary::Detailed)
+        "none" => Option::Some(ReasoningSummary::None)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ReasoningSummary::Custom(raw),
   )
 }
 
@@ -8372,11 +8443,11 @@ pub extend CommandExecutionApprovalKind with ToJson::{to_json}
 ///|
 pub impl ToJson for CommandExecutionApprovalKind with fn to_json(self) {
   let raw = match self {
-    Command => "command"
-    WriteStdin => "writeStdin"
-    Unknown(raw) => raw
+    CommandExecutionApprovalKind::Command => "command"
+    CommandExecutionApprovalKind::WriteStdin => "writeStdin"
+    CommandExecutionApprovalKind::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8394,12 +8465,12 @@ pub impl @json.FromJson for CommandExecutionApprovalKind with fn from_json(
     path,
     raw => {
       match raw {
-        "command" => Some(Command)
-        "writeStdin" => Some(WriteStdin)
-        _ => None
+        "command" => Option::Some(CommandExecutionApprovalKind::Command)
+        "writeStdin" => Option::Some(CommandExecutionApprovalKind::WriteStdin)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CommandExecutionApprovalKind::Unknown(raw),
   )
 }
 
@@ -8430,13 +8501,13 @@ pub extend NetworkApprovalProtocol with ToJson::{to_json}
 ///|
 pub impl ToJson for NetworkApprovalProtocol with fn to_json(self) {
   let raw = match self {
-    Http => "http"
-    Https => "https"
-    Socks5Tcp => "socks5Tcp"
-    Socks5Udp => "socks5Udp"
-    Unknown(raw) => raw
+    NetworkApprovalProtocol::Http => "http"
+    NetworkApprovalProtocol::Https => "https"
+    NetworkApprovalProtocol::Socks5Tcp => "socks5Tcp"
+    NetworkApprovalProtocol::Socks5Udp => "socks5Udp"
+    NetworkApprovalProtocol::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8454,14 +8525,14 @@ pub impl @json.FromJson for NetworkApprovalProtocol with fn from_json(
     path,
     raw => {
       match raw {
-        "http" => Some(Http)
-        "https" => Some(Https)
-        "socks5Tcp" => Some(Socks5Tcp)
-        "socks5Udp" => Some(Socks5Udp)
-        _ => None
+        "http" => Option::Some(NetworkApprovalProtocol::Http)
+        "https" => Option::Some(NetworkApprovalProtocol::Https)
+        "socks5Tcp" => Option::Some(NetworkApprovalProtocol::Socks5Tcp)
+        "socks5Udp" => Option::Some(NetworkApprovalProtocol::Socks5Udp)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => NetworkApprovalProtocol::Unknown(raw),
   )
 }
 
@@ -8545,11 +8616,11 @@ pub extend NetworkPolicyRuleAction with ToJson::{to_json}
 ///|
 pub impl ToJson for NetworkPolicyRuleAction with fn to_json(self) {
   let raw = match self {
-    Allow => "allow"
-    Deny => "deny"
-    Unknown(raw) => raw
+    NetworkPolicyRuleAction::Allow => "allow"
+    NetworkPolicyRuleAction::Deny => "deny"
+    NetworkPolicyRuleAction::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8567,12 +8638,12 @@ pub impl @json.FromJson for NetworkPolicyRuleAction with fn from_json(
     path,
     raw => {
       match raw {
-        "allow" => Some(Allow)
-        "deny" => Some(Deny)
-        _ => None
+        "allow" => Option::Some(NetworkPolicyRuleAction::Allow)
+        "deny" => Option::Some(NetworkPolicyRuleAction::Deny)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => NetworkPolicyRuleAction::Unknown(raw),
   )
 }
 
@@ -8928,19 +8999,20 @@ pub extend CommandExecutionApprovalDecision with ToJson::{to_json}
 ///|
 pub impl ToJson for CommandExecutionApprovalDecision with fn to_json(self) {
   match self {
-    Accept => Json("accept")
-    AcceptForSession => Json("acceptForSession")
-    AcceptWithExecpolicyAmendment(value) =>
+    CommandExecutionApprovalDecision::Accept => @json.Json::Json("accept")
+    CommandExecutionApprovalDecision::AcceptForSession =>
+      @json.Json::Json("acceptForSession")
+    CommandExecutionApprovalDecision::AcceptWithExecpolicyAmendment(value) =>
       @sdkjson.ObjBuilder::new()
       .field("acceptWithExecpolicyAmendment", value)
       .build()
-    ApplyNetworkPolicyAmendment(value) =>
+    CommandExecutionApprovalDecision::ApplyNetworkPolicyAmendment(value) =>
       @sdkjson.ObjBuilder::new()
       .field("applyNetworkPolicyAmendment", value)
       .build()
-    Decline => Json("decline")
-    Cancel => Json("cancel")
-    UnknownValue(value) => value
+    CommandExecutionApprovalDecision::Decline => @json.Json::Json("decline")
+    CommandExecutionApprovalDecision::Cancel => @json.Json::Json("cancel")
+    CommandExecutionApprovalDecision::UnknownValue(value) => value
   }
 }
 
@@ -8955,35 +9027,39 @@ pub impl @json.FromJson for CommandExecutionApprovalDecision with fn from_json(
   path,
 ) {
   match value {
-    String("accept") => Accept
-    String("acceptForSession") => AcceptForSession
-    String("decline") => Decline
-    String("cancel") => Cancel
-    Object(obj) => {
+    @json.Json::String("accept") => CommandExecutionApprovalDecision::Accept
+    @json.Json::String("acceptForSession") =>
+      CommandExecutionApprovalDecision::AcceptForSession
+    @json.Json::String("decline") => CommandExecutionApprovalDecision::Decline
+    @json.Json::String("cancel") => CommandExecutionApprovalDecision::Cancel
+    @json.Json::Object(obj) => {
       if obj.length() != 1 {
-        raise @json.JsonDecodeError((path, "expected exactly one enum tag"))
+        raise @json.JsonDecodeError::JsonDecodeError(
+          (path, "expected exactly one enum tag"),
+        )
       }
-      if obj.get("acceptWithExecpolicyAmendment") is Some(payload) {
-        return AcceptWithExecpolicyAmendment(
+      if obj.get("acceptWithExecpolicyAmendment") is Option::Some(payload) {
+        return CommandExecutionApprovalDecision::AcceptWithExecpolicyAmendment(
           @json.from_json(
             payload,
             path=path.add_key("acceptWithExecpolicyAmendment"),
           ),
         )
       }
-      if obj.get("applyNetworkPolicyAmendment") is Some(payload) {
-        return ApplyNetworkPolicyAmendment(
+      if obj.get("applyNetworkPolicyAmendment") is Option::Some(payload) {
+        return CommandExecutionApprovalDecision::ApplyNetworkPolicyAmendment(
           @json.from_json(
             payload,
             path=path.add_key("applyNetworkPolicyAmendment"),
           ),
         )
       }
-      UnknownValue(value)
+      CommandExecutionApprovalDecision::UnknownValue(value)
     }
-    String(_) => UnknownValue(value)
+    @json.Json::String(_) =>
+      CommandExecutionApprovalDecision::UnknownValue(value)
     _ =>
-      raise @json.JsonDecodeError(
+      raise @json.JsonDecodeError::JsonDecodeError(
         (path, "expected string or single-key object enum"),
       )
   }
@@ -9148,13 +9224,13 @@ pub extend FileChangeApprovalDecision with ToJson::{to_json}
 ///|
 pub impl ToJson for FileChangeApprovalDecision with fn to_json(self) {
   let raw = match self {
-    Accept => "accept"
-    AcceptForSession => "acceptForSession"
-    Decline => "decline"
-    Cancel => "cancel"
-    Custom(raw) => raw
+    FileChangeApprovalDecision::Accept => "accept"
+    FileChangeApprovalDecision::AcceptForSession => "acceptForSession"
+    FileChangeApprovalDecision::Decline => "decline"
+    FileChangeApprovalDecision::Cancel => "cancel"
+    FileChangeApprovalDecision::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9172,14 +9248,15 @@ pub impl @json.FromJson for FileChangeApprovalDecision with fn from_json(
     path,
     raw => {
       match raw {
-        "accept" => Some(Accept)
-        "acceptForSession" => Some(AcceptForSession)
-        "decline" => Some(Decline)
-        "cancel" => Some(Cancel)
-        _ => None
+        "accept" => Option::Some(FileChangeApprovalDecision::Accept)
+        "acceptForSession" =>
+          Option::Some(FileChangeApprovalDecision::AcceptForSession)
+        "decline" => Option::Some(FileChangeApprovalDecision::Decline)
+        "cancel" => Option::Some(FileChangeApprovalDecision::Cancel)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => FileChangeApprovalDecision::Custom(raw),
   )
 }
 
@@ -9256,12 +9333,12 @@ pub extend FileSystemAccessMode with ToJson::{to_json}
 ///|
 pub impl ToJson for FileSystemAccessMode with fn to_json(self) {
   let raw = match self {
-    Read => "read"
-    Write => "write"
-    Deny => "deny"
-    Unknown(raw) => raw
+    FileSystemAccessMode::Read => "read"
+    FileSystemAccessMode::Write => "write"
+    FileSystemAccessMode::Deny => "deny"
+    FileSystemAccessMode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9276,13 +9353,13 @@ pub impl @json.FromJson for FileSystemAccessMode with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "read" => Some(Read)
-        "write" => Some(Write)
-        "deny" => Some(Deny)
-        _ => None
+        "read" => Option::Some(FileSystemAccessMode::Read)
+        "write" => Option::Some(FileSystemAccessMode::Write)
+        "deny" => Option::Some(FileSystemAccessMode::Deny)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FileSystemAccessMode::Unknown(raw),
   )
 }
 
@@ -9724,13 +9801,13 @@ pub extend FileSystemSpecialPath with ToJson::{to_json}
 ///|
 pub impl ToJson for FileSystemSpecialPath with fn to_json(self) {
   match self {
-    Root(value) => Json(value)
-    Minimal(value) => Json(value)
-    ProjectRoots(value) => Json(value)
-    Tmpdir(value) => Json(value)
-    SlashTmp(value) => Json(value)
-    KnownUnknown(value) => Json(value)
-    Unknown(_, value) => value
+    FileSystemSpecialPath::Root(value) => @json.Json::Json(value)
+    FileSystemSpecialPath::Minimal(value) => @json.Json::Json(value)
+    FileSystemSpecialPath::ProjectRoots(value) => @json.Json::Json(value)
+    FileSystemSpecialPath::Tmpdir(value) => @json.Json::Json(value)
+    FileSystemSpecialPath::SlashTmp(value) => @json.Json::Json(value)
+    FileSystemSpecialPath::KnownUnknown(value) => @json.Json::Json(value)
+    FileSystemSpecialPath::Unknown(_, value) => value
   }
 }
 
@@ -9744,13 +9821,16 @@ pub impl @json.FromJson for FileSystemSpecialPath with fn from_json(value, path)
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "kind", path)
   match tag {
-    "root" => Root(@json.from_json(value, path~))
-    "minimal" => Minimal(@json.from_json(value, path~))
-    "project_roots" => ProjectRoots(@json.from_json(value, path~))
-    "tmpdir" => Tmpdir(@json.from_json(value, path~))
-    "slash_tmp" => SlashTmp(@json.from_json(value, path~))
-    "unknown" => KnownUnknown(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "root" => FileSystemSpecialPath::Root(@json.from_json(value, path~))
+    "minimal" => FileSystemSpecialPath::Minimal(@json.from_json(value, path~))
+    "project_roots" =>
+      FileSystemSpecialPath::ProjectRoots(@json.from_json(value, path~))
+    "tmpdir" => FileSystemSpecialPath::Tmpdir(@json.from_json(value, path~))
+    "slash_tmp" =>
+      FileSystemSpecialPath::SlashTmp(@json.from_json(value, path~))
+    "unknown" =>
+      FileSystemSpecialPath::KnownUnknown(@json.from_json(value, path~))
+    other => FileSystemSpecialPath::Unknown(other, value)
   }
 }
 
@@ -9832,10 +9912,10 @@ pub extend FileSystemPath with ToJson::{to_json}
 ///|
 pub impl ToJson for FileSystemPath with fn to_json(self) {
   match self {
-    Path(value) => Json(value)
-    GlobPattern(value) => Json(value)
-    Special(value) => Json(value)
-    Unknown(_, value) => value
+    FileSystemPath::Path(value) => @json.Json::Json(value)
+    FileSystemPath::GlobPattern(value) => @json.Json::Json(value)
+    FileSystemPath::Special(value) => @json.Json::Json(value)
+    FileSystemPath::Unknown(_, value) => value
   }
 }
 
@@ -9849,10 +9929,10 @@ pub impl @json.FromJson for FileSystemPath with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "path" => Path(@json.from_json(value, path~))
-    "glob_pattern" => GlobPattern(@json.from_json(value, path~))
-    "special" => Special(@json.from_json(value, path~))
-    other => Unknown(other, value)
+    "path" => FileSystemPath::Path(@json.from_json(value, path~))
+    "glob_pattern" => FileSystemPath::GlobPattern(@json.from_json(value, path~))
+    "special" => FileSystemPath::Special(@json.from_json(value, path~))
+    other => FileSystemPath::Unknown(other, value)
   }
 }
 
@@ -10258,11 +10338,11 @@ pub extend PermissionGrantScope with ToJson::{to_json}
 ///|
 pub impl ToJson for PermissionGrantScope with fn to_json(self) {
   let raw = match self {
-    Turn => "turn"
-    Session => "session"
-    Custom(raw) => raw
+    PermissionGrantScope::Turn => "turn"
+    PermissionGrantScope::Session => "session"
+    PermissionGrantScope::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -10277,12 +10357,12 @@ pub impl @json.FromJson for PermissionGrantScope with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "turn" => Some(Turn)
-        "session" => Some(Session)
-        _ => None
+        "turn" => Option::Some(PermissionGrantScope::Turn)
+        "session" => Option::Some(PermissionGrantScope::Session)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => PermissionGrantScope::Custom(raw),
   )
 }
 

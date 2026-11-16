@@ -1,6 +1,10 @@
 # Releasing
 
-A release is a version bump on `main`. `release.yml` runs after `CI` succeeds on `main`, and `scripts/release.sh publish` publishes, bottom-up, every listed module whose `version` is not yet in the mooncakes index. Nothing else triggers a publish, and a commit that bumps nothing publishes nothing.
+A release is a version bump on `main`. `release.yml` publishes explicit human
+bumps after `CI` succeeds on `main`, and prepares automatic batches on Mondays
+at 00:20 UTC. Manual dispatch releases the current batch now. In every case,
+`scripts/release.sh publish` works bottom-up and skips versions already in the
+Mooncakes index. Daily spec-watch merges never bump versions or dispatch release.
 
 ## Which modules
 
@@ -38,15 +42,68 @@ Commit, push `main`, and watch the `Release` run. Public API changes show up as 
 
 ## Automated releases from spec-watch
 
-`spec-watch.yml` reads the ledger's `spec_watch = true` entries and bumps each module itself when a new upstream spec changes their `src`: a patch when every `pkg.generated.mbti` is unchanged, otherwise the minor version (the next major after `1.0`), because the generated types are `pub(all)` and any public API change can break a caller. A spec change that leaves `src` alone releases nothing. Each job regenerates and gates only its own SDK. Gates also compare the ledger's host and authentication pins with the vendored spec; a change requires review, with a reason and the expected spec baseline for any deliberate override. When generation, the gates and CI all pass, it merges the PR and dispatches `release.yml`, since a merge made with `GITHUB_TOKEN` starts no CI run on `main`. Anything that fails leaves the PR open and the run red.
+`spec-watch.yml` still detects changes daily. Its matrix has one job per shared
+spec, fetching and re-vendoring once, and generating/gating every consumer. A PR
+lists each module's generation, interface, census-with-compile and gates results.
+All consumers and exact-head CI must pass before auto-merge. A failure leaves
+the PR for review. Host/authentication changes still require pin review.
 
-Before bumping, it adds one entry under `[Unreleased]` with `scripts/release.sh note`, which `bump` then dates together with anything already there:
+Successful regeneration that changes shipped source adds a note under each
+affected module's `[Unreleased]` using `scripts/release.sh note`. It makes no
+version bump. Several daily changes are therefore included in one release.
+See [the factory](sdk-factory.md) for shared-spec selection and provenance.
 
-```markdown
-- **Regenerated from the upstream spec fetched 2026-10-15** (sha256 `ac6b3bb9cec6`). The public API changed; see the `pkg.generated.mbti` diff.
+The Monday job applies to every published `spec_watch = true` module: OpenAI,
+Anthropic, GitHub and Gemini. `tools/weekly_release.py prepare` selects modules
+with nonempty `[Unreleased]` entries and compares all relative
+`pkg.generated.mbti` paths and hashes with their last published baseline. An API
+change gets a minor bump; otherwise it gets a patch, using
+`scripts/release.sh bump` to update sibling imports and date the changelog.
+This minor/patch rule also applies after 1.0, as specified by the factory's
+batch-release policy; a human can explicitly choose a different bump.
+
+Baselines live in `.release-baselines/<ledger-name>.json`: module identity,
+version, registry artifact checksum, publication timestamp and the package's
+shipped interface hashes. They were bootstrapped from actual published packages,
+not from an assumed historical checkout. Before planning, `refresh` compares the
+registry index and downloads any newly published immutable package to record its
+interfaces. An absent or empty module index is valid before its first release:
+`refresh` records `{ "module": "<module>", "state": "unpublished" }` without
+inventing published API hashes. The weekly batch releases that module at its
+current version, including a human-chosen initial version. It invokes
+`scripts/release.sh bump` with that same version to prepare the CHANGELOG; no
+version increment is made. The CI-triggered explicit-release path also proceeds
+after this refresh. After publication, refresh replaces the unpublished state
+with the actual registry artifact's baseline.
+
+A module without a refreshed state file is skipped with a diagnostic asking for
+`refresh`, so it cannot prevent other modules from being prepared. Incomplete
+published baselines still fail validation instead of guessing patch. If the
+local index loses an entry, refresh retains an existing published baseline
+rather than treating a previously published module as new. Refresh also
+recovers if publication succeeded but the later baseline commit failed.
+
+A scheduled retry skips modules already published in the same **UTC ISO week**.
+Manual dispatch bypasses that cadence check; an already explicit human version
+bump is preserved and continues through the ordinary CI-triggered publication.
+No-change modules are skipped. Baseline/API validation for every candidate runs
+before the first bump. The batch runs full gates, including native tests, before
+its bump commit is pushed and published. A concurrent main update makes that
+push fail before publication; it never force-pushes.
+
+After successful publication, `refresh` records the actual registry artifacts
+and commits their baselines. It never records a newer main checkout's API as
+the baseline for an older CI-validated commit. Publication and preparation share
+one workflow concurrency group. The next refresh repairs an interrupted baseline
+recording step from the registry without republishing the same version.
+
+Local inspection (no publish):
+
+```sh
+moon update
+uv run --with pyyaml --with jsonpath-rfc9535 python tools/weekly_release.py refresh
+uv run --with pyyaml --with jsonpath-rfc9535 python tools/weekly_release.py prepare --dry-run
 ```
-
-The date and hash come from `spec/SOURCE.md`; "The public API is unchanged." replaces the second sentence for a patch. When the PR waits for a human, they may replace the pointer to the diff with a summary of what was added or changed, as the backfilled entries do.
 
 ## Credentials
 

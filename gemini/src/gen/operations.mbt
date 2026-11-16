@@ -18,7 +18,10 @@ fn normalize_resource_name(
   prefix : String,
 ) -> String raise ValidationError {
   if value.is_empty() {
-    raise ValidationError(parameter~, message="resource name must not be empty")
+    raise ValidationError::ValidationError(
+      parameter~,
+      message="resource name must not be empty",
+    )
   }
   // These characters can change URL structure or survive a second decoding
   // pass. Reject them even when a permissive provider regex accepts them.
@@ -27,7 +30,7 @@ fn normalize_resource_name(
       char.to_int() < 32 ||
       char.to_int() == 127 ||
       char is ('?' | '#' | '&' | '%' | ':' | '\\') {
-      raise ValidationError(
+      raise ValidationError::ValidationError(
         parameter~,
         message="unsafe character in resource name",
       )
@@ -35,7 +38,10 @@ fn normalize_resource_name(
   }
   for segment in value.split("/") {
     if segment == "" || segment == "." || segment == ".." {
-      raise ValidationError(parameter~, message="invalid resource-name segment")
+      raise ValidationError::ValidationError(
+        parameter~,
+        message="invalid resource-name segment",
+      )
     }
   }
   let normalized = if prefix != "" && !value.contains("/") {
@@ -44,12 +50,12 @@ fn normalize_resource_name(
     value
   }
   let matched = try (
-    Regex("^(?:" + pattern + ")$").execute(normalized) is Some(_)
+    Regex::Regex("^(?:" + pattern + ")$").execute(normalized) is Option::Some(_)
   ) catch {
     _ => false
   }
   if !matched {
-    raise ValidationError(
+    raise ValidationError::ValidationError(
       parameter~,
       message="resource name does not match " + pattern,
     )
@@ -59,14 +65,14 @@ fn normalize_resource_name(
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match Json(value) {
-    String(value) => value
-    True => "true"
-    False => "false"
-    Number(value, repr~) =>
+  match @json.Json::Json(value) {
+    @json.Json::String(value) => value
+    @json.Json::True => "true"
+    @json.Json::False => "false"
+    @json.Json::Number(value, repr~) =>
       match repr {
-        Some(text) => text
-        None => value.to_string()
+        Option::Some(text) => text
+        Option::None => value.to_string()
       }
     other => other.stringify()
   }
@@ -82,10 +88,10 @@ fn[T : @json.FromJson] decode_response(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[T, @client.ResponseFailure] {
-  Ok(@json.from_json(parse_json_body(body))) catch {
+  Result::Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message=error.to_string(),
           body=body[:body.length().min(@client.max_error_body)].to_owned(),
@@ -127,11 +133,11 @@ pub fn cached_contents_patch_request(
   )
   let mut url = "/v1beta/" + @http.percent_encode_path(parameter_value(name))
   match update_mask {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "updateMask", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
-  @http.Request::patch(url).body_json(Json(body))
+  @http.Request::patch(url).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -193,7 +199,9 @@ pub fn cached_contents_get_decode(
 ///
 /// Creates CachedContent resource. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
 pub fn cached_contents_create_request(body : CachedContent) -> @http.Request {
-  @http.Request::post("/v1beta/cachedContents").body_json(Json(body))
+  @http.Request::post("/v1beta/cachedContents").body_json(
+    @json.Json::Json(body),
+  )
 }
 
 ///|
@@ -224,14 +232,14 @@ pub fn cached_contents_list_request(
 ) -> @http.Request {
   let mut url = "/v1beta/cachedContents"
   match page_size {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "pageSize", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match page_token {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "pageToken", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -259,7 +267,7 @@ pub fn cached_contents_list_decode(
 ///
 /// Creates a `File`. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
 pub fn media_upload_request(body : CreateFileRequest) -> @http.Request {
-  @http.Request::post("/v1beta/files").body_json(Json(body))
+  @http.Request::post("/v1beta/files").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -290,14 +298,14 @@ pub fn files_list_request(
 ) -> @http.Request {
   let mut url = "/v1beta/files"
   match page_token {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "pageToken", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match page_size {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "pageSize", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -387,7 +395,7 @@ pub fn models_embed_content_request(
     "/v1beta/" +
     @http.percent_encode_path(parameter_value(model)) +
     ":embedContent",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -426,7 +434,7 @@ pub fn models_batch_embed_contents_request(
     "/v1beta/" +
     @http.percent_encode_path(parameter_value(model)) +
     ":batchEmbedContents",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -457,14 +465,14 @@ pub fn models_list_request(
 ) -> @http.Request {
   let mut url = "/v1beta/models"
   match page_token {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "pageToken", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match page_size {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "pageSize", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -505,7 +513,7 @@ pub fn models_count_tokens_request(
     "/v1beta/" +
     @http.percent_encode_path(parameter_value(model)) +
     ":countTokens",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -544,7 +552,7 @@ pub fn models_generate_content_request(
     "/v1beta/" +
     @http.percent_encode_path(parameter_value(model)) +
     ":generateContent",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -583,7 +591,7 @@ pub fn models_stream_generate_content_request(
     "/v1beta/" +
     @http.percent_encode_path(parameter_value(model)) +
     ":streamGenerateContent",
-  ).body_json(Json(body))
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|

@@ -9,8 +9,8 @@ pub async fn Badhttp::get_status_code(
 ) -> Result[Unit, Failure] {
   let request = get_status_code_request(code, retry_after?)
   match self.send(request, operation="get_status_code") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -34,8 +34,8 @@ pub async fn Badhttp::get_drip(
 ) -> Result[Unit, Failure] {
   let request = get_drip_request(duration?, chunks?, code?)
   match self.send(request, operation="get_drip") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -48,8 +48,8 @@ pub async fn Badhttp::get_truncate(
 ) -> Result[Unit, Failure] {
   let request = get_truncate_request(length?, send?)
   match self.send(request, operation="get_truncate") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -62,8 +62,8 @@ pub async fn Badhttp::get_badjson_flavor(
 ) -> Result[Unit, Failure] {
   let request = get_badjson_flavor_request(flavor, code?)
   match self.send(request, operation="get_badjson_flavor") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -116,15 +116,15 @@ pub async fn Badhttp::get_range_flavor(
 ) -> Result[String, Failure] {
   let request = get_range_flavor_request(flavor, length?, range?, if_range?)
   match self.send(request, operation="get_range_flavor") {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode_text(
           { status: reply.status, headers: reply.headers, },
           reply.body,
         ) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -154,15 +154,15 @@ pub async fn Badhttp::get_etag_flavor(
     if_unmodified_since?,
   )
   match self.send(request, operation="get_etag_flavor") {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode_text(
           { status: reply.status, headers: reply.headers, },
           reply.body,
         ) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -228,8 +228,8 @@ pub async fn Badhttp::get_crosshost_flavor(
 ) -> Result[Unit, Failure] {
   let request = get_crosshost_flavor_request(flavor)
   match self.send(request, operation="get_crosshost_flavor") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -258,8 +258,8 @@ pub async fn Badhttp::get_compress_flavor(
     accept_encoding?,
   )
   match self.send(request, operation="get_compress_flavor") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -328,8 +328,8 @@ pub async fn Badhttp::delete_echo(self : Badhttp) -> Result[Json, Failure] {
 pub async fn Badhttp::get_echo(self : Badhttp) -> Result[Unit, Failure] {
   let request = get_echo_request()
   match self.send(request, operation="get_echo") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -338,8 +338,8 @@ pub async fn Badhttp::get_echo(self : Badhttp) -> Result[Unit, Failure] {
 pub async fn Badhttp::head_echo(self : Badhttp) -> Result[Unit, Failure] {
   let request = head_echo_request()
   match self.send(request, operation="head_echo") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -359,8 +359,8 @@ pub async fn Badhttp::get_402_pay(
 ) -> Result[Unit, Failure] {
   let request = get_402_pay_request(network?, amount?)
   match self.send(request, operation="get_402_pay") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -372,8 +372,8 @@ pub async fn Badhttp::get_402_pay_base(
 ) -> Result[Unit, Failure] {
   let request = get_402_pay_base_request(amount?)
   match self.send(request, operation="get_402_pay_base") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -385,8 +385,8 @@ pub async fn Badhttp::get_402_pay_base_sepolia(
 ) -> Result[Unit, Failure] {
   let request = get_402_pay_base_sepolia_request(amount?)
   match self.send(request, operation="get_402_pay_base_sepolia") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -408,8 +408,8 @@ pub async fn Badhttp::get_402_scenario(
     seconds?,
   )
   match self.send(request, operation="get_402_scenario") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -423,8 +423,8 @@ pub async fn Badhttp::get_402_broken_flavor(
 ) -> Result[Unit, Failure] {
   let request = get_402_broken_flavor_request(flavor, network?, amount?)
   match self.send(request, operation="get_402_broken_flavor") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -440,8 +440,8 @@ pub async fn Badhttp::get_books_json(self : Badhttp) -> Result[Json, Failure] {
 pub async fn Badhttp::get_llms_txt(self : Badhttp) -> Result[Unit, Failure] {
   let request = get_llms_txt_request()
   match self.send(request, operation="get_llms_txt") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -464,8 +464,8 @@ pub async fn Badhttp::get_corpus(self : Badhttp) -> Result[Json, Failure] {
 pub async fn Badhttp::get_corpus_jsonl(self : Badhttp) -> Result[Unit, Failure] {
   let request = get_corpus_jsonl_request()
   match self.send(request, operation="get_corpus_jsonl") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -483,8 +483,8 @@ pub async fn Badhttp::get_clients_jsonl(
 ) -> Result[Unit, Failure] {
   let request = get_clients_jsonl_request()
   match self.send(request, operation="get_clients_jsonl") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -507,10 +507,10 @@ fn decode_text(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[String, @client.ResponseFailure] {
-  Ok(@utf8.decode(body)) catch {
+  Result::Ok(@utf8.decode(body)) catch {
     _ =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message="invalid UTF-8 response body",
           body=body[:body.length().min(@client.max_error_body)].to_owned(),

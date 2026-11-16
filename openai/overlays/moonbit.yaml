@@ -3,6 +3,13 @@ info:
   title: MoonBit generation slice
   version: 0.1.0
 actions:
+  - target: "$['components']['schemas']['CreateChatCompletionRequest']['allOf'][*]['properties']['prediction']"
+    description: Preserve the published prediction union and its content constructor by making the already inferred type discriminator explicit; nullable single-ref unions without a discriminator now lower directly to the optional referenced type.
+    update:
+      discriminator:
+        propertyName: type
+        mapping:
+          content: "#/components/schemas/PredictionContent"
   - target: "$['components']['schemas']['Model']['required'][?@ == 'created']"
     description: DeepSeek documents models without a creation timestamp; preserve absence rather than inventing a timestamp.
     remove: true

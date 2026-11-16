@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Generated code now qualifies constructor references; no public API change.
+
 ## [0.1.0] - 2026-11-16
 
 First release: a Gemini API client generated from Google's Discovery document

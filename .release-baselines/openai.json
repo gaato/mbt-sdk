@@ -1,0 +1,10 @@
+{
+  "api": {
+    "src/gen/pkg.generated.mbti": "320b93d182f78812617ae2f8ae99bf4a8daf5346e4e636829a96c6e5650b0e8d",
+    "src/pkg.generated.mbti": "7f77617aff8aea0128040c0d0d32cb81a95a16685d7806a21914005b315914a2"
+  },
+  "artifact_checksum": "a0c52cab2f36e9684b8b0d521e8bca0f4b1c0ebf61cf489f72d450c24b447ad0",
+  "module": "gaato/openai",
+  "published_at": "2026-11-15T14:33:03.085647+00:00",
+  "version": "0.10.0"
+}

@@ -2,14 +2,14 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match Json(value) {
-    String(value) => value
-    True => "true"
-    False => "false"
-    Number(value, repr~) =>
+  match @json.Json::Json(value) {
+    @json.Json::String(value) => value
+    @json.Json::True => "true"
+    @json.Json::False => "false"
+    @json.Json::Number(value, repr~) =>
       match repr {
-        Some(text) => text
-        None => value.to_string()
+        Option::Some(text) => text
+        Option::None => value.to_string()
       }
     other => other.stringify()
   }
@@ -25,10 +25,10 @@ fn[T : @json.FromJson] decode_response(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[T, @client.ResponseFailure] {
-  Ok(@json.from_json(parse_json_body(body))) catch {
+  Result::Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message=error.to_string(),
           body=body[:body.length().min(@client.max_error_body)].to_owned(),
@@ -41,7 +41,7 @@ fn[T : @json.FromJson] decode_response(
 ///
 /// Update an existing pet.
 pub fn update_pet_request(body : Pet) -> @http.Request {
-  @http.Request::put("/pet").body_json(Json(body))
+  @http.Request::put("/pet").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -65,7 +65,7 @@ pub fn update_pet_decode(
 ///
 /// Add a new pet to the store.
 pub fn add_pet_request(body : Pet) -> @http.Request {
-  @http.Request::post("/pet").body_json(Json(body))
+  @http.Request::post("/pet").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -181,13 +181,14 @@ pub fn update_pet_with_form_request(
 ) -> @http.Request {
   let mut url = "/pet/" + @http.percent_encode(parameter_value(pet_id))
   match name {
-    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "name", parameter_value(value))
+    Option::None => ()
   }
   match status {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "status", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::post(url)
 }
@@ -219,8 +220,9 @@ pub fn delete_pet_request(pet_id : Int64, api_key? : String) -> @http.Request {
     "/pet/" + @http.percent_encode(parameter_value(pet_id)),
   )
   match api_key {
-    Some(value) => request = request.header("api_key", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("api_key", parameter_value(value))
+    Option::None => ()
   }
   request
 }
@@ -236,13 +238,13 @@ pub fn upload_file_request(
     @http.percent_encode(parameter_value(pet_id)) +
     "/uploadImage"
   match additional_metadata {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(
         url,
         "additionalMetadata",
         parameter_value(value),
       )
-    None => ()
+    Option::None => ()
   }
   @http.Request::post(url)
 }
@@ -296,7 +298,7 @@ pub fn get_inventory_decode(
 ///
 /// Place an order for a pet.
 pub fn place_order_request(body : Order) -> @http.Request {
-  @http.Request::post("/store/order").body_json(Json(body))
+  @http.Request::post("/store/order").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -359,7 +361,7 @@ pub fn delete_order_request(order_id : Int64) -> @http.Request {
 ///
 /// Create user.
 pub fn create_user_request(body : User) -> @http.Request {
-  @http.Request::post("/user").body_json(Json(body))
+  @http.Request::post("/user").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -387,7 +389,7 @@ pub fn create_user_decode(
 pub fn create_users_with_list_input_request(
   body : Array[User],
 ) -> @http.Request {
-  @http.Request::post("/user/createWithList").body_json(Json(body))
+  @http.Request::post("/user/createWithList").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -418,14 +420,14 @@ pub fn login_user_request(
 ) -> @http.Request {
   let mut url = "/user/login"
   match username {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "username", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match password {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "password", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -487,7 +489,7 @@ pub fn get_user_by_name_decode(
 /// Update user resource. The caller handles the response as @http.Response.
 pub fn update_user_request(username : String, body : User) -> @http.Request {
   @http.Request::put("/user/" + @http.percent_encode(parameter_value(username))).body_json(
-    Json(body),
+    @json.Json::Json(body),
   )
 }
 

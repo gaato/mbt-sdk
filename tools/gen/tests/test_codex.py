@@ -80,6 +80,19 @@ class CodexSchemaTests(unittest.TestCase):
         ir = builder.build()
         self.assertIn('.field("literal", true)', emit(ir)["types.mbt"])
 
+    def test_nullable_ref_array_dispatches_through_schema_builder(self):
+        bundle = copy.deepcopy(self.bundle)
+        for key in ('anyOf', 'oneOf'):
+            bundle['definitions']['InitializeParams']['properties'][key + 'Items'] = {
+                'type': 'array', 'items': {key: [
+                    {'$ref': '#/definitions/InitializeResponse'}, {'type': 'null'}]}}
+        ir = SchemaBuilder(bundle, self.surface).build()
+        params = next(d for d in ir.declarations if d.name == 'InitializeParams')
+        for key in ('anyOf', 'oneOf'):
+            field = next(f for f in params.fields if f.json_name == key + 'Items')
+            self.assertEqual(field.type.moon_type(), 'Array[InitializeResponse?]')
+        self.assertIn('Array[InitializeResponse?]', emit(ir)['types.mbt'])
+
     def test_regeneration_detects_changes_and_stale_generated_files(self):
         with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()):
             tmp = str(Path(tmp) / 'src/gen')

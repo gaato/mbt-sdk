@@ -26,7 +26,7 @@ pub impl @debug.Debug for Replicate with fn to_repr(_) {
 pub fn Replicate::new(
   backend : &@http.Backend,
   clock : &@rt.Clock,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://api.replicate.com/v1",
   server_urls~ : Map[String, String] = {},
   retry~ : @client.RetryPolicy = default_retry(),
@@ -58,7 +58,7 @@ pub fn Replicate::new(
 /// Credentials are redacted from Debug output.
 pub fn Replicate::from_client(
   client : @client.Client,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://api.replicate.com/v1",
   server_urls~ : Map[String, String] = {},
 ) -> Replicate {
@@ -147,9 +147,14 @@ fn response_failure(
   error : @client.ResponseFailure,
 ) -> Failure {
   match error {
-    @client.UnexpectedStatus(head, body~) =>
-      Http({ operation, head, body, typed: typed_error(operation, head, body), })
-    _ => Decode(error)
+    @client.ResponseFailure::UnexpectedStatus(head, body~) =>
+      Failure::Http({
+        operation,
+        head,
+        body,
+        typed: typed_error(operation, head, body),
+      })
+    _ => Failure::Decode(error)
   }
 }
 
@@ -167,18 +172,19 @@ pub async fn Replicate::send(
       ),
     )
     match reply.body {
-      Ok(body) =>
-        Ok({
+      Result::Ok(body) =>
+        Result::Ok({
           status: reply.status,
           headers: reply.headers,
           body,
           request: reply.request,
           attributes: reply.attributes,
         })
-      Err(error) => Err(response_failure(operation, error))
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -192,12 +198,12 @@ pub async fn[T] Replicate::call(
   operation~ : String = self.infer_operation(request),
 ) -> Result[T, Failure] {
   match self.send(request, operation~) {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode({ status: reply.status, headers: reply.headers, }, reply.body) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -217,8 +223,8 @@ pub async fn Replicate::stream(
     receive,
     stop=(_, event) => {
       match stop {
-        Some(predicate) => predicate(event)
-        None => false
+        Option::Some(predicate) => predicate(event)
+        Option::None => false
       }
     },
     operation~,
@@ -242,11 +248,12 @@ async fn Replicate::stream_with_head(
       ),
     )
     match reply.body {
-      Ok(value) => Ok(value)
-      Err(error) => Err(response_failure(operation, error))
+      Result::Ok(value) => Result::Ok(value)
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -272,8 +279,8 @@ fn Replicate::authenticate(
   request : @http.Request,
 ) -> @http.Request {
   match self.auth {
-    Anonymous => request
-    Bearer(value) => request.bearer(value)
+    Auth::Anonymous => request
+    Auth::Bearer(value) => request.bearer(value)
   }
 }
 
@@ -287,7 +294,7 @@ fn Replicate::operation_config(
     "account.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -295,7 +302,7 @@ fn Replicate::operation_config(
     "collections.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -303,7 +310,7 @@ fn Replicate::operation_config(
     "collections.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -311,7 +318,7 @@ fn Replicate::operation_config(
     "deployments.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -319,7 +326,7 @@ fn Replicate::operation_config(
     "deployments.create" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -327,7 +334,7 @@ fn Replicate::operation_config(
     "deployments.delete" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -335,7 +342,7 @@ fn Replicate::operation_config(
     "deployments.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -343,7 +350,7 @@ fn Replicate::operation_config(
     "deployments.update" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -351,7 +358,7 @@ fn Replicate::operation_config(
     "deployments.predictions.create" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -359,7 +366,7 @@ fn Replicate::operation_config(
     "files.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -367,7 +374,7 @@ fn Replicate::operation_config(
     "files.create" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -375,7 +382,7 @@ fn Replicate::operation_config(
     "files.delete" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -383,7 +390,7 @@ fn Replicate::operation_config(
     "files.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -391,7 +398,7 @@ fn Replicate::operation_config(
     "files.download" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -399,7 +406,7 @@ fn Replicate::operation_config(
     "hardware.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -407,7 +414,7 @@ fn Replicate::operation_config(
     "models.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -415,7 +422,7 @@ fn Replicate::operation_config(
     "models.create" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -423,7 +430,7 @@ fn Replicate::operation_config(
     "models.delete" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -431,7 +438,7 @@ fn Replicate::operation_config(
     "models.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -439,7 +446,7 @@ fn Replicate::operation_config(
     "models.update" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -447,7 +454,7 @@ fn Replicate::operation_config(
     "models.examples.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -455,7 +462,7 @@ fn Replicate::operation_config(
     "models.predictions.create" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -463,7 +470,7 @@ fn Replicate::operation_config(
     "models.readme.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -471,7 +478,7 @@ fn Replicate::operation_config(
     "models.versions.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -479,7 +486,7 @@ fn Replicate::operation_config(
     "models.versions.delete" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -487,7 +494,7 @@ fn Replicate::operation_config(
     "models.versions.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -495,7 +502,7 @@ fn Replicate::operation_config(
     "trainings.create" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -503,7 +510,7 @@ fn Replicate::operation_config(
     "predictions.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -511,7 +518,7 @@ fn Replicate::operation_config(
     "predictions.create" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -519,7 +526,7 @@ fn Replicate::operation_config(
     "predictions.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -527,7 +534,7 @@ fn Replicate::operation_config(
     "predictions.cancel" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -536,7 +543,7 @@ fn Replicate::operation_config(
     "trainings.list" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -544,7 +551,7 @@ fn Replicate::operation_config(
     "trainings.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -552,7 +559,7 @@ fn Replicate::operation_config(
     "trainings.cancel" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -560,7 +567,7 @@ fn Replicate::operation_config(
     "webhooks.default.secret.get" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",

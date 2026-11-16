@@ -8,11 +8,11 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 
@@ -24,16 +24,16 @@ fn json_string_int64_to_json(value : Int64) -> Json {
 ///|
 fn parse_plain_string_int64(text : String) -> Int64? {
   if text.length() == 0 {
-    return None
+    return Option::None
   }
   let negative = text[0] == '-'
   let digits_start = if negative { 1 } else { 0 }
   if digits_start == text.length() {
-    return None
+    return Option::None
   }
   for index in digits_start..<text.length() {
     if text[index] < '0' || text[index] > '9' {
-      return None
+      return Option::None
     }
   }
   let mut significant_start = digits_start
@@ -41,7 +41,7 @@ fn parse_plain_string_int64(text : String) -> Int64? {
     significant_start += 1
   }
   if significant_start == text.length() {
-    return Some(0L)
+    return Option::Some(0L)
   }
   let significant_length = text.length() - significant_start
   let limit = if negative {
@@ -50,14 +50,14 @@ fn parse_plain_string_int64(text : String) -> Int64? {
     "9223372036854775807"
   }
   if significant_length > limit.length() {
-    return None
+    return Option::None
   }
   if significant_length == limit.length() {
     for offset in 0..<significant_length {
       let digit = text[significant_start + offset]
       let boundary = limit[offset]
       if digit > boundary {
-        return None
+        return Option::None
       }
       if digit < boundary {
         break
@@ -73,7 +73,7 @@ fn parse_plain_string_int64(text : String) -> Int64? {
       result = result * 10L + digit
     }
   }
-  Some(result)
+  Option::Some(result)
 }
 
 ///|
@@ -81,15 +81,15 @@ fn json_string_int64(
   value : Json,
   path : @json.JsonPath,
 ) -> Int64 raise @json.JsonDecodeError {
-  guard value is String(text) else {
-    raise @json.JsonDecodeError(
+  guard value is @json.Json::String(text) else {
+    raise @json.JsonDecodeError::JsonDecodeError(
       (path, "expected JSON string for string-encoded Int64"),
     )
   }
   match parse_plain_string_int64(text) {
-    Some(value) => value
-    None =>
-      raise @json.JsonDecodeError(
+    Option::Some(value) => value
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (path, "invalid or out-of-range string-encoded Int64"),
       )
   }
@@ -103,8 +103,8 @@ fn[T] decode_optional_custom(
   decode : (Json, @json.JsonPath) -> T raise @json.JsonDecodeError,
 ) -> T? raise @json.JsonDecodeError {
   match obj.get(key) {
-    None | Some(Null) => None
-    Some(value) => Some(decode(value, path.add_key(key)))
+    Option::None | Option::Some(@json.Json::Null) => Option::None
+    Option::Some(value) => Option::Some(decode(value, path.add_key(key)))
   }
 }
 
@@ -112,7 +112,7 @@ fn[T] decode_optional_custom(
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = Json(item)
+    result[key] = @json.Json::Json(item)
   }
   Json::object(result)
 }
@@ -137,8 +137,9 @@ fn[T : @json.FromJson] decode_optional_json_map(
   path : @json.JsonPath,
 ) -> Map[String, T]? raise @json.JsonDecodeError {
   match obj.get(key) {
-    None | Some(Null) => None
-    Some(value) => Some(decode_json_map(value, path.add_key(key)))
+    Option::None | Option::Some(@json.Json::Null) => Option::None
+    Option::Some(value) =>
+      Option::Some(decode_json_map(value, path.add_key(key)))
   }
 }
 
@@ -170,14 +171,19 @@ pub extend UrlMetadataUrlRetrievalStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for UrlMetadataUrlRetrievalStatus with fn to_json(self) {
   let raw = match self {
-    URLRETRIEVALSTATUSUNSPECIFIED => "URL_RETRIEVAL_STATUS_UNSPECIFIED"
-    URLRETRIEVALSTATUSSUCCESS => "URL_RETRIEVAL_STATUS_SUCCESS"
-    URLRETRIEVALSTATUSERROR => "URL_RETRIEVAL_STATUS_ERROR"
-    URLRETRIEVALSTATUSPAYWALL => "URL_RETRIEVAL_STATUS_PAYWALL"
-    URLRETRIEVALSTATUSUNSAFE => "URL_RETRIEVAL_STATUS_UNSAFE"
-    Unknown(raw) => raw
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSPECIFIED =>
+      "URL_RETRIEVAL_STATUS_UNSPECIFIED"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSSUCCESS =>
+      "URL_RETRIEVAL_STATUS_SUCCESS"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSERROR =>
+      "URL_RETRIEVAL_STATUS_ERROR"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSPAYWALL =>
+      "URL_RETRIEVAL_STATUS_PAYWALL"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSAFE =>
+      "URL_RETRIEVAL_STATUS_UNSAFE"
+    UrlMetadataUrlRetrievalStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -196,15 +202,21 @@ pub impl @json.FromJson for UrlMetadataUrlRetrievalStatus with fn from_json(
     raw => {
       match raw {
         "URL_RETRIEVAL_STATUS_UNSPECIFIED" =>
-          Some(URLRETRIEVALSTATUSUNSPECIFIED)
-        "URL_RETRIEVAL_STATUS_SUCCESS" => Some(URLRETRIEVALSTATUSSUCCESS)
-        "URL_RETRIEVAL_STATUS_ERROR" => Some(URLRETRIEVALSTATUSERROR)
-        "URL_RETRIEVAL_STATUS_PAYWALL" => Some(URLRETRIEVALSTATUSPAYWALL)
-        "URL_RETRIEVAL_STATUS_UNSAFE" => Some(URLRETRIEVALSTATUSUNSAFE)
-        _ => None
+          Option::Some(
+            UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSPECIFIED,
+          )
+        "URL_RETRIEVAL_STATUS_SUCCESS" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSSUCCESS)
+        "URL_RETRIEVAL_STATUS_ERROR" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSERROR)
+        "URL_RETRIEVAL_STATUS_PAYWALL" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSPAYWALL)
+        "URL_RETRIEVAL_STATUS_UNSAFE" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSAFE)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => UrlMetadataUrlRetrievalStatus::Unknown(raw),
   )
 }
 
@@ -541,11 +553,11 @@ pub extend DynamicRetrievalConfigMode with ToJson::{to_json}
 ///|
 pub impl ToJson for DynamicRetrievalConfigMode with fn to_json(self) {
   let raw = match self {
-    MODEUNSPECIFIED => "MODE_UNSPECIFIED"
-    MODEDYNAMIC => "MODE_DYNAMIC"
-    Unknown(raw) => raw
+    DynamicRetrievalConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
+    DynamicRetrievalConfigMode::MODEDYNAMIC => "MODE_DYNAMIC"
+    DynamicRetrievalConfigMode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -563,12 +575,13 @@ pub impl @json.FromJson for DynamicRetrievalConfigMode with fn from_json(
     path,
     raw => {
       match raw {
-        "MODE_UNSPECIFIED" => Some(MODEUNSPECIFIED)
-        "MODE_DYNAMIC" => Some(MODEDYNAMIC)
-        _ => None
+        "MODE_UNSPECIFIED" =>
+          Option::Some(DynamicRetrievalConfigMode::MODEUNSPECIFIED)
+        "MODE_DYNAMIC" => Option::Some(DynamicRetrievalConfigMode::MODEDYNAMIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => DynamicRetrievalConfigMode::Unknown(raw),
   )
 }
 
@@ -708,17 +721,24 @@ pub extend ComputerUseDisabledSafetyPoliciesItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerUseDisabledSafetyPoliciesItem with fn to_json(self) {
   let raw = match self {
-    SAFETYPOLICYUNSPECIFIED => "SAFETY_POLICY_UNSPECIFIED"
-    FINANCIALTRANSACTIONS => "FINANCIAL_TRANSACTIONS"
-    SENSITIVEDATAMODIFICATION => "SENSITIVE_DATA_MODIFICATION"
-    COMMUNICATIONTOOL => "COMMUNICATION_TOOL"
-    ACCOUNTCREATION => "ACCOUNT_CREATION"
-    DATAMODIFICATION => "DATA_MODIFICATION"
-    USERCONSENTMANAGEMENT => "USER_CONSENT_MANAGEMENT"
-    LEGALTERMSANDAGREEMENTS => "LEGAL_TERMS_AND_AGREEMENTS"
-    Unknown(raw) => raw
+    ComputerUseDisabledSafetyPoliciesItem::SAFETYPOLICYUNSPECIFIED =>
+      "SAFETY_POLICY_UNSPECIFIED"
+    ComputerUseDisabledSafetyPoliciesItem::FINANCIALTRANSACTIONS =>
+      "FINANCIAL_TRANSACTIONS"
+    ComputerUseDisabledSafetyPoliciesItem::SENSITIVEDATAMODIFICATION =>
+      "SENSITIVE_DATA_MODIFICATION"
+    ComputerUseDisabledSafetyPoliciesItem::COMMUNICATIONTOOL =>
+      "COMMUNICATION_TOOL"
+    ComputerUseDisabledSafetyPoliciesItem::ACCOUNTCREATION => "ACCOUNT_CREATION"
+    ComputerUseDisabledSafetyPoliciesItem::DATAMODIFICATION =>
+      "DATA_MODIFICATION"
+    ComputerUseDisabledSafetyPoliciesItem::USERCONSENTMANAGEMENT =>
+      "USER_CONSENT_MANAGEMENT"
+    ComputerUseDisabledSafetyPoliciesItem::LEGALTERMSANDAGREEMENTS =>
+      "LEGAL_TERMS_AND_AGREEMENTS"
+    ComputerUseDisabledSafetyPoliciesItem::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -738,18 +758,36 @@ pub impl @json.FromJson for ComputerUseDisabledSafetyPoliciesItem with fn from_j
     path,
     raw => {
       match raw {
-        "SAFETY_POLICY_UNSPECIFIED" => Some(SAFETYPOLICYUNSPECIFIED)
-        "FINANCIAL_TRANSACTIONS" => Some(FINANCIALTRANSACTIONS)
-        "SENSITIVE_DATA_MODIFICATION" => Some(SENSITIVEDATAMODIFICATION)
-        "COMMUNICATION_TOOL" => Some(COMMUNICATIONTOOL)
-        "ACCOUNT_CREATION" => Some(ACCOUNTCREATION)
-        "DATA_MODIFICATION" => Some(DATAMODIFICATION)
-        "USER_CONSENT_MANAGEMENT" => Some(USERCONSENTMANAGEMENT)
-        "LEGAL_TERMS_AND_AGREEMENTS" => Some(LEGALTERMSANDAGREEMENTS)
-        _ => None
+        "SAFETY_POLICY_UNSPECIFIED" =>
+          Option::Some(
+            ComputerUseDisabledSafetyPoliciesItem::SAFETYPOLICYUNSPECIFIED,
+          )
+        "FINANCIAL_TRANSACTIONS" =>
+          Option::Some(
+            ComputerUseDisabledSafetyPoliciesItem::FINANCIALTRANSACTIONS,
+          )
+        "SENSITIVE_DATA_MODIFICATION" =>
+          Option::Some(
+            ComputerUseDisabledSafetyPoliciesItem::SENSITIVEDATAMODIFICATION,
+          )
+        "COMMUNICATION_TOOL" =>
+          Option::Some(ComputerUseDisabledSafetyPoliciesItem::COMMUNICATIONTOOL)
+        "ACCOUNT_CREATION" =>
+          Option::Some(ComputerUseDisabledSafetyPoliciesItem::ACCOUNTCREATION)
+        "DATA_MODIFICATION" =>
+          Option::Some(ComputerUseDisabledSafetyPoliciesItem::DATAMODIFICATION)
+        "USER_CONSENT_MANAGEMENT" =>
+          Option::Some(
+            ComputerUseDisabledSafetyPoliciesItem::USERCONSENTMANAGEMENT,
+          )
+        "LEGAL_TERMS_AND_AGREEMENTS" =>
+          Option::Some(
+            ComputerUseDisabledSafetyPoliciesItem::LEGALTERMSANDAGREEMENTS,
+          )
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ComputerUseDisabledSafetyPoliciesItem::Unknown(raw),
   )
 }
 
@@ -780,13 +818,13 @@ pub extend ComputerUseEnvironment with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerUseEnvironment with fn to_json(self) {
   let raw = match self {
-    ENVIRONMENTUNSPECIFIED => "ENVIRONMENT_UNSPECIFIED"
-    ENVIRONMENTBROWSER => "ENVIRONMENT_BROWSER"
-    ENVIRONMENTMOBILE => "ENVIRONMENT_MOBILE"
-    ENVIRONMENTDESKTOP => "ENVIRONMENT_DESKTOP"
-    Unknown(raw) => raw
+    ComputerUseEnvironment::ENVIRONMENTUNSPECIFIED => "ENVIRONMENT_UNSPECIFIED"
+    ComputerUseEnvironment::ENVIRONMENTBROWSER => "ENVIRONMENT_BROWSER"
+    ComputerUseEnvironment::ENVIRONMENTMOBILE => "ENVIRONMENT_MOBILE"
+    ComputerUseEnvironment::ENVIRONMENTDESKTOP => "ENVIRONMENT_DESKTOP"
+    ComputerUseEnvironment::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -804,14 +842,18 @@ pub impl @json.FromJson for ComputerUseEnvironment with fn from_json(
     path,
     raw => {
       match raw {
-        "ENVIRONMENT_UNSPECIFIED" => Some(ENVIRONMENTUNSPECIFIED)
-        "ENVIRONMENT_BROWSER" => Some(ENVIRONMENTBROWSER)
-        "ENVIRONMENT_MOBILE" => Some(ENVIRONMENTMOBILE)
-        "ENVIRONMENT_DESKTOP" => Some(ENVIRONMENTDESKTOP)
-        _ => None
+        "ENVIRONMENT_UNSPECIFIED" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTUNSPECIFIED)
+        "ENVIRONMENT_BROWSER" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTBROWSER)
+        "ENVIRONMENT_MOBILE" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTMOBILE)
+        "ENVIRONMENT_DESKTOP" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTDESKTOP)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ComputerUseEnvironment::Unknown(raw),
   )
 }
 
@@ -1128,17 +1170,17 @@ pub extend SchemaType with ToJson::{to_json}
 ///|
 pub impl ToJson for SchemaType with fn to_json(self) {
   let raw = match self {
-    TYPEUNSPECIFIED => "TYPE_UNSPECIFIED"
-    STRING => "STRING"
-    NUMBER => "NUMBER"
-    INTEGER => "INTEGER"
-    BOOLEAN => "BOOLEAN"
-    ARRAY => "ARRAY"
-    OBJECT => "OBJECT"
-    NULL => "NULL"
-    Unknown(raw) => raw
+    SchemaType::TYPEUNSPECIFIED => "TYPE_UNSPECIFIED"
+    SchemaType::STRING => "STRING"
+    SchemaType::NUMBER => "NUMBER"
+    SchemaType::INTEGER => "INTEGER"
+    SchemaType::BOOLEAN => "BOOLEAN"
+    SchemaType::ARRAY => "ARRAY"
+    SchemaType::OBJECT => "OBJECT"
+    SchemaType::NULL => "NULL"
+    SchemaType::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1153,18 +1195,18 @@ pub impl @json.FromJson for SchemaType with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "TYPE_UNSPECIFIED" => Some(TYPEUNSPECIFIED)
-        "STRING" => Some(STRING)
-        "NUMBER" => Some(NUMBER)
-        "INTEGER" => Some(INTEGER)
-        "BOOLEAN" => Some(BOOLEAN)
-        "ARRAY" => Some(ARRAY)
-        "OBJECT" => Some(OBJECT)
-        "NULL" => Some(NULL)
-        _ => None
+        "TYPE_UNSPECIFIED" => Option::Some(SchemaType::TYPEUNSPECIFIED)
+        "STRING" => Option::Some(SchemaType::STRING)
+        "NUMBER" => Option::Some(SchemaType::NUMBER)
+        "INTEGER" => Option::Some(SchemaType::INTEGER)
+        "BOOLEAN" => Option::Some(SchemaType::BOOLEAN)
+        "ARRAY" => Option::Some(SchemaType::ARRAY)
+        "OBJECT" => Option::Some(SchemaType::OBJECT)
+        "NULL" => Option::Some(SchemaType::NULL)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SchemaType::Unknown(raw),
   )
 }
 
@@ -1383,12 +1425,12 @@ pub extend FunctionDeclarationBehavior with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionDeclarationBehavior with fn to_json(self) {
   let raw = match self {
-    UNSPECIFIED => "UNSPECIFIED"
-    BLOCKING => "BLOCKING"
-    NONBLOCKING => "NON_BLOCKING"
-    Unknown(raw) => raw
+    FunctionDeclarationBehavior::UNSPECIFIED => "UNSPECIFIED"
+    FunctionDeclarationBehavior::BLOCKING => "BLOCKING"
+    FunctionDeclarationBehavior::NONBLOCKING => "NON_BLOCKING"
+    FunctionDeclarationBehavior::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1406,13 +1448,13 @@ pub impl @json.FromJson for FunctionDeclarationBehavior with fn from_json(
     path,
     raw => {
       match raw {
-        "UNSPECIFIED" => Some(UNSPECIFIED)
-        "BLOCKING" => Some(BLOCKING)
-        "NON_BLOCKING" => Some(NONBLOCKING)
-        _ => None
+        "UNSPECIFIED" => Option::Some(FunctionDeclarationBehavior::UNSPECIFIED)
+        "BLOCKING" => Option::Some(FunctionDeclarationBehavior::BLOCKING)
+        "NON_BLOCKING" => Option::Some(FunctionDeclarationBehavior::NONBLOCKING)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FunctionDeclarationBehavior::Unknown(raw),
   )
 }
 
@@ -1668,12 +1710,13 @@ pub extend PartTextMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartTextMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartTextMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartTextMediaProcessing::STATIC => "STATIC"
+    PartTextMediaProcessing::AGENTIC => "AGENTIC"
+    PartTextMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1691,13 +1734,14 @@ pub impl @json.FromJson for PartTextMediaProcessing with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(PartTextMediaProcessing::MEDIAPROCESSINGUNSPECIFIED)
+        "STATIC" => Option::Some(PartTextMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartTextMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartTextMediaProcessing::Unknown(raw),
   )
 }
 
@@ -1897,14 +1941,17 @@ pub extend V1mainMediaResolutionLevel with ToJson::{to_json}
 ///|
 pub impl ToJson for V1mainMediaResolutionLevel with fn to_json(self) {
   let raw = match self {
-    MEDIARESOLUTIONUNSPECIFIED => "MEDIA_RESOLUTION_UNSPECIFIED"
-    MEDIARESOLUTIONLOW => "MEDIA_RESOLUTION_LOW"
-    MEDIARESOLUTIONMEDIUM => "MEDIA_RESOLUTION_MEDIUM"
-    MEDIARESOLUTIONHIGH => "MEDIA_RESOLUTION_HIGH"
-    MEDIARESOLUTIONULTRAHIGH => "MEDIA_RESOLUTION_ULTRA_HIGH"
-    Unknown(raw) => raw
+    V1mainMediaResolutionLevel::MEDIARESOLUTIONUNSPECIFIED =>
+      "MEDIA_RESOLUTION_UNSPECIFIED"
+    V1mainMediaResolutionLevel::MEDIARESOLUTIONLOW => "MEDIA_RESOLUTION_LOW"
+    V1mainMediaResolutionLevel::MEDIARESOLUTIONMEDIUM =>
+      "MEDIA_RESOLUTION_MEDIUM"
+    V1mainMediaResolutionLevel::MEDIARESOLUTIONHIGH => "MEDIA_RESOLUTION_HIGH"
+    V1mainMediaResolutionLevel::MEDIARESOLUTIONULTRAHIGH =>
+      "MEDIA_RESOLUTION_ULTRA_HIGH"
+    V1mainMediaResolutionLevel::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1922,15 +1969,20 @@ pub impl @json.FromJson for V1mainMediaResolutionLevel with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_RESOLUTION_UNSPECIFIED" => Some(MEDIARESOLUTIONUNSPECIFIED)
-        "MEDIA_RESOLUTION_LOW" => Some(MEDIARESOLUTIONLOW)
-        "MEDIA_RESOLUTION_MEDIUM" => Some(MEDIARESOLUTIONMEDIUM)
-        "MEDIA_RESOLUTION_HIGH" => Some(MEDIARESOLUTIONHIGH)
-        "MEDIA_RESOLUTION_ULTRA_HIGH" => Some(MEDIARESOLUTIONULTRAHIGH)
-        _ => None
+        "MEDIA_RESOLUTION_UNSPECIFIED" =>
+          Option::Some(V1mainMediaResolutionLevel::MEDIARESOLUTIONUNSPECIFIED)
+        "MEDIA_RESOLUTION_LOW" =>
+          Option::Some(V1mainMediaResolutionLevel::MEDIARESOLUTIONLOW)
+        "MEDIA_RESOLUTION_MEDIUM" =>
+          Option::Some(V1mainMediaResolutionLevel::MEDIARESOLUTIONMEDIUM)
+        "MEDIA_RESOLUTION_HIGH" =>
+          Option::Some(V1mainMediaResolutionLevel::MEDIARESOLUTIONHIGH)
+        "MEDIA_RESOLUTION_ULTRA_HIGH" =>
+          Option::Some(V1mainMediaResolutionLevel::MEDIARESOLUTIONULTRAHIGH)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => V1mainMediaResolutionLevel::Unknown(raw),
   )
 }
 
@@ -2150,12 +2202,13 @@ pub extend PartInlineDataMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartInlineDataMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartInlineDataMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartInlineDataMediaProcessing::STATIC => "STATIC"
+    PartInlineDataMediaProcessing::AGENTIC => "AGENTIC"
+    PartInlineDataMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2173,13 +2226,16 @@ pub impl @json.FromJson for PartInlineDataMediaProcessing with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(
+            PartInlineDataMediaProcessing::MEDIAPROCESSINGUNSPECIFIED,
+          )
+        "STATIC" => Option::Some(PartInlineDataMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartInlineDataMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartInlineDataMediaProcessing::Unknown(raw),
   )
 }
 
@@ -2355,12 +2411,13 @@ pub extend PartFileDataMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartFileDataMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartFileDataMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartFileDataMediaProcessing::STATIC => "STATIC"
+    PartFileDataMediaProcessing::AGENTIC => "AGENTIC"
+    PartFileDataMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2378,13 +2435,14 @@ pub impl @json.FromJson for PartFileDataMediaProcessing with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(PartFileDataMediaProcessing::MEDIAPROCESSINGUNSPECIFIED)
+        "STATIC" => Option::Some(PartFileDataMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartFileDataMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartFileDataMediaProcessing::Unknown(raw),
   )
 }
 
@@ -2504,12 +2562,13 @@ pub extend PartFunctionCallMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartFunctionCallMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartFunctionCallMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartFunctionCallMediaProcessing::STATIC => "STATIC"
+    PartFunctionCallMediaProcessing::AGENTIC => "AGENTIC"
+    PartFunctionCallMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2527,13 +2586,16 @@ pub impl @json.FromJson for PartFunctionCallMediaProcessing with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(
+            PartFunctionCallMediaProcessing::MEDIAPROCESSINGUNSPECIFIED,
+          )
+        "STATIC" => Option::Some(PartFunctionCallMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartFunctionCallMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartFunctionCallMediaProcessing::Unknown(raw),
   )
 }
 
@@ -2765,12 +2827,13 @@ pub extend FunctionResponsePartMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionResponsePartMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    FunctionResponsePartMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    FunctionResponsePartMediaProcessing::STATIC => "STATIC"
+    FunctionResponsePartMediaProcessing::AGENTIC => "AGENTIC"
+    FunctionResponsePartMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2788,13 +2851,16 @@ pub impl @json.FromJson for FunctionResponsePartMediaProcessing with fn from_jso
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(
+            FunctionResponsePartMediaProcessing::MEDIAPROCESSINGUNSPECIFIED,
+          )
+        "STATIC" => Option::Some(FunctionResponsePartMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(FunctionResponsePartMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FunctionResponsePartMediaProcessing::Unknown(raw),
   )
 }
 
@@ -2940,13 +3006,14 @@ pub extend FunctionResponseScheduling with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionResponseScheduling with fn to_json(self) {
   let raw = match self {
-    SCHEDULINGUNSPECIFIED => "SCHEDULING_UNSPECIFIED"
-    SILENT => "SILENT"
-    WHENIDLE => "WHEN_IDLE"
-    INTERRUPT => "INTERRUPT"
-    Unknown(raw) => raw
+    FunctionResponseScheduling::SCHEDULINGUNSPECIFIED =>
+      "SCHEDULING_UNSPECIFIED"
+    FunctionResponseScheduling::SILENT => "SILENT"
+    FunctionResponseScheduling::WHENIDLE => "WHEN_IDLE"
+    FunctionResponseScheduling::INTERRUPT => "INTERRUPT"
+    FunctionResponseScheduling::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -2964,14 +3031,15 @@ pub impl @json.FromJson for FunctionResponseScheduling with fn from_json(
     path,
     raw => {
       match raw {
-        "SCHEDULING_UNSPECIFIED" => Some(SCHEDULINGUNSPECIFIED)
-        "SILENT" => Some(SILENT)
-        "WHEN_IDLE" => Some(WHENIDLE)
-        "INTERRUPT" => Some(INTERRUPT)
-        _ => None
+        "SCHEDULING_UNSPECIFIED" =>
+          Option::Some(FunctionResponseScheduling::SCHEDULINGUNSPECIFIED)
+        "SILENT" => Option::Some(FunctionResponseScheduling::SILENT)
+        "WHEN_IDLE" => Option::Some(FunctionResponseScheduling::WHENIDLE)
+        "INTERRUPT" => Option::Some(FunctionResponseScheduling::INTERRUPT)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FunctionResponseScheduling::Unknown(raw),
   )
 }
 
@@ -3069,12 +3137,13 @@ pub extend PartFunctionResponseMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartFunctionResponseMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartFunctionResponseMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartFunctionResponseMediaProcessing::STATIC => "STATIC"
+    PartFunctionResponseMediaProcessing::AGENTIC => "AGENTIC"
+    PartFunctionResponseMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3092,13 +3161,16 @@ pub impl @json.FromJson for PartFunctionResponseMediaProcessing with fn from_jso
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(
+            PartFunctionResponseMediaProcessing::MEDIAPROCESSINGUNSPECIFIED,
+          )
+        "STATIC" => Option::Some(PartFunctionResponseMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartFunctionResponseMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartFunctionResponseMediaProcessing::Unknown(raw),
   )
 }
 
@@ -3217,11 +3289,11 @@ pub extend ExecutableCodeLanguage with ToJson::{to_json}
 ///|
 pub impl ToJson for ExecutableCodeLanguage with fn to_json(self) {
   let raw = match self {
-    LANGUAGEUNSPECIFIED => "LANGUAGE_UNSPECIFIED"
-    PYTHON => "PYTHON"
-    Unknown(raw) => raw
+    ExecutableCodeLanguage::LANGUAGEUNSPECIFIED => "LANGUAGE_UNSPECIFIED"
+    ExecutableCodeLanguage::PYTHON => "PYTHON"
+    ExecutableCodeLanguage::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3239,12 +3311,13 @@ pub impl @json.FromJson for ExecutableCodeLanguage with fn from_json(
     path,
     raw => {
       match raw {
-        "LANGUAGE_UNSPECIFIED" => Some(LANGUAGEUNSPECIFIED)
-        "PYTHON" => Some(PYTHON)
-        _ => None
+        "LANGUAGE_UNSPECIFIED" =>
+          Option::Some(ExecutableCodeLanguage::LANGUAGEUNSPECIFIED)
+        "PYTHON" => Option::Some(ExecutableCodeLanguage::PYTHON)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ExecutableCodeLanguage::Unknown(raw),
   )
 }
 
@@ -3330,12 +3403,13 @@ pub extend PartExecutableCodeMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartExecutableCodeMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartExecutableCodeMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartExecutableCodeMediaProcessing::STATIC => "STATIC"
+    PartExecutableCodeMediaProcessing::AGENTIC => "AGENTIC"
+    PartExecutableCodeMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3353,13 +3427,16 @@ pub impl @json.FromJson for PartExecutableCodeMediaProcessing with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(
+            PartExecutableCodeMediaProcessing::MEDIAPROCESSINGUNSPECIFIED,
+          )
+        "STATIC" => Option::Some(PartExecutableCodeMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartExecutableCodeMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartExecutableCodeMediaProcessing::Unknown(raw),
   )
 }
 
@@ -3480,13 +3557,14 @@ pub extend CodeExecutionResultOutcome with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionResultOutcome with fn to_json(self) {
   let raw = match self {
-    OUTCOMEUNSPECIFIED => "OUTCOME_UNSPECIFIED"
-    OUTCOMEOK => "OUTCOME_OK"
-    OUTCOMEFAILED => "OUTCOME_FAILED"
-    OUTCOMEDEADLINEEXCEEDED => "OUTCOME_DEADLINE_EXCEEDED"
-    Unknown(raw) => raw
+    CodeExecutionResultOutcome::OUTCOMEUNSPECIFIED => "OUTCOME_UNSPECIFIED"
+    CodeExecutionResultOutcome::OUTCOMEOK => "OUTCOME_OK"
+    CodeExecutionResultOutcome::OUTCOMEFAILED => "OUTCOME_FAILED"
+    CodeExecutionResultOutcome::OUTCOMEDEADLINEEXCEEDED =>
+      "OUTCOME_DEADLINE_EXCEEDED"
+    CodeExecutionResultOutcome::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3504,14 +3582,17 @@ pub impl @json.FromJson for CodeExecutionResultOutcome with fn from_json(
     path,
     raw => {
       match raw {
-        "OUTCOME_UNSPECIFIED" => Some(OUTCOMEUNSPECIFIED)
-        "OUTCOME_OK" => Some(OUTCOMEOK)
-        "OUTCOME_FAILED" => Some(OUTCOMEFAILED)
-        "OUTCOME_DEADLINE_EXCEEDED" => Some(OUTCOMEDEADLINEEXCEEDED)
-        _ => None
+        "OUTCOME_UNSPECIFIED" =>
+          Option::Some(CodeExecutionResultOutcome::OUTCOMEUNSPECIFIED)
+        "OUTCOME_OK" => Option::Some(CodeExecutionResultOutcome::OUTCOMEOK)
+        "OUTCOME_FAILED" =>
+          Option::Some(CodeExecutionResultOutcome::OUTCOMEFAILED)
+        "OUTCOME_DEADLINE_EXCEEDED" =>
+          Option::Some(CodeExecutionResultOutcome::OUTCOMEDEADLINEEXCEEDED)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CodeExecutionResultOutcome::Unknown(raw),
   )
 }
 
@@ -3597,12 +3678,13 @@ pub extend PartCodeExecutionResultMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartCodeExecutionResultMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartCodeExecutionResultMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartCodeExecutionResultMediaProcessing::STATIC => "STATIC"
+    PartCodeExecutionResultMediaProcessing::AGENTIC => "AGENTIC"
+    PartCodeExecutionResultMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3622,13 +3704,17 @@ pub impl @json.FromJson for PartCodeExecutionResultMediaProcessing with fn from_
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(
+            PartCodeExecutionResultMediaProcessing::MEDIAPROCESSINGUNSPECIFIED,
+          )
+        "STATIC" => Option::Some(PartCodeExecutionResultMediaProcessing::STATIC)
+        "AGENTIC" =>
+          Option::Some(PartCodeExecutionResultMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartCodeExecutionResultMediaProcessing::Unknown(raw),
   )
 }
 
@@ -3755,16 +3841,16 @@ pub extend ToolCallToolType with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolCallToolType with fn to_json(self) {
   let raw = match self {
-    TOOLTYPEUNSPECIFIED => "TOOL_TYPE_UNSPECIFIED"
-    GOOGLESEARCHWEB => "GOOGLE_SEARCH_WEB"
-    GOOGLESEARCHIMAGE => "GOOGLE_SEARCH_IMAGE"
-    URLCONTEXT => "URL_CONTEXT"
-    GOOGLEMAPS => "GOOGLE_MAPS"
-    FILESEARCH => "FILE_SEARCH"
-    MEDIAPROCESSING => "MEDIA_PROCESSING"
-    Unknown(raw) => raw
+    ToolCallToolType::TOOLTYPEUNSPECIFIED => "TOOL_TYPE_UNSPECIFIED"
+    ToolCallToolType::GOOGLESEARCHWEB => "GOOGLE_SEARCH_WEB"
+    ToolCallToolType::GOOGLESEARCHIMAGE => "GOOGLE_SEARCH_IMAGE"
+    ToolCallToolType::URLCONTEXT => "URL_CONTEXT"
+    ToolCallToolType::GOOGLEMAPS => "GOOGLE_MAPS"
+    ToolCallToolType::FILESEARCH => "FILE_SEARCH"
+    ToolCallToolType::MEDIAPROCESSING => "MEDIA_PROCESSING"
+    ToolCallToolType::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3779,17 +3865,19 @@ pub impl @json.FromJson for ToolCallToolType with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "TOOL_TYPE_UNSPECIFIED" => Some(TOOLTYPEUNSPECIFIED)
-        "GOOGLE_SEARCH_WEB" => Some(GOOGLESEARCHWEB)
-        "GOOGLE_SEARCH_IMAGE" => Some(GOOGLESEARCHIMAGE)
-        "URL_CONTEXT" => Some(URLCONTEXT)
-        "GOOGLE_MAPS" => Some(GOOGLEMAPS)
-        "FILE_SEARCH" => Some(FILESEARCH)
-        "MEDIA_PROCESSING" => Some(MEDIAPROCESSING)
-        _ => None
+        "TOOL_TYPE_UNSPECIFIED" =>
+          Option::Some(ToolCallToolType::TOOLTYPEUNSPECIFIED)
+        "GOOGLE_SEARCH_WEB" => Option::Some(ToolCallToolType::GOOGLESEARCHWEB)
+        "GOOGLE_SEARCH_IMAGE" =>
+          Option::Some(ToolCallToolType::GOOGLESEARCHIMAGE)
+        "URL_CONTEXT" => Option::Some(ToolCallToolType::URLCONTEXT)
+        "GOOGLE_MAPS" => Option::Some(ToolCallToolType::GOOGLEMAPS)
+        "FILE_SEARCH" => Option::Some(ToolCallToolType::FILESEARCH)
+        "MEDIA_PROCESSING" => Option::Some(ToolCallToolType::MEDIAPROCESSING)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ToolCallToolType::Unknown(raw),
   )
 }
 
@@ -3879,12 +3967,13 @@ pub extend PartToolCallMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartToolCallMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartToolCallMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartToolCallMediaProcessing::STATIC => "STATIC"
+    PartToolCallMediaProcessing::AGENTIC => "AGENTIC"
+    PartToolCallMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -3902,13 +3991,14 @@ pub impl @json.FromJson for PartToolCallMediaProcessing with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(PartToolCallMediaProcessing::MEDIAPROCESSINGUNSPECIFIED)
+        "STATIC" => Option::Some(PartToolCallMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartToolCallMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartToolCallMediaProcessing::Unknown(raw),
   )
 }
 
@@ -4028,12 +4118,13 @@ pub extend PartToolResponseMediaProcessing with ToJson::{to_json}
 ///|
 pub impl ToJson for PartToolResponseMediaProcessing with fn to_json(self) {
   let raw = match self {
-    MEDIAPROCESSINGUNSPECIFIED => "MEDIA_PROCESSING_UNSPECIFIED"
-    STATIC => "STATIC"
-    AGENTIC => "AGENTIC"
-    Unknown(raw) => raw
+    PartToolResponseMediaProcessing::MEDIAPROCESSINGUNSPECIFIED =>
+      "MEDIA_PROCESSING_UNSPECIFIED"
+    PartToolResponseMediaProcessing::STATIC => "STATIC"
+    PartToolResponseMediaProcessing::AGENTIC => "AGENTIC"
+    PartToolResponseMediaProcessing::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4051,13 +4142,16 @@ pub impl @json.FromJson for PartToolResponseMediaProcessing with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_PROCESSING_UNSPECIFIED" => Some(MEDIAPROCESSINGUNSPECIFIED)
-        "STATIC" => Some(STATIC)
-        "AGENTIC" => Some(AGENTIC)
-        _ => None
+        "MEDIA_PROCESSING_UNSPECIFIED" =>
+          Option::Some(
+            PartToolResponseMediaProcessing::MEDIAPROCESSINGUNSPECIFIED,
+          )
+        "STATIC" => Option::Some(PartToolResponseMediaProcessing::STATIC)
+        "AGENTIC" => Option::Some(PartToolResponseMediaProcessing::AGENTIC)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PartToolResponseMediaProcessing::Unknown(raw),
   )
 }
 
@@ -4091,16 +4185,16 @@ pub extend ToolResponseToolType with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolResponseToolType with fn to_json(self) {
   let raw = match self {
-    TOOLTYPEUNSPECIFIED => "TOOL_TYPE_UNSPECIFIED"
-    GOOGLESEARCHWEB => "GOOGLE_SEARCH_WEB"
-    GOOGLESEARCHIMAGE => "GOOGLE_SEARCH_IMAGE"
-    URLCONTEXT => "URL_CONTEXT"
-    GOOGLEMAPS => "GOOGLE_MAPS"
-    FILESEARCH => "FILE_SEARCH"
-    MEDIAPROCESSING => "MEDIA_PROCESSING"
-    Unknown(raw) => raw
+    ToolResponseToolType::TOOLTYPEUNSPECIFIED => "TOOL_TYPE_UNSPECIFIED"
+    ToolResponseToolType::GOOGLESEARCHWEB => "GOOGLE_SEARCH_WEB"
+    ToolResponseToolType::GOOGLESEARCHIMAGE => "GOOGLE_SEARCH_IMAGE"
+    ToolResponseToolType::URLCONTEXT => "URL_CONTEXT"
+    ToolResponseToolType::GOOGLEMAPS => "GOOGLE_MAPS"
+    ToolResponseToolType::FILESEARCH => "FILE_SEARCH"
+    ToolResponseToolType::MEDIAPROCESSING => "MEDIA_PROCESSING"
+    ToolResponseToolType::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4115,17 +4209,21 @@ pub impl @json.FromJson for ToolResponseToolType with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "TOOL_TYPE_UNSPECIFIED" => Some(TOOLTYPEUNSPECIFIED)
-        "GOOGLE_SEARCH_WEB" => Some(GOOGLESEARCHWEB)
-        "GOOGLE_SEARCH_IMAGE" => Some(GOOGLESEARCHIMAGE)
-        "URL_CONTEXT" => Some(URLCONTEXT)
-        "GOOGLE_MAPS" => Some(GOOGLEMAPS)
-        "FILE_SEARCH" => Some(FILESEARCH)
-        "MEDIA_PROCESSING" => Some(MEDIAPROCESSING)
-        _ => None
+        "TOOL_TYPE_UNSPECIFIED" =>
+          Option::Some(ToolResponseToolType::TOOLTYPEUNSPECIFIED)
+        "GOOGLE_SEARCH_WEB" =>
+          Option::Some(ToolResponseToolType::GOOGLESEARCHWEB)
+        "GOOGLE_SEARCH_IMAGE" =>
+          Option::Some(ToolResponseToolType::GOOGLESEARCHIMAGE)
+        "URL_CONTEXT" => Option::Some(ToolResponseToolType::URLCONTEXT)
+        "GOOGLE_MAPS" => Option::Some(ToolResponseToolType::GOOGLEMAPS)
+        "FILE_SEARCH" => Option::Some(ToolResponseToolType::FILESEARCH)
+        "MEDIA_PROCESSING" =>
+          Option::Some(ToolResponseToolType::MEDIAPROCESSING)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ToolResponseToolType::Unknown(raw),
   )
 }
 
@@ -4303,15 +4401,15 @@ pub extend Part with ToJson::{to_json}
 ///|
 pub impl ToJson for Part with fn to_json(self) {
   match self {
-    Text(payload) => Json(payload)
-    InlineData(payload) => Json(payload)
-    FileData(payload) => Json(payload)
-    FunctionCall(payload) => Json(payload)
-    FunctionResponse(payload) => Json(payload)
-    ExecutableCode(payload) => Json(payload)
-    CodeExecutionResult(payload) => Json(payload)
-    ToolCall(payload) => Json(payload)
-    ToolResponse(payload) => Json(payload)
+    Part::Text(payload) => @json.Json::Json(payload)
+    Part::InlineData(payload) => @json.Json::Json(payload)
+    Part::FileData(payload) => @json.Json::Json(payload)
+    Part::FunctionCall(payload) => @json.Json::Json(payload)
+    Part::FunctionResponse(payload) => @json.Json::Json(payload)
+    Part::ExecutableCode(payload) => @json.Json::Json(payload)
+    Part::CodeExecutionResult(payload) => @json.Json::Json(payload)
+    Part::ToolCall(payload) => @json.Json::Json(payload)
+    Part::ToolResponse(payload) => @json.Json::Json(payload)
   }
 }
 
@@ -4350,36 +4448,38 @@ pub impl @json.FromJson for Part with fn from_json(value, path) {
     count += 1
   }
   if count != 1 {
-    raise @json.JsonDecodeError((path, "expected exactly one data field"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected exactly one data field"),
+    )
   }
   if obj.contains("text") {
-    return Text(@json.from_json(value, path~))
+    return Part::Text(@json.from_json(value, path~))
   }
   if obj.contains("inlineData") {
-    return InlineData(@json.from_json(value, path~))
+    return Part::InlineData(@json.from_json(value, path~))
   }
   if obj.contains("fileData") {
-    return FileData(@json.from_json(value, path~))
+    return Part::FileData(@json.from_json(value, path~))
   }
   if obj.contains("functionCall") {
-    return FunctionCall(@json.from_json(value, path~))
+    return Part::FunctionCall(@json.from_json(value, path~))
   }
   if obj.contains("functionResponse") {
-    return FunctionResponse(@json.from_json(value, path~))
+    return Part::FunctionResponse(@json.from_json(value, path~))
   }
   if obj.contains("executableCode") {
-    return ExecutableCode(@json.from_json(value, path~))
+    return Part::ExecutableCode(@json.from_json(value, path~))
   }
   if obj.contains("codeExecutionResult") {
-    return CodeExecutionResult(@json.from_json(value, path~))
+    return Part::CodeExecutionResult(@json.from_json(value, path~))
   }
   if obj.contains("toolCall") {
-    return ToolCall(@json.from_json(value, path~))
+    return Part::ToolCall(@json.from_json(value, path~))
   }
   if obj.contains("toolResponse") {
-    return ToolResponse(@json.from_json(value, path~))
+    return Part::ToolResponse(@json.from_json(value, path~))
   }
-  raise @json.JsonDecodeError((path, "missing data field"))
+  raise @json.JsonDecodeError::JsonDecodeError((path, "missing data field"))
 }
 
 ///|
@@ -4459,14 +4559,14 @@ pub extend FunctionCallingConfigMode with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionCallingConfigMode with fn to_json(self) {
   let raw = match self {
-    MODEUNSPECIFIED => "MODE_UNSPECIFIED"
-    AUTO => "AUTO"
-    ANY => "ANY"
-    NONE => "NONE"
-    VALIDATED => "VALIDATED"
-    Unknown(raw) => raw
+    FunctionCallingConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
+    FunctionCallingConfigMode::AUTO => "AUTO"
+    FunctionCallingConfigMode::ANY => "ANY"
+    FunctionCallingConfigMode::NONE => "NONE"
+    FunctionCallingConfigMode::VALIDATED => "VALIDATED"
+    FunctionCallingConfigMode::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4484,15 +4584,16 @@ pub impl @json.FromJson for FunctionCallingConfigMode with fn from_json(
     path,
     raw => {
       match raw {
-        "MODE_UNSPECIFIED" => Some(MODEUNSPECIFIED)
-        "AUTO" => Some(AUTO)
-        "ANY" => Some(ANY)
-        "NONE" => Some(NONE)
-        "VALIDATED" => Some(VALIDATED)
-        _ => None
+        "MODE_UNSPECIFIED" =>
+          Option::Some(FunctionCallingConfigMode::MODEUNSPECIFIED)
+        "AUTO" => Option::Some(FunctionCallingConfigMode::AUTO)
+        "ANY" => Option::Some(FunctionCallingConfigMode::ANY)
+        "NONE" => Option::Some(FunctionCallingConfigMode::NONE)
+        "VALIDATED" => Option::Some(FunctionCallingConfigMode::VALIDATED)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FunctionCallingConfigMode::Unknown(raw),
   )
 }
 
@@ -4855,18 +4956,18 @@ pub extend EmbedContentConfigTaskType with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbedContentConfigTaskType with fn to_json(self) {
   let raw = match self {
-    TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
-    RETRIEVALQUERY => "RETRIEVAL_QUERY"
-    RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
-    SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
-    CLASSIFICATION => "CLASSIFICATION"
-    CLUSTERING => "CLUSTERING"
-    QUESTIONANSWERING => "QUESTION_ANSWERING"
-    FACTVERIFICATION => "FACT_VERIFICATION"
-    CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
-    Custom(raw) => raw
+    EmbedContentConfigTaskType::TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
+    EmbedContentConfigTaskType::RETRIEVALQUERY => "RETRIEVAL_QUERY"
+    EmbedContentConfigTaskType::RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
+    EmbedContentConfigTaskType::SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
+    EmbedContentConfigTaskType::CLASSIFICATION => "CLASSIFICATION"
+    EmbedContentConfigTaskType::CLUSTERING => "CLUSTERING"
+    EmbedContentConfigTaskType::QUESTIONANSWERING => "QUESTION_ANSWERING"
+    EmbedContentConfigTaskType::FACTVERIFICATION => "FACT_VERIFICATION"
+    EmbedContentConfigTaskType::CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
+    EmbedContentConfigTaskType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -4884,19 +4985,27 @@ pub impl @json.FromJson for EmbedContentConfigTaskType with fn from_json(
     path,
     raw => {
       match raw {
-        "TASK_TYPE_UNSPECIFIED" => Some(TASKTYPEUNSPECIFIED)
-        "RETRIEVAL_QUERY" => Some(RETRIEVALQUERY)
-        "RETRIEVAL_DOCUMENT" => Some(RETRIEVALDOCUMENT)
-        "SEMANTIC_SIMILARITY" => Some(SEMANTICSIMILARITY)
-        "CLASSIFICATION" => Some(CLASSIFICATION)
-        "CLUSTERING" => Some(CLUSTERING)
-        "QUESTION_ANSWERING" => Some(QUESTIONANSWERING)
-        "FACT_VERIFICATION" => Some(FACTVERIFICATION)
-        "CODE_RETRIEVAL_QUERY" => Some(CODERETRIEVALQUERY)
-        _ => None
+        "TASK_TYPE_UNSPECIFIED" =>
+          Option::Some(EmbedContentConfigTaskType::TASKTYPEUNSPECIFIED)
+        "RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentConfigTaskType::RETRIEVALQUERY)
+        "RETRIEVAL_DOCUMENT" =>
+          Option::Some(EmbedContentConfigTaskType::RETRIEVALDOCUMENT)
+        "SEMANTIC_SIMILARITY" =>
+          Option::Some(EmbedContentConfigTaskType::SEMANTICSIMILARITY)
+        "CLASSIFICATION" =>
+          Option::Some(EmbedContentConfigTaskType::CLASSIFICATION)
+        "CLUSTERING" => Option::Some(EmbedContentConfigTaskType::CLUSTERING)
+        "QUESTION_ANSWERING" =>
+          Option::Some(EmbedContentConfigTaskType::QUESTIONANSWERING)
+        "FACT_VERIFICATION" =>
+          Option::Some(EmbedContentConfigTaskType::FACTVERIFICATION)
+        "CODE_RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentConfigTaskType::CODERETRIEVALQUERY)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbedContentConfigTaskType::Custom(raw),
   )
 }
 
@@ -6326,13 +6435,13 @@ pub extend FileSource with ToJson::{to_json}
 ///|
 pub impl ToJson for FileSource with fn to_json(self) {
   let raw = match self {
-    SOURCEUNSPECIFIED => "SOURCE_UNSPECIFIED"
-    UPLOADED => "UPLOADED"
-    GENERATED => "GENERATED"
-    REGISTERED => "REGISTERED"
-    Unknown(raw) => raw
+    FileSource::SOURCEUNSPECIFIED => "SOURCE_UNSPECIFIED"
+    FileSource::UPLOADED => "UPLOADED"
+    FileSource::GENERATED => "GENERATED"
+    FileSource::REGISTERED => "REGISTERED"
+    FileSource::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6347,14 +6456,14 @@ pub impl @json.FromJson for FileSource with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "SOURCE_UNSPECIFIED" => Some(SOURCEUNSPECIFIED)
-        "UPLOADED" => Some(UPLOADED)
-        "GENERATED" => Some(GENERATED)
-        "REGISTERED" => Some(REGISTERED)
-        _ => None
+        "SOURCE_UNSPECIFIED" => Option::Some(FileSource::SOURCEUNSPECIFIED)
+        "UPLOADED" => Option::Some(FileSource::UPLOADED)
+        "GENERATED" => Option::Some(FileSource::GENERATED)
+        "REGISTERED" => Option::Some(FileSource::REGISTERED)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FileSource::Unknown(raw),
   )
 }
 
@@ -6441,13 +6550,13 @@ pub extend FileState with ToJson::{to_json}
 ///|
 pub impl ToJson for FileState with fn to_json(self) {
   let raw = match self {
-    STATEUNSPECIFIED => "STATE_UNSPECIFIED"
-    PROCESSING => "PROCESSING"
-    ACTIVE => "ACTIVE"
-    FAILED => "FAILED"
-    Unknown(raw) => raw
+    FileState::STATEUNSPECIFIED => "STATE_UNSPECIFIED"
+    FileState::PROCESSING => "PROCESSING"
+    FileState::ACTIVE => "ACTIVE"
+    FileState::FAILED => "FAILED"
+    FileState::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6462,14 +6571,14 @@ pub impl @json.FromJson for FileState with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "STATE_UNSPECIFIED" => Some(STATEUNSPECIFIED)
-        "PROCESSING" => Some(PROCESSING)
-        "ACTIVE" => Some(ACTIVE)
-        "FAILED" => Some(FAILED)
-        _ => None
+        "STATE_UNSPECIFIED" => Option::Some(FileState::STATEUNSPECIFIED)
+        "PROCESSING" => Option::Some(FileState::PROCESSING)
+        "ACTIVE" => Option::Some(FileState::ACTIVE)
+        "FAILED" => Option::Some(FileState::FAILED)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => FileState::Unknown(raw),
   )
 }
 
@@ -6623,15 +6732,15 @@ pub extend ModalityTokenCountModality with ToJson::{to_json}
 ///|
 pub impl ToJson for ModalityTokenCountModality with fn to_json(self) {
   let raw = match self {
-    MODALITYUNSPECIFIED => "MODALITY_UNSPECIFIED"
-    TEXT => "TEXT"
-    IMAGE => "IMAGE"
-    VIDEO => "VIDEO"
-    AUDIO => "AUDIO"
-    DOCUMENT => "DOCUMENT"
-    Unknown(raw) => raw
+    ModalityTokenCountModality::MODALITYUNSPECIFIED => "MODALITY_UNSPECIFIED"
+    ModalityTokenCountModality::TEXT => "TEXT"
+    ModalityTokenCountModality::IMAGE => "IMAGE"
+    ModalityTokenCountModality::VIDEO => "VIDEO"
+    ModalityTokenCountModality::AUDIO => "AUDIO"
+    ModalityTokenCountModality::DOCUMENT => "DOCUMENT"
+    ModalityTokenCountModality::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6649,16 +6758,17 @@ pub impl @json.FromJson for ModalityTokenCountModality with fn from_json(
     path,
     raw => {
       match raw {
-        "MODALITY_UNSPECIFIED" => Some(MODALITYUNSPECIFIED)
-        "TEXT" => Some(TEXT)
-        "IMAGE" => Some(IMAGE)
-        "VIDEO" => Some(VIDEO)
-        "AUDIO" => Some(AUDIO)
-        "DOCUMENT" => Some(DOCUMENT)
-        _ => None
+        "MODALITY_UNSPECIFIED" =>
+          Option::Some(ModalityTokenCountModality::MODALITYUNSPECIFIED)
+        "TEXT" => Option::Some(ModalityTokenCountModality::TEXT)
+        "IMAGE" => Option::Some(ModalityTokenCountModality::IMAGE)
+        "VIDEO" => Option::Some(ModalityTokenCountModality::VIDEO)
+        "AUDIO" => Option::Some(ModalityTokenCountModality::AUDIO)
+        "DOCUMENT" => Option::Some(ModalityTokenCountModality::DOCUMENT)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ModalityTokenCountModality::Unknown(raw),
   )
 }
 
@@ -6867,32 +6977,34 @@ pub extend CandidateFinishReason with ToJson::{to_json}
 ///|
 pub impl ToJson for CandidateFinishReason with fn to_json(self) {
   let raw = match self {
-    FINISHREASONUNSPECIFIED => "FINISH_REASON_UNSPECIFIED"
-    STOP => "STOP"
-    MAXTOKENS => "MAX_TOKENS"
-    SAFETY => "SAFETY"
-    RECITATION => "RECITATION"
-    LANGUAGE => "LANGUAGE"
-    OTHER => "OTHER"
-    BLOCKLIST => "BLOCKLIST"
-    PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
-    SPII => "SPII"
-    MALFORMEDFUNCTIONCALL => "MALFORMED_FUNCTION_CALL"
-    IMAGESAFETY => "IMAGE_SAFETY"
-    IMAGEPROHIBITEDCONTENT => "IMAGE_PROHIBITED_CONTENT"
-    IMAGEOTHER => "IMAGE_OTHER"
-    NOIMAGE => "NO_IMAGE"
-    IMAGERECITATION => "IMAGE_RECITATION"
-    UNEXPECTEDTOOLCALL => "UNEXPECTED_TOOL_CALL"
-    TOOMANYTOOLCALLS => "TOO_MANY_TOOL_CALLS"
-    MISSINGTHOUGHTSIGNATURE => "MISSING_THOUGHT_SIGNATURE"
-    MALFORMEDRESPONSE => "MALFORMED_RESPONSE"
-    ESCALATION => "ESCALATION"
-    PUPLIMITEDDISABLED => "PUP_LIMITED_DISABLED"
-    CONTINUATION => "CONTINUATION"
-    Unknown(raw) => raw
+    CandidateFinishReason::FINISHREASONUNSPECIFIED =>
+      "FINISH_REASON_UNSPECIFIED"
+    CandidateFinishReason::STOP => "STOP"
+    CandidateFinishReason::MAXTOKENS => "MAX_TOKENS"
+    CandidateFinishReason::SAFETY => "SAFETY"
+    CandidateFinishReason::RECITATION => "RECITATION"
+    CandidateFinishReason::LANGUAGE => "LANGUAGE"
+    CandidateFinishReason::OTHER => "OTHER"
+    CandidateFinishReason::BLOCKLIST => "BLOCKLIST"
+    CandidateFinishReason::PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
+    CandidateFinishReason::SPII => "SPII"
+    CandidateFinishReason::MALFORMEDFUNCTIONCALL => "MALFORMED_FUNCTION_CALL"
+    CandidateFinishReason::IMAGESAFETY => "IMAGE_SAFETY"
+    CandidateFinishReason::IMAGEPROHIBITEDCONTENT => "IMAGE_PROHIBITED_CONTENT"
+    CandidateFinishReason::IMAGEOTHER => "IMAGE_OTHER"
+    CandidateFinishReason::NOIMAGE => "NO_IMAGE"
+    CandidateFinishReason::IMAGERECITATION => "IMAGE_RECITATION"
+    CandidateFinishReason::UNEXPECTEDTOOLCALL => "UNEXPECTED_TOOL_CALL"
+    CandidateFinishReason::TOOMANYTOOLCALLS => "TOO_MANY_TOOL_CALLS"
+    CandidateFinishReason::MISSINGTHOUGHTSIGNATURE =>
+      "MISSING_THOUGHT_SIGNATURE"
+    CandidateFinishReason::MALFORMEDRESPONSE => "MALFORMED_RESPONSE"
+    CandidateFinishReason::ESCALATION => "ESCALATION"
+    CandidateFinishReason::PUPLIMITEDDISABLED => "PUP_LIMITED_DISABLED"
+    CandidateFinishReason::CONTINUATION => "CONTINUATION"
+    CandidateFinishReason::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -6907,33 +7019,43 @@ pub impl @json.FromJson for CandidateFinishReason with fn from_json(value, path)
     path,
     raw => {
       match raw {
-        "FINISH_REASON_UNSPECIFIED" => Some(FINISHREASONUNSPECIFIED)
-        "STOP" => Some(STOP)
-        "MAX_TOKENS" => Some(MAXTOKENS)
-        "SAFETY" => Some(SAFETY)
-        "RECITATION" => Some(RECITATION)
-        "LANGUAGE" => Some(LANGUAGE)
-        "OTHER" => Some(OTHER)
-        "BLOCKLIST" => Some(BLOCKLIST)
-        "PROHIBITED_CONTENT" => Some(PROHIBITEDCONTENT)
-        "SPII" => Some(SPII)
-        "MALFORMED_FUNCTION_CALL" => Some(MALFORMEDFUNCTIONCALL)
-        "IMAGE_SAFETY" => Some(IMAGESAFETY)
-        "IMAGE_PROHIBITED_CONTENT" => Some(IMAGEPROHIBITEDCONTENT)
-        "IMAGE_OTHER" => Some(IMAGEOTHER)
-        "NO_IMAGE" => Some(NOIMAGE)
-        "IMAGE_RECITATION" => Some(IMAGERECITATION)
-        "UNEXPECTED_TOOL_CALL" => Some(UNEXPECTEDTOOLCALL)
-        "TOO_MANY_TOOL_CALLS" => Some(TOOMANYTOOLCALLS)
-        "MISSING_THOUGHT_SIGNATURE" => Some(MISSINGTHOUGHTSIGNATURE)
-        "MALFORMED_RESPONSE" => Some(MALFORMEDRESPONSE)
-        "ESCALATION" => Some(ESCALATION)
-        "PUP_LIMITED_DISABLED" => Some(PUPLIMITEDDISABLED)
-        "CONTINUATION" => Some(CONTINUATION)
-        _ => None
+        "FINISH_REASON_UNSPECIFIED" =>
+          Option::Some(CandidateFinishReason::FINISHREASONUNSPECIFIED)
+        "STOP" => Option::Some(CandidateFinishReason::STOP)
+        "MAX_TOKENS" => Option::Some(CandidateFinishReason::MAXTOKENS)
+        "SAFETY" => Option::Some(CandidateFinishReason::SAFETY)
+        "RECITATION" => Option::Some(CandidateFinishReason::RECITATION)
+        "LANGUAGE" => Option::Some(CandidateFinishReason::LANGUAGE)
+        "OTHER" => Option::Some(CandidateFinishReason::OTHER)
+        "BLOCKLIST" => Option::Some(CandidateFinishReason::BLOCKLIST)
+        "PROHIBITED_CONTENT" =>
+          Option::Some(CandidateFinishReason::PROHIBITEDCONTENT)
+        "SPII" => Option::Some(CandidateFinishReason::SPII)
+        "MALFORMED_FUNCTION_CALL" =>
+          Option::Some(CandidateFinishReason::MALFORMEDFUNCTIONCALL)
+        "IMAGE_SAFETY" => Option::Some(CandidateFinishReason::IMAGESAFETY)
+        "IMAGE_PROHIBITED_CONTENT" =>
+          Option::Some(CandidateFinishReason::IMAGEPROHIBITEDCONTENT)
+        "IMAGE_OTHER" => Option::Some(CandidateFinishReason::IMAGEOTHER)
+        "NO_IMAGE" => Option::Some(CandidateFinishReason::NOIMAGE)
+        "IMAGE_RECITATION" =>
+          Option::Some(CandidateFinishReason::IMAGERECITATION)
+        "UNEXPECTED_TOOL_CALL" =>
+          Option::Some(CandidateFinishReason::UNEXPECTEDTOOLCALL)
+        "TOO_MANY_TOOL_CALLS" =>
+          Option::Some(CandidateFinishReason::TOOMANYTOOLCALLS)
+        "MISSING_THOUGHT_SIGNATURE" =>
+          Option::Some(CandidateFinishReason::MISSINGTHOUGHTSIGNATURE)
+        "MALFORMED_RESPONSE" =>
+          Option::Some(CandidateFinishReason::MALFORMEDRESPONSE)
+        "ESCALATION" => Option::Some(CandidateFinishReason::ESCALATION)
+        "PUP_LIMITED_DISABLED" =>
+          Option::Some(CandidateFinishReason::PUPLIMITEDDISABLED)
+        "CONTINUATION" => Option::Some(CandidateFinishReason::CONTINUATION)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => CandidateFinishReason::Unknown(raw),
   )
 }
 
@@ -7383,14 +7505,15 @@ pub extend SafetyRatingProbability with ToJson::{to_json}
 ///|
 pub impl ToJson for SafetyRatingProbability with fn to_json(self) {
   let raw = match self {
-    HARMPROBABILITYUNSPECIFIED => "HARM_PROBABILITY_UNSPECIFIED"
-    NEGLIGIBLE => "NEGLIGIBLE"
-    LOW => "LOW"
-    MEDIUM => "MEDIUM"
-    HIGH => "HIGH"
-    Unknown(raw) => raw
+    SafetyRatingProbability::HARMPROBABILITYUNSPECIFIED =>
+      "HARM_PROBABILITY_UNSPECIFIED"
+    SafetyRatingProbability::NEGLIGIBLE => "NEGLIGIBLE"
+    SafetyRatingProbability::LOW => "LOW"
+    SafetyRatingProbability::MEDIUM => "MEDIUM"
+    SafetyRatingProbability::HIGH => "HIGH"
+    SafetyRatingProbability::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7408,15 +7531,16 @@ pub impl @json.FromJson for SafetyRatingProbability with fn from_json(
     path,
     raw => {
       match raw {
-        "HARM_PROBABILITY_UNSPECIFIED" => Some(HARMPROBABILITYUNSPECIFIED)
-        "NEGLIGIBLE" => Some(NEGLIGIBLE)
-        "LOW" => Some(LOW)
-        "MEDIUM" => Some(MEDIUM)
-        "HIGH" => Some(HIGH)
-        _ => None
+        "HARM_PROBABILITY_UNSPECIFIED" =>
+          Option::Some(SafetyRatingProbability::HARMPROBABILITYUNSPECIFIED)
+        "NEGLIGIBLE" => Option::Some(SafetyRatingProbability::NEGLIGIBLE)
+        "LOW" => Option::Some(SafetyRatingProbability::LOW)
+        "MEDIUM" => Option::Some(SafetyRatingProbability::MEDIUM)
+        "HIGH" => Option::Some(SafetyRatingProbability::HIGH)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SafetyRatingProbability::Unknown(raw),
   )
 }
 
@@ -7456,22 +7580,25 @@ pub extend SafetyRatingCategory with ToJson::{to_json}
 ///|
 pub impl ToJson for SafetyRatingCategory with fn to_json(self) {
   let raw = match self {
-    HARMCATEGORYUNSPECIFIED => "HARM_CATEGORY_UNSPECIFIED"
-    HARMCATEGORYDEROGATORY => "HARM_CATEGORY_DEROGATORY"
-    HARMCATEGORYTOXICITY => "HARM_CATEGORY_TOXICITY"
-    HARMCATEGORYVIOLENCE => "HARM_CATEGORY_VIOLENCE"
-    HARMCATEGORYSEXUAL => "HARM_CATEGORY_SEXUAL"
-    HARMCATEGORYMEDICAL => "HARM_CATEGORY_MEDICAL"
-    HARMCATEGORYDANGEROUS => "HARM_CATEGORY_DANGEROUS"
-    HARMCATEGORYHARASSMENT => "HARM_CATEGORY_HARASSMENT"
-    HARMCATEGORYHATESPEECH => "HARM_CATEGORY_HATE_SPEECH"
-    HARMCATEGORYSEXUALLYEXPLICIT => "HARM_CATEGORY_SEXUALLY_EXPLICIT"
-    HARMCATEGORYDANGEROUSCONTENT => "HARM_CATEGORY_DANGEROUS_CONTENT"
-    HARMCATEGORYCIVICINTEGRITY => "HARM_CATEGORY_CIVIC_INTEGRITY"
-    HARMCATEGORYJAILBREAK => "HARM_CATEGORY_JAILBREAK"
-    Unknown(raw) => raw
+    SafetyRatingCategory::HARMCATEGORYUNSPECIFIED => "HARM_CATEGORY_UNSPECIFIED"
+    SafetyRatingCategory::HARMCATEGORYDEROGATORY => "HARM_CATEGORY_DEROGATORY"
+    SafetyRatingCategory::HARMCATEGORYTOXICITY => "HARM_CATEGORY_TOXICITY"
+    SafetyRatingCategory::HARMCATEGORYVIOLENCE => "HARM_CATEGORY_VIOLENCE"
+    SafetyRatingCategory::HARMCATEGORYSEXUAL => "HARM_CATEGORY_SEXUAL"
+    SafetyRatingCategory::HARMCATEGORYMEDICAL => "HARM_CATEGORY_MEDICAL"
+    SafetyRatingCategory::HARMCATEGORYDANGEROUS => "HARM_CATEGORY_DANGEROUS"
+    SafetyRatingCategory::HARMCATEGORYHARASSMENT => "HARM_CATEGORY_HARASSMENT"
+    SafetyRatingCategory::HARMCATEGORYHATESPEECH => "HARM_CATEGORY_HATE_SPEECH"
+    SafetyRatingCategory::HARMCATEGORYSEXUALLYEXPLICIT =>
+      "HARM_CATEGORY_SEXUALLY_EXPLICIT"
+    SafetyRatingCategory::HARMCATEGORYDANGEROUSCONTENT =>
+      "HARM_CATEGORY_DANGEROUS_CONTENT"
+    SafetyRatingCategory::HARMCATEGORYCIVICINTEGRITY =>
+      "HARM_CATEGORY_CIVIC_INTEGRITY"
+    SafetyRatingCategory::HARMCATEGORYJAILBREAK => "HARM_CATEGORY_JAILBREAK"
+    SafetyRatingCategory::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7486,23 +7613,36 @@ pub impl @json.FromJson for SafetyRatingCategory with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "HARM_CATEGORY_UNSPECIFIED" => Some(HARMCATEGORYUNSPECIFIED)
-        "HARM_CATEGORY_DEROGATORY" => Some(HARMCATEGORYDEROGATORY)
-        "HARM_CATEGORY_TOXICITY" => Some(HARMCATEGORYTOXICITY)
-        "HARM_CATEGORY_VIOLENCE" => Some(HARMCATEGORYVIOLENCE)
-        "HARM_CATEGORY_SEXUAL" => Some(HARMCATEGORYSEXUAL)
-        "HARM_CATEGORY_MEDICAL" => Some(HARMCATEGORYMEDICAL)
-        "HARM_CATEGORY_DANGEROUS" => Some(HARMCATEGORYDANGEROUS)
-        "HARM_CATEGORY_HARASSMENT" => Some(HARMCATEGORYHARASSMENT)
-        "HARM_CATEGORY_HATE_SPEECH" => Some(HARMCATEGORYHATESPEECH)
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT" => Some(HARMCATEGORYSEXUALLYEXPLICIT)
-        "HARM_CATEGORY_DANGEROUS_CONTENT" => Some(HARMCATEGORYDANGEROUSCONTENT)
-        "HARM_CATEGORY_CIVIC_INTEGRITY" => Some(HARMCATEGORYCIVICINTEGRITY)
-        "HARM_CATEGORY_JAILBREAK" => Some(HARMCATEGORYJAILBREAK)
-        _ => None
+        "HARM_CATEGORY_UNSPECIFIED" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYUNSPECIFIED)
+        "HARM_CATEGORY_DEROGATORY" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYDEROGATORY)
+        "HARM_CATEGORY_TOXICITY" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYTOXICITY)
+        "HARM_CATEGORY_VIOLENCE" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYVIOLENCE)
+        "HARM_CATEGORY_SEXUAL" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYSEXUAL)
+        "HARM_CATEGORY_MEDICAL" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYMEDICAL)
+        "HARM_CATEGORY_DANGEROUS" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYDANGEROUS)
+        "HARM_CATEGORY_HARASSMENT" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYHARASSMENT)
+        "HARM_CATEGORY_HATE_SPEECH" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYHATESPEECH)
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYSEXUALLYEXPLICIT)
+        "HARM_CATEGORY_DANGEROUS_CONTENT" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYDANGEROUSCONTENT)
+        "HARM_CATEGORY_CIVIC_INTEGRITY" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYCIVICINTEGRITY)
+        "HARM_CATEGORY_JAILBREAK" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYJAILBREAK)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => SafetyRatingCategory::Unknown(raw),
   )
 }
 
@@ -7898,12 +8038,12 @@ pub extend ImageResponseFormatDelivery with ToJson::{to_json}
 ///|
 pub impl ToJson for ImageResponseFormatDelivery with fn to_json(self) {
   let raw = match self {
-    DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
-    INLINE => "INLINE"
-    URI => "URI"
-    Custom(raw) => raw
+    ImageResponseFormatDelivery::DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
+    ImageResponseFormatDelivery::INLINE => "INLINE"
+    ImageResponseFormatDelivery::URI => "URI"
+    ImageResponseFormatDelivery::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7921,13 +8061,14 @@ pub impl @json.FromJson for ImageResponseFormatDelivery with fn from_json(
     path,
     raw => {
       match raw {
-        "DELIVERY_UNSPECIFIED" => Some(DELIVERYUNSPECIFIED)
-        "INLINE" => Some(INLINE)
-        "URI" => Some(URI)
-        _ => None
+        "DELIVERY_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatDelivery::DELIVERYUNSPECIFIED)
+        "INLINE" => Option::Some(ImageResponseFormatDelivery::INLINE)
+        "URI" => Option::Some(ImageResponseFormatDelivery::URI)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ImageResponseFormatDelivery::Custom(raw),
   )
 }
 
@@ -7959,14 +8100,16 @@ pub extend ImageResponseFormatImageSize with ToJson::{to_json}
 ///|
 pub impl ToJson for ImageResponseFormatImageSize with fn to_json(self) {
   let raw = match self {
-    IMAGESIZEUNSPECIFIED => "IMAGE_SIZE_UNSPECIFIED"
-    IMAGESIZEFIVETWELVE => "IMAGE_SIZE_FIVE_TWELVE"
-    IMAGESIZEONEK => "IMAGE_SIZE_ONE_K"
-    IMAGESIZETWOK => "IMAGE_SIZE_TWO_K"
-    IMAGESIZEFOURK => "IMAGE_SIZE_FOUR_K"
-    Custom(raw) => raw
+    ImageResponseFormatImageSize::IMAGESIZEUNSPECIFIED =>
+      "IMAGE_SIZE_UNSPECIFIED"
+    ImageResponseFormatImageSize::IMAGESIZEFIVETWELVE =>
+      "IMAGE_SIZE_FIVE_TWELVE"
+    ImageResponseFormatImageSize::IMAGESIZEONEK => "IMAGE_SIZE_ONE_K"
+    ImageResponseFormatImageSize::IMAGESIZETWOK => "IMAGE_SIZE_TWO_K"
+    ImageResponseFormatImageSize::IMAGESIZEFOURK => "IMAGE_SIZE_FOUR_K"
+    ImageResponseFormatImageSize::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -7984,15 +8127,20 @@ pub impl @json.FromJson for ImageResponseFormatImageSize with fn from_json(
     path,
     raw => {
       match raw {
-        "IMAGE_SIZE_UNSPECIFIED" => Some(IMAGESIZEUNSPECIFIED)
-        "IMAGE_SIZE_FIVE_TWELVE" => Some(IMAGESIZEFIVETWELVE)
-        "IMAGE_SIZE_ONE_K" => Some(IMAGESIZEONEK)
-        "IMAGE_SIZE_TWO_K" => Some(IMAGESIZETWOK)
-        "IMAGE_SIZE_FOUR_K" => Some(IMAGESIZEFOURK)
-        _ => None
+        "IMAGE_SIZE_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEUNSPECIFIED)
+        "IMAGE_SIZE_FIVE_TWELVE" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEFIVETWELVE)
+        "IMAGE_SIZE_ONE_K" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEONEK)
+        "IMAGE_SIZE_TWO_K" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZETWOK)
+        "IMAGE_SIZE_FOUR_K" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEFOURK)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ImageResponseFormatImageSize::Custom(raw),
   )
 }
 
@@ -8034,24 +8182,39 @@ pub extend ImageResponseFormatAspectRatio with ToJson::{to_json}
 ///|
 pub impl ToJson for ImageResponseFormatAspectRatio with fn to_json(self) {
   let raw = match self {
-    ASPECTRATIOUNSPECIFIED => "ASPECT_RATIO_UNSPECIFIED"
-    ASPECTRATIOONEBYONE => "ASPECT_RATIO_ONE_BY_ONE"
-    ASPECTRATIOTWOBYTHREE => "ASPECT_RATIO_TWO_BY_THREE"
-    ASPECTRATIOTHREEBYTWO => "ASPECT_RATIO_THREE_BY_TWO"
-    ASPECTRATIOTHREEBYFOUR => "ASPECT_RATIO_THREE_BY_FOUR"
-    ASPECTRATIOFOURBYTHREE => "ASPECT_RATIO_FOUR_BY_THREE"
-    ASPECTRATIOFOURBYFIVE => "ASPECT_RATIO_FOUR_BY_FIVE"
-    ASPECTRATIOFIVEBYFOUR => "ASPECT_RATIO_FIVE_BY_FOUR"
-    ASPECTRATIONINEBYSIXTEEN => "ASPECT_RATIO_NINE_BY_SIXTEEN"
-    ASPECTRATIOSIXTEENBYNINE => "ASPECT_RATIO_SIXTEEN_BY_NINE"
-    ASPECTRATIOTWENTYONEBYNINE => "ASPECT_RATIO_TWENTY_ONE_BY_NINE"
-    ASPECTRATIOONEBYEIGHT => "ASPECT_RATIO_ONE_BY_EIGHT"
-    ASPECTRATIOEIGHTBYONE => "ASPECT_RATIO_EIGHT_BY_ONE"
-    ASPECTRATIOONEBYFOUR => "ASPECT_RATIO_ONE_BY_FOUR"
-    ASPECTRATIOFOURBYONE => "ASPECT_RATIO_FOUR_BY_ONE"
-    Custom(raw) => raw
+    ImageResponseFormatAspectRatio::ASPECTRATIOUNSPECIFIED =>
+      "ASPECT_RATIO_UNSPECIFIED"
+    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYONE =>
+      "ASPECT_RATIO_ONE_BY_ONE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTWOBYTHREE =>
+      "ASPECT_RATIO_TWO_BY_THREE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYTWO =>
+      "ASPECT_RATIO_THREE_BY_TWO"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYFOUR =>
+      "ASPECT_RATIO_THREE_BY_FOUR"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYTHREE =>
+      "ASPECT_RATIO_FOUR_BY_THREE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYFIVE =>
+      "ASPECT_RATIO_FOUR_BY_FIVE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFIVEBYFOUR =>
+      "ASPECT_RATIO_FIVE_BY_FOUR"
+    ImageResponseFormatAspectRatio::ASPECTRATIONINEBYSIXTEEN =>
+      "ASPECT_RATIO_NINE_BY_SIXTEEN"
+    ImageResponseFormatAspectRatio::ASPECTRATIOSIXTEENBYNINE =>
+      "ASPECT_RATIO_SIXTEEN_BY_NINE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTWENTYONEBYNINE =>
+      "ASPECT_RATIO_TWENTY_ONE_BY_NINE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYEIGHT =>
+      "ASPECT_RATIO_ONE_BY_EIGHT"
+    ImageResponseFormatAspectRatio::ASPECTRATIOEIGHTBYONE =>
+      "ASPECT_RATIO_EIGHT_BY_ONE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYFOUR =>
+      "ASPECT_RATIO_ONE_BY_FOUR"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYONE =>
+      "ASPECT_RATIO_FOUR_BY_ONE"
+    ImageResponseFormatAspectRatio::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8069,25 +8232,42 @@ pub impl @json.FromJson for ImageResponseFormatAspectRatio with fn from_json(
     path,
     raw => {
       match raw {
-        "ASPECT_RATIO_UNSPECIFIED" => Some(ASPECTRATIOUNSPECIFIED)
-        "ASPECT_RATIO_ONE_BY_ONE" => Some(ASPECTRATIOONEBYONE)
-        "ASPECT_RATIO_TWO_BY_THREE" => Some(ASPECTRATIOTWOBYTHREE)
-        "ASPECT_RATIO_THREE_BY_TWO" => Some(ASPECTRATIOTHREEBYTWO)
-        "ASPECT_RATIO_THREE_BY_FOUR" => Some(ASPECTRATIOTHREEBYFOUR)
-        "ASPECT_RATIO_FOUR_BY_THREE" => Some(ASPECTRATIOFOURBYTHREE)
-        "ASPECT_RATIO_FOUR_BY_FIVE" => Some(ASPECTRATIOFOURBYFIVE)
-        "ASPECT_RATIO_FIVE_BY_FOUR" => Some(ASPECTRATIOFIVEBYFOUR)
-        "ASPECT_RATIO_NINE_BY_SIXTEEN" => Some(ASPECTRATIONINEBYSIXTEEN)
-        "ASPECT_RATIO_SIXTEEN_BY_NINE" => Some(ASPECTRATIOSIXTEENBYNINE)
-        "ASPECT_RATIO_TWENTY_ONE_BY_NINE" => Some(ASPECTRATIOTWENTYONEBYNINE)
-        "ASPECT_RATIO_ONE_BY_EIGHT" => Some(ASPECTRATIOONEBYEIGHT)
-        "ASPECT_RATIO_EIGHT_BY_ONE" => Some(ASPECTRATIOEIGHTBYONE)
-        "ASPECT_RATIO_ONE_BY_FOUR" => Some(ASPECTRATIOONEBYFOUR)
-        "ASPECT_RATIO_FOUR_BY_ONE" => Some(ASPECTRATIOFOURBYONE)
-        _ => None
+        "ASPECT_RATIO_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOUNSPECIFIED)
+        "ASPECT_RATIO_ONE_BY_ONE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYONE)
+        "ASPECT_RATIO_TWO_BY_THREE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTWOBYTHREE)
+        "ASPECT_RATIO_THREE_BY_TWO" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYTWO)
+        "ASPECT_RATIO_THREE_BY_FOUR" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYFOUR)
+        "ASPECT_RATIO_FOUR_BY_THREE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYTHREE)
+        "ASPECT_RATIO_FOUR_BY_FIVE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYFIVE)
+        "ASPECT_RATIO_FIVE_BY_FOUR" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFIVEBYFOUR)
+        "ASPECT_RATIO_NINE_BY_SIXTEEN" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIONINEBYSIXTEEN)
+        "ASPECT_RATIO_SIXTEEN_BY_NINE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOSIXTEENBYNINE)
+        "ASPECT_RATIO_TWENTY_ONE_BY_NINE" =>
+          Option::Some(
+            ImageResponseFormatAspectRatio::ASPECTRATIOTWENTYONEBYNINE,
+          )
+        "ASPECT_RATIO_ONE_BY_EIGHT" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYEIGHT)
+        "ASPECT_RATIO_EIGHT_BY_ONE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOEIGHTBYONE)
+        "ASPECT_RATIO_ONE_BY_FOUR" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYFOUR)
+        "ASPECT_RATIO_FOUR_BY_ONE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYONE)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ImageResponseFormatAspectRatio::Custom(raw),
   )
 }
 
@@ -8116,11 +8296,11 @@ pub extend ImageResponseFormatMimeType with ToJson::{to_json}
 ///|
 pub impl ToJson for ImageResponseFormatMimeType with fn to_json(self) {
   let raw = match self {
-    MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
-    IMAGEJPEG => "IMAGE_JPEG"
-    Custom(raw) => raw
+    ImageResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
+    ImageResponseFormatMimeType::IMAGEJPEG => "IMAGE_JPEG"
+    ImageResponseFormatMimeType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8138,12 +8318,13 @@ pub impl @json.FromJson for ImageResponseFormatMimeType with fn from_json(
     path,
     raw => {
       match raw {
-        "MIME_TYPE_UNSPECIFIED" => Some(MIMETYPEUNSPECIFIED)
-        "IMAGE_JPEG" => Some(IMAGEJPEG)
-        _ => None
+        "MIME_TYPE_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatMimeType::MIMETYPEUNSPECIFIED)
+        "IMAGE_JPEG" => Option::Some(ImageResponseFormatMimeType::IMAGEJPEG)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ImageResponseFormatMimeType::Custom(raw),
   )
 }
 
@@ -8234,13 +8415,17 @@ pub extend GenerationConfigMediaResolution with ToJson::{to_json}
 ///|
 pub impl ToJson for GenerationConfigMediaResolution with fn to_json(self) {
   let raw = match self {
-    MEDIARESOLUTIONUNSPECIFIED => "MEDIA_RESOLUTION_UNSPECIFIED"
-    MEDIARESOLUTIONLOW => "MEDIA_RESOLUTION_LOW"
-    MEDIARESOLUTIONMEDIUM => "MEDIA_RESOLUTION_MEDIUM"
-    MEDIARESOLUTIONHIGH => "MEDIA_RESOLUTION_HIGH"
-    Custom(raw) => raw
+    GenerationConfigMediaResolution::MEDIARESOLUTIONUNSPECIFIED =>
+      "MEDIA_RESOLUTION_UNSPECIFIED"
+    GenerationConfigMediaResolution::MEDIARESOLUTIONLOW =>
+      "MEDIA_RESOLUTION_LOW"
+    GenerationConfigMediaResolution::MEDIARESOLUTIONMEDIUM =>
+      "MEDIA_RESOLUTION_MEDIUM"
+    GenerationConfigMediaResolution::MEDIARESOLUTIONHIGH =>
+      "MEDIA_RESOLUTION_HIGH"
+    GenerationConfigMediaResolution::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8258,14 +8443,20 @@ pub impl @json.FromJson for GenerationConfigMediaResolution with fn from_json(
     path,
     raw => {
       match raw {
-        "MEDIA_RESOLUTION_UNSPECIFIED" => Some(MEDIARESOLUTIONUNSPECIFIED)
-        "MEDIA_RESOLUTION_LOW" => Some(MEDIARESOLUTIONLOW)
-        "MEDIA_RESOLUTION_MEDIUM" => Some(MEDIARESOLUTIONMEDIUM)
-        "MEDIA_RESOLUTION_HIGH" => Some(MEDIARESOLUTIONHIGH)
-        _ => None
+        "MEDIA_RESOLUTION_UNSPECIFIED" =>
+          Option::Some(
+            GenerationConfigMediaResolution::MEDIARESOLUTIONUNSPECIFIED,
+          )
+        "MEDIA_RESOLUTION_LOW" =>
+          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONLOW)
+        "MEDIA_RESOLUTION_MEDIUM" =>
+          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONMEDIUM)
+        "MEDIA_RESOLUTION_HIGH" =>
+          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONHIGH)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GenerationConfigMediaResolution::Custom(raw),
   )
 }
 
@@ -8296,13 +8487,14 @@ pub extend GenerationConfigResponseModalitiesItem with ToJson::{to_json}
 ///|
 pub impl ToJson for GenerationConfigResponseModalitiesItem with fn to_json(self) {
   let raw = match self {
-    MODALITYUNSPECIFIED => "MODALITY_UNSPECIFIED"
-    TEXT => "TEXT"
-    IMAGE => "IMAGE"
-    AUDIO => "AUDIO"
-    Custom(raw) => raw
+    GenerationConfigResponseModalitiesItem::MODALITYUNSPECIFIED =>
+      "MODALITY_UNSPECIFIED"
+    GenerationConfigResponseModalitiesItem::TEXT => "TEXT"
+    GenerationConfigResponseModalitiesItem::IMAGE => "IMAGE"
+    GenerationConfigResponseModalitiesItem::AUDIO => "AUDIO"
+    GenerationConfigResponseModalitiesItem::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8322,14 +8514,17 @@ pub impl @json.FromJson for GenerationConfigResponseModalitiesItem with fn from_
     path,
     raw => {
       match raw {
-        "MODALITY_UNSPECIFIED" => Some(MODALITYUNSPECIFIED)
-        "TEXT" => Some(TEXT)
-        "IMAGE" => Some(IMAGE)
-        "AUDIO" => Some(AUDIO)
-        _ => None
+        "MODALITY_UNSPECIFIED" =>
+          Option::Some(
+            GenerationConfigResponseModalitiesItem::MODALITYUNSPECIFIED,
+          )
+        "TEXT" => Option::Some(GenerationConfigResponseModalitiesItem::TEXT)
+        "IMAGE" => Option::Some(GenerationConfigResponseModalitiesItem::IMAGE)
+        "AUDIO" => Option::Some(GenerationConfigResponseModalitiesItem::AUDIO)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GenerationConfigResponseModalitiesItem::Custom(raw),
   )
 }
 
@@ -8359,12 +8554,12 @@ pub extend TextResponseFormatMimeType with ToJson::{to_json}
 ///|
 pub impl ToJson for TextResponseFormatMimeType with fn to_json(self) {
   let raw = match self {
-    MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
-    APPLICATIONJSON => "APPLICATION_JSON"
-    TEXTPLAIN => "TEXT_PLAIN"
-    Custom(raw) => raw
+    TextResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
+    TextResponseFormatMimeType::APPLICATIONJSON => "APPLICATION_JSON"
+    TextResponseFormatMimeType::TEXTPLAIN => "TEXT_PLAIN"
+    TextResponseFormatMimeType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8382,13 +8577,15 @@ pub impl @json.FromJson for TextResponseFormatMimeType with fn from_json(
     path,
     raw => {
       match raw {
-        "MIME_TYPE_UNSPECIFIED" => Some(MIMETYPEUNSPECIFIED)
-        "APPLICATION_JSON" => Some(APPLICATIONJSON)
-        "TEXT_PLAIN" => Some(TEXTPLAIN)
-        _ => None
+        "MIME_TYPE_UNSPECIFIED" =>
+          Option::Some(TextResponseFormatMimeType::MIMETYPEUNSPECIFIED)
+        "APPLICATION_JSON" =>
+          Option::Some(TextResponseFormatMimeType::APPLICATIONJSON)
+        "TEXT_PLAIN" => Option::Some(TextResponseFormatMimeType::TEXTPLAIN)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => TextResponseFormatMimeType::Custom(raw),
   )
 }
 
@@ -8470,12 +8667,12 @@ pub extend AudioResponseFormatDelivery with ToJson::{to_json}
 ///|
 pub impl ToJson for AudioResponseFormatDelivery with fn to_json(self) {
   let raw = match self {
-    DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
-    INLINE => "INLINE"
-    URI => "URI"
-    Custom(raw) => raw
+    AudioResponseFormatDelivery::DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
+    AudioResponseFormatDelivery::INLINE => "INLINE"
+    AudioResponseFormatDelivery::URI => "URI"
+    AudioResponseFormatDelivery::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8493,13 +8690,14 @@ pub impl @json.FromJson for AudioResponseFormatDelivery with fn from_json(
     path,
     raw => {
       match raw {
-        "DELIVERY_UNSPECIFIED" => Some(DELIVERYUNSPECIFIED)
-        "INLINE" => Some(INLINE)
-        "URI" => Some(URI)
-        _ => None
+        "DELIVERY_UNSPECIFIED" =>
+          Option::Some(AudioResponseFormatDelivery::DELIVERYUNSPECIFIED)
+        "INLINE" => Option::Some(AudioResponseFormatDelivery::INLINE)
+        "URI" => Option::Some(AudioResponseFormatDelivery::URI)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => AudioResponseFormatDelivery::Custom(raw),
   )
 }
 
@@ -8533,16 +8731,16 @@ pub extend AudioResponseFormatMimeType with ToJson::{to_json}
 ///|
 pub impl ToJson for AudioResponseFormatMimeType with fn to_json(self) {
   let raw = match self {
-    MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
-    AUDIOMP3 => "AUDIO_MP3"
-    AUDIOOGGOPUS => "AUDIO_OGG_OPUS"
-    AUDIOL16 => "AUDIO_L16"
-    AUDIOWAV => "AUDIO_WAV"
-    AUDIOALAW => "AUDIO_ALAW"
-    AUDIOMULAW => "AUDIO_MULAW"
-    Custom(raw) => raw
+    AudioResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
+    AudioResponseFormatMimeType::AUDIOMP3 => "AUDIO_MP3"
+    AudioResponseFormatMimeType::AUDIOOGGOPUS => "AUDIO_OGG_OPUS"
+    AudioResponseFormatMimeType::AUDIOL16 => "AUDIO_L16"
+    AudioResponseFormatMimeType::AUDIOWAV => "AUDIO_WAV"
+    AudioResponseFormatMimeType::AUDIOALAW => "AUDIO_ALAW"
+    AudioResponseFormatMimeType::AUDIOMULAW => "AUDIO_MULAW"
+    AudioResponseFormatMimeType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8560,17 +8758,19 @@ pub impl @json.FromJson for AudioResponseFormatMimeType with fn from_json(
     path,
     raw => {
       match raw {
-        "MIME_TYPE_UNSPECIFIED" => Some(MIMETYPEUNSPECIFIED)
-        "AUDIO_MP3" => Some(AUDIOMP3)
-        "AUDIO_OGG_OPUS" => Some(AUDIOOGGOPUS)
-        "AUDIO_L16" => Some(AUDIOL16)
-        "AUDIO_WAV" => Some(AUDIOWAV)
-        "AUDIO_ALAW" => Some(AUDIOALAW)
-        "AUDIO_MULAW" => Some(AUDIOMULAW)
-        _ => None
+        "MIME_TYPE_UNSPECIFIED" =>
+          Option::Some(AudioResponseFormatMimeType::MIMETYPEUNSPECIFIED)
+        "AUDIO_MP3" => Option::Some(AudioResponseFormatMimeType::AUDIOMP3)
+        "AUDIO_OGG_OPUS" =>
+          Option::Some(AudioResponseFormatMimeType::AUDIOOGGOPUS)
+        "AUDIO_L16" => Option::Some(AudioResponseFormatMimeType::AUDIOL16)
+        "AUDIO_WAV" => Option::Some(AudioResponseFormatMimeType::AUDIOWAV)
+        "AUDIO_ALAW" => Option::Some(AudioResponseFormatMimeType::AUDIOALAW)
+        "AUDIO_MULAW" => Option::Some(AudioResponseFormatMimeType::AUDIOMULAW)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => AudioResponseFormatMimeType::Custom(raw),
   )
 }
 
@@ -8716,12 +8916,12 @@ pub extend AudioTranscriptionConfigMode with ToJson::{to_json}
 ///|
 pub impl ToJson for AudioTranscriptionConfigMode with fn to_json(self) {
   let raw = match self {
-    MODEUNSPECIFIED => "MODE_UNSPECIFIED"
-    VERBATIM => "VERBATIM"
-    SMART => "SMART"
-    Custom(raw) => raw
+    AudioTranscriptionConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
+    AudioTranscriptionConfigMode::VERBATIM => "VERBATIM"
+    AudioTranscriptionConfigMode::SMART => "SMART"
+    AudioTranscriptionConfigMode::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8739,13 +8939,14 @@ pub impl @json.FromJson for AudioTranscriptionConfigMode with fn from_json(
     path,
     raw => {
       match raw {
-        "MODE_UNSPECIFIED" => Some(MODEUNSPECIFIED)
-        "VERBATIM" => Some(VERBATIM)
-        "SMART" => Some(SMART)
-        _ => None
+        "MODE_UNSPECIFIED" =>
+          Option::Some(AudioTranscriptionConfigMode::MODEUNSPECIFIED)
+        "VERBATIM" => Option::Some(AudioTranscriptionConfigMode::VERBATIM)
+        "SMART" => Option::Some(AudioTranscriptionConfigMode::SMART)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => AudioTranscriptionConfigMode::Custom(raw),
   )
 }
 
@@ -8923,15 +9124,16 @@ pub extend ThinkingConfigThinkingLevel with ToJson::{to_json}
 ///|
 pub impl ToJson for ThinkingConfigThinkingLevel with fn to_json(self) {
   let raw = match self {
-    THINKINGLEVELUNSPECIFIED => "THINKING_LEVEL_UNSPECIFIED"
-    MINIMAL => "MINIMAL"
-    LOW => "LOW"
-    MEDIUM => "MEDIUM"
-    HIGH => "HIGH"
-    XHIGH => "XHIGH"
-    Custom(raw) => raw
+    ThinkingConfigThinkingLevel::THINKINGLEVELUNSPECIFIED =>
+      "THINKING_LEVEL_UNSPECIFIED"
+    ThinkingConfigThinkingLevel::MINIMAL => "MINIMAL"
+    ThinkingConfigThinkingLevel::LOW => "LOW"
+    ThinkingConfigThinkingLevel::MEDIUM => "MEDIUM"
+    ThinkingConfigThinkingLevel::HIGH => "HIGH"
+    ThinkingConfigThinkingLevel::XHIGH => "XHIGH"
+    ThinkingConfigThinkingLevel::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -8949,16 +9151,17 @@ pub impl @json.FromJson for ThinkingConfigThinkingLevel with fn from_json(
     path,
     raw => {
       match raw {
-        "THINKING_LEVEL_UNSPECIFIED" => Some(THINKINGLEVELUNSPECIFIED)
-        "MINIMAL" => Some(MINIMAL)
-        "LOW" => Some(LOW)
-        "MEDIUM" => Some(MEDIUM)
-        "HIGH" => Some(HIGH)
-        "XHIGH" => Some(XHIGH)
-        _ => None
+        "THINKING_LEVEL_UNSPECIFIED" =>
+          Option::Some(ThinkingConfigThinkingLevel::THINKINGLEVELUNSPECIFIED)
+        "MINIMAL" => Option::Some(ThinkingConfigThinkingLevel::MINIMAL)
+        "LOW" => Option::Some(ThinkingConfigThinkingLevel::LOW)
+        "MEDIUM" => Option::Some(ThinkingConfigThinkingLevel::MEDIUM)
+        "HIGH" => Option::Some(ThinkingConfigThinkingLevel::HIGH)
+        "XHIGH" => Option::Some(ThinkingConfigThinkingLevel::XHIGH)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => ThinkingConfigThinkingLevel::Custom(raw),
   )
 }
 
@@ -9230,22 +9433,26 @@ pub extend SafetySettingCategory with ToJson::{to_json}
 ///|
 pub impl ToJson for SafetySettingCategory with fn to_json(self) {
   let raw = match self {
-    HARMCATEGORYUNSPECIFIED => "HARM_CATEGORY_UNSPECIFIED"
-    HARMCATEGORYDEROGATORY => "HARM_CATEGORY_DEROGATORY"
-    HARMCATEGORYTOXICITY => "HARM_CATEGORY_TOXICITY"
-    HARMCATEGORYVIOLENCE => "HARM_CATEGORY_VIOLENCE"
-    HARMCATEGORYSEXUAL => "HARM_CATEGORY_SEXUAL"
-    HARMCATEGORYMEDICAL => "HARM_CATEGORY_MEDICAL"
-    HARMCATEGORYDANGEROUS => "HARM_CATEGORY_DANGEROUS"
-    HARMCATEGORYHARASSMENT => "HARM_CATEGORY_HARASSMENT"
-    HARMCATEGORYHATESPEECH => "HARM_CATEGORY_HATE_SPEECH"
-    HARMCATEGORYSEXUALLYEXPLICIT => "HARM_CATEGORY_SEXUALLY_EXPLICIT"
-    HARMCATEGORYDANGEROUSCONTENT => "HARM_CATEGORY_DANGEROUS_CONTENT"
-    HARMCATEGORYCIVICINTEGRITY => "HARM_CATEGORY_CIVIC_INTEGRITY"
-    HARMCATEGORYJAILBREAK => "HARM_CATEGORY_JAILBREAK"
-    Custom(raw) => raw
+    SafetySettingCategory::HARMCATEGORYUNSPECIFIED =>
+      "HARM_CATEGORY_UNSPECIFIED"
+    SafetySettingCategory::HARMCATEGORYDEROGATORY => "HARM_CATEGORY_DEROGATORY"
+    SafetySettingCategory::HARMCATEGORYTOXICITY => "HARM_CATEGORY_TOXICITY"
+    SafetySettingCategory::HARMCATEGORYVIOLENCE => "HARM_CATEGORY_VIOLENCE"
+    SafetySettingCategory::HARMCATEGORYSEXUAL => "HARM_CATEGORY_SEXUAL"
+    SafetySettingCategory::HARMCATEGORYMEDICAL => "HARM_CATEGORY_MEDICAL"
+    SafetySettingCategory::HARMCATEGORYDANGEROUS => "HARM_CATEGORY_DANGEROUS"
+    SafetySettingCategory::HARMCATEGORYHARASSMENT => "HARM_CATEGORY_HARASSMENT"
+    SafetySettingCategory::HARMCATEGORYHATESPEECH => "HARM_CATEGORY_HATE_SPEECH"
+    SafetySettingCategory::HARMCATEGORYSEXUALLYEXPLICIT =>
+      "HARM_CATEGORY_SEXUALLY_EXPLICIT"
+    SafetySettingCategory::HARMCATEGORYDANGEROUSCONTENT =>
+      "HARM_CATEGORY_DANGEROUS_CONTENT"
+    SafetySettingCategory::HARMCATEGORYCIVICINTEGRITY =>
+      "HARM_CATEGORY_CIVIC_INTEGRITY"
+    SafetySettingCategory::HARMCATEGORYJAILBREAK => "HARM_CATEGORY_JAILBREAK"
+    SafetySettingCategory::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9260,23 +9467,36 @@ pub impl @json.FromJson for SafetySettingCategory with fn from_json(value, path)
     path,
     raw => {
       match raw {
-        "HARM_CATEGORY_UNSPECIFIED" => Some(HARMCATEGORYUNSPECIFIED)
-        "HARM_CATEGORY_DEROGATORY" => Some(HARMCATEGORYDEROGATORY)
-        "HARM_CATEGORY_TOXICITY" => Some(HARMCATEGORYTOXICITY)
-        "HARM_CATEGORY_VIOLENCE" => Some(HARMCATEGORYVIOLENCE)
-        "HARM_CATEGORY_SEXUAL" => Some(HARMCATEGORYSEXUAL)
-        "HARM_CATEGORY_MEDICAL" => Some(HARMCATEGORYMEDICAL)
-        "HARM_CATEGORY_DANGEROUS" => Some(HARMCATEGORYDANGEROUS)
-        "HARM_CATEGORY_HARASSMENT" => Some(HARMCATEGORYHARASSMENT)
-        "HARM_CATEGORY_HATE_SPEECH" => Some(HARMCATEGORYHATESPEECH)
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT" => Some(HARMCATEGORYSEXUALLYEXPLICIT)
-        "HARM_CATEGORY_DANGEROUS_CONTENT" => Some(HARMCATEGORYDANGEROUSCONTENT)
-        "HARM_CATEGORY_CIVIC_INTEGRITY" => Some(HARMCATEGORYCIVICINTEGRITY)
-        "HARM_CATEGORY_JAILBREAK" => Some(HARMCATEGORYJAILBREAK)
-        _ => None
+        "HARM_CATEGORY_UNSPECIFIED" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYUNSPECIFIED)
+        "HARM_CATEGORY_DEROGATORY" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYDEROGATORY)
+        "HARM_CATEGORY_TOXICITY" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYTOXICITY)
+        "HARM_CATEGORY_VIOLENCE" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYVIOLENCE)
+        "HARM_CATEGORY_SEXUAL" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYSEXUAL)
+        "HARM_CATEGORY_MEDICAL" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYMEDICAL)
+        "HARM_CATEGORY_DANGEROUS" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYDANGEROUS)
+        "HARM_CATEGORY_HARASSMENT" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYHARASSMENT)
+        "HARM_CATEGORY_HATE_SPEECH" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYHATESPEECH)
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYSEXUALLYEXPLICIT)
+        "HARM_CATEGORY_DANGEROUS_CONTENT" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYDANGEROUSCONTENT)
+        "HARM_CATEGORY_CIVIC_INTEGRITY" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYCIVICINTEGRITY)
+        "HARM_CATEGORY_JAILBREAK" =>
+          Option::Some(SafetySettingCategory::HARMCATEGORYJAILBREAK)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => SafetySettingCategory::Custom(raw),
   )
 }
 
@@ -9309,15 +9529,16 @@ pub extend SafetySettingThreshold with ToJson::{to_json}
 ///|
 pub impl ToJson for SafetySettingThreshold with fn to_json(self) {
   let raw = match self {
-    HARMBLOCKTHRESHOLDUNSPECIFIED => "HARM_BLOCK_THRESHOLD_UNSPECIFIED"
-    BLOCKLOWANDABOVE => "BLOCK_LOW_AND_ABOVE"
-    BLOCKMEDIUMANDABOVE => "BLOCK_MEDIUM_AND_ABOVE"
-    BLOCKONLYHIGH => "BLOCK_ONLY_HIGH"
-    BLOCKNONE => "BLOCK_NONE"
-    OFF => "OFF"
-    Custom(raw) => raw
+    SafetySettingThreshold::HARMBLOCKTHRESHOLDUNSPECIFIED =>
+      "HARM_BLOCK_THRESHOLD_UNSPECIFIED"
+    SafetySettingThreshold::BLOCKLOWANDABOVE => "BLOCK_LOW_AND_ABOVE"
+    SafetySettingThreshold::BLOCKMEDIUMANDABOVE => "BLOCK_MEDIUM_AND_ABOVE"
+    SafetySettingThreshold::BLOCKONLYHIGH => "BLOCK_ONLY_HIGH"
+    SafetySettingThreshold::BLOCKNONE => "BLOCK_NONE"
+    SafetySettingThreshold::OFF => "OFF"
+    SafetySettingThreshold::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9336,16 +9557,18 @@ pub impl @json.FromJson for SafetySettingThreshold with fn from_json(
     raw => {
       match raw {
         "HARM_BLOCK_THRESHOLD_UNSPECIFIED" =>
-          Some(HARMBLOCKTHRESHOLDUNSPECIFIED)
-        "BLOCK_LOW_AND_ABOVE" => Some(BLOCKLOWANDABOVE)
-        "BLOCK_MEDIUM_AND_ABOVE" => Some(BLOCKMEDIUMANDABOVE)
-        "BLOCK_ONLY_HIGH" => Some(BLOCKONLYHIGH)
-        "BLOCK_NONE" => Some(BLOCKNONE)
-        "OFF" => Some(OFF)
-        _ => None
+          Option::Some(SafetySettingThreshold::HARMBLOCKTHRESHOLDUNSPECIFIED)
+        "BLOCK_LOW_AND_ABOVE" =>
+          Option::Some(SafetySettingThreshold::BLOCKLOWANDABOVE)
+        "BLOCK_MEDIUM_AND_ABOVE" =>
+          Option::Some(SafetySettingThreshold::BLOCKMEDIUMANDABOVE)
+        "BLOCK_ONLY_HIGH" => Option::Some(SafetySettingThreshold::BLOCKONLYHIGH)
+        "BLOCK_NONE" => Option::Some(SafetySettingThreshold::BLOCKNONE)
+        "OFF" => Option::Some(SafetySettingThreshold::OFF)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => SafetySettingThreshold::Custom(raw),
   )
 }
 
@@ -9428,13 +9651,13 @@ pub extend GenerateContentRequestServiceTier with ToJson::{to_json}
 ///|
 pub impl ToJson for GenerateContentRequestServiceTier with fn to_json(self) {
   let raw = match self {
-    Unspecified => "unspecified"
-    Standard => "standard"
-    Flex => "flex"
-    Priority => "priority"
-    Custom(raw) => raw
+    GenerateContentRequestServiceTier::Unspecified => "unspecified"
+    GenerateContentRequestServiceTier::Standard => "standard"
+    GenerateContentRequestServiceTier::Flex => "flex"
+    GenerateContentRequestServiceTier::Priority => "priority"
+    GenerateContentRequestServiceTier::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9452,14 +9675,15 @@ pub impl @json.FromJson for GenerateContentRequestServiceTier with fn from_json(
     path,
     raw => {
       match raw {
-        "unspecified" => Some(Unspecified)
-        "standard" => Some(Standard)
-        "flex" => Some(Flex)
-        "priority" => Some(Priority)
-        _ => None
+        "unspecified" =>
+          Option::Some(GenerateContentRequestServiceTier::Unspecified)
+        "standard" => Option::Some(GenerateContentRequestServiceTier::Standard)
+        "flex" => Option::Some(GenerateContentRequestServiceTier::Flex)
+        "priority" => Option::Some(GenerateContentRequestServiceTier::Priority)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GenerateContentRequestServiceTier::Custom(raw),
   )
 }
 
@@ -9656,17 +9880,17 @@ pub extend ModelStatusModelStage with ToJson::{to_json}
 ///|
 pub impl ToJson for ModelStatusModelStage with fn to_json(self) {
   let raw = match self {
-    MODELSTAGEUNSPECIFIED => "MODEL_STAGE_UNSPECIFIED"
-    UNSTABLEEXPERIMENTAL => "UNSTABLE_EXPERIMENTAL"
-    EXPERIMENTAL => "EXPERIMENTAL"
-    PREVIEW => "PREVIEW"
-    STABLE => "STABLE"
-    LEGACY => "LEGACY"
-    DEPRECATED => "DEPRECATED"
-    RETIRED => "RETIRED"
-    Unknown(raw) => raw
+    ModelStatusModelStage::MODELSTAGEUNSPECIFIED => "MODEL_STAGE_UNSPECIFIED"
+    ModelStatusModelStage::UNSTABLEEXPERIMENTAL => "UNSTABLE_EXPERIMENTAL"
+    ModelStatusModelStage::EXPERIMENTAL => "EXPERIMENTAL"
+    ModelStatusModelStage::PREVIEW => "PREVIEW"
+    ModelStatusModelStage::STABLE => "STABLE"
+    ModelStatusModelStage::LEGACY => "LEGACY"
+    ModelStatusModelStage::DEPRECATED => "DEPRECATED"
+    ModelStatusModelStage::RETIRED => "RETIRED"
+    ModelStatusModelStage::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9681,18 +9905,20 @@ pub impl @json.FromJson for ModelStatusModelStage with fn from_json(value, path)
     path,
     raw => {
       match raw {
-        "MODEL_STAGE_UNSPECIFIED" => Some(MODELSTAGEUNSPECIFIED)
-        "UNSTABLE_EXPERIMENTAL" => Some(UNSTABLEEXPERIMENTAL)
-        "EXPERIMENTAL" => Some(EXPERIMENTAL)
-        "PREVIEW" => Some(PREVIEW)
-        "STABLE" => Some(STABLE)
-        "LEGACY" => Some(LEGACY)
-        "DEPRECATED" => Some(DEPRECATED)
-        "RETIRED" => Some(RETIRED)
-        _ => None
+        "MODEL_STAGE_UNSPECIFIED" =>
+          Option::Some(ModelStatusModelStage::MODELSTAGEUNSPECIFIED)
+        "UNSTABLE_EXPERIMENTAL" =>
+          Option::Some(ModelStatusModelStage::UNSTABLEEXPERIMENTAL)
+        "EXPERIMENTAL" => Option::Some(ModelStatusModelStage::EXPERIMENTAL)
+        "PREVIEW" => Option::Some(ModelStatusModelStage::PREVIEW)
+        "STABLE" => Option::Some(ModelStatusModelStage::STABLE)
+        "LEGACY" => Option::Some(ModelStatusModelStage::LEGACY)
+        "DEPRECATED" => Option::Some(ModelStatusModelStage::DEPRECATED)
+        "RETIRED" => Option::Some(ModelStatusModelStage::RETIRED)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => ModelStatusModelStage::Unknown(raw),
   )
 }
 
@@ -9779,13 +10005,13 @@ pub extend UsageMetadataServiceTier with ToJson::{to_json}
 ///|
 pub impl ToJson for UsageMetadataServiceTier with fn to_json(self) {
   let raw = match self {
-    Unspecified => "unspecified"
-    Standard => "standard"
-    Flex => "flex"
-    Priority => "priority"
-    Unknown(raw) => raw
+    UsageMetadataServiceTier::Unspecified => "unspecified"
+    UsageMetadataServiceTier::Standard => "standard"
+    UsageMetadataServiceTier::Flex => "flex"
+    UsageMetadataServiceTier::Priority => "priority"
+    UsageMetadataServiceTier::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9803,14 +10029,14 @@ pub impl @json.FromJson for UsageMetadataServiceTier with fn from_json(
     path,
     raw => {
       match raw {
-        "unspecified" => Some(Unspecified)
-        "standard" => Some(Standard)
-        "flex" => Some(Flex)
-        "priority" => Some(Priority)
-        _ => None
+        "unspecified" => Option::Some(UsageMetadataServiceTier::Unspecified)
+        "standard" => Option::Some(UsageMetadataServiceTier::Standard)
+        "flex" => Option::Some(UsageMetadataServiceTier::Flex)
+        "priority" => Option::Some(UsageMetadataServiceTier::Priority)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => UsageMetadataServiceTier::Unknown(raw),
   )
 }
 
@@ -9953,15 +10179,16 @@ pub extend PromptFeedbackBlockReason with ToJson::{to_json}
 ///|
 pub impl ToJson for PromptFeedbackBlockReason with fn to_json(self) {
   let raw = match self {
-    BLOCKREASONUNSPECIFIED => "BLOCK_REASON_UNSPECIFIED"
-    SAFETY => "SAFETY"
-    OTHER => "OTHER"
-    BLOCKLIST => "BLOCKLIST"
-    PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
-    IMAGESAFETY => "IMAGE_SAFETY"
-    Unknown(raw) => raw
+    PromptFeedbackBlockReason::BLOCKREASONUNSPECIFIED =>
+      "BLOCK_REASON_UNSPECIFIED"
+    PromptFeedbackBlockReason::SAFETY => "SAFETY"
+    PromptFeedbackBlockReason::OTHER => "OTHER"
+    PromptFeedbackBlockReason::BLOCKLIST => "BLOCKLIST"
+    PromptFeedbackBlockReason::PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
+    PromptFeedbackBlockReason::IMAGESAFETY => "IMAGE_SAFETY"
+    PromptFeedbackBlockReason::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -9979,16 +10206,18 @@ pub impl @json.FromJson for PromptFeedbackBlockReason with fn from_json(
     path,
     raw => {
       match raw {
-        "BLOCK_REASON_UNSPECIFIED" => Some(BLOCKREASONUNSPECIFIED)
-        "SAFETY" => Some(SAFETY)
-        "OTHER" => Some(OTHER)
-        "BLOCKLIST" => Some(BLOCKLIST)
-        "PROHIBITED_CONTENT" => Some(PROHIBITEDCONTENT)
-        "IMAGE_SAFETY" => Some(IMAGESAFETY)
-        _ => None
+        "BLOCK_REASON_UNSPECIFIED" =>
+          Option::Some(PromptFeedbackBlockReason::BLOCKREASONUNSPECIFIED)
+        "SAFETY" => Option::Some(PromptFeedbackBlockReason::SAFETY)
+        "OTHER" => Option::Some(PromptFeedbackBlockReason::OTHER)
+        "BLOCKLIST" => Option::Some(PromptFeedbackBlockReason::BLOCKLIST)
+        "PROHIBITED_CONTENT" =>
+          Option::Some(PromptFeedbackBlockReason::PROHIBITEDCONTENT)
+        "IMAGE_SAFETY" => Option::Some(PromptFeedbackBlockReason::IMAGESAFETY)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PromptFeedbackBlockReason::Unknown(raw),
   )
 }
 
@@ -10263,18 +10492,18 @@ pub extend EmbedContentRequestTaskType with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbedContentRequestTaskType with fn to_json(self) {
   let raw = match self {
-    TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
-    RETRIEVALQUERY => "RETRIEVAL_QUERY"
-    RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
-    SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
-    CLASSIFICATION => "CLASSIFICATION"
-    CLUSTERING => "CLUSTERING"
-    QUESTIONANSWERING => "QUESTION_ANSWERING"
-    FACTVERIFICATION => "FACT_VERIFICATION"
-    CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
-    Custom(raw) => raw
+    EmbedContentRequestTaskType::TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
+    EmbedContentRequestTaskType::RETRIEVALQUERY => "RETRIEVAL_QUERY"
+    EmbedContentRequestTaskType::RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
+    EmbedContentRequestTaskType::SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
+    EmbedContentRequestTaskType::CLASSIFICATION => "CLASSIFICATION"
+    EmbedContentRequestTaskType::CLUSTERING => "CLUSTERING"
+    EmbedContentRequestTaskType::QUESTIONANSWERING => "QUESTION_ANSWERING"
+    EmbedContentRequestTaskType::FACTVERIFICATION => "FACT_VERIFICATION"
+    EmbedContentRequestTaskType::CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
+    EmbedContentRequestTaskType::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -10292,19 +10521,27 @@ pub impl @json.FromJson for EmbedContentRequestTaskType with fn from_json(
     path,
     raw => {
       match raw {
-        "TASK_TYPE_UNSPECIFIED" => Some(TASKTYPEUNSPECIFIED)
-        "RETRIEVAL_QUERY" => Some(RETRIEVALQUERY)
-        "RETRIEVAL_DOCUMENT" => Some(RETRIEVALDOCUMENT)
-        "SEMANTIC_SIMILARITY" => Some(SEMANTICSIMILARITY)
-        "CLASSIFICATION" => Some(CLASSIFICATION)
-        "CLUSTERING" => Some(CLUSTERING)
-        "QUESTION_ANSWERING" => Some(QUESTIONANSWERING)
-        "FACT_VERIFICATION" => Some(FACTVERIFICATION)
-        "CODE_RETRIEVAL_QUERY" => Some(CODERETRIEVALQUERY)
-        _ => None
+        "TASK_TYPE_UNSPECIFIED" =>
+          Option::Some(EmbedContentRequestTaskType::TASKTYPEUNSPECIFIED)
+        "RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentRequestTaskType::RETRIEVALQUERY)
+        "RETRIEVAL_DOCUMENT" =>
+          Option::Some(EmbedContentRequestTaskType::RETRIEVALDOCUMENT)
+        "SEMANTIC_SIMILARITY" =>
+          Option::Some(EmbedContentRequestTaskType::SEMANTICSIMILARITY)
+        "CLASSIFICATION" =>
+          Option::Some(EmbedContentRequestTaskType::CLASSIFICATION)
+        "CLUSTERING" => Option::Some(EmbedContentRequestTaskType::CLUSTERING)
+        "QUESTION_ANSWERING" =>
+          Option::Some(EmbedContentRequestTaskType::QUESTIONANSWERING)
+        "FACT_VERIFICATION" =>
+          Option::Some(EmbedContentRequestTaskType::FACTVERIFICATION)
+        "CODE_RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentRequestTaskType::CODERETRIEVALQUERY)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => EmbedContentRequestTaskType::Custom(raw),
   )
 }
 

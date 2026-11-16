@@ -8,7 +8,8 @@ import json
 from pathlib import Path
 import re
 
-from tools.gen.emit_moonbit import HEADER, emit, _operation
+from tools.gen.emit_moonbit import HEADER, emit, _operation, operation_locals
+from tools.gen.qualify import qualify
 from tools.gen.ir import IR, IRBuilder, HTTP_METHODS, Struct, json_response_media, media_type, pascal_case, snake_case, Note
 
 TEMPLATES = Path(__file__).with_name('templates')
@@ -115,10 +116,10 @@ def retry_source(config):
         return '@client.RetryPolicy::conservative()'
     def methods(value):
         if isinstance(value, list):
-            return 'Listed([' + ', '.join('@http.Method::parse(' + quote(v) + ')' for v in value) + '])'
-        return {'idempotent': 'Idempotent', 'any': 'Any', 'never': 'Never'}[value]
+            return '@client.Methods::Listed([' + ', '.join('@http.Method::parse(' + quote(v) + ')' for v in value) + '])'
+        return '@client.Methods::' + {'idempotent': 'Idempotent', 'any': 'Any', 'never': 'Never'}[value]
     def status_source(statuses):
-        return ', '.join(f'Range({s[0]}, {s[1]})' if isinstance(s, list) else f'Code({s})' for s in statuses)
+        return ', '.join(f'@client.StatusMatch::Range({s[0]}, {s[1]})' if isinstance(s, list) else f'@client.StatusMatch::Code({s})' for s in statuses)
     base_statuses = config.get('statuses', [408, 409, 429, 500, 502, 503, 504])
     status_rules = [(base_statuses, config.get('methods', 'idempotent'))]
     if config.get('status_overrides'):
@@ -147,15 +148,17 @@ def retry_source(config):
     statuses = ', '.join('{ statuses: [' + status_source(codes) + '], methods: ' + methods(allowed) + ' }' for codes, allowed in status_rules)
     cap = config.get('retry_after_cap_ms', 60000)
     cap = 'NoCap' if cap == 'none' else f'{"BackoffAbove" if config.get("retry_after_cap", "stop") == "backoff" else "StopAbove"}({cap})'
+    cap = '@client.RetryAfterCap::' + cap
     jitter = config.get('jitter', [800, 1200])
     jitter = f'Proportional(lo={jitter[0]}, hi={jitter[1]})' if isinstance(jitter, list) else {'none': 'NoJitter', 'full': 'Full'}[jitter]
+    jitter = '@client.Jitter::' + jitter
     return f'''{{ rule: {{
       max_retries: {config.get('retries', 2)},
       statuses: [{statuses}],
       sent_failures: {methods(config.get('sent_failures', config.get('methods', 'idempotent')))},
       unsent_failures: {str(config.get('unprocessed_failures', True)).lower()},
-      override_header: {'Some(' + quote(config['override_header']) + ')' if config.get('override_header') else 'None'},
-      retry_after: {{ source: { {'ignore': 'Ignore', 'header': 'Header', 'ms_then_header': 'MsThenHeader'}[config.get('retry_after', 'ms_then_header')]}, cap: {cap}, zero_means_backoff: {str(config.get('zero_means_backoff', False)).lower()} }},
+      override_header: {'Option::Some(' + quote(config['override_header']) + ')' if config.get('override_header') else 'Option::None'},
+      retry_after: {{ source: @client.RetryAfterSource::{ {'ignore': 'Ignore', 'header': 'Header', 'ms_then_header': 'MsThenHeader'}[config.get('retry_after', 'ms_then_header')]}, cap: {cap}, zero_means_backoff: {str(config.get('zero_means_backoff', False)).lower()} }},
       backoff: {{ base_ms: {config.get('backoff_base_ms', 500)}, max_ms: {config.get('backoff_max_ms', 30000)}, jitter: {jitter} }}
     }} }}'''
 
@@ -260,18 +263,26 @@ def request_parts(op, raw, prefix, auth_headers):
     for parameter in filtered.parameters:
         if parameter.required and parameter.location in ('path', 'query'):
             params = params.replace(parameter.moon_name + ' :', parameter.moon_name + '~ :')
-    # Qualify named types without changing containers or primitive names.
+    # Use the IR kind, not spelling: a legal schema called Json or Result is
+    # a domain type even though a primitive/prelude type shares that spelling.
     if prefix:
-        params = qualify_type(params, prefix)
+        formals = [(p.moon_name, p.type) for p in filtered.parameters]
+        if op.request_type:
+            formals.append((operation_locals(filtered)['body'], op.request_type))
+        formals.extend((field.moon_name, field.type) for field in op.multipart_fields if field.type)
+        for name, ref in formals:
+            for suffix in ('', '?', '~'):
+                params = params.replace(name + suffix + ' : ' + ref.moon_type(),
+                                        name + suffix + ' : ' + qualified_ref(ref, prefix))
     positional = [p.moon_name if p not in dropped else '""' for p in op.parameters if p.required]
     if op.request_type:
-        positional.append('body')
+        positional.append(operation_locals(filtered)['body'])
     for field in op.multipart_fields:
         names = multipart_names(field)
         if field.required:
             positional.extend(names)
     if op.multipart_fields:
-        positional.append('boundary')
+        positional.append(operation_locals(filtered)['boundary'])
     positional.extend(p.moon_name + '?' for p in op.parameters if not p.required and p not in dropped)
     for field in op.multipart_fields:
         if not field.required:
@@ -298,7 +309,7 @@ def wrapper(op, raw, prefix, client, auth_headers, name):
     if stream_kind == 'sse':
         if op.response_type is None:
             raise ValueError(f'{op.operation_id}: SSE operation needs a JSON response schema')
-        result = qualify_type(op.response_type.moon_type(), prefix)
+        result = qualified_ref(op.response_type, prefix)
         params = 'self : ' + client + (', ' + params if params else '')
         params += f', receive : async ({result}) -> Unit, stop? : ({result}) -> Bool'
         return f'''///|
@@ -332,7 +343,7 @@ pub async fn {client}::{name}({params}) -> Result[Unit, Failure] {{
 }}
 '''
     if op.response_type:
-        result = qualify_type(op.response_type.moon_type(), prefix)
+        result = qualified_ref(op.response_type, prefix)
         expression = f'self.call(request, {prefix}{op.moon_name}_decode, operation={quote(op.operation_id)})'
     elif not success_media(raw):
         result = 'Unit'
@@ -388,11 +399,16 @@ def validated_request(op, request, prefix, *, paginator=False):
     }})'''
 
 
-def qualify_type(text, prefix):
-    if not prefix:
-        return text
-    primitives = {'Array', 'Map', 'String', 'Bytes', 'Int32', 'UInt32', 'Int64', 'UInt64', 'Double', 'Bool', 'Json', 'Unit'}
-    return re.sub(r'\b[A-Z][A-Za-z0-9_]*\b', lambda m: m[0] if m[0] in primitives else prefix + m[0], text)
+def qualified_ref(ref, prefix):
+    if ref.kind == 'named':
+        return prefix + ref.name
+    if ref.kind == 'array':
+        return 'Array[' + qualified_ref(ref.item, prefix) + ']'
+    if ref.kind == 'map':
+        return 'Map[String, ' + qualified_ref(ref.item, prefix) + ']'
+    if ref.kind == 'optional':
+        return qualified_ref(ref.item, prefix) + '?'
+    return ref.moon_type()
 
 
 def emit_client(doc, ir, sdk, vocabulary_files=None):
@@ -416,7 +432,7 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
   @debug.Repr::literal("<credentials redacted>")
 }
 '''
-    apply = ['match self.auth {', 'Anonymous => request']
+    apply = ['match self.auth {', 'Auth::Anonymous => request']
     for a in choices:
         ctor = auth_constructor(a, doc)
         if a['kind'] == 'none':
@@ -425,7 +441,7 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
         expression = {'bearer': 'request.bearer(value)', 'basic': 'request.basic(username, password)',
                       'header': f'request.set_header({quote(a.get("name", ""))}, value)',
                       'query': f'request.query({quote(a.get("name", ""))}, value)'}[a['kind']]
-        apply.append(f'{ctor}({args}) => {expression}')
+        apply.append(f'Auth::{ctor}({args}) => {expression}')
     apply.append('}')
     credential_headers = [a['name'].lower() for a in choices if a['kind'] == 'header']
     auth_code = auth + '\n///|\nfn ' + client + '::authenticate(self : ' + client + ', request : @http.Request) -> @http.Request {\n' + '\n'.join(apply) + '\n}\n'
@@ -444,7 +460,7 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
         condition = error_condition(status)
         error_decode.append(f'''if operation == {quote(operation)} && {condition} {{
           let value : {error_names[name]} = @json.from_json(json)
-          return Some({variant}(value))
+          return Some(ErrorBody::{variant}(value))
         }}''')
     for op, raw, item in operations(doc, ir):
         security = raw.get('security', doc.get('security'))
@@ -471,7 +487,7 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
                     if a not in choices:
                         raise ValueError(f'{op.operation_id}: scheme {name} is absent from the pinned auth')
                     allowed.append(a)
-        patterns = [auth_constructor(a, doc) + ('(_, _)' if a['kind'] == 'basic' else '(_)' if a['kind'] != 'none' else '') for a in allowed]
+        patterns = ['Auth::' + auth_constructor(a, doc) + ('(_, _)' if a['kind'] == 'basic' else '(_)' if a['kind'] != 'none' else '') for a in allowed]
         # Anonymous-only access means credentials are never attached.  Keep the
         # compact historical representation while retaining Anonymous in the pin.
         auth_bool = 'false' if not patterns or all(a['kind'] == 'none' for a in allowed) else 'match self.auth { ' + ' | '.join(dict.fromkeys(patterns)) + ' => true; _ => false }'
@@ -564,7 +580,7 @@ pub(all) enum ErrorBody {
         typed = '\n'.join(error_decode) + '\nNone'
         typed = 'let json = @json.parse(@utf8.decode(body))\n' + typed
     else:
-        typed = 'ignore(operation)\nignore(head)\nSome(RawJson(@json.parse(@utf8.decode(body))))'
+        typed = 'ignore(operation)\nignore(head)\nSome(ErrorBody::RawJson(@json.parse(@utf8.decode(body))))'
     failure += f'''///|
 fn typed_error(operation : String, head : @http.ResponseHead, body : Bytes) -> ErrorBody? {{
   try {{ {typed} }} catch {{ _ => None }}
@@ -572,7 +588,7 @@ fn typed_error(operation : String, head : @http.ResponseHead, body : Bytes) -> E
 '''
     # error schemas get the same proven JSON codecs, but stay in the facade.
     error_code = emit(IR(ir.package, error_types.declarations, ()))['types.mbt'][len(HEADER):]
-    runtime = (TEMPLATES / 'client.mbt').read_text().replace('__CLIENT__', client).replace('__BASE_URL__', quote(sdk['base_url'])).replace('__PROVIDER__', quote(sdk['name']))
+    runtime = (TEMPLATES / 'client.mbt').read_text().replace('__CLIENT__', client).replace('__BASE_URL__', quote(sdk['base_url'])).replace('__PROVIDER__', quote(sdk['name'])).replace('= Anonymous', '= Auth::Anonymous')
     if ir.operations and all(any(p.resource_name for p in op.parameters) for op in ir.operations):
         # Resource-only clients use the pattern matcher; keep strict builds free
         # of an unused legacy template matcher without changing existing SDKs.
@@ -642,6 +658,7 @@ test "generated provider timeout default and caller override" {{
         assertion = 'assert_eq(count.val, 2)\nassert_eq(clock.slept().length(), 1)\nassert_eq(default_retry(), @client.RetryPolicy::conservative())'
     files['contract_gen.mbt'] = files['contract_gen.mbt'].replace('__RETRY_ASSERT__', assertion)
     files['contract_gen.mbt'] = files['contract_gen.mbt'].replace('assert_eq(', 'try! assert_eq(').replace('assert_true(', 'try! assert_true(').replace('assert_false(', 'try! assert_false(')
+    files = {name: qualify(source) for name, source in files.items()}
     combined = '\n'.join(files.values()) + '\n'.join((vocabulary_files or {}).values())
     imports = {
         'http': 'gaato/mttp_core', 'client': 'gaato/mttp_core/client', 'rt': 'gaato/mttp_core/rt',
@@ -738,7 +755,7 @@ test "generated server replacement {op.operation_id}" {{
             for auth in choices:
                 if auth['kind'] == 'none':
                     continue
-                ctor = auth_constructor(auth, doc) + ('("u", "p")' if auth['kind'] == 'basic' else '("secret")')
+                ctor = 'Auth::' + auth_constructor(auth, doc) + ('("u", "p")' if auth['kind'] == 'basic' else '("secret")')
                 check = 'assert_false(request.url.contains("secret"))' if auth['kind'] == 'query' else f'assert_eq(request.headers.get({quote(auth.get("name", "authorization"))}), None)'
                 tests.append(f'''///|
 test "generated public operation {op.operation_id} {auth_constructor(auth, doc)}" {{
@@ -788,7 +805,7 @@ def paginator(op, raw, ir, prefix, client, auth_headers, name):
     config = raw['x-moonbit-paginate']
     validate_pagination(op, config)
     item = paginator_item_type(ir, op, config)
-    item_type = qualify_type(item.moon_type(), prefix) if item else 'Json'
+    item_type = qualified_ref(item, prefix) if item else 'Json'
     params, request = request_parts(op, raw, prefix, auth_headers)
     request = validated_request(op, request, prefix, paginator=True)
     params = 'self : ' + client + (', ' + params if params else '')
@@ -807,7 +824,7 @@ def contract_auth(choices, client, doc=None):
     for a in choices:
         if a['kind'] == 'none':
             continue
-        auth = auth_constructor(a, doc) + ('("user", "pass")' if a['kind'] == 'basic' else '("test-secret")')
+        auth = 'Auth::' + auth_constructor(a, doc) + ('("user", "pass")' if a['kind'] == 'basic' else '("test-secret")')
         key = a.get('name', 'authorization').lower()
         value = {'bearer': 'Bearer test-secret', 'basic': 'Basic dXNlcjpwYXNz'}.get(a['kind'], 'test-secret')
         check = f'assert_eq(request.headers.get({quote(key)}), Some({quote(value)}))' if a['kind'] != 'query' else f'assert_true(request.url.contains({quote(key + "=test-secret")}))'

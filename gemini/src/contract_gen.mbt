@@ -11,25 +11,29 @@ test "generated default URL, bucket, HTTP and transport failures" {
     )
     try! assert_eq(
       request.attributes.get(@client.rate_limit_bucket),
-      Some("gemini" + ":"),
+      Option::Some("gemini" + ":"),
     )
     @http.Response::new(
       400,
       headers=@http.Headers::of([("x-test", "retained")]),
-      body=Bytes(b"{\"error\":\"bad\"}"),
+      body=@http.Body::Bytes(b"{\"error\":\"bad\"}"),
     )
   })
   let sdk = Gemini::new(backend, @sim.FakeClock::new())
   match @driver.run_sync(() => sdk.send(@http.Request::get("/contract-test"))) {
-    Err(Http(error)) => {
+    Result::Err(Failure::Http(error)) => {
       try! assert_eq(error.head.status, 400)
-      try! assert_eq(error.head.headers.get("x-test"), Some("retained"))
+      try! assert_eq(error.head.headers.get("x-test"), Option::Some("retained"))
       try! assert_eq(error.body, b"{\"error\":\"bad\"}")
     }
     _ => fail("expected HTTP failure")
   }
   let failing = @client.from_fn((_, _) => {
-    raise @http.TransportError(kind=Network, phase=Body, detail="offline test")
+    raise @http.TransportError::TransportError(
+      kind=Network,
+      phase=Body,
+      detail="offline test",
+    )
   })
   let sdk = Gemini::new(
     failing,
@@ -38,7 +42,11 @@ test "generated default URL, bucket, HTTP and transport failures" {
   )
   match
     @driver.run_sync(() => sdk.send(@http.Request::post("/contract-test"))) {
-    Err(Transport(@http.TransportError(kind~, phase~, ..))) => {
+    Result::Err(
+      Failure::Transport(
+        @http.TransportError::TransportError(kind~, phase~, ..)
+      )
+    ) => {
       try! assert_true(kind is Network)
       try! assert_true(phase is Body)
     }
@@ -48,13 +56,13 @@ test "generated default URL, bucket, HTTP and transport failures" {
 
 ///|
 test "generated base override, paginator termination and SSE stop" {
-  let count = Ref(0)
+  let count = Ref::Ref(0)
   let backend = @client.from_fn((request, _) => {
     try! assert_true(request.url.has_prefix("https://override.example/"))
     count.val += 1
     @http.Response::new(
       200,
-      body=Bytes(
+      body=@http.Body::Bytes(
         if count.val == 1 {
           b"{\"results\":[1],\"next\":\"https://override.example/page2\"}"
         } else {
@@ -70,17 +78,17 @@ test "generated base override, paginator termination and SSE stop" {
   )
   let pages : @client.Paginator[Json, Failure] = sdk.paginate(
     @http.Request::get("/page1"),
-    kind=NextUrl,
+    kind=PageKind::NextUrl,
     items="results",
     next="next",
   )
   @driver.run_sync(() => {
-    try! assert_true(pages.next_page() is Ok(Some(_)))
-    try! assert_true(pages.next_page() is Ok(Some(_)))
-    try! assert_true(pages.next_page() is Ok(None))
+    try! assert_true(pages.next_page() is Result::Ok(Option::Some(_)))
+    try! assert_true(pages.next_page() is Result::Ok(Option::Some(_)))
+    try! assert_true(pages.next_page() is Result::Ok(Option::None))
   })
   try! assert_eq(count.val, 2)
-  let seen : Ref[Array[String]] = Ref([])
+  let seen : Ref[Array[String]] = Ref::Ref([])
   let driver = @driver.Driver::new()
   let source = @sim.Feed::bytes(driver, [
     b"data: one\n\n", b"data: stop\n\n", b"data: unreachable\n\n",
@@ -89,7 +97,7 @@ test "generated base override, paginator termination and SSE stop" {
     @http.Response::new(
       200,
       headers=@http.Headers::of([("content-type", "text/event-stream")]),
-      body=Stream(@http.StreamBody::new(source)),
+      body=@http.Body::Stream(@http.StreamBody::new(source)),
     )
   })
   let sdk = Gemini::new(backend, @sim.FakeClock::new())
@@ -101,7 +109,7 @@ test "generated base override, paginator termination and SSE stop" {
         stop=event => event.data == "stop",
       )
     })
-    is Ok(_),
+    is Result::Ok(_),
   )
   try! assert_eq(seen.val, ["one"])
   try! assert_eq(source.closes(), 1)
@@ -119,20 +127,24 @@ test "generated cursor pages replace the cursor and preserve failures" {
       3 => b"{\"data\":[1],\"next\":\"last\"}"
       _ => b"{\"data\":[2],\"next\":null}"
     }
-    @http.Response::new(200, body=Bytes(body))
+    @http.Response::new(200, body=@http.Body::Bytes(body))
   })
   let sdk = Gemini::new(backend, @sim.FakeClock::new())
   let pages : @client.Paginator[Json, Failure] = sdk.paginate(
     @http.Request::get("/pages?cursor=old&limit=2"),
-    kind=Cursor("cursor"),
+    kind=PageKind::Cursor("cursor"),
     items="data",
     next="next",
   )
   @driver.run_sync(() => {
-    try! assert_true(pages.next_page() is Err(Decode(_)))
-    try! assert_true(pages.next_page() is Ok(Some([Number(1, ..)])))
-    try! assert_true(pages.next_page() is Ok(Some([Number(2, ..)])))
-    try! assert_true(pages.next_page() is Ok(None))
+    try! assert_true(pages.next_page() is Result::Err(Failure::Decode(_)))
+    try! assert_true(
+      pages.next_page() is Result::Ok(Option::Some([@json.Json::Number(1, ..)])),
+    )
+    try! assert_true(
+      pages.next_page() is Result::Ok(Option::Some([@json.Json::Number(2, ..)])),
+    )
+    try! assert_true(pages.next_page() is Result::Ok(Option::None))
   })
   try! assert_eq(seen.length(), 4)
   try! assert_eq(seen[1], seen[2])
@@ -144,7 +156,7 @@ test "generated cursor pages replace the cursor and preserve failures" {
 ///|
 test "generated default retry reaches the runtime" {
   let clock = @sim.FakeClock::new()
-  let count = Ref(0)
+  let count = Ref::Ref(0)
   let backend = @client.from_fn((_, _) => {
     count.val += 1
     @http.Response::new(
@@ -153,7 +165,7 @@ test "generated default retry reaches the runtime" {
       } else {
         200
       },
-      body=Bytes(b"ok"),
+      body=@http.Body::Bytes(b"ok"),
     )
   })
   let sdk = Gemini::new(backend, clock)
@@ -161,19 +173,24 @@ test "generated default retry reaches the runtime" {
   try! assert_eq(default_retry(), {
     rule: {
       max_retries: 4,
-      statuses: [{ statuses: [Code(503)], methods: Any, }],
-      sent_failures: Never,
+      statuses: [
+        {
+          statuses: [@client.StatusMatch::Code(503)],
+          methods: @client.Methods::Any,
+        },
+      ],
+      sent_failures: @client.Methods::Never,
       unsent_failures: true,
-      override_header: None,
+      override_header: Option::None,
       retry_after: {
-        source: Header,
-        cap: StopAbove(60000),
+        source: @client.RetryAfterSource::Header,
+        cap: @client.RetryAfterCap::StopAbove(60000),
         zero_means_backoff: false,
       },
       backoff: {
         base_ms: 1000,
         max_ms: 60000,
-        jitter: Proportional(lo=1000, hi=2000),
+        jitter: @client.Jitter::Proportional(lo=1000, hi=2000),
       },
     },
   })
@@ -184,13 +201,13 @@ test "generated default retry reaches the runtime" {
 ///|
 test "generated auth ApiKey and redirect boundaries" {
   for same_origin in [true, false] {
-    let count = Ref(0)
+    let count = Ref::Ref(0)
     let backend = @client.from_fn((request, _) => {
       count.val += 1
       if count.val == 1 {
         try! assert_eq(
           request.headers.get("x-goog-api-key"),
-          Some("test-secret"),
+          Option::Some("test-secret"),
         )
         @http.Response::new(
           302,
@@ -209,22 +226,22 @@ test "generated auth ApiKey and redirect boundaries" {
         try! assert_eq(
           request.headers.get("x-goog-api-key"),
           if same_origin {
-            Some("test-secret")
+            Option::Some("test-secret")
           } else {
-            None
+            Option::None
           },
         )
-        @http.Response::new(200, body=Bytes(b"ok"))
+        @http.Response::new(200, body=@http.Body::Bytes(b"ok"))
       }
     })
     let sdk = Gemini::new(
       backend,
       @sim.FakeClock::new(),
-      auth=ApiKey("test-secret"),
+      auth=Auth::ApiKey("test-secret"),
     )
     try! assert_true(
       @driver.run_sync(() => sdk.send(@http.Request::get("/contract-test")))
-      is Ok(_),
+      is Result::Ok(_),
     )
     try! assert_eq(count.val, 2)
   }
@@ -233,7 +250,7 @@ test "generated auth ApiKey and redirect boundaries" {
 ///|
 test "generated auth ApiKeyInQuery and redirect boundaries" {
   for same_origin in [true, false] {
-    let count = Ref(0)
+    let count = Ref::Ref(0)
     let backend = @client.from_fn((request, _) => {
       count.val += 1
       if count.val == 1 {
@@ -253,17 +270,17 @@ test "generated auth ApiKeyInQuery and redirect boundaries" {
         )
       } else {
         ()
-        @http.Response::new(200, body=Bytes(b"ok"))
+        @http.Response::new(200, body=@http.Body::Bytes(b"ok"))
       }
     })
     let sdk = Gemini::new(
       backend,
       @sim.FakeClock::new(),
-      auth=ApiKeyInQuery("test-secret"),
+      auth=Auth::ApiKeyInQuery("test-secret"),
     )
     try! assert_true(
       @driver.run_sync(() => sdk.send(@http.Request::get("/contract-test")))
-      is Ok(_),
+      is Result::Ok(_),
     )
     try! assert_eq(count.val, 2)
   }
@@ -272,13 +289,13 @@ test "generated auth ApiKeyInQuery and redirect boundaries" {
 ///|
 test "generated auth OAuthToken and redirect boundaries" {
   for same_origin in [true, false] {
-    let count = Ref(0)
+    let count = Ref::Ref(0)
     let backend = @client.from_fn((request, _) => {
       count.val += 1
       if count.val == 1 {
         try! assert_eq(
           request.headers.get("authorization"),
-          Some("Bearer test-secret"),
+          Option::Some("Bearer test-secret"),
         )
         @http.Response::new(
           302,
@@ -297,22 +314,22 @@ test "generated auth OAuthToken and redirect boundaries" {
         try! assert_eq(
           request.headers.get("authorization"),
           if same_origin {
-            Some("Bearer test-secret")
+            Option::Some("Bearer test-secret")
           } else {
-            None
+            Option::None
           },
         )
-        @http.Response::new(200, body=Bytes(b"ok"))
+        @http.Response::new(200, body=@http.Body::Bytes(b"ok"))
       }
     })
     let sdk = Gemini::new(
       backend,
       @sim.FakeClock::new(),
-      auth=OAuthToken("test-secret"),
+      auth=Auth::OAuthToken("test-secret"),
     )
     try! assert_true(
       @driver.run_sync(() => sdk.send(@http.Request::get("/contract-test")))
-      is Ok(_),
+      is Result::Ok(_),
     )
     try! assert_eq(count.val, 2)
   }
@@ -320,7 +337,7 @@ test "generated auth OAuthToken and redirect boundaries" {
 
 ///|
 test "generated route and server cached_contents_delete" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -341,7 +358,7 @@ test "generated route and server cached_contents_delete" {
 
 ///|
 test "generated route and server cached_contents_patch" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -362,7 +379,7 @@ test "generated route and server cached_contents_patch" {
 
 ///|
 test "generated route and server cached_contents_get" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -383,7 +400,7 @@ test "generated route and server cached_contents_get" {
 
 ///|
 test "generated route and server cached_contents_create" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -407,7 +424,7 @@ test "generated route and server cached_contents_create" {
 
 ///|
 test "generated route and server cached_contents_list" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -428,7 +445,7 @@ test "generated route and server cached_contents_list" {
 
 ///|
 test "generated route and server media_upload" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -447,7 +464,7 @@ test "generated route and server media_upload" {
 
 ///|
 test "generated route and server files_list" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -466,7 +483,7 @@ test "generated route and server files_list" {
 
 ///|
 test "generated route and server files_get" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -487,7 +504,7 @@ test "generated route and server files_get" {
 
 ///|
 test "generated route and server files_delete" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -508,7 +525,7 @@ test "generated route and server files_delete" {
 
 ///|
 test "generated route and server models_embed_content" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -532,7 +549,7 @@ test "generated route and server models_embed_content" {
 
 ///|
 test "generated route and server models_batch_embed_contents" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -556,7 +573,7 @@ test "generated route and server models_batch_embed_contents" {
 
 ///|
 test "generated route and server models_list" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -575,7 +592,7 @@ test "generated route and server models_list" {
 
 ///|
 test "generated route and server models_count_tokens" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -599,7 +616,7 @@ test "generated route and server models_count_tokens" {
 
 ///|
 test "generated route and server models_generate_content" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -623,7 +640,7 @@ test "generated route and server models_generate_content" {
 
 ///|
 test "generated route and server models_stream_generate_content" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -647,7 +664,7 @@ test "generated route and server models_stream_generate_content" {
 
 ///|
 test "generated route and server models_get" {
-  let seen = Ref("")
+  let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
     @http.Response::new(200)
@@ -672,7 +689,7 @@ test "generated typed HTTP error body" {
     "{\"error\": {\"code\": 1, \"message\": \"example\", \"status\": \"example\"}}",
   )
   let backend = @client.from_fn((_, _) => {
-    @http.Response::new(400, body=Bytes(body))
+    @http.Response::new(400, body=@http.Body::Bytes(body))
   })
   let sdk = Gemini::new(
     backend,
@@ -686,8 +703,8 @@ test "generated typed HTTP error body" {
         operation="cached_contents_delete",
       )
     }) {
-    Err(Http(failure)) => {
-      try! assert_true(failure.typed is Some(_))
+    Result::Err(Failure::Http(failure)) => {
+      try! assert_true(failure.typed is Option::Some(_))
       try! assert_eq(failure.body, body)
     }
     _ => fail("expected typed HTTP error")

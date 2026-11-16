@@ -8,27 +8,27 @@ fn[T : @json.FromJson] required_field(
 ) -> T raise @json.JsonDecodeError {
   let field_path = path.add_key(key)
   match obj.get(key) {
-    None =>
-      raise @json.JsonDecodeError(
+    Option::None =>
+      raise @json.JsonDecodeError::JsonDecodeError(
         (field_path, "required だが欠落: " + field_path.to_string()),
       )
-    Some(value) => @json.from_json(value, path=field_path)
+    Option::Some(value) => @json.from_json(value, path=field_path)
   }
 }
 
 ///|
 fn parse_plain_int64(text : String) -> Int64? {
   if text.length() == 0 {
-    return None
+    return Option::None
   }
   let negative = text[0] == '-'
   let digits_start = if negative { 1 } else { 0 }
   if digits_start == text.length() {
-    return None
+    return Option::None
   }
   for index in digits_start..<text.length() {
     if text[index] < '0' || text[index] > '9' {
-      return None
+      return Option::None
     }
   }
   let mut significant_start = digits_start
@@ -36,7 +36,7 @@ fn parse_plain_int64(text : String) -> Int64? {
     significant_start += 1
   }
   if significant_start == text.length() {
-    return Some(0L)
+    return Option::Some(0L)
   }
   let significant_length = text.length() - significant_start
   let limit = if negative {
@@ -45,14 +45,14 @@ fn parse_plain_int64(text : String) -> Int64? {
     "9223372036854775807"
   }
   if significant_length > limit.length() {
-    return None
+    return Option::None
   }
   if significant_length == limit.length() {
     for offset in 0..<significant_length {
       let digit = text[significant_start + offset]
       let boundary = limit[offset]
       if digit > boundary {
-        return None
+        return Option::None
       }
       if digit < boundary {
         break
@@ -68,7 +68,7 @@ fn parse_plain_int64(text : String) -> Int64? {
       result = result * 10L + digit
     }
   }
-  Some(result)
+  Option::Some(result)
 }
 
 ///|
@@ -93,14 +93,16 @@ fn json_int64(
   value : Json,
   path : @json.JsonPath,
 ) -> Int64 raise @json.JsonDecodeError {
-  guard value is Number(raw, repr~) else {
-    raise @json.JsonDecodeError((path, "expected JSON number for Int64"))
+  guard value is @json.Json::Number(raw, repr~) else {
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected JSON number for Int64"),
+    )
   }
-  if repr is Some(text) && is_plain_integer(text) {
+  if repr is Option::Some(text) && is_plain_integer(text) {
     match parse_plain_int64(text) {
-      Some(value) => return value
-      None =>
-        raise @json.JsonDecodeError(
+      Option::Some(value) => return value
+      Option::None =>
+        raise @json.JsonDecodeError::JsonDecodeError(
           (path, "JSON number is outside Int64 range"),
         )
     }
@@ -108,11 +110,15 @@ fn json_int64(
   if raw.is_nan() ||
     raw < -9223372036854775808.0 ||
     raw >= 9223372036854775808.0 {
-    raise @json.JsonDecodeError((path, "JSON number is outside Int64 range"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "JSON number is outside Int64 range"),
+    )
   }
   let result = raw.to_int64()
   if result.to_double() != raw {
-    raise @json.JsonDecodeError((path, "expected integral JSON number"))
+    raise @json.JsonDecodeError::JsonDecodeError(
+      (path, "expected integral JSON number"),
+    )
   }
   result
 }
@@ -130,8 +136,8 @@ fn decode_optional_int64(
 ) -> Int64? raise @json.JsonDecodeError {
   let raw : Json? = @sdkjson.opt_field(obj, key, path)
   match raw {
-    Some(value) => Some(json_int64(value, path.add_key(key)))
-    None => None
+    Option::Some(value) => Option::Some(json_int64(value, path.add_key(key)))
+    Option::None => Option::None
   }
 }
 
@@ -161,12 +167,12 @@ pub extend OrderStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for OrderStatus with fn to_json(self) {
   let raw = match self {
-    Placed => "placed"
-    Approved => "approved"
-    Delivered => "delivered"
-    Unknown(raw) => raw
+    OrderStatus::Placed => "placed"
+    OrderStatus::Approved => "approved"
+    OrderStatus::Delivered => "delivered"
+    OrderStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -181,13 +187,13 @@ pub impl @json.FromJson for OrderStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "placed" => Some(Placed)
-        "approved" => Some(Approved)
-        "delivered" => Some(Delivered)
-        _ => None
+        "placed" => Option::Some(OrderStatus::Placed)
+        "approved" => Option::Some(OrderStatus::Approved)
+        "delivered" => Option::Some(OrderStatus::Delivered)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => OrderStatus::Unknown(raw),
   )
 }
 
@@ -459,12 +465,12 @@ pub extend PetStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for PetStatus with fn to_json(self) {
   let raw = match self {
-    Available => "available"
-    Pending => "pending"
-    Sold => "sold"
-    Unknown(raw) => raw
+    PetStatus::Available => "available"
+    PetStatus::Pending => "pending"
+    PetStatus::Sold => "sold"
+    PetStatus::Unknown(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -479,13 +485,13 @@ pub impl @json.FromJson for PetStatus with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "available" => Some(Available)
-        "pending" => Some(Pending)
-        "sold" => Some(Sold)
-        _ => None
+        "available" => Option::Some(PetStatus::Available)
+        "pending" => Option::Some(PetStatus::Pending)
+        "sold" => Option::Some(PetStatus::Sold)
+        _ => Option::None
       }
     },
-    raw => Unknown(raw),
+    raw => PetStatus::Unknown(raw),
   )
 }
 
@@ -639,12 +645,12 @@ pub extend FindPetsByStatusStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for FindPetsByStatusStatus with fn to_json(self) {
   let raw = match self {
-    Available => "available"
-    Pending => "pending"
-    Sold => "sold"
-    Custom(raw) => raw
+    FindPetsByStatusStatus::Available => "available"
+    FindPetsByStatusStatus::Pending => "pending"
+    FindPetsByStatusStatus::Sold => "sold"
+    FindPetsByStatusStatus::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -662,12 +668,12 @@ pub impl @json.FromJson for FindPetsByStatusStatus with fn from_json(
     path,
     raw => {
       match raw {
-        "available" => Some(Available)
-        "pending" => Some(Pending)
-        "sold" => Some(Sold)
-        _ => None
+        "available" => Option::Some(FindPetsByStatusStatus::Available)
+        "pending" => Option::Some(FindPetsByStatusStatus::Pending)
+        "sold" => Option::Some(FindPetsByStatusStatus::Sold)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => FindPetsByStatusStatus::Custom(raw),
   )
 }

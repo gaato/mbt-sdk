@@ -30,7 +30,7 @@ class FactoryTests(unittest.TestCase):
         self.spec.write_text(json.dumps(self.doc))
         self.write('seed/moon.mod', 'name = "gaato/seed"\nversion = "0.1.0"\nimport {\n  "gaato/mttp_core@0.1.0",\n}\n')
         self.write('seed/spec/spec.json', json.dumps(self.doc))
-        self.write('seed/spec/SOURCE.md', '- Source: https://example.invalid/spec.json\n')
+        self.write('seed/spec/SOURCE.md', '- Source: https://example.invalid/seed-spec.json\n')
         self.write('moon.work', 'members = [\n  "seed",\n]\n')
         self.write('runtime-tests/moon.mod', 'name = "gaato/runtime-tests"\nimport {\n}\n')
         self.write('scripts/docs_audit.json', '{"modules": [], "generated": []}\n')
@@ -43,7 +43,7 @@ dir = "seed"
 module = "gaato/seed"
 generator = "openapi"
 spec_file = "seed/spec/spec.json"
-spec_url = "https://example.invalid/spec.json"
+spec_url = "https://example.invalid/seed-spec.json"
 spec_fetch = "plain"
 package = "gaato/seed/gen"
 out = "seed/src/gen"
@@ -85,7 +85,7 @@ offline_packages = []
         self.assertFalse(sdk['spec_watch'])
         self.assertTrue(sdk['include_all'])
         self.assertEqual((self.root / sdk['spec_file']).read_bytes(), self.spec.read_bytes())
-        self.assertIn(hashlib.sha256(self.spec.read_bytes()).hexdigest(), (self.root / 'sample/spec/SOURCE.md').read_text())
+        self.assertIn(hashlib.sha256(self.spec.read_bytes()).hexdigest(), (self.root / 'specs/sample/SOURCE.md').read_text())
         self.assertTrue((self.root / 'sample/README.md').is_symlink())
         self.assertEqual((self.root / 'sample/README.md').read_text(), (self.root / 'sample/src/overview.mbt.md').read_text())
         self.assertIn('https://github.com/gaato/moonbit-sdks/blob/main/docs/behavior/sample.md', (self.root / 'sample/README.md').read_text())
@@ -125,13 +125,13 @@ offline_packages = []
         self.assertEqual(self.create('--generator', 'discovery'), 0)
         sdk = sdks.load()[-1]
         self.assertEqual(sdk['generator'], 'discovery')
-        self.assertEqual(sdk['spec_file'], 'sample/spec/discovery.json')
+        self.assertEqual(sdk['spec_file'], 'specs/sample/discovery.json')
         self.assertEqual(sdk['base_url'], 'https://api.example/v1')
         self.assertEqual(sdk['auth'], {'kind': 'alternatives', 'schemes': [
             {'kind': 'header', 'name': 'x-goog-api-key'},
             {'kind': 'query', 'name': 'key'},
         ]})
-        source = (self.root / 'sample/spec/SOURCE.md').read_text()
+        source = (self.root / 'specs/sample/SOURCE.md').read_text()
         self.assertIn('- Discovery revision: 20261116', source)
         self.assertFalse(sdks.sync(sdks.load(), True))
 
@@ -216,7 +216,7 @@ offline_packages = []
 
     def test_source_url_drift_is_an_error(self):
         self.assertEqual(self.create(), 0)
-        self.write('sample/spec/SOURCE.md', '- Source: https://example.invalid/different.json\n')
+        self.write('specs/sample/SOURCE.md', '- Source: https://example.invalid/different.json\n')
         with self.assertRaisesRegex(ValueError, 'sample: SOURCE.md Source line disagrees'):
             sdks.sync(sdks.load(), True)
 
@@ -227,6 +227,42 @@ offline_packages = []
         with redirect_stderr(io.StringIO()):
             sdks.sync(sdks.load(), False)
         self.assertFalse(sdks.sync(sdks.load(), True))
+
+    def test_shared_spec_selection_scaffold_and_grouped_watch(self):
+        other = operation(operation_id='otherOperation')
+        self.doc['paths']['/other'] = {'servers': [{'url': 'https://other.invalid'}], 'get': other}
+        self.write('seed/spec/spec.json', json.dumps(self.doc))
+        provenance = (self.root / 'seed/spec/SOURCE.md').read_bytes()
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(new_sdk.run(['sample', '--from-spec', 'seed', '--paths', '/test', '--generate']), 0)
+        seed, sample = sdks.load()
+        self.assertEqual(sample['spec_file'], seed['spec_file'])
+        self.assertEqual(sample['selection'], {'paths': ['/test']})
+        self.assertEqual((self.root / 'seed/spec/SOURCE.md').read_bytes(), provenance)
+        self.assertFalse((self.root / 'sample/spec').exists())
+        self.assertFalse((self.root / 'specs/sample').exists())
+        generated = (self.root / 'sample/src/gen/operations.mbt').read_text()
+        self.assertIn('test_operation_request', generated)
+        self.assertNotIn('other_operation_request', generated)
+        sdks.pins([{**sample, 'client_layer': True}])
+        groups = sdks.spec_groups([{**seed, 'spec_watch': True}, sample])
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0]['modules'], ['seed', 'sample'])
+
+    def test_shared_spec_conflicting_metadata_is_rejected(self):
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(new_sdk.run(['sample', '--from-spec', 'seed/spec/spec.json', '--paths', '/test']), 0)
+        text = (self.root / 'sdks.toml').read_text()
+        before, after = text.split('name = "sample"', 1)
+        self.write('sdks.toml', before + 'name = "sample"' + after.replace('spec_fetch = "plain"', 'spec_fetch = "gzip"'))
+        with self.assertRaisesRegex(ValueError, 'contradictory source metadata'):
+            sdks.load()
+
+    def test_shared_scaffold_bad_selection_leaves_everything_unchanged(self):
+        before = self.snapshot()
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(new_sdk.run(['sample', '--from-spec', 'seed', '--paths', '/missing']), 1)
+        self.assertEqual(self.snapshot(), before)
 
     def test_unrepresentable_auth_refuses_before_creation(self):
         self.doc['components']['securitySchemes']['token'] = {

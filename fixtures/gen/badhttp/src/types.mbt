@@ -39,25 +39,25 @@ pub extend GetBadjsonFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetBadjsonFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    Truncated => "truncated"
-    TrailingComma => "trailing-comma"
-    SingleQuotes => "single-quotes"
-    Nan => "nan"
-    Bom => "bom"
-    Html => "html"
-    Mislabeled => "mislabeled"
-    Empty => "empty"
-    Unterminated => "unterminated"
-    Bigint => "bigint"
-    DuplicateKeys => "duplicate-keys"
-    Comments => "comments"
-    LeadingGarbage => "leading-garbage"
-    Concatenated => "concatenated"
-    Deep => "deep"
-    Utf16 => "utf16"
-    Custom(raw) => raw
+    GetBadjsonFlavorFlavor::Truncated => "truncated"
+    GetBadjsonFlavorFlavor::TrailingComma => "trailing-comma"
+    GetBadjsonFlavorFlavor::SingleQuotes => "single-quotes"
+    GetBadjsonFlavorFlavor::Nan => "nan"
+    GetBadjsonFlavorFlavor::Bom => "bom"
+    GetBadjsonFlavorFlavor::Html => "html"
+    GetBadjsonFlavorFlavor::Mislabeled => "mislabeled"
+    GetBadjsonFlavorFlavor::Empty => "empty"
+    GetBadjsonFlavorFlavor::Unterminated => "unterminated"
+    GetBadjsonFlavorFlavor::Bigint => "bigint"
+    GetBadjsonFlavorFlavor::DuplicateKeys => "duplicate-keys"
+    GetBadjsonFlavorFlavor::Comments => "comments"
+    GetBadjsonFlavorFlavor::LeadingGarbage => "leading-garbage"
+    GetBadjsonFlavorFlavor::Concatenated => "concatenated"
+    GetBadjsonFlavorFlavor::Deep => "deep"
+    GetBadjsonFlavorFlavor::Utf16 => "utf16"
+    GetBadjsonFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -75,26 +75,27 @@ pub impl @json.FromJson for GetBadjsonFlavorFlavor with fn from_json(
     path,
     raw => {
       match raw {
-        "truncated" => Some(Truncated)
-        "trailing-comma" => Some(TrailingComma)
-        "single-quotes" => Some(SingleQuotes)
-        "nan" => Some(Nan)
-        "bom" => Some(Bom)
-        "html" => Some(Html)
-        "mislabeled" => Some(Mislabeled)
-        "empty" => Some(Empty)
-        "unterminated" => Some(Unterminated)
-        "bigint" => Some(Bigint)
-        "duplicate-keys" => Some(DuplicateKeys)
-        "comments" => Some(Comments)
-        "leading-garbage" => Some(LeadingGarbage)
-        "concatenated" => Some(Concatenated)
-        "deep" => Some(Deep)
-        "utf16" => Some(Utf16)
-        _ => None
+        "truncated" => Option::Some(GetBadjsonFlavorFlavor::Truncated)
+        "trailing-comma" => Option::Some(GetBadjsonFlavorFlavor::TrailingComma)
+        "single-quotes" => Option::Some(GetBadjsonFlavorFlavor::SingleQuotes)
+        "nan" => Option::Some(GetBadjsonFlavorFlavor::Nan)
+        "bom" => Option::Some(GetBadjsonFlavorFlavor::Bom)
+        "html" => Option::Some(GetBadjsonFlavorFlavor::Html)
+        "mislabeled" => Option::Some(GetBadjsonFlavorFlavor::Mislabeled)
+        "empty" => Option::Some(GetBadjsonFlavorFlavor::Empty)
+        "unterminated" => Option::Some(GetBadjsonFlavorFlavor::Unterminated)
+        "bigint" => Option::Some(GetBadjsonFlavorFlavor::Bigint)
+        "duplicate-keys" => Option::Some(GetBadjsonFlavorFlavor::DuplicateKeys)
+        "comments" => Option::Some(GetBadjsonFlavorFlavor::Comments)
+        "leading-garbage" =>
+          Option::Some(GetBadjsonFlavorFlavor::LeadingGarbage)
+        "concatenated" => Option::Some(GetBadjsonFlavorFlavor::Concatenated)
+        "deep" => Option::Some(GetBadjsonFlavorFlavor::Deep)
+        "utf16" => Option::Some(GetBadjsonFlavorFlavor::Utf16)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetBadjsonFlavorFlavor::Custom(raw),
   )
 }
 
@@ -135,23 +136,23 @@ pub extend GetSseFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetSseFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    Ok => "ok"
-    Stall => "stall"
-    Cut => "cut"
-    Drop => "drop"
-    Crlf => "crlf"
-    Cr => "cr"
-    NoSpace => "no-space"
-    Multiline => "multiline"
-    Comments => "comments"
-    SplitUtf8 => "split-utf8"
-    WrongType => "wrong-type"
-    ErrorEvent => "error-event"
-    Big => "big"
-    Resume => "resume"
-    Custom(raw) => raw
+    GetSseFlavorFlavor::Ok => "ok"
+    GetSseFlavorFlavor::Stall => "stall"
+    GetSseFlavorFlavor::Cut => "cut"
+    GetSseFlavorFlavor::Drop => "drop"
+    GetSseFlavorFlavor::Crlf => "crlf"
+    GetSseFlavorFlavor::Cr => "cr"
+    GetSseFlavorFlavor::NoSpace => "no-space"
+    GetSseFlavorFlavor::Multiline => "multiline"
+    GetSseFlavorFlavor::Comments => "comments"
+    GetSseFlavorFlavor::SplitUtf8 => "split-utf8"
+    GetSseFlavorFlavor::WrongType => "wrong-type"
+    GetSseFlavorFlavor::ErrorEvent => "error-event"
+    GetSseFlavorFlavor::Big => "big"
+    GetSseFlavorFlavor::Resume => "resume"
+    GetSseFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -166,24 +167,24 @@ pub impl @json.FromJson for GetSseFlavorFlavor with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "ok" => Some(Ok)
-        "stall" => Some(Stall)
-        "cut" => Some(Cut)
-        "drop" => Some(Drop)
-        "crlf" => Some(Crlf)
-        "cr" => Some(Cr)
-        "no-space" => Some(NoSpace)
-        "multiline" => Some(Multiline)
-        "comments" => Some(Comments)
-        "split-utf8" => Some(SplitUtf8)
-        "wrong-type" => Some(WrongType)
-        "error-event" => Some(ErrorEvent)
-        "big" => Some(Big)
-        "resume" => Some(Resume)
-        _ => None
+        "ok" => Option::Some(GetSseFlavorFlavor::Ok)
+        "stall" => Option::Some(GetSseFlavorFlavor::Stall)
+        "cut" => Option::Some(GetSseFlavorFlavor::Cut)
+        "drop" => Option::Some(GetSseFlavorFlavor::Drop)
+        "crlf" => Option::Some(GetSseFlavorFlavor::Crlf)
+        "cr" => Option::Some(GetSseFlavorFlavor::Cr)
+        "no-space" => Option::Some(GetSseFlavorFlavor::NoSpace)
+        "multiline" => Option::Some(GetSseFlavorFlavor::Multiline)
+        "comments" => Option::Some(GetSseFlavorFlavor::Comments)
+        "split-utf8" => Option::Some(GetSseFlavorFlavor::SplitUtf8)
+        "wrong-type" => Option::Some(GetSseFlavorFlavor::WrongType)
+        "error-event" => Option::Some(GetSseFlavorFlavor::ErrorEvent)
+        "big" => Option::Some(GetSseFlavorFlavor::Big)
+        "resume" => Option::Some(GetSseFlavorFlavor::Resume)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetSseFlavorFlavor::Custom(raw),
   )
 }
 
@@ -224,23 +225,23 @@ pub extend GetRangeFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetRangeFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    Ok => "ok"
-    Ignore => "ignore"
-    AdvertiseOnly => "advertise-only"
-    OffByOne => "off-by-one"
-    Shifted => "shifted"
-    SuffixAsPrefix => "suffix-as-prefix"
-    FromZero => "from-zero"
-    WrongTotal => "wrong-total"
-    NoContentRange => "no-content-range"
-    Always206 => "always-206"
-    Value200ContentRange => "200-content-range"
-    Always416 => "always-416"
-    UnknownTotal => "unknown-total"
-    IfRangeIgnored => "if-range-ignored"
-    Custom(raw) => raw
+    GetRangeFlavorFlavor::Ok => "ok"
+    GetRangeFlavorFlavor::Ignore => "ignore"
+    GetRangeFlavorFlavor::AdvertiseOnly => "advertise-only"
+    GetRangeFlavorFlavor::OffByOne => "off-by-one"
+    GetRangeFlavorFlavor::Shifted => "shifted"
+    GetRangeFlavorFlavor::SuffixAsPrefix => "suffix-as-prefix"
+    GetRangeFlavorFlavor::FromZero => "from-zero"
+    GetRangeFlavorFlavor::WrongTotal => "wrong-total"
+    GetRangeFlavorFlavor::NoContentRange => "no-content-range"
+    GetRangeFlavorFlavor::Always206 => "always-206"
+    GetRangeFlavorFlavor::Value200ContentRange => "200-content-range"
+    GetRangeFlavorFlavor::Always416 => "always-416"
+    GetRangeFlavorFlavor::UnknownTotal => "unknown-total"
+    GetRangeFlavorFlavor::IfRangeIgnored => "if-range-ignored"
+    GetRangeFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -255,24 +256,25 @@ pub impl @json.FromJson for GetRangeFlavorFlavor with fn from_json(value, path) 
     path,
     raw => {
       match raw {
-        "ok" => Some(Ok)
-        "ignore" => Some(Ignore)
-        "advertise-only" => Some(AdvertiseOnly)
-        "off-by-one" => Some(OffByOne)
-        "shifted" => Some(Shifted)
-        "suffix-as-prefix" => Some(SuffixAsPrefix)
-        "from-zero" => Some(FromZero)
-        "wrong-total" => Some(WrongTotal)
-        "no-content-range" => Some(NoContentRange)
-        "always-206" => Some(Always206)
-        "200-content-range" => Some(Value200ContentRange)
-        "always-416" => Some(Always416)
-        "unknown-total" => Some(UnknownTotal)
-        "if-range-ignored" => Some(IfRangeIgnored)
-        _ => None
+        "ok" => Option::Some(GetRangeFlavorFlavor::Ok)
+        "ignore" => Option::Some(GetRangeFlavorFlavor::Ignore)
+        "advertise-only" => Option::Some(GetRangeFlavorFlavor::AdvertiseOnly)
+        "off-by-one" => Option::Some(GetRangeFlavorFlavor::OffByOne)
+        "shifted" => Option::Some(GetRangeFlavorFlavor::Shifted)
+        "suffix-as-prefix" => Option::Some(GetRangeFlavorFlavor::SuffixAsPrefix)
+        "from-zero" => Option::Some(GetRangeFlavorFlavor::FromZero)
+        "wrong-total" => Option::Some(GetRangeFlavorFlavor::WrongTotal)
+        "no-content-range" => Option::Some(GetRangeFlavorFlavor::NoContentRange)
+        "always-206" => Option::Some(GetRangeFlavorFlavor::Always206)
+        "200-content-range" =>
+          Option::Some(GetRangeFlavorFlavor::Value200ContentRange)
+        "always-416" => Option::Some(GetRangeFlavorFlavor::Always416)
+        "unknown-total" => Option::Some(GetRangeFlavorFlavor::UnknownTotal)
+        "if-range-ignored" => Option::Some(GetRangeFlavorFlavor::IfRangeIgnored)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetRangeFlavorFlavor::Custom(raw),
   )
 }
 
@@ -309,19 +311,19 @@ pub extend GetEtagFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetEtagFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    Ok => "ok"
-    Weak => "weak"
-    Changing => "changing"
-    Ignore => "ignore"
-    Always304 => "always-304"
-    Mismatch => "mismatch"
-    NoValidator304 => "no-validator-304"
-    Unquoted => "unquoted"
-    BadDate => "bad-date"
-    Future => "future"
-    Custom(raw) => raw
+    GetEtagFlavorFlavor::Ok => "ok"
+    GetEtagFlavorFlavor::Weak => "weak"
+    GetEtagFlavorFlavor::Changing => "changing"
+    GetEtagFlavorFlavor::Ignore => "ignore"
+    GetEtagFlavorFlavor::Always304 => "always-304"
+    GetEtagFlavorFlavor::Mismatch => "mismatch"
+    GetEtagFlavorFlavor::NoValidator304 => "no-validator-304"
+    GetEtagFlavorFlavor::Unquoted => "unquoted"
+    GetEtagFlavorFlavor::BadDate => "bad-date"
+    GetEtagFlavorFlavor::Future => "future"
+    GetEtagFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -336,20 +338,20 @@ pub impl @json.FromJson for GetEtagFlavorFlavor with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "ok" => Some(Ok)
-        "weak" => Some(Weak)
-        "changing" => Some(Changing)
-        "ignore" => Some(Ignore)
-        "always-304" => Some(Always304)
-        "mismatch" => Some(Mismatch)
-        "no-validator-304" => Some(NoValidator304)
-        "unquoted" => Some(Unquoted)
-        "bad-date" => Some(BadDate)
-        "future" => Some(Future)
-        _ => None
+        "ok" => Option::Some(GetEtagFlavorFlavor::Ok)
+        "weak" => Option::Some(GetEtagFlavorFlavor::Weak)
+        "changing" => Option::Some(GetEtagFlavorFlavor::Changing)
+        "ignore" => Option::Some(GetEtagFlavorFlavor::Ignore)
+        "always-304" => Option::Some(GetEtagFlavorFlavor::Always304)
+        "mismatch" => Option::Some(GetEtagFlavorFlavor::Mismatch)
+        "no-validator-304" => Option::Some(GetEtagFlavorFlavor::NoValidator304)
+        "unquoted" => Option::Some(GetEtagFlavorFlavor::Unquoted)
+        "bad-date" => Option::Some(GetEtagFlavorFlavor::BadDate)
+        "future" => Option::Some(GetEtagFlavorFlavor::Future)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetEtagFlavorFlavor::Custom(raw),
   )
 }
 
@@ -395,28 +397,28 @@ pub extend GetCookiesFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetCookiesFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    Ok => "ok"
-    Echo => "echo"
-    Folded => "folded"
-    Many => "many"
-    Duplicate => "duplicate"
-    OnRedirect => "on-redirect"
-    Delete => "delete"
-    ConflictingExpiry => "conflicting-expiry"
-    BadExpires => "bad-expires"
-    FarFuture => "far-future"
-    WrongDomain => "wrong-domain"
-    PublicSuffix => "public-suffix"
-    Domain => "domain"
-    PathPrefix => "path-prefix"
-    NamePrefixes => "name-prefixes"
-    Quoted => "quoted"
-    Utf8 => "utf8"
-    Nameless => "nameless"
-    Huge => "huge"
-    Custom(raw) => raw
+    GetCookiesFlavorFlavor::Ok => "ok"
+    GetCookiesFlavorFlavor::Echo => "echo"
+    GetCookiesFlavorFlavor::Folded => "folded"
+    GetCookiesFlavorFlavor::Many => "many"
+    GetCookiesFlavorFlavor::Duplicate => "duplicate"
+    GetCookiesFlavorFlavor::OnRedirect => "on-redirect"
+    GetCookiesFlavorFlavor::Delete => "delete"
+    GetCookiesFlavorFlavor::ConflictingExpiry => "conflicting-expiry"
+    GetCookiesFlavorFlavor::BadExpires => "bad-expires"
+    GetCookiesFlavorFlavor::FarFuture => "far-future"
+    GetCookiesFlavorFlavor::WrongDomain => "wrong-domain"
+    GetCookiesFlavorFlavor::PublicSuffix => "public-suffix"
+    GetCookiesFlavorFlavor::Domain => "domain"
+    GetCookiesFlavorFlavor::PathPrefix => "path-prefix"
+    GetCookiesFlavorFlavor::NamePrefixes => "name-prefixes"
+    GetCookiesFlavorFlavor::Quoted => "quoted"
+    GetCookiesFlavorFlavor::Utf8 => "utf8"
+    GetCookiesFlavorFlavor::Nameless => "nameless"
+    GetCookiesFlavorFlavor::Huge => "huge"
+    GetCookiesFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -434,29 +436,30 @@ pub impl @json.FromJson for GetCookiesFlavorFlavor with fn from_json(
     path,
     raw => {
       match raw {
-        "ok" => Some(Ok)
-        "echo" => Some(Echo)
-        "folded" => Some(Folded)
-        "many" => Some(Many)
-        "duplicate" => Some(Duplicate)
-        "on-redirect" => Some(OnRedirect)
-        "delete" => Some(Delete)
-        "conflicting-expiry" => Some(ConflictingExpiry)
-        "bad-expires" => Some(BadExpires)
-        "far-future" => Some(FarFuture)
-        "wrong-domain" => Some(WrongDomain)
-        "public-suffix" => Some(PublicSuffix)
-        "domain" => Some(Domain)
-        "path-prefix" => Some(PathPrefix)
-        "name-prefixes" => Some(NamePrefixes)
-        "quoted" => Some(Quoted)
-        "utf8" => Some(Utf8)
-        "nameless" => Some(Nameless)
-        "huge" => Some(Huge)
-        _ => None
+        "ok" => Option::Some(GetCookiesFlavorFlavor::Ok)
+        "echo" => Option::Some(GetCookiesFlavorFlavor::Echo)
+        "folded" => Option::Some(GetCookiesFlavorFlavor::Folded)
+        "many" => Option::Some(GetCookiesFlavorFlavor::Many)
+        "duplicate" => Option::Some(GetCookiesFlavorFlavor::Duplicate)
+        "on-redirect" => Option::Some(GetCookiesFlavorFlavor::OnRedirect)
+        "delete" => Option::Some(GetCookiesFlavorFlavor::Delete)
+        "conflicting-expiry" =>
+          Option::Some(GetCookiesFlavorFlavor::ConflictingExpiry)
+        "bad-expires" => Option::Some(GetCookiesFlavorFlavor::BadExpires)
+        "far-future" => Option::Some(GetCookiesFlavorFlavor::FarFuture)
+        "wrong-domain" => Option::Some(GetCookiesFlavorFlavor::WrongDomain)
+        "public-suffix" => Option::Some(GetCookiesFlavorFlavor::PublicSuffix)
+        "domain" => Option::Some(GetCookiesFlavorFlavor::Domain)
+        "path-prefix" => Option::Some(GetCookiesFlavorFlavor::PathPrefix)
+        "name-prefixes" => Option::Some(GetCookiesFlavorFlavor::NamePrefixes)
+        "quoted" => Option::Some(GetCookiesFlavorFlavor::Quoted)
+        "utf8" => Option::Some(GetCookiesFlavorFlavor::Utf8)
+        "nameless" => Option::Some(GetCookiesFlavorFlavor::Nameless)
+        "huge" => Option::Some(GetCookiesFlavorFlavor::Huge)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetCookiesFlavorFlavor::Custom(raw),
   )
 }
 
@@ -501,27 +504,27 @@ pub extend GetAuthFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetAuthFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    Basic => "basic"
-    Bearer => "bearer"
-    Digest => "digest"
-    DigestSha256 => "digest-sha256"
-    None => "none"
-    BareScheme => "bare-scheme"
-    UnknownScheme => "unknown-scheme"
-    Token68 => "token68"
-    Multi => "multi"
-    Case => "case"
-    Quoted => "quoted"
-    Utf8 => "utf8"
-    Always401 => "always-401"
-    AcceptAny => "accept-any"
-    Forbidden => "forbidden"
-    Stale => "stale"
-    Proxy => "proxy"
-    Redirect => "redirect"
-    Custom(raw) => raw
+    GetAuthFlavorFlavor::Basic => "basic"
+    GetAuthFlavorFlavor::Bearer => "bearer"
+    GetAuthFlavorFlavor::Digest => "digest"
+    GetAuthFlavorFlavor::DigestSha256 => "digest-sha256"
+    GetAuthFlavorFlavor::None => "none"
+    GetAuthFlavorFlavor::BareScheme => "bare-scheme"
+    GetAuthFlavorFlavor::UnknownScheme => "unknown-scheme"
+    GetAuthFlavorFlavor::Token68 => "token68"
+    GetAuthFlavorFlavor::Multi => "multi"
+    GetAuthFlavorFlavor::Case => "case"
+    GetAuthFlavorFlavor::Quoted => "quoted"
+    GetAuthFlavorFlavor::Utf8 => "utf8"
+    GetAuthFlavorFlavor::Always401 => "always-401"
+    GetAuthFlavorFlavor::AcceptAny => "accept-any"
+    GetAuthFlavorFlavor::Forbidden => "forbidden"
+    GetAuthFlavorFlavor::Stale => "stale"
+    GetAuthFlavorFlavor::Proxy => "proxy"
+    GetAuthFlavorFlavor::Redirect => "redirect"
+    GetAuthFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -536,28 +539,28 @@ pub impl @json.FromJson for GetAuthFlavorFlavor with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "basic" => Some(Basic)
-        "bearer" => Some(Bearer)
-        "digest" => Some(Digest)
-        "digest-sha256" => Some(DigestSha256)
-        "none" => Some(None)
-        "bare-scheme" => Some(BareScheme)
-        "unknown-scheme" => Some(UnknownScheme)
-        "token68" => Some(Token68)
-        "multi" => Some(Multi)
-        "case" => Some(Case)
-        "quoted" => Some(Quoted)
-        "utf8" => Some(Utf8)
-        "always-401" => Some(Always401)
-        "accept-any" => Some(AcceptAny)
-        "forbidden" => Some(Forbidden)
-        "stale" => Some(Stale)
-        "proxy" => Some(Proxy)
-        "redirect" => Some(Redirect)
-        _ => None
+        "basic" => Option::Some(GetAuthFlavorFlavor::Basic)
+        "bearer" => Option::Some(GetAuthFlavorFlavor::Bearer)
+        "digest" => Option::Some(GetAuthFlavorFlavor::Digest)
+        "digest-sha256" => Option::Some(GetAuthFlavorFlavor::DigestSha256)
+        "none" => Option::Some(GetAuthFlavorFlavor::None)
+        "bare-scheme" => Option::Some(GetAuthFlavorFlavor::BareScheme)
+        "unknown-scheme" => Option::Some(GetAuthFlavorFlavor::UnknownScheme)
+        "token68" => Option::Some(GetAuthFlavorFlavor::Token68)
+        "multi" => Option::Some(GetAuthFlavorFlavor::Multi)
+        "case" => Option::Some(GetAuthFlavorFlavor::Case)
+        "quoted" => Option::Some(GetAuthFlavorFlavor::Quoted)
+        "utf8" => Option::Some(GetAuthFlavorFlavor::Utf8)
+        "always-401" => Option::Some(GetAuthFlavorFlavor::Always401)
+        "accept-any" => Option::Some(GetAuthFlavorFlavor::AcceptAny)
+        "forbidden" => Option::Some(GetAuthFlavorFlavor::Forbidden)
+        "stale" => Option::Some(GetAuthFlavorFlavor::Stale)
+        "proxy" => Option::Some(GetAuthFlavorFlavor::Proxy)
+        "redirect" => Option::Some(GetAuthFlavorFlavor::Redirect)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetAuthFlavorFlavor::Custom(raw),
   )
 }
 
@@ -593,18 +596,18 @@ pub extend GetCrosshostFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetCrosshostFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    SameOrigin => "same-origin"
-    ToSubdomain => "to-subdomain"
-    FromSubdomain => "from-subdomain"
-    Boomerang => "boomerang"
-    SchemeUpgrade => "scheme-upgrade"
-    SchemeDowngrade => "scheme-downgrade"
-    PortChange => "port-change"
-    RelativeAuthority => "relative-authority"
-    Jar => "jar"
-    Custom(raw) => raw
+    GetCrosshostFlavorFlavor::SameOrigin => "same-origin"
+    GetCrosshostFlavorFlavor::ToSubdomain => "to-subdomain"
+    GetCrosshostFlavorFlavor::FromSubdomain => "from-subdomain"
+    GetCrosshostFlavorFlavor::Boomerang => "boomerang"
+    GetCrosshostFlavorFlavor::SchemeUpgrade => "scheme-upgrade"
+    GetCrosshostFlavorFlavor::SchemeDowngrade => "scheme-downgrade"
+    GetCrosshostFlavorFlavor::PortChange => "port-change"
+    GetCrosshostFlavorFlavor::RelativeAuthority => "relative-authority"
+    GetCrosshostFlavorFlavor::Jar => "jar"
+    GetCrosshostFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -622,19 +625,23 @@ pub impl @json.FromJson for GetCrosshostFlavorFlavor with fn from_json(
     path,
     raw => {
       match raw {
-        "same-origin" => Some(SameOrigin)
-        "to-subdomain" => Some(ToSubdomain)
-        "from-subdomain" => Some(FromSubdomain)
-        "boomerang" => Some(Boomerang)
-        "scheme-upgrade" => Some(SchemeUpgrade)
-        "scheme-downgrade" => Some(SchemeDowngrade)
-        "port-change" => Some(PortChange)
-        "relative-authority" => Some(RelativeAuthority)
-        "jar" => Some(Jar)
-        _ => None
+        "same-origin" => Option::Some(GetCrosshostFlavorFlavor::SameOrigin)
+        "to-subdomain" => Option::Some(GetCrosshostFlavorFlavor::ToSubdomain)
+        "from-subdomain" =>
+          Option::Some(GetCrosshostFlavorFlavor::FromSubdomain)
+        "boomerang" => Option::Some(GetCrosshostFlavorFlavor::Boomerang)
+        "scheme-upgrade" =>
+          Option::Some(GetCrosshostFlavorFlavor::SchemeUpgrade)
+        "scheme-downgrade" =>
+          Option::Some(GetCrosshostFlavorFlavor::SchemeDowngrade)
+        "port-change" => Option::Some(GetCrosshostFlavorFlavor::PortChange)
+        "relative-authority" =>
+          Option::Some(GetCrosshostFlavorFlavor::RelativeAuthority)
+        "jar" => Option::Some(GetCrosshostFlavorFlavor::Jar)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetCrosshostFlavorFlavor::Custom(raw),
   )
 }
 
@@ -682,30 +689,30 @@ pub extend GetCompressFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for GetCompressFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    Ok => "ok"
-    Br => "br"
-    Zstd => "zstd"
-    Deflate => "deflate"
-    NotCompressed => "not-compressed"
-    Undeclared => "undeclared"
-    Truncated => "truncated"
-    Corrupt => "corrupt"
-    BadCrc => "bad-crc"
-    TrailingGarbage => "trailing-garbage"
-    MultiMember => "multi-member"
-    Double => "double"
-    DoubleHidden => "double-hidden"
-    DeflateRaw => "deflate-raw"
-    UnknownCoding => "unknown-coding"
-    Uppercase => "uppercase"
-    XGzip => "x-gzip"
-    Empty => "empty"
-    WrongLength => "wrong-length"
-    GzipFile => "gzip-file"
-    Bomb => "bomb"
-    Custom(raw) => raw
+    GetCompressFlavorFlavor::Ok => "ok"
+    GetCompressFlavorFlavor::Br => "br"
+    GetCompressFlavorFlavor::Zstd => "zstd"
+    GetCompressFlavorFlavor::Deflate => "deflate"
+    GetCompressFlavorFlavor::NotCompressed => "not-compressed"
+    GetCompressFlavorFlavor::Undeclared => "undeclared"
+    GetCompressFlavorFlavor::Truncated => "truncated"
+    GetCompressFlavorFlavor::Corrupt => "corrupt"
+    GetCompressFlavorFlavor::BadCrc => "bad-crc"
+    GetCompressFlavorFlavor::TrailingGarbage => "trailing-garbage"
+    GetCompressFlavorFlavor::MultiMember => "multi-member"
+    GetCompressFlavorFlavor::Double => "double"
+    GetCompressFlavorFlavor::DoubleHidden => "double-hidden"
+    GetCompressFlavorFlavor::DeflateRaw => "deflate-raw"
+    GetCompressFlavorFlavor::UnknownCoding => "unknown-coding"
+    GetCompressFlavorFlavor::Uppercase => "uppercase"
+    GetCompressFlavorFlavor::XGzip => "x-gzip"
+    GetCompressFlavorFlavor::Empty => "empty"
+    GetCompressFlavorFlavor::WrongLength => "wrong-length"
+    GetCompressFlavorFlavor::GzipFile => "gzip-file"
+    GetCompressFlavorFlavor::Bomb => "bomb"
+    GetCompressFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -723,31 +730,32 @@ pub impl @json.FromJson for GetCompressFlavorFlavor with fn from_json(
     path,
     raw => {
       match raw {
-        "ok" => Some(Ok)
-        "br" => Some(Br)
-        "zstd" => Some(Zstd)
-        "deflate" => Some(Deflate)
-        "not-compressed" => Some(NotCompressed)
-        "undeclared" => Some(Undeclared)
-        "truncated" => Some(Truncated)
-        "corrupt" => Some(Corrupt)
-        "bad-crc" => Some(BadCrc)
-        "trailing-garbage" => Some(TrailingGarbage)
-        "multi-member" => Some(MultiMember)
-        "double" => Some(Double)
-        "double-hidden" => Some(DoubleHidden)
-        "deflate-raw" => Some(DeflateRaw)
-        "unknown-coding" => Some(UnknownCoding)
-        "uppercase" => Some(Uppercase)
-        "x-gzip" => Some(XGzip)
-        "empty" => Some(Empty)
-        "wrong-length" => Some(WrongLength)
-        "gzip-file" => Some(GzipFile)
-        "bomb" => Some(Bomb)
-        _ => None
+        "ok" => Option::Some(GetCompressFlavorFlavor::Ok)
+        "br" => Option::Some(GetCompressFlavorFlavor::Br)
+        "zstd" => Option::Some(GetCompressFlavorFlavor::Zstd)
+        "deflate" => Option::Some(GetCompressFlavorFlavor::Deflate)
+        "not-compressed" => Option::Some(GetCompressFlavorFlavor::NotCompressed)
+        "undeclared" => Option::Some(GetCompressFlavorFlavor::Undeclared)
+        "truncated" => Option::Some(GetCompressFlavorFlavor::Truncated)
+        "corrupt" => Option::Some(GetCompressFlavorFlavor::Corrupt)
+        "bad-crc" => Option::Some(GetCompressFlavorFlavor::BadCrc)
+        "trailing-garbage" =>
+          Option::Some(GetCompressFlavorFlavor::TrailingGarbage)
+        "multi-member" => Option::Some(GetCompressFlavorFlavor::MultiMember)
+        "double" => Option::Some(GetCompressFlavorFlavor::Double)
+        "double-hidden" => Option::Some(GetCompressFlavorFlavor::DoubleHidden)
+        "deflate-raw" => Option::Some(GetCompressFlavorFlavor::DeflateRaw)
+        "unknown-coding" => Option::Some(GetCompressFlavorFlavor::UnknownCoding)
+        "uppercase" => Option::Some(GetCompressFlavorFlavor::Uppercase)
+        "x-gzip" => Option::Some(GetCompressFlavorFlavor::XGzip)
+        "empty" => Option::Some(GetCompressFlavorFlavor::Empty)
+        "wrong-length" => Option::Some(GetCompressFlavorFlavor::WrongLength)
+        "gzip-file" => Option::Some(GetCompressFlavorFlavor::GzipFile)
+        "bomb" => Option::Some(GetCompressFlavorFlavor::Bomb)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => GetCompressFlavorFlavor::Custom(raw),
   )
 }
 
@@ -775,8 +783,8 @@ pub extend GetRedirectHopsHops with ToJson::{to_json}
 ///|
 pub impl ToJson for GetRedirectHopsHops with fn to_json(self) {
   match self {
-    Int(value) => Json(value)
-    Text(value) => Json(value)
+    GetRedirectHopsHops::Int(value) => @json.Json::Json(value)
+    GetRedirectHopsHops::Text(value) => @json.Json::Json(value)
   }
 }
 
@@ -787,15 +795,15 @@ pub extend GetRedirectHopsHops with @json.FromJson::{from_json}
 
 ///|
 pub impl @json.FromJson for GetRedirectHopsHops with fn from_json(value, path) {
-  if value is Number(_, ..) {
+  if value is @json.Json::Number(_, ..) {
     let decoded : Int32 = @json.from_json(value, path~)
-    return Int(decoded)
+    return GetRedirectHopsHops::Int(decoded)
   }
-  if value is String(_) {
+  if value is @json.Json::String(_) {
     let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
+    return GetRedirectHopsHops::Text(decoded)
   }
-  raise @json.JsonDecodeError(
+  raise @json.JsonDecodeError::JsonDecodeError(
     (path, "JSON shape does not match any GetRedirectHopsHops variant"),
   )
 }
@@ -825,11 +833,11 @@ pub extend Get402PayNetwork with ToJson::{to_json}
 ///|
 pub impl ToJson for Get402PayNetwork with fn to_json(self) {
   let raw = match self {
-    BaseSepolia => "base-sepolia"
-    Base => "base"
-    Custom(raw) => raw
+    Get402PayNetwork::BaseSepolia => "base-sepolia"
+    Get402PayNetwork::Base => "base"
+    Get402PayNetwork::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -844,12 +852,12 @@ pub impl @json.FromJson for Get402PayNetwork with fn from_json(value, path) {
     path,
     raw => {
       match raw {
-        "base-sepolia" => Some(BaseSepolia)
-        "base" => Some(Base)
-        _ => None
+        "base-sepolia" => Option::Some(Get402PayNetwork::BaseSepolia)
+        "base" => Option::Some(Get402PayNetwork::Base)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Get402PayNetwork::Custom(raw),
   )
 }
 
@@ -883,16 +891,16 @@ pub extend Get402ScenarioScenario with ToJson::{to_json}
 ///|
 pub impl ToJson for Get402ScenarioScenario with fn to_json(self) {
   let raw = match self {
-    Never => "never"
-    Reject => "reject"
-    Slow => "slow"
-    Crash => "crash"
-    BadReceipt => "bad-receipt"
-    Overpriced => "overpriced"
-    WrongNetwork => "wrong-network"
-    Custom(raw) => raw
+    Get402ScenarioScenario::Never => "never"
+    Get402ScenarioScenario::Reject => "reject"
+    Get402ScenarioScenario::Slow => "slow"
+    Get402ScenarioScenario::Crash => "crash"
+    Get402ScenarioScenario::BadReceipt => "bad-receipt"
+    Get402ScenarioScenario::Overpriced => "overpriced"
+    Get402ScenarioScenario::WrongNetwork => "wrong-network"
+    Get402ScenarioScenario::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -910,17 +918,17 @@ pub impl @json.FromJson for Get402ScenarioScenario with fn from_json(
     path,
     raw => {
       match raw {
-        "never" => Some(Never)
-        "reject" => Some(Reject)
-        "slow" => Some(Slow)
-        "crash" => Some(Crash)
-        "bad-receipt" => Some(BadReceipt)
-        "overpriced" => Some(Overpriced)
-        "wrong-network" => Some(WrongNetwork)
-        _ => None
+        "never" => Option::Some(Get402ScenarioScenario::Never)
+        "reject" => Option::Some(Get402ScenarioScenario::Reject)
+        "slow" => Option::Some(Get402ScenarioScenario::Slow)
+        "crash" => Option::Some(Get402ScenarioScenario::Crash)
+        "bad-receipt" => Option::Some(Get402ScenarioScenario::BadReceipt)
+        "overpriced" => Option::Some(Get402ScenarioScenario::Overpriced)
+        "wrong-network" => Option::Some(Get402ScenarioScenario::WrongNetwork)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Get402ScenarioScenario::Custom(raw),
   )
 }
 
@@ -949,11 +957,11 @@ pub extend Get402ScenarioNetwork with ToJson::{to_json}
 ///|
 pub impl ToJson for Get402ScenarioNetwork with fn to_json(self) {
   let raw = match self {
-    BaseSepolia => "base-sepolia"
-    Base => "base"
-    Custom(raw) => raw
+    Get402ScenarioNetwork::BaseSepolia => "base-sepolia"
+    Get402ScenarioNetwork::Base => "base"
+    Get402ScenarioNetwork::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -968,12 +976,12 @@ pub impl @json.FromJson for Get402ScenarioNetwork with fn from_json(value, path)
     path,
     raw => {
       match raw {
-        "base-sepolia" => Some(BaseSepolia)
-        "base" => Some(Base)
-        _ => None
+        "base-sepolia" => Option::Some(Get402ScenarioNetwork::BaseSepolia)
+        "base" => Option::Some(Get402ScenarioNetwork::Base)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Get402ScenarioNetwork::Custom(raw),
   )
 }
 
@@ -1010,19 +1018,19 @@ pub extend Get402BrokenFlavorFlavor with ToJson::{to_json}
 ///|
 pub impl ToJson for Get402BrokenFlavorFlavor with fn to_json(self) {
   let raw = match self {
-    NotBase64 => "not-base64"
-    NotJson => "not-json"
-    NoAccepts => "no-accepts"
-    EmptyAccepts => "empty-accepts"
-    NoExtra => "no-extra"
-    NoResource => "no-resource"
-    Version99 => "version-99"
-    DecimalAmount => "decimal-amount"
-    MissingHeader => "missing-header"
-    V1Body => "v1-body"
-    Custom(raw) => raw
+    Get402BrokenFlavorFlavor::NotBase64 => "not-base64"
+    Get402BrokenFlavorFlavor::NotJson => "not-json"
+    Get402BrokenFlavorFlavor::NoAccepts => "no-accepts"
+    Get402BrokenFlavorFlavor::EmptyAccepts => "empty-accepts"
+    Get402BrokenFlavorFlavor::NoExtra => "no-extra"
+    Get402BrokenFlavorFlavor::NoResource => "no-resource"
+    Get402BrokenFlavorFlavor::Version99 => "version-99"
+    Get402BrokenFlavorFlavor::DecimalAmount => "decimal-amount"
+    Get402BrokenFlavorFlavor::MissingHeader => "missing-header"
+    Get402BrokenFlavorFlavor::V1Body => "v1-body"
+    Get402BrokenFlavorFlavor::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1040,20 +1048,22 @@ pub impl @json.FromJson for Get402BrokenFlavorFlavor with fn from_json(
     path,
     raw => {
       match raw {
-        "not-base64" => Some(NotBase64)
-        "not-json" => Some(NotJson)
-        "no-accepts" => Some(NoAccepts)
-        "empty-accepts" => Some(EmptyAccepts)
-        "no-extra" => Some(NoExtra)
-        "no-resource" => Some(NoResource)
-        "version-99" => Some(Version99)
-        "decimal-amount" => Some(DecimalAmount)
-        "missing-header" => Some(MissingHeader)
-        "v1-body" => Some(V1Body)
-        _ => None
+        "not-base64" => Option::Some(Get402BrokenFlavorFlavor::NotBase64)
+        "not-json" => Option::Some(Get402BrokenFlavorFlavor::NotJson)
+        "no-accepts" => Option::Some(Get402BrokenFlavorFlavor::NoAccepts)
+        "empty-accepts" => Option::Some(Get402BrokenFlavorFlavor::EmptyAccepts)
+        "no-extra" => Option::Some(Get402BrokenFlavorFlavor::NoExtra)
+        "no-resource" => Option::Some(Get402BrokenFlavorFlavor::NoResource)
+        "version-99" => Option::Some(Get402BrokenFlavorFlavor::Version99)
+        "decimal-amount" =>
+          Option::Some(Get402BrokenFlavorFlavor::DecimalAmount)
+        "missing-header" =>
+          Option::Some(Get402BrokenFlavorFlavor::MissingHeader)
+        "v1-body" => Option::Some(Get402BrokenFlavorFlavor::V1Body)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Get402BrokenFlavorFlavor::Custom(raw),
   )
 }
 
@@ -1082,11 +1092,11 @@ pub extend Get402BrokenFlavorNetwork with ToJson::{to_json}
 ///|
 pub impl ToJson for Get402BrokenFlavorNetwork with fn to_json(self) {
   let raw = match self {
-    BaseSepolia => "base-sepolia"
-    Base => "base"
-    Custom(raw) => raw
+    Get402BrokenFlavorNetwork::BaseSepolia => "base-sepolia"
+    Get402BrokenFlavorNetwork::Base => "base"
+    Get402BrokenFlavorNetwork::Custom(raw) => raw
   }
-  Json(raw)
+  @json.Json::Json(raw)
 }
 
 ///|
@@ -1104,11 +1114,11 @@ pub impl @json.FromJson for Get402BrokenFlavorNetwork with fn from_json(
     path,
     raw => {
       match raw {
-        "base-sepolia" => Some(BaseSepolia)
-        "base" => Some(Base)
-        _ => None
+        "base-sepolia" => Option::Some(Get402BrokenFlavorNetwork::BaseSepolia)
+        "base" => Option::Some(Get402BrokenFlavorNetwork::Base)
+        _ => Option::None
       }
     },
-    raw => Custom(raw),
+    raw => Get402BrokenFlavorNetwork::Custom(raw),
   )
 }

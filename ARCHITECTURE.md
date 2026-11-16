@@ -32,12 +32,18 @@ SendOptions for each attempt; response bodies belong to their consumer.
 
 ## Generation
 
-Pinned specs under each module's `spec/` pass through overlays, normalization,
+Pinned specs use a shared `specs/<provider>/` directory with one `SOURCE.md`;
+older per-module `spec/` locations remain supported without duplicating them.
+Several ledger entries can consume one file with their own operation selections.
+Specs pass through overlays, operation selection, normalization,
 IR and `tools/gen/emit_moonbit.py`. Generated code is committed under `src/gen`;
 users need no Python. The generator stays in Python so language changes do not
 also break the tool that regenerates the SDKs. Unknown shapes are rejected with
 overlay locations rather than silently degraded to Json. The census documents
 intentional raw Json surfaces.
+Every ledger entry's gate also generates an isolated scratch module and checks
+it with denied warnings after a diagnostic-free census. See
+[SDK factory](docs/sdk-factory.md) for selection and shared-source rules.
 
 Generated request functions return http.Request. Successful response decoders
 take ResponseHead and Bytes and return Result with mttp_core/client.ResponseFailure. JSON

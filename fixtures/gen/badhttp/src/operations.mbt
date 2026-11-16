@@ -2,14 +2,14 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match Json(value) {
-    String(value) => value
-    True => "true"
-    False => "false"
-    Number(value, repr~) =>
+  match @json.Json::Json(value) {
+    @json.Json::String(value) => value
+    @json.Json::True => "true"
+    @json.Json::False => "false"
+    @json.Json::Number(value, repr~) =>
       match repr {
-        Some(text) => text
-        None => value.to_string()
+        Option::Some(text) => text
+        Option::None => value.to_string()
       }
     other => other.stringify()
   }
@@ -25,10 +25,10 @@ fn[T : @json.FromJson] decode_response(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[T, @client.ResponseFailure] {
-  Ok(@json.from_json(parse_json_body(body))) catch {
+  Result::Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message=error.to_string(),
           body=body[:body.length().min(@client.max_error_body)].to_owned(),
@@ -46,9 +46,9 @@ pub fn get_status_code_request(
 ) -> @http.Request {
   let mut url = "/status/" + @http.percent_encode(parameter_value(code))
   match retry_after {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "retry-after", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -89,18 +89,19 @@ pub fn get_drip_request(
 ) -> @http.Request {
   let mut url = "/drip"
   match duration {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "duration", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match chunks {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "chunks", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "code", parameter_value(value))
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -111,13 +112,14 @@ pub fn get_drip_request(
 pub fn get_truncate_request(length? : Int32, send? : Int32) -> @http.Request {
   let mut url = "/truncate"
   match length {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "length", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match send {
-    Some(value) => url = @http.append_query(url, "send", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "send", parameter_value(value))
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -131,8 +133,9 @@ pub fn get_badjson_flavor_request(
 ) -> @http.Request {
   let mut url = "/badjson/" + @http.percent_encode(parameter_value(flavor))
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "code", parameter_value(value))
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -174,30 +177,30 @@ pub fn get_sse_flavor_request(
 ) -> @http.Request {
   let mut url = "/sse/" + @http.percent_encode(parameter_value(flavor))
   match events {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "events", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match interval {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "interval", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match seconds {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "seconds", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match bytes {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "bytes", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   let mut request = @http.Request::get(url)
   match last_event_id {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("Last-Event-ID", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -237,18 +240,20 @@ pub fn get_range_flavor_request(
 ) -> @http.Request {
   let mut url = "/range/" + @http.percent_encode(parameter_value(flavor))
   match length {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "length", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   let mut request = @http.Request::get(url)
   match range {
-    Some(value) => request = request.header("Range", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("Range", parameter_value(value))
+    Option::None => ()
   }
   match if_range {
-    Some(value) => request = request.header("If-Range", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("If-Range", parameter_value(value))
+    Option::None => ()
   }
   request
 }
@@ -291,23 +296,24 @@ pub fn get_etag_flavor_request(
     "/etag/" + @http.percent_encode(parameter_value(flavor)),
   )
   match if_none_match {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("If-None-Match", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match if_modified_since {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("If-Modified-Since", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match if_match {
-    Some(value) => request = request.header("If-Match", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("If-Match", parameter_value(value))
+    Option::None => ()
   }
   match if_unmodified_since {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("If-Unmodified-Since", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -349,19 +355,20 @@ pub fn get_cookies_flavor_request(
 ) -> @http.Request {
   let mut url = "/cookies/" + @http.percent_encode(parameter_value(flavor))
   match count {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "count", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match bytes {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "bytes", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   let mut request = @http.Request::get(url)
   match cookie {
-    Some(value) => request = request.header("Cookie", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      request = request.header("Cookie", parameter_value(value))
+    Option::None => ()
   }
   request
 }
@@ -536,23 +543,25 @@ pub fn get_compress_flavor_request(
 ) -> @http.Request {
   let mut url = "/compress/" + @http.percent_encode(parameter_value(flavor))
   match length {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "length", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "code", parameter_value(value))
+    Option::None => ()
   }
   match size {
-    Some(value) => url = @http.append_query(url, "size", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "size", parameter_value(value))
+    Option::None => ()
   }
   let mut request = @http.Request::get(url)
   match accept_encoding {
-    Some(value) =>
+    Option::Some(value) =>
       request = request.header("Accept-Encoding", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   request
 }
@@ -568,16 +577,19 @@ pub fn get_flaky_percent_request(
 ) -> @http.Request {
   let mut url = "/flaky/" + @http.percent_encode(parameter_value(percent))
   match fail {
-    Some(value) => url = @http.append_query(url, "fail", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "fail", parameter_value(value))
+    Option::None => ()
   }
   match seed {
-    Some(value) => url = @http.append_query(url, "seed", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "seed", parameter_value(value))
+    Option::None => ()
   }
   match i {
-    Some(value) => url = @http.append_query(url, "i", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "i", parameter_value(value))
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -611,13 +623,14 @@ pub fn get_redirect_hops_request(
 ) -> @http.Request {
   let mut url = "/redirect/" + @http.percent_encode(parameter_value(hops))
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
-    None => ()
+    Option::Some(value) =>
+      url = @http.append_query(url, "code", parameter_value(value))
+    Option::None => ()
   }
   match absolute {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "absolute", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -812,14 +825,14 @@ pub fn get_402_pay_request(
 ) -> @http.Request {
   let mut url = "/402/pay"
   match network {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "network", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match amount {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "amount", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -830,9 +843,9 @@ pub fn get_402_pay_request(
 pub fn get_402_pay_base_request(amount? : Double) -> @http.Request {
   let mut url = "/402/pay/base"
   match amount {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "amount", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -843,9 +856,9 @@ pub fn get_402_pay_base_request(amount? : Double) -> @http.Request {
 pub fn get_402_pay_base_sepolia_request(amount? : Double) -> @http.Request {
   let mut url = "/402/pay/base-sepolia"
   match amount {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "amount", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -862,24 +875,24 @@ pub fn get_402_scenario_request(
 ) -> @http.Request {
   let mut url = "/402/" + @http.percent_encode(parameter_value(scenario))
   match network {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "network", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match amount {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "amount", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match reason {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "reason", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match seconds {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "seconds", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }
@@ -894,14 +907,14 @@ pub fn get_402_broken_flavor_request(
 ) -> @http.Request {
   let mut url = "/402/broken/" + @http.percent_encode(parameter_value(flavor))
   match network {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "network", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   match amount {
-    Some(value) =>
+    Option::Some(value) =>
       url = @http.append_query(url, "amount", parameter_value(value))
-    None => ()
+    Option::None => ()
   }
   @http.Request::get(url)
 }

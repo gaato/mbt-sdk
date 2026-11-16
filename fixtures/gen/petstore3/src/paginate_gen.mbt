@@ -17,15 +17,18 @@ fn page_field(value : Json, path : String) -> Json? raise PageDecodeError {
   let mut current = value
   for part in path.split(".") {
     match current {
-      Object(fields) =>
+      @json.Json::Object(fields) =>
         match fields.get(part.to_owned()) {
-          Some(value) => current = value
-          None => return None
+          Option::Some(value) => current = value
+          Option::None => return Option::None
         }
-      _ => raise PageDecodeError("pagination field path traverses a non-object")
+      _ =>
+        raise PageDecodeError::PageDecodeError(
+          "pagination field path traverses a non-object",
+        )
     }
   }
-  Some(current)
+  Option::Some(current)
 }
 
 ///|
@@ -39,19 +42,19 @@ pub fn[T : @json.FromJson] Petstore3::paginate(
   next~ : String,
   operation~ : String = self.infer_operation(first),
 ) -> @client.Paginator[T, Failure] {
-  let cursor : Ref[String?] = Ref(None)
-  let done = Ref(false)
+  let cursor : Ref[String?] = Ref::Ref(Option::None)
+  let done = Ref::Ref(false)
   @client.Paginator::new(() => {
     if done.val {
-      return Ok(None)
+      return Result::Ok(Option::None)
     }
     for ;; {
       let request = match cursor.val {
-        None => first
-        Some(value) =>
+        Option::None => first
+        Option::Some(value) =>
           match kind {
-            NextUrl => { ..first, url: value, }
-            Cursor(param) => {
+            PageKind::NextUrl => { ..first, url: value, }
+            PageKind::Cursor(param) => {
               let url = @http.Url::parse(first.url)
               {
                 ..first,
@@ -61,31 +64,35 @@ pub fn[T : @json.FromJson] Petstore3::paginate(
           }
       }
       match self.send(request, operation~) {
-        Err(error) => return Err(error)
-        Ok(reply) =>
+        Result::Err(error) => return Result::Err(error)
+        Result::Ok(reply) =>
           try {
             let json = @json.parse(@utf8.decode(reply.body))
             let values = match page_field(json, items) {
-              Some(Array(values)) => values
-              None => []
-              _ => raise PageDecodeError("pagination items must be an array")
+              Option::Some(@json.Json::Array(values)) => values
+              Option::None => []
+              _ =>
+                raise PageDecodeError::PageDecodeError(
+                  "pagination items must be an array",
+                )
             }
             let next_cursor = match page_field(json, next) {
-              Some(String(value)) if value != "" => Some(value)
-              Some(Null) | None => None
-              Some(String(_)) => None
+              Option::Some(@json.Json::String(value)) if value != "" =>
+                Option::Some(value)
+              Option::Some(@json.Json::Null) | Option::None => Option::None
+              Option::Some(@json.Json::String(_)) => Option::None
               _ =>
-                raise PageDecodeError(
+                raise PageDecodeError::PageDecodeError(
                   "pagination next must be a string or null",
                 )
             }
             let typed : Array[T] = values.map(value => @json.from_json(value))
             let next_cursor = match (kind, next_cursor) {
-              (NextUrl, Some(reference)) => {
+              (PageKind::NextUrl, Option::Some(reference)) => {
                 let current = reply.attributes
                   .get(@client.final_url)
                   .unwrap_or(reply.request.url)
-                Some(
+                Option::Some(
                   @http.Url::parse(current)
                   .resolve(@http.Url::parse(reference))
                   .to_string(),
@@ -94,18 +101,18 @@ pub fn[T : @json.FromJson] Petstore3::paginate(
               _ => next_cursor
             }
             cursor.val = next_cursor
-            done.val = next_cursor is None
+            done.val = next_cursor is Option::None
             if !typed.is_empty() {
-              return Ok(Some(typed))
+              return Result::Ok(Option::Some(typed))
             }
             if done.val {
-              return Ok(None)
+              return Result::Ok(Option::None)
             }
           } catch {
             error =>
-              return Err(
-                Decode(
-                  @client.Deserialization(
+              return Result::Err(
+                Failure::Decode(
+                  @client.ResponseFailure::Deserialization(
                     { status: reply.status, headers: reply.headers, },
                     message=error.to_string(),
                     body=reply.body[:reply.body

@@ -26,7 +26,7 @@ pub impl @debug.Debug for Petstore3 with fn to_repr(_) {
 pub fn Petstore3::new(
   backend : &@http.Backend,
   clock : &@rt.Clock,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://petstore3.swagger.io/api/v3",
   server_urls~ : Map[String, String] = {},
   retry~ : @client.RetryPolicy = default_retry(),
@@ -58,7 +58,7 @@ pub fn Petstore3::new(
 /// Credentials are redacted from Debug output.
 pub fn Petstore3::from_client(
   client : @client.Client,
-  auth~ : Auth = Anonymous,
+  auth~ : Auth = Auth::Anonymous,
   base_url~ : String = "https://petstore3.swagger.io/api/v3",
   server_urls~ : Map[String, String] = {},
 ) -> Petstore3 {
@@ -147,9 +147,14 @@ fn response_failure(
   error : @client.ResponseFailure,
 ) -> Failure {
   match error {
-    @client.UnexpectedStatus(head, body~) =>
-      Http({ operation, head, body, typed: typed_error(operation, head, body), })
-    _ => Decode(error)
+    @client.ResponseFailure::UnexpectedStatus(head, body~) =>
+      Failure::Http({
+        operation,
+        head,
+        body,
+        typed: typed_error(operation, head, body),
+      })
+    _ => Failure::Decode(error)
   }
 }
 
@@ -167,18 +172,19 @@ pub async fn Petstore3::send(
       ),
     )
     match reply.body {
-      Ok(body) =>
-        Ok({
+      Result::Ok(body) =>
+        Result::Ok({
           status: reply.status,
           headers: reply.headers,
           body,
           request: reply.request,
           attributes: reply.attributes,
         })
-      Err(error) => Err(response_failure(operation, error))
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -192,12 +198,12 @@ pub async fn[T] Petstore3::call(
   operation~ : String = self.infer_operation(request),
 ) -> Result[T, Failure] {
   match self.send(request, operation~) {
-    Err(error) => Err(error)
-    Ok(reply) =>
+    Result::Err(error) => Result::Err(error)
+    Result::Ok(reply) =>
       match
         decode({ status: reply.status, headers: reply.headers, }, reply.body) {
-        Ok(value) => Ok(value)
-        Err(error) => Err(Decode(error))
+        Result::Ok(value) => Result::Ok(value)
+        Result::Err(error) => Result::Err(Failure::Decode(error))
       }
   }
 }
@@ -217,8 +223,8 @@ pub async fn Petstore3::stream(
     receive,
     stop=(_, event) => {
       match stop {
-        Some(predicate) => predicate(event)
-        None => false
+        Option::Some(predicate) => predicate(event)
+        Option::None => false
       }
     },
     operation~,
@@ -242,11 +248,12 @@ async fn Petstore3::stream_with_head(
       ),
     )
     match reply.body {
-      Ok(value) => Ok(value)
-      Err(error) => Err(response_failure(operation, error))
+      Result::Ok(value) => Result::Ok(value)
+      Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
-    @http.TransportError(..) as error => Err(Transport(error))
+    @http.TransportError::TransportError(..) as error =>
+      Result::Err(Failure::Transport(error))
     error => raise error
   }
 }
@@ -273,9 +280,9 @@ fn Petstore3::authenticate(
   request : @http.Request,
 ) -> @http.Request {
   match self.auth {
-    Anonymous => request
-    Bearer(value) => request.bearer(value)
-    ApiKey(value) => request.set_header("api_key", value)
+    Auth::Anonymous => request
+    Auth::Bearer(value) => request.bearer(value)
+    Auth::ApiKey(value) => request.set_header("api_key", value)
   }
 }
 
@@ -289,7 +296,7 @@ fn Petstore3::operation_config(
     "updatePet" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -297,7 +304,7 @@ fn Petstore3::operation_config(
     "addPet" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -305,7 +312,7 @@ fn Petstore3::operation_config(
     "findPetsByStatus" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -313,7 +320,7 @@ fn Petstore3::operation_config(
     "findPetsByTags" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -321,7 +328,7 @@ fn Petstore3::operation_config(
     "getPetById" =>
       (
         match self.auth {
-          ApiKey(_) | Bearer(_) => true
+          Auth::ApiKey(_) | Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -329,7 +336,7 @@ fn Petstore3::operation_config(
     "updatePetWithForm" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -337,7 +344,7 @@ fn Petstore3::operation_config(
     "deletePet" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -345,7 +352,7 @@ fn Petstore3::operation_config(
     "uploadFile" =>
       (
         match self.auth {
-          Bearer(_) => true
+          Auth::Bearer(_) => true
           _ => false
         },
         "",
@@ -353,7 +360,7 @@ fn Petstore3::operation_config(
     "getInventory" =>
       (
         match self.auth {
-          ApiKey(_) => true
+          Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -361,7 +368,7 @@ fn Petstore3::operation_config(
     "placeOrder" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -369,7 +376,7 @@ fn Petstore3::operation_config(
     "getOrderById" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -377,7 +384,7 @@ fn Petstore3::operation_config(
     "deleteOrder" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -385,7 +392,7 @@ fn Petstore3::operation_config(
     "createUser" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -393,7 +400,7 @@ fn Petstore3::operation_config(
     "createUsersWithListInput" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -401,7 +408,7 @@ fn Petstore3::operation_config(
     "loginUser" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -409,7 +416,7 @@ fn Petstore3::operation_config(
     "logoutUser" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -417,7 +424,7 @@ fn Petstore3::operation_config(
     "getUserByName" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -425,7 +432,7 @@ fn Petstore3::operation_config(
     "updateUser" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",
@@ -433,7 +440,7 @@ fn Petstore3::operation_config(
     "deleteUser" =>
       (
         match self.auth {
-          Bearer(_) | ApiKey(_) => true
+          Auth::Bearer(_) | Auth::ApiKey(_) => true
           _ => false
         },
         "",

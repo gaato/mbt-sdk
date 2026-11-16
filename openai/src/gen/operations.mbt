@@ -2,14 +2,14 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match Json(value) {
-    String(value) => value
-    True => "true"
-    False => "false"
-    Number(value, repr~) =>
+  match @json.Json::Json(value) {
+    @json.Json::String(value) => value
+    @json.Json::True => "true"
+    @json.Json::False => "false"
+    @json.Json::Number(value, repr~) =>
       match repr {
-        Some(text) => text
-        None => value.to_string()
+        Option::Some(text) => text
+        Option::None => value.to_string()
       }
     other => other.stringify()
   }
@@ -25,10 +25,10 @@ fn[T : @json.FromJson] decode_response(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[T, @client.ResponseFailure] {
-  Ok(@json.from_json(parse_json_body(body))) catch {
+  Result::Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      Err(
-        @client.Deserialization(
+      Result::Err(
+        @client.ResponseFailure::Deserialization(
           head,
           message=error.to_string(),
           body=body[:body.length().min(@client.max_error_body)].to_owned(),
@@ -43,7 +43,7 @@ fn[T : @json.FromJson] decode_response(
 pub fn create_chat_completion_request(
   body : CreateChatCompletionRequest,
 ) -> @http.Request {
-  @http.Request::post("/chat/completions").body_json(Json(body))
+  @http.Request::post("/chat/completions").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -69,7 +69,7 @@ pub fn create_chat_completion_decode(
 ///
 /// Creates an embedding vector representing the input text.
 pub fn create_embedding_request(body : CreateEmbeddingRequest) -> @http.Request {
-  @http.Request::post("/embeddings").body_json(Json(body))
+  @http.Request::post("/embeddings").body_json(@json.Json::Json(body))
 }
 
 ///|
@@ -147,7 +147,7 @@ pub fn retrieve_model_decode(
 ///
 /// Creates a model response. Provide [text](/docs/guides/text) or [image](/docs/guides/images) inputs to generate [text](/docs/guides/text) or [JSON](/docs/guides/structured-outputs) outputs. Have the model call your own [custom code](/docs/guides/function-calling) or use built-in [tools](/docs/guides/tools) like [web search](/docs/guides/tools-web-search) or [file search](/docs/guides/tools-file-search) to use your own data as input for the model's response.
 pub fn create_response_request(body : CreateResponse) -> @http.Request {
-  @http.Request::post("/responses").body_json(Json(body))
+  @http.Request::post("/responses").body_json(@json.Json::Json(body))
 }
 
 ///|

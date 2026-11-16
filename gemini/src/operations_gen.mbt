@@ -7,14 +7,18 @@ pub async fn Gemini::delete_cached_content(
   name~ : String,
 ) -> Result[Unit, Failure] {
   let request = @gen.cached_contents_delete_request(name) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(operation="cached_contents_delete", parameter~, message~),
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
+          operation="cached_contents_delete",
+          parameter~,
+          message~,
+        ),
       )
   }
   match self.send(request, operation="cached_contents_delete") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -27,9 +31,13 @@ pub async fn Gemini::update_cached_content(
   update_mask? : String,
 ) -> Result[@gen.CachedContent, Failure] {
   let request = @gen.cached_contents_patch_request(name, body, update_mask?) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(operation="cached_contents_patch", parameter~, message~),
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
+          operation="cached_contents_patch",
+          parameter~,
+          message~,
+        ),
       )
   }
   self.call(
@@ -46,9 +54,13 @@ pub async fn Gemini::get_cached_content(
   name~ : String,
 ) -> Result[@gen.CachedContent, Failure] {
   let request = @gen.cached_contents_get_request(name) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(operation="cached_contents_get", parameter~, message~),
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
+          operation="cached_contents_get",
+          parameter~,
+          message~,
+        ),
       )
   }
   self.call(
@@ -115,8 +127,10 @@ pub async fn Gemini::get_file(
   name~ : String,
 ) -> Result[@gen.File, Failure] {
   let request = @gen.files_get_request(name) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(Validation(operation="files_get", parameter~, message~))
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(operation="files_get", parameter~, message~),
+      )
   }
   self.call(request, @gen.files_get_decode, operation="files_get")
 }
@@ -128,12 +142,14 @@ pub async fn Gemini::delete_file(
   name~ : String,
 ) -> Result[Unit, Failure] {
   let request = @gen.files_delete_request(name) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(Validation(operation="files_delete", parameter~, message~))
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(operation="files_delete", parameter~, message~),
+      )
   }
   match self.send(request, operation="files_delete") {
-    Ok(_) => Ok(())
-    Err(error) => Err(error)
+    Result::Ok(_) => Result::Ok(())
+    Result::Err(error) => Result::Err(error)
   }
 }
 
@@ -145,9 +161,13 @@ pub async fn Gemini::embed_content(
   body : @gen.EmbedContentRequest,
 ) -> Result[@gen.EmbedContentResponse, Failure] {
   let request = @gen.models_embed_content_request(model, body) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(operation="models_embed_content", parameter~, message~),
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
+          operation="models_embed_content",
+          parameter~,
+          message~,
+        ),
       )
   }
   self.call(
@@ -165,9 +185,9 @@ pub async fn Gemini::batch_embed_contents(
   body : @gen.BatchEmbedContentsRequest,
 ) -> Result[@gen.BatchEmbedContentsResponse, Failure] {
   let request = @gen.models_batch_embed_contents_request(model, body) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
           operation="models_batch_embed_contents",
           parameter~,
           message~,
@@ -200,9 +220,13 @@ pub async fn Gemini::count_tokens(
   body : @gen.CountTokensRequest,
 ) -> Result[@gen.CountTokensResponse, Failure] {
   let request = @gen.models_count_tokens_request(model, body) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(operation="models_count_tokens", parameter~, message~),
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
+          operation="models_count_tokens",
+          parameter~,
+          message~,
+        ),
       )
   }
   self.call(
@@ -220,9 +244,13 @@ pub async fn Gemini::generate_content(
   body : @gen.GenerateContentRequest,
 ) -> Result[@gen.GenerateContentResponse, Failure] {
   let request = @gen.models_generate_content_request(model, body) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(operation="models_generate_content", parameter~, message~),
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
+          operation="models_generate_content",
+          parameter~,
+          message~,
+        ),
       )
   }
   self.call(
@@ -242,26 +270,26 @@ pub async fn Gemini::stream_generate_content(
   stop? : (@gen.GenerateContentResponse) -> Bool,
 ) -> Result[Unit, Failure] {
   let request = (@gen.models_stream_generate_content_request(model, body) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(
-        Validation(
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(
           operation="models_stream_generate_content",
           parameter~,
           message~,
         ),
       )
   }).query("alt", "sse")
-  let decoded : Ref[@gen.GenerateContentResponse?] = Ref(None)
-  let decode_error : Ref[@client.ResponseFailure?] = Ref(None)
+  let decoded : Ref[@gen.GenerateContentResponse?] = Ref::Ref(Option::None)
+  let decode_error : Ref[@client.ResponseFailure?] = Ref::Ref(Option::None)
   let stream_result = self.stream_with_head(
     request,
     _event => {
       match decoded.val {
-        Some(value) => {
-          decoded.val = None
+        Option::Some(value) => {
+          decoded.val = Option::None
           receive(value)
         }
-        None => ()
+        Option::None => ()
       }
     },
     stop=(head, event) => {
@@ -270,15 +298,15 @@ pub async fn Gemini::stream_generate_content(
           head,
           @utf8.encode(event.data),
         ) {
-        Err(error) => {
-          decode_error.val = Some(error)
+        Result::Err(error) => {
+          decode_error.val = Option::Some(error)
           true
         }
-        Ok(value) =>
+        Result::Ok(value) =>
           match stop {
-            Some(predicate) if predicate(value) => true
+            Option::Some(predicate) if predicate(value) => true
             _ => {
-              decoded.val = Some(value)
+              decoded.val = Option::Some(value)
               false
             }
           }
@@ -287,8 +315,8 @@ pub async fn Gemini::stream_generate_content(
     operation="models_stream_generate_content",
   )
   match decode_error.val {
-    Some(error) => Err(Decode(error))
-    None => stream_result
+    Option::Some(error) => Result::Err(Failure::Decode(error))
+    Option::None => stream_result
   }
 }
 
@@ -299,8 +327,10 @@ pub async fn Gemini::get_model(
   name~ : String,
 ) -> Result[@gen.Model, Failure] {
   let request = @gen.models_get_request(name) catch {
-    @gen.ValidationError(parameter~, message~) =>
-      return Err(Validation(operation="models_get", parameter~, message~))
+    @gen.ValidationError::ValidationError(parameter~, message~) =>
+      return Result::Err(
+        Failure::Validation(operation="models_get", parameter~, message~),
+      )
   }
   self.call(request, @gen.models_get_decode, operation="models_get")
 }

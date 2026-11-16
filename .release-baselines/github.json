@@ -1,0 +1,10 @@
+{
+  "api": {
+    "src/gen/pkg.generated.mbti": "0648a24dfc412d39fb64ec0bf6e662ef73e838bd41e762257791933f6e2eaee5",
+    "src/pkg.generated.mbti": "a63cfb8345bc27e57a122d7762b44ef3b9e2ebb57afc793892f12cfadc1412c5"
+  },
+  "artifact_checksum": "6f187986378fd9da4ab605e8a81e0de9435362e5939bf068fec14961d503667c",
+  "module": "gaato/github",
+  "published_at": "2026-11-16T00:24:40.426638+00:00",
+  "version": "0.25.0"
+}

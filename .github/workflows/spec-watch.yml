@@ -1,24 +1,13 @@
 name: Spec watch
 
-# Fetches the ledger-selected upstream specs daily. When changed: re-vendor, apply the
-# overlays, regenerate, run the gates, bump the module version when src changed,
-# and open a PR. When generation, the gates and CI all pass, the PR is merged
-# here and release.yml publishes; otherwise it stays open for a human.
-# Overlay actions that no longer match (zero-match) or no longer change anything
-# (no-op: upstream fixed it) fail the overlay step; their messages go into the
-# PR body so a human can prune the overlay.
-
+# One daily job per vendored source; publication is batched weekly.
 on:
   schedule:
-    # 07:43 JST (15:43 US Pacific): results are ready by morning in Japan; later
-    # upstream spec changes are picked up the next day.
     - cron: "43 22 * * *"
   workflow_dispatch:
 
 permissions:
-  actions: write
-  contents: write
-  pull-requests: write
+  contents: read
 
 env:
   MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.20-65efd5b93
@@ -26,41 +15,43 @@ env:
 jobs:
   matrix:
     runs-on: ubuntu-26.04
-    permissions:
-      contents: read
     outputs:
-      sdks: ${{ steps.sdks.outputs.matrix }}
+      specs: ${{ steps.sdks.outputs.matrix }}
     steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Read SDK ledger
-        id: sdks
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: sdks
         run: echo "matrix=$(python3 tools/sdks.py matrix)" >> "$GITHUB_OUTPUT"
 
   watch:
     needs: matrix
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.matrix.outputs.sdks) }}
+      matrix: ${{ fromJSON(needs.matrix.outputs.specs) }}
+    concurrency:
+      group: spec-watch-${{ matrix.provider }}
+      cancel-in-progress: false
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
     env:
       PROVIDER: ${{ matrix.provider }}
       SPEC_FILE: ${{ matrix.spec_file }}
       SPEC_PATH: ${{ matrix.spec_path }}
       SPEC_URL: ${{ matrix.spec_url }}
-      SDK_DIR: ${{ matrix.dir }}
       SPEC_FETCH: ${{ matrix.spec_fetch }}
       GENERATOR: ${{ matrix.generator }}
+      MODULE_DIRS: ${{ toJSON(matrix.dirs) }}
     runs-on: ubuntu-26.04
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Fetch upstream spec and compare
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Fetch once and compare
         id: fetch
         run: |
-          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
-            "$SPEC_URL" --output "$RUNNER_TEMP/download"
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location "$SPEC_URL" --output "$RUNNER_TEMP/download"
           if [ "$SPEC_FETCH" = gzip ]; then
             gzip -dc "$RUNNER_TEMP/download" > "$RUNNER_TEMP/$SPEC_FILE"
             echo "gzip_sha=$(sha256sum "$RUNNER_TEMP/download" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
@@ -70,22 +61,16 @@ jobs:
           new="$(sha256sum "$RUNNER_TEMP/$SPEC_FILE" | cut -d' ' -f1)"
           old="$(sha256sum "$SPEC_PATH" | cut -d' ' -f1)"
           echo "new=$new" >> "$GITHUB_OUTPUT"
+          changed=true
           if [ "$new" = "$old" ]; then
             changed=false
           elif [ "$GENERATOR" = discovery ] && python3 tools/gen/discovery.py watch-equal "$SPEC_PATH" "$RUNNER_TEMP/$SPEC_FILE"; then
-            # Discovery revision/etag churn alone has no generated API effect.
             changed=false
-          else
-            changed=true
           fi
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
-
       - name: Set up uv
         if: steps.fetch.outputs.changed == 'true'
         uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-
-      # The generator needs moonfmt and the gates need uv, so both run in the
-      # MoonBit image with the host's uv mounted in (the image has no Python).
       - name: Define the MoonBit runner
         if: steps.fetch.outputs.changed == 'true'
         run: |
@@ -98,182 +83,82 @@ jobs:
           EOF
           chmod +x "$RUNNER_TEMP/moonbit"
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
-
-      - name: Re-vendor and regenerate
+      - name: Re-vendor once and process every consumer
         if: steps.fetch.outputs.changed == 'true'
-        id: regen
+        id: consumers
+        env:
+          NEW_SHA: ${{ steps.fetch.outputs.new }}
+          GZIP_SHA: ${{ steps.fetch.outputs.gzip_sha }}
         run: |
           cp "$RUNNER_TEMP/$SPEC_FILE" "$SPEC_PATH"
           source_file="$(dirname "$SPEC_PATH")/SOURCE.md"
           today="$(date -u +%F)"
-          sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: ${{ steps.fetch.outputs.new }}/" "$source_file"
+          sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: $NEW_SHA/" "$source_file"
           if [ "$GENERATOR" = discovery ]; then
             revision="$(python3 tools/gen/discovery.py revision "$SPEC_PATH")"
             sed -i -E "s/^- Discovery revision: .*/- Discovery revision: $revision/" "$source_file"
           fi
           if [ "$SPEC_FETCH" = gzip ]; then
-            sed -i -E "s/^- sha256 \(gzip as downloaded\): .*/- sha256 (gzip as downloaded): ${{ steps.fetch.outputs.gzip_sha }}/" "$source_file"
+            sed -i -E "s/^- sha256 \(gzip as downloaded\): .*/- sha256 (gzip as downloaded): $GZIP_SHA/" "$source_file"
           fi
-          set +e
-          moonbit scripts/generate.sh "$PROVIDER" > "$RUNNER_TEMP/generate.log" 2>&1
-          status=$?
-          echo "generate_status=$status" >> "$GITHUB_OUTPUT"
-          echo "generate.sh exited $status"; tail -n 20 "$RUNNER_TEMP/generate.log"
-          # Each container starts without the registry index, which moon info needs.
-          # The bump reads the .mbti diff, which is only meaningful when this succeeded.
-          # Expand the SDK directory in the container shell.
-          # shellcheck disable=SC2016
-          moonbit bash -c 'moon update && moon -C "$1" fmt && moon -C "$1" info' _ "$SDK_DIR" > "$RUNNER_TEMP/info.log" 2>&1
-          status=$?
-          echo "info_status=$status" >> "$GITHUB_OUTPUT"
-          echo "moon info exited $status"; tail -n 20 "$RUNNER_TEMP/info.log"
-
-      - name: Gates (native and wasm-gc; the PR's CI run adds js)
-        if: steps.fetch.outputs.changed == 'true'
-        id: gates
-        run: |
-          set +e
-          moonbit scripts/gates.sh --sdk "$PROVIDER" --no-js > "$RUNNER_TEMP/gates.log" 2>&1
-          status=$?
-          echo "gates_status=$status" >> "$GITHUB_OUTPUT"
-          echo "gates.sh exited $status"; tail -n 20 "$RUNNER_TEMP/gates.log"
-
-      # Only src ships. A spec change that leaves src alone releases nothing; a
-      # src change with the same public API (.mbti) is a patch. Generated types
-      # are pub(all), so any public API change is breaking: minor while 0.x.
-      # The changelog entry goes under [Unreleased], which the bump then dates.
-      # This runs after the gates so that the PR body reports their result next
-      # to the version, and it trusts the .mbti diff only when moon info passed.
-      - name: Bump the module version
-        if: steps.fetch.outputs.changed == 'true'
-        id: bump
-        env:
-          INFO_STATUS: ${{ steps.regen.outputs.info_status }}
-        run: |
-          if [ -z "$(git status --porcelain -- "$SDK_DIR/src")" ]; then
-            echo "Nothing under $SDK_DIR/src changed; no release."
-            exit 0
+          status=0
+          python3 tools/spec_watch.py --spec-path "$SPEC_PATH" --log-dir "$RUNNER_TEMP/consumers" || status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          if [ ! -f "$RUNNER_TEMP/consumers/body.md" ]; then
+            mkdir -p "$RUNNER_TEMP/consumers"
+            echo 'Consumer processing failed before producing its table; manual review required.' > "$RUNNER_TEMP/consumers/body.md"
           fi
-          # Without a fresh moon info the .mbti files are stale, and an unchanged
-          # .mbti would pass a breaking change off as a patch.
-          if [ "$INFO_STATUS" != 0 ]; then
-            echo "summary=not decided (moon info failed, so the public API change is unknown; a human picks the version)" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          current="$(sed -nE 's/^version = "(.*)"$/\1/p' "$SDK_DIR/moon.mod")"
-          IFS=. read -r major minor patch <<< "$current"
-          if [ -n "$(git status --porcelain -- ":(glob)$SDK_DIR/src/**/*.mbti")" ]; then
-            kind="public API changed"
-            if [ "$major" = 0 ]; then next="0.$((minor + 1)).0"; else next="$((major + 1)).0.0"; fi
-          else
-            kind="public API unchanged"
-            next="$major.$minor.$((patch + 1))"
-          fi
-          source_file="$(dirname "$SPEC_PATH")/SOURCE.md"
-          fetched="$(sed -nE 's/^- Fetched: (.*)$/\1/p' "$source_file")"
-          sha="$(sed -nE 's/^- sha256: (.*)$/\1/p' "$source_file")"
-          if [ "$kind" = "public API changed" ]; then
-            api="The public API changed; see the \`pkg.generated.mbti\` diff."
-          else
-            api="The public API is unchanged."
-          fi
-          scripts/release.sh note "$SDK_DIR" Changed \
-            "**Regenerated from the upstream spec fetched $fetched** (sha256 \`${sha:0:12}\`). $api"
-          scripts/release.sh bump "$SDK_DIR" "$next"
-          echo "version=$next" >> "$GITHUB_OUTPUT"
-          echo "summary=$current → $next ($kind)" >> "$GITHUB_OUTPUT"
-
-      - name: Open pull request
+          cat "$RUNNER_TEMP/consumers/body.md"
+      - name: Open one PR for the shared source
         if: steps.fetch.outputs.changed == 'true'
         id: pr
         env:
           GH_TOKEN: ${{ github.token }}
+          NEW_SHA: ${{ steps.fetch.outputs.new }}
         run: |
-          hash="${{ steps.fetch.outputs.new }}"
-          branch="spec-watch/$PROVIDER/${hash:0:20}"
+          branch="spec-watch/$PROVIDER/${NEW_SHA:0:20}"
           echo "branch=$branch" >> "$GITHUB_OUTPUT"
-          # Same upstream hash as an earlier run: reuse its PR (it may still be
-          # waiting for a merge), or stop if someone closed it.
           if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
             pr="$(gh pr list --head "$branch" --state open --json number --jq '.[].number')"
-            if [ -z "$pr" ]; then
-              echo "::error::$branch exists without an open PR; delete the branch to regenerate it."
-              exit 1
-            fi
-            echo "An open PR (#$pr) already tracks $branch."
+            [ -n "$pr" ] || { echo "::error::$branch exists without an open PR"; exit 1; }
             echo "number=$pr" >> "$GITHUB_OUTPUT"
+            # Fresh local results cannot establish that an older PR has the same patch.
+            echo "reused=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add -A -- "$SDK_DIR" "$SPEC_PATH" "$(dirname "$SPEC_PATH")/SOURCE.md" ':(glob)*/moon.mod'
-          git commit -m "Update vendored $PROVIDER spec and regenerate"
+          git add -A -- "$SPEC_PATH" "$(dirname "$SPEC_PATH")/SOURCE.md"
+          mapfile -t dirs < <(python3 -c 'import json,os; print("\n".join(json.loads(os.environ["MODULE_DIRS"])))')
+          git add -A -- "${dirs[@]}"
+          git commit -m "Update shared $PROVIDER spec and regenerate its consumers"
           git push origin "$branch"
-          {
-            echo "Upstream spec changed (sha256 \`${{ steps.fetch.outputs.new }}\`)."
-            echo
-            echo "- overlay + generator exit status: \`${{ steps.regen.outputs.generate_status }}\`"
-            echo "- moon info exit status: \`${{ steps.regen.outputs.info_status }}\`"
-            echo "- gates exit status: \`${{ steps.gates.outputs.gates_status }}\`"
-            echo "- release: ${{ steps.bump.outputs.summary || 'none (nothing under src changed)' }}"
-            echo
-            echo "Spec watch merges this PR itself when generation and gates are \`0\` and CI passes; otherwise it waits for a human."
-            echo
-            echo '<details><summary>generate.log</summary>'; echo; echo '```'; tail -n 80 "$RUNNER_TEMP/generate.log"; echo '```'; echo '</details>'
-            echo '<details><summary>info.log (tail)</summary>'; echo; echo '```'; tail -n 40 "$RUNNER_TEMP/info.log"; echo '```'; echo '</details>'
-            echo '<details><summary>gates.log (tail)</summary>'; echo; echo '```'; tail -n 60 "$RUNNER_TEMP/gates.log"; echo '```'; echo '</details>'
-          } > "$RUNNER_TEMP/body.md"
-          url="$(gh pr create --base main --head "$branch" \
-            --title "Update vendored $PROVIDER spec" --body-file "$RUNNER_TEMP/body.md")"
-          number="${url##*/}"
-          echo "number=$number" >> "$GITHUB_OUTPUT"
-          # An older upstream hash of this provider is now out of date: close its PR
-          # and branch, so at most one spec-watch PR per provider stays open.
-          gh pr list --state open --limit 100 --json number,headRefName \
-            --jq ".[] | select(.headRefName | startswith(\"spec-watch/$PROVIDER/\")) | select(.headRefName != \"$branch\") | .number" |
-            while read -r old; do
-              gh pr close "$old" --comment "Superseded by #$number." --delete-branch
-            done
-
-      # pull_request runs for PRs opened with GITHUB_TOKEN wait for approval, but
-      # workflow_dispatch runs start at once and report on the branch head.
-      - name: Merge when generation, gates and CI pass
-        if: steps.pr.outputs.number != '' && steps.regen.outputs.generate_status == '0' && steps.gates.outputs.gates_status == '0'
+          url="$(gh pr create --base main --head "$branch" --title "Update shared $PROVIDER spec" --body-file "$RUNNER_TEMP/consumers/body.md")"
+          echo "number=${url##*/}" >> "$GITHUB_OUTPUT"
+      - name: Merge only after all consumers and exact-head CI pass
+        if: steps.pr.outputs.number != '' && steps.pr.outputs.reused != 'true' && steps.consumers.outputs.status == '0'
         env:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ steps.pr.outputs.branch }}
           PR: ${{ steps.pr.outputs.number }}
-          VERSION: ${{ steps.bump.outputs.version }}
         run: |
           sha="$(gh pr view "$PR" --json headRefOid --jq .headRefOid)"
           find_run() {
-            gh run list --workflow ci.yml --branch "$BRANCH" --event workflow_dispatch \
-              --json databaseId,headSha --jq "map(select(.headSha == \"$sha\"))[0].databaseId // empty"
+            gh run list --workflow ci.yml --branch "$BRANCH" --event workflow_dispatch --json databaseId,headSha --jq "map(select(.headSha == \"$sha\"))[0].databaseId // empty"
           }
           run="$(find_run)"
           if [ -z "$run" ]; then
             gh workflow run ci.yml --ref "$BRANCH"
             for _ in $(seq 30); do sleep 5; run="$(find_run)"; [ -n "$run" ] && break; done
           fi
-          if [ -z "$run" ]; then
-            echo "::error::No CI run appeared for $BRANCH; leaving PR #$PR for review."
-            exit 1
-          fi
-          if ! gh run watch "$run" --exit-status > /dev/null; then
-            echo "::error::CI run $run failed; leaving PR #$PR for review."
-            exit 1
-          fi
+          [ -n "$run" ] || { echo '::error::CI run did not appear; leaving PR open'; exit 1; }
+          gh run watch "$run" --exit-status > /dev/null
           gh pr merge "$PR" --squash --match-head-commit "$sha"
           gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$BRANCH"
-          # A merge made with GITHUB_TOKEN starts no CI run on main, so the
-          # workflow_run trigger of release.yml never fires; dispatch it instead.
-          if [ -n "$VERSION" ]; then
-            gh workflow run release.yml --ref main
-          fi
-
-      - name: Flag for review
-        if: steps.pr.outputs.number != '' && (steps.regen.outputs.generate_status != '0' || steps.gates.outputs.gates_status != '0')
+      - name: Flag failed consumers
+        if: steps.pr.outputs.number != '' && steps.consumers.outputs.status != '0'
         run: |
-          echo "::error::Generation or gates failed; PR #${{ steps.pr.outputs.number }} needs a human."
+          echo '::error::A consumer stage failed; see the per-module PR table.'
           exit 1
+
