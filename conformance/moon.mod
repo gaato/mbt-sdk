@@ -2,7 +2,7 @@
 // CONTRACT.md through one harness, and checks them against third-party test
 // data (see NOTICE), from outside their modules, as a consumer would.
 
-name = "gaato/mbt-sdk-conformance"
+name = "gaato/moonbit-sdks-conformance"
 
 version = "0.0.0"
 

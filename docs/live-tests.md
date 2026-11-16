@@ -2,7 +2,7 @@
 
 The live suite in `runtime-tests/src/live` sends real requests. `scripts/live.sh`
 runs it and reads provider settings from the environment or
-`~/.config/mbt-sdk/env`. Remote tests make actual provider requests and may
+`~/.config/moonbit-sdks/env`. Remote tests make actual provider requests and may
 incur charges. A provider without a key is skipped, and a skipped run is not
 evidence of compatibility with the official service.
 

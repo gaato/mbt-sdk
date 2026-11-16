@@ -1,7 +1,7 @@
 import {
   "gaato/mttp_core" @http,
   "gaato/mttp_core/sse",
-  "gaato/mbt-sdk-conformance/harness",
+  "gaato/moonbit-sdks-conformance/harness",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/random",
 } for "wbtest"

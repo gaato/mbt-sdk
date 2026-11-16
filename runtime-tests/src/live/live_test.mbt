@@ -986,7 +986,7 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
     //    it to %2F makes GitHub answer 404.
     let content_path = "docs/census.md"
     let content_request = @github_gen.repos_get_content_request(
-      "gaato", "mbt-sdk", content_path,
+      "gaato", "moonbit-sdks", content_path,
     )
     if !content_request.url.has_suffix("/contents/" + content_path) {
       validation_failure(
@@ -1079,7 +1079,7 @@ async test "live GitHub GraphQL passthrough, error envelope, and point budget" {
     //    field and a typed entry in errors, which the facade must refuse to
     //    return as a success.
     let missing =
-      #|query { repository(owner: "gaato", name: "mbt-sdk-does-not-exist-4f2a9") { id } }
+      #|query { repository(owner: "gaato", name: "moonbit-sdks-does-not-exist-4f2a9") { id } }
     try expect(gh.graphql(query=missing)) catch {
       error => {
         if status_of(error) is Some(status) {

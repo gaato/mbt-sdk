@@ -8,7 +8,7 @@ It uses [`gaato/mttp_core`](https://github.com/gaato/mttp), with a caller-suppli
 
 > **Status**: unofficial and experimental. Minor releases may contain breaking
 > changes; the
-> [changelog](https://github.com/gaato/mbt-sdk/blob/main/openai/CHANGELOG.md)
+> [changelog](https://github.com/gaato/moonbit-sdks/blob/main/openai/CHANGELOG.md)
 > lists each one.
 
 ## Install
@@ -211,9 +211,9 @@ retried after delivery starts. Close the backend when its owner shuts down.
 
 ## Links
 
-- [Changelog](https://github.com/gaato/mbt-sdk/blob/main/openai/CHANGELOG.md)
-- [Repository](https://github.com/gaato/mbt-sdk)
-- [Spec provenance](https://github.com/gaato/mbt-sdk/blob/main/openai/spec/SOURCE.md):
+- [Changelog](https://github.com/gaato/moonbit-sdks/blob/main/openai/CHANGELOG.md)
+- [Repository](https://github.com/gaato/moonbit-sdks)
+- [Spec provenance](https://github.com/gaato/moonbit-sdks/blob/main/openai/spec/SOURCE.md):
   where the vendored OpenAPI spec comes from
 
 ## License

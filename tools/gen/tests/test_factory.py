@@ -88,7 +88,7 @@ offline_packages = []
         self.assertIn(hashlib.sha256(self.spec.read_bytes()).hexdigest(), (self.root / 'sample/spec/SOURCE.md').read_text())
         self.assertTrue((self.root / 'sample/README.md').is_symlink())
         self.assertEqual((self.root / 'sample/README.md').read_text(), (self.root / 'sample/src/overview.mbt.md').read_text())
-        self.assertIn('https://github.com/gaato/mbt-sdk/blob/main/docs/behavior/sample.md', (self.root / 'sample/README.md').read_text())
+        self.assertIn('https://github.com/gaato/moonbit-sdks/blob/main/docs/behavior/sample.md', (self.root / 'sample/README.md').read_text())
         self.assertIn('## [Unreleased]', (self.root / 'sample/CHANGELOG.md').read_text())
         self.assertFalse((self.root / 'sample/src/gen').exists())
         self.assertFalse(sdks.sync(sdks.load(), True))

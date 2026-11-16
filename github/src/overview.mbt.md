@@ -8,7 +8,7 @@ caller-supplied `Backend` and `Clock`; the facade has no async runtime.
 
 > **Status**: unofficial and experimental. Minor releases may contain breaking
 > changes; the
-> [changelog](https://github.com/gaato/mbt-sdk/blob/main/github/CHANGELOG.md)
+> [changelog](https://github.com/gaato/moonbit-sdks/blob/main/github/CHANGELOG.md)
 > lists each one with a migration note.
 
 ## Install
@@ -50,7 +50,7 @@ pub async fn stars(
 ) -> Result[Int32, @github.GitHubFailure] {
   let gh = @github.GitHub::new(backend, clock, token~)
   let repo = gh.call(
-    @gen.repos_get_request("gaato", "mbt-sdk"),
+    @gen.repos_get_request("gaato", "moonbit-sdks"),
     @gen.repos_get_decode,
   )
   match repo {
@@ -92,7 +92,7 @@ pub async fn compare_diff(
   range : String,
 ) -> Result[String, @github.GitHubFailure] {
   let response = gh.send(
-    @gen.repos_compare_commits_request("gaato", "mbt-sdk", range).header(
+    @gen.repos_compare_commits_request("gaato", "moonbit-sdks", range).header(
       "accept", "application/vnd.github.diff",
     ),
   )
@@ -109,7 +109,7 @@ default.
 Not every field is typed. Where the generator could not resolve a schema into
 a single MoonBit type, such as a union whose branches carry no tag of their
 own, the value is carried as raw `Json`. The
-[census](https://github.com/gaato/mbt-sdk/blob/main/docs/census.md) (in
+[census](https://github.com/gaato/moonbit-sdks/blob/main/docs/census.md) (in
 Japanese) lists each one with the reason.
 
 ## Downloads and redirects
@@ -141,7 +141,7 @@ redirect then returns an HTTP failure value whose head keeps `location`:
 /// The short-lived URL of a repository's tarball, without downloading it.
 pub async fn tarball_url(gh : @github.GitHub, ref_ : String) -> String? {
   let request = @gen.repos_download_tarball_archive_request(
-    "gaato", "mbt-sdk", ref_,
+    "gaato", "moonbit-sdks", ref_,
   ).attribute(@client.redirect_limit, 0)
   match gh.send(request) {
     Err(@github.GitHubFailure::Http(failure)) =>
@@ -189,7 +189,7 @@ pub async fn stars_graphql(
 ) -> Result[Json, @github.GitHubFailure] {
   gh.graphql(
     query="query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { stargazerCount } }",
-    variables={ "owner": "gaato", "name": "mbt-sdk" },
+    variables={ "owner": "gaato", "name": "moonbit-sdks" },
   )
 }
 ```
@@ -283,11 +283,11 @@ deployment, and takes `graphql_url` too.
 
 ## Links
 
-- [Changelog](https://github.com/gaato/mbt-sdk/blob/main/github/CHANGELOG.md)
-- [Repository](https://github.com/gaato/mbt-sdk)
-- [Spec provenance](https://github.com/gaato/mbt-sdk/blob/main/github/spec/SOURCE.md)
-  and [generation overlays](https://github.com/gaato/mbt-sdk/blob/main/github/overlays/moonbit.yaml)
-- [Untyped fields census](https://github.com/gaato/mbt-sdk/blob/main/docs/census.md)
+- [Changelog](https://github.com/gaato/moonbit-sdks/blob/main/github/CHANGELOG.md)
+- [Repository](https://github.com/gaato/moonbit-sdks)
+- [Spec provenance](https://github.com/gaato/moonbit-sdks/blob/main/github/spec/SOURCE.md)
+  and [generation overlays](https://github.com/gaato/moonbit-sdks/blob/main/github/overlays/moonbit.yaml)
+- [Untyped fields census](https://github.com/gaato/moonbit-sdks/blob/main/docs/census.md)
   (in Japanese)
 
 ## License

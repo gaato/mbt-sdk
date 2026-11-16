@@ -4,7 +4,7 @@ version = "0.2.0"
 
 license = "Apache-2.0"
 
-repository = "https://github.com/gaato/mbt-sdk"
+repository = "https://github.com/gaato/moonbit-sdks"
 
 description = "Schema-generated Codex app-server v2 protocol types and typed requests"
 

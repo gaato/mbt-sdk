@@ -8,7 +8,7 @@ version = "0.2.0"
 
 license = "Apache-2.0"
 
-repository = "https://github.com/gaato/mbt-sdk"
+repository = "https://github.com/gaato/moonbit-sdks"
 
 keywords = [ "jsonrpc", "json-rpc", "stdio", "async", "acp" ]
 

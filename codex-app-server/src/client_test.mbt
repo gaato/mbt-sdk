@@ -1,7 +1,10 @@
 ///|
 fn initialize() -> @protocol.InitializeParams {
   @protocol.InitializeParams::new(
-    client_info=@protocol.ClientInfo::new(name="mbt-sdk-test", version="0.1.0"),
+    client_info=@protocol.ClientInfo::new(
+      name="moonbit-sdks-test",
+      version="0.1.0",
+    ),
   )
 }
 

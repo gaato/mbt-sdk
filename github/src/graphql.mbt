@@ -13,7 +13,7 @@
 ///         #|  repository(owner: $owner, name: $name) { stargazerCount }
 ///         #|}
 ///       ),
-///       variables={ "owner": "gaato", "name": "mbt-sdk" },
+///       variables={ "owner": "gaato", "name": "moonbit-sdks" },
 ///     )
 ///
 /// A GraphQL failure does not use the HTTP status: the reply is `200` with an
@@ -104,7 +104,7 @@ pub async fn GitHub::graphql_response(
 ///         },
 ///         query=(
 ///           #|query($cursor: String) {
-///           #|  repository(owner: "gaato", name: "mbt-sdk") {
+///           #|  repository(owner: "gaato", name: "moonbit-sdks") {
 ///           #|    issues(first: 100, after: $cursor) {
 ///           #|      nodes { number title }
 ///           #|      pageInfo { hasNextPage endCursor }

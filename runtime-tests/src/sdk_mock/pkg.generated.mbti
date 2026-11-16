@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "gaato/mbt-sdk-runtime-tests/sdk_mock"
+package "gaato/moonbit-sdks-runtime-tests/sdk_mock"
 
 import {
   "gaato/mttp_core",

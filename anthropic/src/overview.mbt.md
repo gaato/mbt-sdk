@@ -8,7 +8,7 @@ It uses [`gaato/mttp_core`](https://github.com/gaato/mttp), with a caller-suppli
 
 > **Status**: unofficial and experimental. Minor releases may contain breaking
 > changes; the
-> [changelog](https://github.com/gaato/mbt-sdk/blob/main/anthropic/CHANGELOG.md)
+> [changelog](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/CHANGELOG.md)
 > lists each one with a migration note.
 
 ## Install
@@ -150,10 +150,10 @@ retried after delivery starts. Close the backend when its owner shuts down.
 
 ## Links
 
-- [Changelog](https://github.com/gaato/mbt-sdk/blob/main/anthropic/CHANGELOG.md)
-- [Repository](https://github.com/gaato/mbt-sdk)
-- [Spec provenance](https://github.com/gaato/mbt-sdk/blob/main/anthropic/spec/SOURCE.md)
-  and [generation overlays](https://github.com/gaato/mbt-sdk/blob/main/anthropic/overlays/moonbit.yaml)
+- [Changelog](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/CHANGELOG.md)
+- [Repository](https://github.com/gaato/moonbit-sdks)
+- [Spec provenance](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/spec/SOURCE.md)
+  and [generation overlays](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/overlays/moonbit.yaml)
 
 ## License
 

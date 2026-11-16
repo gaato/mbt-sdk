@@ -9,7 +9,7 @@ test "rate limit bucket separates search from the rest of the API" {
     rate_limit_bucket("GET", "/search/code?q=addr%3Ain%3Afile"),
     "search",
   )
-  assert_eq(rate_limit_bucket("GET", "/repos/gaato/mbt-sdk"), "core")
+  assert_eq(rate_limit_bucket("GET", "/repos/gaato/moonbit-sdks"), "core")
   assert_eq(rate_limit_bucket("GET", "/rate_limit"), "core")
   assert_eq(rate_limit_bucket("GET", "/"), "core")
   // Absolute URLs, as a Link header hands them back for the following page.
@@ -56,11 +56,11 @@ test "request_path strips the authority, the query, and the fragment" {
 test "default headers carry the version, the media type, and a user agent" {
   let headers = default_headers(
     api_version="2022-11-28",
-    user_agent="gaato-mbt-sdk/0.1.0",
+    user_agent="gaato-moonbit-sdks/0.1.0",
   )
   assert_eq(headers.get("accept"), Some("application/vnd.github+json"))
   assert_eq(headers.get("x-github-api-version"), Some("2022-11-28"))
-  assert_eq(headers.get("user-agent"), Some("gaato-mbt-sdk/0.1.0"))
+  assert_eq(headers.get("user-agent"), Some("gaato-moonbit-sdks/0.1.0"))
   assert_eq(headers.length(), 3)
 }
 
@@ -73,7 +73,7 @@ test "a request that sets a default header keeps its own value" {
   // set, and Headers reports the request's own value for each of them.
   let defaults = default_headers(
     api_version="2022-11-28",
-    user_agent="gaato-mbt-sdk/0.1.0",
+    user_agent="gaato-moonbit-sdks/0.1.0",
   )
   let request = @http.Request::get("/repos/o/r/compare/main...topic")
     .header("accept", "application/vnd.github.diff")

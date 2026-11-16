@@ -17,7 +17,7 @@ test "graphql is metered in its own bucket" {
   )
   // The other two buckets are unchanged, and nothing else answers to the name.
   assert_eq(rate_limit_bucket("GET", "/search/issues?q=x"), "search")
-  assert_eq(rate_limit_bucket("GET", "/repos/gaato/mbt-sdk"), "core")
+  assert_eq(rate_limit_bucket("GET", "/repos/gaato/moonbit-sdks"), "core")
   assert_eq(rate_limit_bucket("GET", "/repos/gaato/graphql"), "core")
   assert_eq(rate_limit_bucket("GET", "/graphql/schema"), "core")
 }
@@ -53,15 +53,15 @@ test "the graphql endpoint is derived from the rest root" {
 
 ///|
 test "a cursor is added to a copy of the variables" {
-  let variables : Json = { "owner": "gaato", "name": "mbt-sdk" }
+  let variables : Json = { "owner": "gaato", "name": "moonbit-sdks" }
   let first = with_cursor(Some(variables), "after", "Y3Vyc29yOjE=")
   assert_eq(first, {
     "owner": "gaato",
-    "name": "mbt-sdk",
+    "name": "moonbit-sdks",
     "after": "Y3Vyc29yOjE=",
   })
   // The caller's value is untouched, so a retried page sends the same request.
-  assert_eq(variables, { "owner": "gaato", "name": "mbt-sdk" })
+  assert_eq(variables, { "owner": "gaato", "name": "moonbit-sdks" })
   // A query with no other variable still gets one.
   assert_eq(with_cursor(None, "cursor", "abc"), { "cursor": "abc" })
   assert_eq(with_cursor(Some(Json::null()), "cursor", "abc"), {

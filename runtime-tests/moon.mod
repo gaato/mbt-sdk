@@ -1,7 +1,7 @@
 // Unpublished SDK integration tests. Portable suites use http/driver;
 // socket and live suites use core/async in target-specific packages.
 
-name = "gaato/mbt-sdk-runtime-tests"
+name = "gaato/moonbit-sdks-runtime-tests"
 
 version = "0.0.0"
 

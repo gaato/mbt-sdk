@@ -68,7 +68,7 @@ completion wait. `src/examples/initialize` runs the real CLI handshake without
 starting a thread or making a model request:
 
 ```sh
-codex_smoke_home=$(mktemp -d /tmp/mbt-sdk-codex-home.XXXXXX)
+codex_smoke_home=$(mktemp -d /tmp/moonbit-sdks-codex-home.XXXXXX)
 moon run --target native codex-app-server/src/examples/initialize -- "$codex_smoke_home"
 ```
 

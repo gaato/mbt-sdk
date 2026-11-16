@@ -103,8 +103,8 @@ test "mttp preserves partial GraphQL responses and decodes generated REST calls"
 ///|
 test "downloads follow the 302 without the token unless redirect_limit is 0" {
   @driver.run_sync(() => {
-    let start = "https://api.github.com/repos/gaato/mbt-sdk/tarball/main"
-    let location = "https://codeload.github.com/gaato/mbt-sdk/legacy.tar.gz/main"
+    let start = "https://api.github.com/repos/gaato/moonbit-sdks/tarball/main"
+    let location = "https://codeload.github.com/gaato/moonbit-sdks/legacy.tar.gz/main"
     let redirect = @testing.Canned::bytes(
       302,
       headers=@http.Headers::of([("location", location)]),
@@ -131,7 +131,7 @@ test "downloads follow the 302 without the token unless redirect_limit is 0" {
       limiter=@client.NoLimiter::new(),
     )
     let request = @gen.repos_download_tarball_archive_request(
-      "gaato", "mbt-sdk", "main",
+      "gaato", "moonbit-sdks", "main",
     )
     assert_eq(api.send(request).unwrap().body, b"archive")
     let held = api.send(request.attribute(@client.redirect_limit, 0))

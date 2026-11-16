@@ -5,7 +5,7 @@
 /// call reads as a single line:
 ///
 ///     let repo = gh.call(
-///       @gen.repos_get_request("gaato", "mbt-sdk"),
+///       @gen.repos_get_request("gaato", "moonbit-sdks"),
 ///       @gen.repos_get_decode,
 ///     )
 ///

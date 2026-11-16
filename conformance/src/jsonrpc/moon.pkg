@@ -1,6 +1,6 @@
 import {
   "gaato/jsonrpc",
-  "gaato/mbt-sdk-conformance/harness",
+  "gaato/moonbit-sdks-conformance/harness",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/json",
   "moonbitlang/core/random",

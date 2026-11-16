@@ -521,9 +521,9 @@ fn full_repository_example() -> String {
 
 ///|
 test "generated requests carry the method and the path of the operation" {
-  let repo = @gen.repos_get_request("gaato", "mbt-sdk")
+  let repo = @gen.repos_get_request("gaato", "moonbit-sdks")
   assert_eq(repo.meth, @http.Get)
-  assert_eq(repo.url, "/repos/gaato/mbt-sdk")
+  assert_eq(repo.url, "/repos/gaato/moonbit-sdks")
   assert_eq(repo.body, Empty)
   // No generated operation sets headers: the client's defaults supply them.
   assert_eq(repo.headers.length(), 0)

@@ -9,7 +9,7 @@ license = "Apache-2.0"
 
 readme = "README.md"
 
-repository = "https://github.com/gaato/mbt-sdk"
+repository = "https://github.com/gaato/moonbit-sdks"
 
 keywords = [ "github", "rest", "graphql", "sdk", "openapi" ]
 

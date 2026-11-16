@@ -10,7 +10,7 @@ async fn main {
       group,
       @protocol.InitializeParams::new(
         client_info=@protocol.ClientInfo::new(
-          name="mbt-sdk-smoke",
+          name="moonbit-sdks-smoke",
           version="0.1.0",
         ),
       ),

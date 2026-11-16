@@ -1,6 +1,6 @@
 import {
   "gaato/mttp_core" @http,
-  "gaato/mbt-sdk-runtime-tests/sdk_mock" @mock,
+  "gaato/moonbit-sdks-runtime-tests/sdk_mock" @mock,
   "gaato/mttp_core/rt" @sync,
   "gaato/mttp_core/client" @runtime,
   "gaato/anthropic" @anthropic_sdk,

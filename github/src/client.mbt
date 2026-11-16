@@ -75,7 +75,7 @@ pub fn GitHub::new(
   token? : String,
   base_url~ : String = "https://api.github.com",
   api_version~ : String = "2022-11-28",
-  user_agent~ : String = "gaato-mbt-sdk/0.1.0",
+  user_agent~ : String = "gaato-moonbit-sdks/0.1.0",
   retry? : @client.RetryPolicy,
   limiter? : &@client.RateLimiter,
   graphql_url? : String,

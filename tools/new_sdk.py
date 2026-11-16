@@ -107,7 +107,7 @@ def scaffold(args):
         raise ValueError('existing SDKs disagree on the mttp_core dependency version')
     core_version = versions.pop()
     quote = json.dumps
-    repo = 'https://github.com/gaato/mbt-sdk'
+    repo = 'https://github.com/gaato/moonbit-sdks'
     fields = dict(name=name, dir=name, module=module, generator=args.generator, spec_file=spec_file,
                   spec_url=args.spec_url, spec_fetch='plain', include_all=True, derive_operation_ids=True,
                   package=f'{module}/gen', out=f'{name}/src/gen',

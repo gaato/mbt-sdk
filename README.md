@@ -1,4 +1,4 @@
-# mbt-sdk
+# moonbit-sdks
 
 API SDKs and a Codex app-server client for [MoonBit](https://www.moonbitlang.com/).
 Pinned upstream API descriptions generate the public vocabulary; small facades

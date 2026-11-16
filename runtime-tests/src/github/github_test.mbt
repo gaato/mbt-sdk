@@ -33,7 +33,7 @@ fn link_header(pairs : Array[(String, String)]) -> String {
 /// One `issues/list-for-repo` element, carrying every field the generated
 /// `Issue` decoder requires.
 fn issue_fixture(number : Int32, title : String) -> String {
-  let base = "https://api.github.com/repos/gaato/mbt-sdk/issues/" +
+  let base = "https://api.github.com/repos/gaato/moonbit-sdks/issues/" +
     number.to_string()
   "{\"id\":" +
   (number * 100).to_string() +
@@ -41,14 +41,14 @@ fn issue_fixture(number : Int32, title : String) -> String {
   number.to_string() +
   "\",\"url\":\"" +
   base +
-  "\",\"repository_url\":\"https://api.github.com/repos/gaato/mbt-sdk\"" +
+  "\",\"repository_url\":\"https://api.github.com/repos/gaato/moonbit-sdks\"" +
   ",\"labels_url\":\"" +
   base +
   "/labels\",\"comments_url\":\"" +
   base +
   "/comments\",\"events_url\":\"" +
   base +
-  "/events\",\"html_url\":\"https://github.com/gaato/mbt-sdk/issues/" +
+  "/events\",\"html_url\":\"https://github.com/gaato/moonbit-sdks/issues/" +
   number.to_string() +
   "\",\"number\":" +
   number.to_string() +
@@ -165,7 +165,10 @@ test "GitHub sends the documented defaults and omits auth without a token" {
       Some("application/vnd.github+json"),
     )
     assert_eq(sent[0].headers.get("x-github-api-version"), Some("2022-11-28"))
-    assert_eq(sent[0].headers.get("user-agent"), Some("gaato-mbt-sdk/0.1.0"))
+    assert_eq(
+      sent[0].headers.get("user-agent"),
+      Some("gaato-moonbit-sdks/0.1.0"),
+    )
     assert_eq(sent[0].headers.get("content-type"), None)
     // Exactly the four headers above: no default is sent twice.
     assert_eq(sent[0].headers.length(), 4)
@@ -218,7 +221,7 @@ test "a request header overrides the client default on the wire" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk/compare/main...topic",
+      "/repos/gaato/moonbit-sdks/compare/main...topic",
       json_response(
         "diff --git a/README.md b/README.md\n",
         headers=@http.Headers::of([("content-type", "text/plain")]),
@@ -231,7 +234,7 @@ test "a request header overrides the client default on the wire" {
     )
     let response = expect(
       gh.send(
-        @http.Request::get("/repos/gaato/mbt-sdk/compare/main...topic")
+        @http.Request::get("/repos/gaato/moonbit-sdks/compare/main...topic")
         .header("accept", "application/vnd.github.diff")
         .header("user-agent", "diff-fetcher/1"),
       ),
@@ -276,7 +279,7 @@ fn paging_transport() -> @mock.FakeBackend {
   let transport = @mock.FakeBackend::new()
   transport.expect(
     "GET",
-    "https://api.github.com/repos/gaato/mbt-sdk/issues?per_page=2",
+    "https://api.github.com/repos/gaato/moonbit-sdks/issues?per_page=2",
     json_response(
       issue_page([1, 2]),
       headers=@http.Headers::of([
@@ -326,7 +329,7 @@ test "Link pagination follows the absolute next URL to the last page" {
     let numbers : Array[Int32] = []
     gh
     .paginator(
-      @gen.issues_list_for_repo_request("gaato", "mbt-sdk", per_page=2),
+      @gen.issues_list_for_repo_request("gaato", "moonbit-sdks", per_page=2),
       @gen.issues_list_for_repo_decode,
     )
     .each(issue => {
@@ -338,7 +341,7 @@ test "Link pagination follows the absolute next URL to the last page" {
     assert_eq(numbers, [1, 2, 3, 4, 5])
     let sent = transport.sent()
     assert_eq(sent.map(request => request.url), [
-      "https://api.github.com/repos/gaato/mbt-sdk/issues?per_page=2",
+      "https://api.github.com/repos/gaato/moonbit-sdks/issues?per_page=2",
       page_url(2),
       page_url(3),
     ])
@@ -362,7 +365,7 @@ test "collect stops at max without fetching the page it does not need" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
-      "https://api.github.com/repos/gaato/mbt-sdk/issues?per_page=2",
+      "https://api.github.com/repos/gaato/moonbit-sdks/issues?per_page=2",
       json_response(
         issue_page([1, 2]),
         headers=@http.Headers::of([
@@ -387,7 +390,7 @@ test "collect stops at max without fetching the page it does not need" {
     )
     let titles = gh
       .paginator(
-        @gen.issues_list_for_repo_request("gaato", "mbt-sdk", per_page=2),
+        @gen.issues_list_for_repo_request("gaato", "moonbit-sdks", per_page=2),
         @gen.issues_list_for_repo_decode,
       )
       .collect(max=3)
@@ -411,23 +414,23 @@ test "an exhausted window makes the next call wait for the reset" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response("{}", headers=rate_limit_headers(0, 60)),
     )
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response("{}", headers=rate_limit_headers(4999, 3600)),
     )
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response("{}", headers=rate_limit_headers(4998, 3600)),
     )
     // The clock starts at the Unix epoch, so `x-ratelimit-reset: 60` is 60s away.
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
-    let request = @gen.repos_get_request("gaato", "mbt-sdk")
+    let request = @gen.repos_get_request("gaato", "moonbit-sdks")
     ignore(expect(gh.send(request)))
     assert_eq(clock.slept(), [])
     ignore(expect(gh.send(request)))
@@ -455,7 +458,7 @@ test "search and core meter in separate buckets" {
     )
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response("{}", headers=rate_limit_headers(4999, 3600)),
     )
     transport.expect(
@@ -471,7 +474,7 @@ test "search and core meter in separate buckets" {
     let search = @gen.search_repos_request("moonbit")
     ignore(expect(gh.send(search)))
     // Exhausting search does not hold up a core request.
-    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "moonbit-sdks"))))
     assert_eq(clock.slept(), [])
     // The next search still pays for the exhausted search window: first the
     // 2 s spacing between searches, then the rest of the window.
@@ -491,10 +494,10 @@ test "a 502 is retried after a backoff and then succeeds" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response("{\"message\":\"Server Error\"}", status=502),
     )
-    transport.expect("GET", "/repos/gaato/mbt-sdk", json_response("{}"))
+    transport.expect("GET", "/repos/gaato/moonbit-sdks", json_response("{}"))
     let clock = @mock.FakeClock::new()
     // from_client pins the jitter source, so the backoff is exact here:
     // 500ms base, jitter 0.2, random 0.5 => 500ms.
@@ -508,7 +511,7 @@ test "a 502 is retried after a backoff and then succeeds" {
         random=() => 0.5,
       ),
     )
-    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "moonbit-sdks"))))
     assert_eq(clock.slept(), [500])
     assert_eq(transport.sent().length(), 2)
     transport.assert_complete()
@@ -521,7 +524,7 @@ test "a 429 is RateLimited and its retry-after drives the wait" {
     let failing = @mock.FakeBackend::new()
     failing.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response(
         "{\"message\":\"You have exceeded a secondary rate limit.\",\"documentation_url\":\"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api\"}",
         status=429,
@@ -535,7 +538,7 @@ test "a 429 is RateLimited and its retry-after drives the wait" {
       retry=@runtime.RetryPolicy::none(),
       limiter=no_limiter(),
     )
-    try expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))) catch {
+    try expect(gh.send(@gen.repos_get_request("gaato", "moonbit-sdks"))) catch {
       TestResponseFailure(@runtime.UnexpectedStatus(head, ..)) as error => {
         assert_eq(@runtime.retry_after_ms(head.headers), Some(60000))
         assert_eq(status_of(error), Some(429))
@@ -559,14 +562,14 @@ test "a 429 is RateLimited and its retry-after drives the wait" {
     let retrying = @mock.FakeBackend::new()
     retrying.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response(
         "{\"message\":\"You have exceeded a secondary rate limit.\"}",
         status=429,
         headers=@http.Headers::of([("retry-after", "1")]),
       ),
     )
-    retrying.expect("GET", "/repos/gaato/mbt-sdk", json_response("{}"))
+    retrying.expect("GET", "/repos/gaato/moonbit-sdks", json_response("{}"))
     let clock = @mock.FakeClock::new()
     let patient = @github_sdk.GitHub::new(
       retrying,
@@ -574,7 +577,9 @@ test "a 429 is RateLimited and its retry-after drives the wait" {
       token="ghp_test",
       limiter=no_limiter(),
     )
-    ignore(expect(patient.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
+    ignore(
+      expect(patient.send(@gen.repos_get_request("gaato", "moonbit-sdks"))),
+    )
     // retry-after wins over the backoff schedule.
     assert_eq(clock.slept(), [1000])
     assert_eq(retrying.sent().length(), 2)
@@ -589,7 +594,7 @@ test "a 403 separates the secondary limit from the hourly quota" {
     // Secondary limit, reported with retry-after and an untouched quota.
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response(
         "{\"message\":\"You have exceeded a secondary rate limit. Please wait a few minutes before you try again.\",\"documentation_url\":\"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api\"}",
         status=403,
@@ -602,7 +607,7 @@ test "a 403 separates the secondary limit from the hourly quota" {
     // Primary hourly quota: remaining 0 and no retry-after.
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response(
         "{\"message\":\"API rate limit exceeded for 1.2.3.4.\",\"documentation_url\":\"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api\"}",
         status=403,
@@ -612,7 +617,7 @@ test "a 403 separates the secondary limit from the hourly quota" {
     // Secondary limit named only in the body.
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response(
         "{\"message\":\"You have exceeded a secondary rate limit.\"}",
         status=403,
@@ -621,7 +626,7 @@ test "a 403 separates the secondary limit from the hourly quota" {
     // A plain authorization failure is neither.
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response(
         "{\"message\":\"Resource not accessible by integration\",\"documentation_url\":\"https://docs.github.com/rest\"}",
         status=403,
@@ -634,7 +639,7 @@ test "a 403 separates the secondary limit from the hourly quota" {
       retry=@runtime.RetryPolicy::none(),
       limiter=no_limiter(),
     )
-    let request = @gen.repos_get_request("gaato", "mbt-sdk")
+    let request = @gen.repos_get_request("gaato", "moonbit-sdks")
     let verdicts : Array[Bool] = []
     for _ in 0..<4 {
       try expect(gh.send(request)) catch {
@@ -664,7 +669,7 @@ test "a 304 answer to a conditional request is recognised" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response(
         "",
         status=304,
@@ -684,7 +689,7 @@ test "a 304 answer to a conditional request is recognised" {
     try
       expect(
         gh.send(
-          @gen.repos_get_request("gaato", "mbt-sdk").header(
+          @gen.repos_get_request("gaato", "moonbit-sdks").header(
             "if-none-match", "W/\"a1b2c3\"",
           ),
         ),
@@ -717,7 +722,7 @@ test "a 422 validation body is readable through api_error" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
-      "/repos/gaato/mbt-sdk/issues",
+      "/repos/gaato/moonbit-sdks/issues",
       json_response(body, status=422),
     )
     let gh = @github_sdk.GitHub::new(
@@ -729,7 +734,7 @@ test "a 422 validation body is readable through api_error" {
     try
       expect(
         gh.send(
-          @http.Request::post("/repos/gaato/mbt-sdk/issues").body_json({
+          @http.Request::post("/repos/gaato/moonbit-sdks/issues").body_json({
             "body": "no title",
             "milestone": "nonexistent",
           }),
@@ -812,7 +817,10 @@ test "a graphql query leaves as a POST to the graphql endpoint" {
     assert_eq(sent[0].headers.get("content-type"), Some("application/json"))
     assert_eq(sent[0].headers.get("authorization"), Some("Bearer ghp_test"))
     assert_eq(sent[0].headers.get("x-github-api-version"), Some("2022-11-28"))
-    assert_eq(sent[0].headers.get("user-agent"), Some("gaato-mbt-sdk/0.1.0"))
+    assert_eq(
+      sent[0].headers.get("user-agent"),
+      Some("gaato-moonbit-sdks/0.1.0"),
+    )
     assert_eq(sent[0].headers.length(), 5)
     transport.assert_complete()
   })
@@ -1000,7 +1008,7 @@ test "graphql and core meter in separate buckets" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response("{}", headers=rate_limit_headers(0, 60)),
     )
     transport.expect(
@@ -1013,18 +1021,18 @@ test "graphql and core meter in separate buckets" {
     )
     transport.expect(
       "GET",
-      "/repos/gaato/mbt-sdk",
+      "/repos/gaato/moonbit-sdks",
       json_response("{}", headers=rate_limit_headers(4999, 3600)),
     )
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
-    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "moonbit-sdks"))))
     // Exhausting the core window does not hold up a GraphQL call: GitHub meters
     // GraphQL on a budget of its own and says so in x-ratelimit-resource.
     ignore(expect(gh.graphql(query="{ viewer { login } }")))
     assert_eq(clock.slept(), [])
     // The next core request still pays for the exhausted core window.
-    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "moonbit-sdks"))))
     assert_eq(clock.slept(), [60000])
     transport.assert_complete()
   })
@@ -1036,7 +1044,7 @@ test "an enterprise server reaches graphql outside the rest mount" {
     let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
-      "https://ghe.example.com/api/v3/repos/gaato/mbt-sdk",
+      "https://ghe.example.com/api/v3/repos/gaato/moonbit-sdks",
       json_response("{}"),
     )
     transport.expect(
@@ -1050,7 +1058,7 @@ test "an enterprise server reaches graphql outside the rest mount" {
       token="ghp_test",
       base_url="https://ghe.example.com/api/v3",
     )
-    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "moonbit-sdks"))))
     // REST is mounted at /api/v3 and GraphQL at /api/graphql, so appending to
     // the REST root would address an endpoint that does not exist.
     ignore(expect(gh.graphql(query="{ viewer { login } }")))
@@ -1127,7 +1135,7 @@ test "a graphql paginator threads endCursor through the variables" {
           }
           (items, next)
         },
-        query="query($cursor: String) { repository(owner: \"gaato\", name: \"mbt-sdk\") { issues(first: 1, after: $cursor) { nodes { number } pageInfo { hasNextPage endCursor } } } }",
+        query="query($cursor: String) { repository(owner: \"gaato\", name: \"moonbit-sdks\") { issues(first: 1, after: $cursor) { nodes { number } pageInfo { hasNextPage endCursor } } } }",
         variables={ "owner": "gaato" },
         cursor_variable="cursor",
       )
