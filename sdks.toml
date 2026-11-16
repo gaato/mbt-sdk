@@ -203,8 +203,8 @@ report_census_args = ["--ops", "models_generate_content,models_stream_generate_c
 offline_packages = ["gemini/src", "gemini/src/gen"]
 base_url = "https://generativelanguage.googleapis.com"
 auth = { kind = "alternatives", schemes = [{ kind = "header", name = "x-goog-api-key" }, { kind = "query", name = "key" }, { kind = "bearer" }] }
-publish = false
-spec_watch = false
+publish = true
+spec_watch = true
 
 [sdk.retry]
 retries = 4

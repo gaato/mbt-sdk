@@ -156,3 +156,7 @@ the backend. It covers the native generateContent API; Live, Interactions,
 tuning, batch jobs and file-search stores are outside this module's surface.
 See the [behavior survey](https://github.com/gaato/moonbit-sdks/blob/main/docs/behavior/gemini.md)
 and [specification source](https://generativelanguage.googleapis.com/$discovery/rest?version=v1beta).
+
+## License
+
+Apache-2.0

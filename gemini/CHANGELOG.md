@@ -2,16 +2,16 @@
 
 ## [Unreleased]
 
-- Add typed Gemini generation, SSE, embeddings, token counting, model discovery,
-  files and context caching through a generated client facade.
-- Add buffered resumable-session upload with start and upload/finalize.
-- Enforce one Part data variant while preserving typed metadata siblings.
-- Retry 503 and proven-unsent transport failures; honour Retry-After, surface
-  429 immediately, and leave timeouts to the application. RetryInfo body delays
-  are retained in errors but not interpreted for retries.
-- Accept canonical resource names and bare IDs for simple collection patterns;
-  reject unsafe names as Validation failures before building a request.
-- Return Unit for empty protobuf responses, name authentication variants ApiKey,
-  ApiKeyInQuery and OAuthToken, and expose GoogleErrorStatus for RPC errors.
-- Treat omitted pagination arrays as empty pages; stop retries when Retry-After
-  exceeds 60 seconds.
+## [0.1.0] - 2026-11-16
+
+First release: a Gemini API client generated from Google's Discovery document
+(`generativelanguage` v1beta).
+
+- Content generation, including the SSE stream, embeddings, token counting,
+  models, files (with resumable upload) and cached contents.
+- `Part` is a union over its data field, so each part carries exactly one kind
+  of data.
+- Model, file and cache names are accepted as IDs or resource names and checked
+  against the API's patterns before a request is sent.
+- Retries follow Google's AIP-194: 503 and failures that prove nothing was sent;
+  429 is returned at once.

@@ -2,11 +2,13 @@
   "modules": [
     "openai",
     "anthropic",
-    "github"
+    "github",
+    "gemini"
   ],
   "generated": [
     "openai/src/gen",
     "anthropic/src/gen",
-    "github/src/gen"
+    "github/src/gen",
+    "gemini/src/gen"
   ]
 }
