@@ -5,6 +5,7 @@
 ### Changed
 
 - Generated code now qualifies constructor references; no public API change.
+- **Regenerated from the upstream spec fetched 2026-11-16** (sha256 `9ef8b554c97e`). Changes are batched for the next weekly release; see the generated interface diff.
 
 ## [0.1.0] - 2026-11-16
 
