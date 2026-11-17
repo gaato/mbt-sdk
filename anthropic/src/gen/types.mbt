@@ -16726,6 +16726,46 @@ pub impl @json.FromJson for ContextManagementCapability with fn from_json(
 
 ///|
 ///
+/// The organization has reached the spend limit of its contract.
+#derive(Eq, @debug.Debug)
+pub(all) struct ContractSpendLimitReachedErrorDetails {}
+
+///|
+pub extend ContractSpendLimitReachedErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ContractSpendLimitReachedErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ContractSpendLimitReachedErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ContractSpendLimitReachedErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "contract_spend_limit_reached")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ContractSpendLimitReachedErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ContractSpendLimitReachedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  ContractSpendLimitReachedErrorDetails::{ }
+}
+
+///|
+///
 /// Top-level cache control automatically applies a cache_control marker to the last cacheable block in the request.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
@@ -22170,6 +22210,104 @@ pub impl @json.FromJson for ErrorResponse with fn from_json(value, path) {
 
 ///|
 ///
+/// Anthropic cannot currently bill the organization linked to the request's user profile, for a reason that lies with that organization's own account. The response does not say what the reason is.
+#derive(Eq, @debug.Debug)
+pub(all) struct LinkedOrganizationBillingUnavailableErrorDetails {}
+
+///|
+pub extend LinkedOrganizationBillingUnavailableErrorDetails with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend LinkedOrganizationBillingUnavailableErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend LinkedOrganizationBillingUnavailableErrorDetails with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for LinkedOrganizationBillingUnavailableErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "linked_organization_billing_unavailable")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend LinkedOrganizationBillingUnavailableErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for LinkedOrganizationBillingUnavailableErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  LinkedOrganizationBillingUnavailableErrorDetails::{ }
+}
+
+///|
+///
+/// The organization linked to the request's user profile has reached a spend limit that it set, or lacks credit for the request. The response does not say which applies.
+#derive(Eq, @debug.Debug)
+pub(all) struct LinkedOrganizationSpendLimitReachedErrorDetails {}
+
+///|
+pub extend LinkedOrganizationSpendLimitReachedErrorDetails with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend LinkedOrganizationSpendLimitReachedErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend LinkedOrganizationSpendLimitReachedErrorDetails with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for LinkedOrganizationSpendLimitReachedErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "linked_organization_spend_limit_reached")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend LinkedOrganizationSpendLimitReachedErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for LinkedOrganizationSpendLimitReachedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  LinkedOrganizationSpendLimitReachedErrorDetails::{ }
+}
+
+///|
+///
 /// Web search and code execution tool support, with one entry per tool.
 #derive(Eq, @debug.Debug)
 pub(all) struct ServerToolsCapability {
@@ -24273,6 +24411,129 @@ pub impl @json.FromJson for ToolReferenceUnresolvedErrorDetails with fn from_jso
 ) {
   let _ = @sdkjson.expect_object(value, path)
   ToolReferenceUnresolvedErrorDetails::{ }
+}
+
+///|
+///
+/// The customer that the named user profile represents has not authorized the caller to bill them, or the authorization that the request's credential uses has ended. The response does not say which applies.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserProfileBillingNotAuthorizedErrorDetails {}
+
+///|
+pub extend UserProfileBillingNotAuthorizedErrorDetails with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend UserProfileBillingNotAuthorizedErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserProfileBillingNotAuthorizedErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserProfileBillingNotAuthorizedErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "user_profile_billing_not_authorized")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserProfileBillingNotAuthorizedErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for UserProfileBillingNotAuthorizedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  UserProfileBillingNotAuthorizedErrorDetails::{ }
+}
+
+///|
+///
+/// The caller is not allowed to bill the user profile that the request names. The response gives no more specific error code and does not say what the reason is.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserProfileNotBillableErrorDetails {}
+
+///|
+pub extend UserProfileNotBillableErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend UserProfileNotBillableErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserProfileNotBillableErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserProfileNotBillableErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "user_profile_not_billable")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserProfileNotBillableErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserProfileNotBillableErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  UserProfileNotBillableErrorDetails::{ }
+}
+
+///|
+///
+/// The request sets `billing_policy.bill_to` to `"user_profile"` but names no user profile. Name the profile to bill in the `anthropic-user-profile-id` header.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserProfileRequiredErrorDetails {}
+
+///|
+pub extend UserProfileRequiredErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend UserProfileRequiredErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserProfileRequiredErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserProfileRequiredErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "user_profile_required")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserProfileRequiredErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserProfileRequiredErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  UserProfileRequiredErrorDetails::{ }
 }
 
 ///|
