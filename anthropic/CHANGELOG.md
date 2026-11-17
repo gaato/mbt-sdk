@@ -18,6 +18,7 @@ are optional unless the field is required, and keep a wildcard arm.
 ### Changed
 
 - Generated code now qualifies constructor references; no public API change.
+- **Regenerated from the upstream spec fetched 2026-11-17** (sha256 `7696dbb0d6d6`). Changes are batched for the next weekly release; see the generated interface diff.
 
 ## [0.17.0] - 2026-11-12
 

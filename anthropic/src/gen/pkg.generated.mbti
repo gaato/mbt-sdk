@@ -1812,6 +1812,17 @@ pub impl @json.FromJson for ContextManagementCapability
 pub impl @json.ToJson for ContextManagementCapability
 
 #derive(Eq, @debug.Debug)
+pub(all) struct ContractSpendLimitReachedErrorDetails {
+}
+pub fn ContractSpendLimitReachedErrorDetails::equal(Self, Self) -> Bool
+pub fn ContractSpendLimitReachedErrorDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ContractSpendLimitReachedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn ContractSpendLimitReachedErrorDetails::to_json(Self) -> @json.Json
+pub fn ContractSpendLimitReachedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ContractSpendLimitReachedErrorDetails
+pub impl @json.ToJson for ContractSpendLimitReachedErrorDetails
+
+#derive(Eq, @debug.Debug)
 pub(all) struct CountMessageTokensParams {
   cache_control : @jsonkit.Presence[CountMessageTokensParamsCacheControl]
   messages : Array[InputMessageUnion]
@@ -2290,6 +2301,28 @@ pub fn JsonOutputFormat::to_json(Self) -> @json.Json
 pub fn JsonOutputFormat::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for JsonOutputFormat
 pub impl @json.ToJson for JsonOutputFormat
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LinkedOrganizationBillingUnavailableErrorDetails {
+}
+pub fn LinkedOrganizationBillingUnavailableErrorDetails::equal(Self, Self) -> Bool
+pub fn LinkedOrganizationBillingUnavailableErrorDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn LinkedOrganizationBillingUnavailableErrorDetails::not_equal(Self, Self) -> Bool
+pub fn LinkedOrganizationBillingUnavailableErrorDetails::to_json(Self) -> @json.Json
+pub fn LinkedOrganizationBillingUnavailableErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LinkedOrganizationBillingUnavailableErrorDetails
+pub impl @json.ToJson for LinkedOrganizationBillingUnavailableErrorDetails
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LinkedOrganizationSpendLimitReachedErrorDetails {
+}
+pub fn LinkedOrganizationSpendLimitReachedErrorDetails::equal(Self, Self) -> Bool
+pub fn LinkedOrganizationSpendLimitReachedErrorDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn LinkedOrganizationSpendLimitReachedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn LinkedOrganizationSpendLimitReachedErrorDetails::to_json(Self) -> @json.Json
+pub fn LinkedOrganizationSpendLimitReachedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LinkedOrganizationSpendLimitReachedErrorDetails
+pub impl @json.ToJson for LinkedOrganizationSpendLimitReachedErrorDetails
 
 #derive(Eq, @debug.Debug)
 pub(all) struct ListResponseModelInfo {
@@ -5613,6 +5646,39 @@ pub fn UserLocation::to_json(Self) -> @json.Json
 pub fn UserLocation::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for UserLocation
 pub impl @json.ToJson for UserLocation
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserProfileBillingNotAuthorizedErrorDetails {
+}
+pub fn UserProfileBillingNotAuthorizedErrorDetails::equal(Self, Self) -> Bool
+pub fn UserProfileBillingNotAuthorizedErrorDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserProfileBillingNotAuthorizedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn UserProfileBillingNotAuthorizedErrorDetails::to_json(Self) -> @json.Json
+pub fn UserProfileBillingNotAuthorizedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserProfileBillingNotAuthorizedErrorDetails
+pub impl @json.ToJson for UserProfileBillingNotAuthorizedErrorDetails
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserProfileNotBillableErrorDetails {
+}
+pub fn UserProfileNotBillableErrorDetails::equal(Self, Self) -> Bool
+pub fn UserProfileNotBillableErrorDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserProfileNotBillableErrorDetails::not_equal(Self, Self) -> Bool
+pub fn UserProfileNotBillableErrorDetails::to_json(Self) -> @json.Json
+pub fn UserProfileNotBillableErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserProfileNotBillableErrorDetails
+pub impl @json.ToJson for UserProfileNotBillableErrorDetails
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserProfileRequiredErrorDetails {
+}
+pub fn UserProfileRequiredErrorDetails::equal(Self, Self) -> Bool
+pub fn UserProfileRequiredErrorDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserProfileRequiredErrorDetails::not_equal(Self, Self) -> Bool
+pub fn UserProfileRequiredErrorDetails::to_json(Self) -> @json.Json
+pub fn UserProfileRequiredErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserProfileRequiredErrorDetails
+pub impl @json.ToJson for UserProfileRequiredErrorDetails
 
 #derive(Eq, @debug.Debug)
 pub(all) struct WebFetchTool20250910 {
