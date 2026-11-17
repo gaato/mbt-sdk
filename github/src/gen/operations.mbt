@@ -16169,7 +16169,7 @@ pub fn secret_scanning_list_org_custom_patterns_request(
 /// Decodes a parsed successful secret-scanning/list-org-custom-patterns response.
 pub fn secret_scanning_list_org_custom_patterns_decode_json(
   value : Json,
-) -> Array[SecretScanningCustomPattern] raise @json.JsonDecodeError {
+) -> Array[SecretScanningCustomPatternWithDryRun] raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
@@ -16179,7 +16179,10 @@ pub fn secret_scanning_list_org_custom_patterns_decode_json(
 pub fn secret_scanning_list_org_custom_patterns_decode(
   head : @http.ResponseHead,
   body : Bytes,
-) -> Result[Array[SecretScanningCustomPattern], @client.ResponseFailure] {
+) -> Result[
+  Array[SecretScanningCustomPatternWithDryRun],
+  @client.ResponseFailure,
+] {
   decode_response(head, body)
 }
 
@@ -36390,7 +36393,7 @@ pub fn secret_scanning_list_repo_custom_patterns_request(
 /// Decodes a parsed successful secret-scanning/list-repo-custom-patterns response.
 pub fn secret_scanning_list_repo_custom_patterns_decode_json(
   value : Json,
-) -> Array[SecretScanningCustomPattern] raise @json.JsonDecodeError {
+) -> Array[SecretScanningCustomPatternWithDryRun] raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
@@ -36400,7 +36403,10 @@ pub fn secret_scanning_list_repo_custom_patterns_decode_json(
 pub fn secret_scanning_list_repo_custom_patterns_decode(
   head : @http.ResponseHead,
   body : Bytes,
-) -> Result[Array[SecretScanningCustomPattern], @client.ResponseFailure] {
+) -> Result[
+  Array[SecretScanningCustomPatternWithDryRun],
+  @client.ResponseFailure,
+] {
   decode_response(head, body)
 }
 

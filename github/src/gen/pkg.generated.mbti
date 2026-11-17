@@ -5772,9 +5772,9 @@ pub fn secret_scanning_list_locations_for_alert_decode_json(@json.Json) -> Array
 
 pub fn secret_scanning_list_locations_for_alert_request(String, String, Int32, page? : Int32, per_page? : Int32) -> @mttp_core.Request
 
-pub fn secret_scanning_list_org_custom_patterns_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[SecretScanningCustomPattern], @client.ResponseFailure]
+pub fn secret_scanning_list_org_custom_patterns_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[SecretScanningCustomPatternWithDryRun], @client.ResponseFailure]
 
-pub fn secret_scanning_list_org_custom_patterns_decode_json(@json.Json) -> Array[SecretScanningCustomPattern] raise @json.JsonDecodeError
+pub fn secret_scanning_list_org_custom_patterns_decode_json(@json.Json) -> Array[SecretScanningCustomPatternWithDryRun] raise @json.JsonDecodeError
 
 pub fn secret_scanning_list_org_custom_patterns_request(String, state? : SecretScanningListOrgCustomPatternsState, push_protection? : SecretScanningListOrgCustomPatternsPushProtection, sort? : SecretScanningListOrgCustomPatternsSort, direction? : SecretScanningListOrgCustomPatternsDirection, before? : String, after? : String) -> @mttp_core.Request
 
@@ -5784,9 +5784,9 @@ pub fn secret_scanning_list_org_pattern_configs_decode_json(@json.Json) -> Secre
 
 pub fn secret_scanning_list_org_pattern_configs_request(String) -> @mttp_core.Request
 
-pub fn secret_scanning_list_repo_custom_patterns_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[SecretScanningCustomPattern], @client.ResponseFailure]
+pub fn secret_scanning_list_repo_custom_patterns_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[SecretScanningCustomPatternWithDryRun], @client.ResponseFailure]
 
-pub fn secret_scanning_list_repo_custom_patterns_decode_json(@json.Json) -> Array[SecretScanningCustomPattern] raise @json.JsonDecodeError
+pub fn secret_scanning_list_repo_custom_patterns_decode_json(@json.Json) -> Array[SecretScanningCustomPatternWithDryRun] raise @json.JsonDecodeError
 
 pub fn secret_scanning_list_repo_custom_patterns_request(String, String, state? : SecretScanningListRepoCustomPatternsState, push_protection? : SecretScanningListRepoCustomPatternsPushProtection, sort? : SecretScanningListRepoCustomPatternsSort, direction? : SecretScanningListRepoCustomPatternsDirection, before? : String, after? : String) -> @mttp_core.Request
 
@@ -32596,10 +32596,11 @@ pub(all) struct CopilotUpdateRepositoryCodeReviewSettingsRequest {
   severity_filter : CopilotUpdateRepositoryCodeReviewSettingsRequestSeverityFilter?
   custom_instructions_enabled : Bool?
   mcp_enabled : Bool?
+  cross_repo_context_enabled : Bool?
 }
 pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::equal(Self, Self) -> Bool
 pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::new(review_effort? : String, severity_filter? : CopilotUpdateRepositoryCodeReviewSettingsRequestSeverityFilter, custom_instructions_enabled? : Bool, mcp_enabled? : Bool) -> Self
+pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::new(review_effort? : String, severity_filter? : CopilotUpdateRepositoryCodeReviewSettingsRequestSeverityFilter, custom_instructions_enabled? : Bool, mcp_enabled? : Bool, cross_repo_context_enabled? : Bool) -> Self
 pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::not_equal(Self, Self) -> Bool
 pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::to_json(Self) -> @json.Json
 pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::to_repr(Self) -> @debug.Repr
@@ -52342,10 +52343,11 @@ pub(all) struct RepositoryCopilotCodeReviewSettings {
   severity_filter : RepositoryCopilotCodeReviewSettingsSeverityFilter
   custom_instructions_enabled : Bool
   mcp_enabled : Bool
+  cross_repo_context_enabled : Bool
 }
 pub fn RepositoryCopilotCodeReviewSettings::equal(Self, Self) -> Bool
 pub fn RepositoryCopilotCodeReviewSettings::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn RepositoryCopilotCodeReviewSettings::new(review_effort~ : RepositoryCopilotCodeReviewSettingsReviewEffort, available_review_efforts~ : Array[String], severity_filter~ : RepositoryCopilotCodeReviewSettingsSeverityFilter, custom_instructions_enabled~ : Bool, mcp_enabled~ : Bool) -> Self
+pub fn RepositoryCopilotCodeReviewSettings::new(review_effort~ : RepositoryCopilotCodeReviewSettingsReviewEffort, available_review_efforts~ : Array[String], severity_filter~ : RepositoryCopilotCodeReviewSettingsSeverityFilter, custom_instructions_enabled~ : Bool, mcp_enabled~ : Bool, cross_repo_context_enabled~ : Bool) -> Self
 pub fn RepositoryCopilotCodeReviewSettings::not_equal(Self, Self) -> Bool
 pub fn RepositoryCopilotCodeReviewSettings::to_json(Self) -> @json.Json
 pub fn RepositoryCopilotCodeReviewSettings::to_repr(Self) -> @debug.Repr
@@ -56415,6 +56417,46 @@ pub fn SecretScanningCustomPatternValidationErrorCode::to_json(Self) -> @json.Js
 pub fn SecretScanningCustomPatternValidationErrorCode::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for SecretScanningCustomPatternValidationErrorCode
 pub impl @json.ToJson for SecretScanningCustomPatternValidationErrorCode
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SecretScanningCustomPatternWithDryRun {
+  id : Int32
+  name : String
+  pattern : String
+  slug : String
+  state : SecretScanningCustomPatternWithDryRunState
+  push_protection_enabled : Bool
+  start_delimiter : @jsonkit.Presence[String]
+  end_delimiter : @jsonkit.Presence[String]
+  must_match : @jsonkit.Presence[Array[String]]
+  must_not_match : @jsonkit.Presence[Array[String]]
+  custom_pattern_version : @jsonkit.Presence[String]
+  created_at : String?
+  updated_at : String?
+}
+pub fn SecretScanningCustomPatternWithDryRun::equal(Self, Self) -> Bool
+pub fn SecretScanningCustomPatternWithDryRun::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SecretScanningCustomPatternWithDryRun::new(id~ : Int32, name~ : String, pattern~ : String, slug~ : String, state~ : SecretScanningCustomPatternWithDryRunState, push_protection_enabled~ : Bool, start_delimiter? : String, end_delimiter? : String, must_match? : Array[String], must_not_match? : Array[String], custom_pattern_version? : String, created_at? : String, updated_at? : String) -> Self
+pub fn SecretScanningCustomPatternWithDryRun::not_equal(Self, Self) -> Bool
+pub fn SecretScanningCustomPatternWithDryRun::to_json(Self) -> @json.Json
+pub fn SecretScanningCustomPatternWithDryRun::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SecretScanningCustomPatternWithDryRun
+pub impl @json.ToJson for SecretScanningCustomPatternWithDryRun
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum SecretScanningCustomPatternWithDryRunState {
+  Published
+  Unpublished
+  Unknown(String)
+}
+pub fn SecretScanningCustomPatternWithDryRunState::equal(Self, Self) -> Bool
+pub fn SecretScanningCustomPatternWithDryRunState::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SecretScanningCustomPatternWithDryRunState::not_equal(Self, Self) -> Bool
+pub fn SecretScanningCustomPatternWithDryRunState::to_json(Self) -> @json.Json
+pub fn SecretScanningCustomPatternWithDryRunState::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SecretScanningCustomPatternWithDryRunState
+pub impl @json.ToJson for SecretScanningCustomPatternWithDryRunState
 
 #non_exhaustive
 #derive(Eq, @debug.Debug)

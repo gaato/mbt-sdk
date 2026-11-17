@@ -51727,6 +51727,265 @@ pub impl @json.FromJson for OrganizationSecretScanningAlert with fn from_json(
 /// The state of the custom pattern.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
+pub(all) enum SecretScanningCustomPatternWithDryRunState {
+  Published
+  Unpublished
+  Unknown(String)
+}
+
+///|
+pub extend SecretScanningCustomPatternWithDryRunState with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend SecretScanningCustomPatternWithDryRunState with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend SecretScanningCustomPatternWithDryRunState with ToJson::{to_json}
+
+///|
+pub impl ToJson for SecretScanningCustomPatternWithDryRunState with fn to_json(
+  self,
+) {
+  let raw = match self {
+    SecretScanningCustomPatternWithDryRunState::Published => "published"
+    SecretScanningCustomPatternWithDryRunState::Unpublished => "unpublished"
+    SecretScanningCustomPatternWithDryRunState::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend SecretScanningCustomPatternWithDryRunState with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for SecretScanningCustomPatternWithDryRunState with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "published" =>
+          Option::Some(SecretScanningCustomPatternWithDryRunState::Published)
+        "unpublished" =>
+          Option::Some(SecretScanningCustomPatternWithDryRunState::Unpublished)
+        _ => Option::None
+      }
+    },
+    raw => SecretScanningCustomPatternWithDryRunState::Unknown(raw),
+  )
+}
+
+///|
+///
+/// A custom pattern for secret scanning.
+#derive(Eq, @debug.Debug)
+pub(all) struct SecretScanningCustomPatternWithDryRun {
+  id : Int32
+  name : String
+  pattern : String
+  slug : String
+  state : SecretScanningCustomPatternWithDryRunState
+  push_protection_enabled : Bool
+  start_delimiter : @sdkjson.Presence[String]
+  end_delimiter : @sdkjson.Presence[String]
+  must_match : @sdkjson.Presence[Array[String]]
+  must_not_match : @sdkjson.Presence[Array[String]]
+  custom_pattern_version : @sdkjson.Presence[String]
+  created_at : String?
+  updated_at : String?
+}
+
+///|
+pub extend SecretScanningCustomPatternWithDryRun with Eq::{equal, not_equal}
+
+///|
+pub extend SecretScanningCustomPatternWithDryRun with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a SecretScanningCustomPatternWithDryRun with omitted optional fields absent.
+pub fn SecretScanningCustomPatternWithDryRun::new(
+  id~ : Int32,
+  name~ : String,
+  pattern~ : String,
+  slug~ : String,
+  state~ : SecretScanningCustomPatternWithDryRunState,
+  push_protection_enabled~ : Bool,
+  start_delimiter? : String,
+  end_delimiter? : String,
+  must_match? : Array[String],
+  must_not_match? : Array[String],
+  custom_pattern_version? : String,
+  created_at? : String,
+  updated_at? : String,
+) -> SecretScanningCustomPatternWithDryRun {
+  {
+    id,
+    name,
+    pattern,
+    slug,
+    state,
+    push_protection_enabled,
+    start_delimiter: @sdkjson.Presence::from_option(start_delimiter),
+    end_delimiter: @sdkjson.Presence::from_option(end_delimiter),
+    must_match: @sdkjson.Presence::from_option(must_match),
+    must_not_match: @sdkjson.Presence::from_option(must_not_match),
+    custom_pattern_version: @sdkjson.Presence::from_option(
+      custom_pattern_version,
+    ),
+    created_at,
+    updated_at,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend SecretScanningCustomPatternWithDryRun with ToJson::{to_json}
+
+///|
+pub impl ToJson for SecretScanningCustomPatternWithDryRun with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("name", self.name)
+  .field("pattern", self.pattern)
+  .field("slug", self.slug)
+  .field("state", self.state)
+  .field("push_protection_enabled", self.push_protection_enabled)
+  .presence("start_delimiter", self.start_delimiter)
+  .presence("end_delimiter", self.end_delimiter)
+  .presence("must_match", self.must_match)
+  .presence("must_not_match", self.must_not_match)
+  .presence("custom_pattern_version", self.custom_pattern_version)
+  .opt("created_at", self.created_at)
+  .opt("updated_at", self.updated_at)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend SecretScanningCustomPatternWithDryRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for SecretScanningCustomPatternWithDryRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    name: required_field(obj, "name", path),
+    pattern: required_field(obj, "pattern", path),
+    slug: required_field(obj, "slug", path),
+    state: required_field(obj, "state", path),
+    push_protection_enabled: required_field(
+      obj, "push_protection_enabled", path,
+    ),
+    start_delimiter: @sdkjson.presence_field(obj, "start_delimiter", path),
+    end_delimiter: @sdkjson.presence_field(obj, "end_delimiter", path),
+    must_match: @sdkjson.presence_field(obj, "must_match", path),
+    must_not_match: @sdkjson.presence_field(obj, "must_not_match", path),
+    custom_pattern_version: @sdkjson.presence_field(
+      obj, "custom_pattern_version", path,
+    ),
+    created_at: @sdkjson.opt_field(obj, "created_at", path),
+    updated_at: @sdkjson.opt_field(obj, "updated_at", path),
+  }
+}
+
+///|
+///
+/// A custom pattern to create in a bulk operation.
+#derive(Eq, @debug.Debug)
+pub(all) struct SecretScanningCustomPatternToCreate {
+  name : String
+  pattern : String
+  start_delimiter : String?
+  end_delimiter : String?
+  must_match : Array[String]?
+  must_not_match : Array[String]?
+}
+
+///|
+pub extend SecretScanningCustomPatternToCreate with Eq::{equal, not_equal}
+
+///|
+pub extend SecretScanningCustomPatternToCreate with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a SecretScanningCustomPatternToCreate with omitted optional fields absent.
+pub fn SecretScanningCustomPatternToCreate::new(
+  name~ : String,
+  pattern~ : String,
+  start_delimiter? : String,
+  end_delimiter? : String,
+  must_match? : Array[String],
+  must_not_match? : Array[String],
+) -> SecretScanningCustomPatternToCreate {
+  { name, pattern, start_delimiter, end_delimiter, must_match, must_not_match, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend SecretScanningCustomPatternToCreate with ToJson::{to_json}
+
+///|
+pub impl ToJson for SecretScanningCustomPatternToCreate with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("name", self.name)
+  .field("pattern", self.pattern)
+  .opt("start_delimiter", self.start_delimiter)
+  .opt("end_delimiter", self.end_delimiter)
+  .opt("must_match", self.must_match)
+  .opt("must_not_match", self.must_not_match)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend SecretScanningCustomPatternToCreate with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SecretScanningCustomPatternToCreate with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: required_field(obj, "name", path),
+    pattern: required_field(obj, "pattern", path),
+    start_delimiter: @sdkjson.opt_field(obj, "start_delimiter", path),
+    end_delimiter: @sdkjson.opt_field(obj, "end_delimiter", path),
+    must_match: @sdkjson.opt_field(obj, "must_match", path),
+    must_not_match: @sdkjson.opt_field(obj, "must_not_match", path),
+  }
+}
+
+///|
+///
+/// The state of the custom pattern.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
 pub(all) enum SecretScanningCustomPatternState {
   Published
   Unpublished
@@ -51895,77 +52154,6 @@ pub impl @json.FromJson for SecretScanningCustomPattern with fn from_json(
     ),
     created_at: @sdkjson.opt_field(obj, "created_at", path),
     updated_at: @sdkjson.opt_field(obj, "updated_at", path),
-  }
-}
-
-///|
-///
-/// A custom pattern to create in a bulk operation.
-#derive(Eq, @debug.Debug)
-pub(all) struct SecretScanningCustomPatternToCreate {
-  name : String
-  pattern : String
-  start_delimiter : String?
-  end_delimiter : String?
-  must_match : Array[String]?
-  must_not_match : Array[String]?
-}
-
-///|
-pub extend SecretScanningCustomPatternToCreate with Eq::{equal, not_equal}
-
-///|
-pub extend SecretScanningCustomPatternToCreate with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a SecretScanningCustomPatternToCreate with omitted optional fields absent.
-pub fn SecretScanningCustomPatternToCreate::new(
-  name~ : String,
-  pattern~ : String,
-  start_delimiter? : String,
-  end_delimiter? : String,
-  must_match? : Array[String],
-  must_not_match? : Array[String],
-) -> SecretScanningCustomPatternToCreate {
-  { name, pattern, start_delimiter, end_delimiter, must_match, must_not_match, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend SecretScanningCustomPatternToCreate with ToJson::{to_json}
-
-///|
-pub impl ToJson for SecretScanningCustomPatternToCreate with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("name", self.name)
-  .field("pattern", self.pattern)
-  .opt("start_delimiter", self.start_delimiter)
-  .opt("end_delimiter", self.end_delimiter)
-  .opt("must_match", self.must_match)
-  .opt("must_not_match", self.must_not_match)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend SecretScanningCustomPatternToCreate with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for SecretScanningCustomPatternToCreate with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    name: required_field(obj, "name", path),
-    pattern: required_field(obj, "pattern", path),
-    start_delimiter: @sdkjson.opt_field(obj, "start_delimiter", path),
-    end_delimiter: @sdkjson.opt_field(obj, "end_delimiter", path),
-    must_match: @sdkjson.opt_field(obj, "must_match", path),
-    must_not_match: @sdkjson.opt_field(obj, "must_not_match", path),
   }
 }
 
@@ -74781,6 +74969,7 @@ pub(all) struct RepositoryCopilotCodeReviewSettings {
   severity_filter : RepositoryCopilotCodeReviewSettingsSeverityFilter
   custom_instructions_enabled : Bool
   mcp_enabled : Bool
+  cross_repo_context_enabled : Bool
 }
 
 ///|
@@ -74798,6 +74987,7 @@ pub fn RepositoryCopilotCodeReviewSettings::new(
   severity_filter~ : RepositoryCopilotCodeReviewSettingsSeverityFilter,
   custom_instructions_enabled~ : Bool,
   mcp_enabled~ : Bool,
+  cross_repo_context_enabled~ : Bool,
 ) -> RepositoryCopilotCodeReviewSettings {
   {
     review_effort,
@@ -74805,6 +74995,7 @@ pub fn RepositoryCopilotCodeReviewSettings::new(
     severity_filter,
     custom_instructions_enabled,
     mcp_enabled,
+    cross_repo_context_enabled,
   }
 }
 
@@ -74821,6 +75012,7 @@ pub impl ToJson for RepositoryCopilotCodeReviewSettings with fn to_json(self) {
   .field("severity_filter", self.severity_filter)
   .field("custom_instructions_enabled", self.custom_instructions_enabled)
   .field("mcp_enabled", self.mcp_enabled)
+  .field("cross_repo_context_enabled", self.cross_repo_context_enabled)
   .build()
 }
 
@@ -74845,6 +75037,9 @@ pub impl @json.FromJson for RepositoryCopilotCodeReviewSettings with fn from_jso
       obj, "custom_instructions_enabled", path,
     ),
     mcp_enabled: required_field(obj, "mcp_enabled", path),
+    cross_repo_context_enabled: required_field(
+      obj, "cross_repo_context_enabled", path,
+    ),
   }
 }
 
@@ -215386,6 +215581,7 @@ pub(all) struct CopilotUpdateRepositoryCodeReviewSettingsRequest {
   severity_filter : CopilotUpdateRepositoryCodeReviewSettingsRequestSeverityFilter?
   custom_instructions_enabled : Bool?
   mcp_enabled : Bool?
+  cross_repo_context_enabled : Bool?
 }
 
 ///|
@@ -215407,8 +215603,15 @@ pub fn CopilotUpdateRepositoryCodeReviewSettingsRequest::new(
   severity_filter? : CopilotUpdateRepositoryCodeReviewSettingsRequestSeverityFilter,
   custom_instructions_enabled? : Bool,
   mcp_enabled? : Bool,
+  cross_repo_context_enabled? : Bool,
 ) -> CopilotUpdateRepositoryCodeReviewSettingsRequest {
-  { review_effort, severity_filter, custom_instructions_enabled, mcp_enabled, }
+  {
+    review_effort,
+    severity_filter,
+    custom_instructions_enabled,
+    mcp_enabled,
+    cross_repo_context_enabled,
+  }
 }
 
 ///|
@@ -215427,6 +215630,7 @@ pub impl ToJson for CopilotUpdateRepositoryCodeReviewSettingsRequest with fn to_
   .opt("severity_filter", self.severity_filter)
   .opt("custom_instructions_enabled", self.custom_instructions_enabled)
   .opt("mcp_enabled", self.mcp_enabled)
+  .opt("cross_repo_context_enabled", self.cross_repo_context_enabled)
   .build()
 }
 
@@ -215450,6 +215654,9 @@ pub impl @json.FromJson for CopilotUpdateRepositoryCodeReviewSettingsRequest wit
       obj, "custom_instructions_enabled", path,
     ),
     mcp_enabled: @sdkjson.opt_field(obj, "mcp_enabled", path),
+    cross_repo_context_enabled: @sdkjson.opt_field(
+      obj, "cross_repo_context_enabled", path,
+    ),
   }
 }
 

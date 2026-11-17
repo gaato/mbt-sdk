@@ -18,6 +18,7 @@ are optional unless the field is required, and keep a wildcard arm.
 
 - The default `User-Agent` is now `gaato-moonbit-sdks/0.1.0` (was `gaato-mbt-sdk/0.1.0`), because the repository was renamed to `gaato/moonbit-sdks`. Pass `user_agent~` to keep your own.
 - Generated code now qualifies constructor references; no public API change.
+- **Regenerated from the upstream spec fetched 2026-11-17** (sha256 `1b1a8248bd69`). Changes are batched for the next weekly release; see the generated interface diff.
 
 ## [0.25.0] - 2026-11-16
 
