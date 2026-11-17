@@ -30,6 +30,10 @@ permission(fs: { "read": [".."] })
 /// 6. Doc comments: every top-level `pub` declaration in a published, hand
 ///    written package has a `///` doc comment. A file whose first line says
 ///    `DO NOT EDIT` is generated and skipped.
+/// 7. Local paths: no Markdown line, in prose or in code, names a home
+///    directory (`/home/<name>`, `/Users/<name>`, `C:\Users\<name>`). The
+///    repositories are public: such a path shows a contributor's machine and
+///    works on no other. Write `$HOME`, a placeholder or a relative path.
 ///
 /// The published modules and generated sources are listed in
 /// `scripts/docs_audit.json`; what a module leaves out of its package comes
@@ -223,13 +227,16 @@ fn resolve(file : String, target : String) -> String {
 }
 
 ///|
-/// Rules 1–3: fences and links in every Markdown file.
+/// Rules 1–3 and 7: fences, links and local paths in every Markdown file.
 fn scan_markdown(repo : Repo, found : Map[String, String]) -> Unit {
   for file in repo.markdown {
     let (path, text) = file
     let published = published_module(repo, path) is Some(_)
     let mut in_fence = false
     for index, line in text.split("\n").to_array() {
+      if has_local_path(line.to_owned()) {
+        found["\{path} local-path:\{index + 1}"] = "a home directory; the repository is public, so write $HOME, a placeholder or a relative path"
+      }
       let trimmed = line.trim().to_owned()
       if trimmed.has_prefix("```") {
         if !in_fence && trimmed.has_prefix("```fish") {
@@ -253,6 +260,34 @@ fn scan_markdown(repo : Repo, found : Map[String, String]) -> Unit {
       }
     }
   }
+}
+
+///|
+/// Prefixes of a home directory on Linux, macOS and Windows. Each counts
+/// only when a letter follows, so a bare `/home/` or `/users/@me` passes.
+let local_path_prefixes : Array[String] = ["/home/", "/Users/", "C:\\Users\\"]
+
+///|
+/// Whether `line` names a home directory (rule 7).
+fn has_local_path(line : String) -> Bool {
+  let chars = line.to_array()
+  for prefix in local_path_prefixes {
+    let p = prefix.to_array()
+    for i in 0..<(chars.length() - p.length()) {
+      let mut matches = true
+      for j in 0..<p.length() {
+        if chars[i + j] != p[j] {
+          matches = false
+          break
+        }
+      }
+      let next = chars[i + p.length()]
+      if matches && ((next >= 'a' && next <= 'z') || (next >= 'A' && next <= 'Z')) {
+        return true
+      }
+    }
+  }
+  false
 }
 
 ///|
@@ -594,6 +629,28 @@ fn run_self_test() -> Unit raise {
   audit(
     selftest(repo, markdown=good.copy()..push(("guide/x.md", "```sh\nls\n```\n"))),
     allow,
+  )
+  // A home directory fails in prose and in code; $HOME, a bare prefix and
+  // an API path such as /users/@me pass.
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=good.copy()..push(("guide/x.md", "```sh\nexport PATH=/home/alice/bin:$PATH\n```\n"))),
+      allow,
+    )
+  })
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=good.copy()..push(("guide/x.md", "Built in /Users/Alice/src.\n"))),
+      allow,
+    )
+  })
+  audit(
+    selftest(repo, markdown=good.copy()..push(("guide/x.md", "Use $HOME/.moonup, /home/ and GET /users/@me.\n"))),
+    allow,
+  )
+  audit(
+    selftest(repo, markdown=good.copy()..push(("guide/x.md", "See /home/alice.\n"))),
+    allow + "\nguide/x.md local-path:1 # self-test\n",
   )
   // A relative link to an existing file fails in a published file and
   // passes in a directory the package leaves out or outside any module.
