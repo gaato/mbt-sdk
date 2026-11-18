@@ -24,6 +24,33 @@ class EnvelopedSliceTests(unittest.TestCase):
             fields = {field.json_name: field for field in declaration(ir, variant.type.name).fields}
             self.assertEqual(fields["id"].presence, Presence.REQUIRED)
 
+    def test_required_fields_by_tag_only_refine_the_response_branch(self):
+        schemas = {
+            tag: {"type": "object", "properties": {
+                "kind": {"type": "string", "enum": [tag]},
+                "comment": {"type": "string"},
+            }, "required": ["kind"]}
+            for tag in ("A", "B")
+        }
+        choices = [{"$ref": f"#/components/schemas/{tag}"} for tag in schemas]
+        request = {"oneOf": choices, "required": ["comment"]}
+        response = {
+            "oneOf": choices,
+            "x-moonbit-nullable-fields": ["comment"],
+            "x-moonbit-required-fields-by-tag": {"B": ["comment"]},
+        }
+        ir = IRBuilder(document(operation(request=request, response=response), schemas), "fixture/gen").build()
+        for name, expected in (
+            ("TestOperationRequest", [Presence.REQUIRED, Presence.REQUIRED]),
+            ("TestOperationResponse", [Presence.PRESENCE, Presence.NULLABLE_REQUIRED]),
+        ):
+            union = declaration(ir, name)
+            actual = [
+                next(field.presence for field in declaration(ir, variant.type.name).fields if field.json_name == "comment")
+                for variant in union.variants
+            ]
+            self.assertEqual(actual, expected)
+
     def test_independent_union_intersections_are_diagnostics(self):
         def choices(key):
             return [{"type": "object", "properties": {key: {"type": "string", "enum": [tag]}}}

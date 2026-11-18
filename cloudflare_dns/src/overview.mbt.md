@@ -116,6 +116,11 @@ endpoints to three requests per minute per user.
 page. For the full response including the five `result_info` fields, use
 `send` with the corresponding request builder from `gaato/cloudflare_dns/gen`.
 
+`delete_zone` returns `Ok(None)` when Cloudflare sends a null or omitted
+result. Other methods that decode a result require a non-null payload.
+Fields represented by `Presence` distinguish an omitted field from an
+explicit null.
+
 HTTP errors and JSON responses with `success: false` return `Failure::Http`.
 Its response head includes the status and headers. The two message arrays
 include codes, descriptions and available documentation links or source

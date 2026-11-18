@@ -2088,13 +2088,13 @@ pub impl @json.ToJson for DnsRecordResponse
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseA {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @jsonkit.Presence[String]
   private_routing : Bool?
   type_ : String
   comment_modified_on : String?
@@ -2116,13 +2116,13 @@ pub impl @json.ToJson for DnsRecordResponseA
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseAAAA {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @jsonkit.Presence[String]
   private_routing : Bool?
   type_ : String
   comment_modified_on : String?
@@ -2176,14 +2176,14 @@ pub impl @json.ToJson for DnsRecordResponseAMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseCAA {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseCAAData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseCAAData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2235,14 +2235,14 @@ pub impl @json.ToJson for DnsRecordResponseCAAMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseCERT {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseCERTData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseCERTData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2295,13 +2295,13 @@ pub impl @json.ToJson for DnsRecordResponseCERTMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseCNAME {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordResponseCNAMESettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordResponseCNAMESettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @jsonkit.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2351,14 +2351,14 @@ pub impl @json.ToJson for DnsRecordResponseCNAMESettings
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseDNSKEY {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseDNSKEYData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseDNSKEYData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2411,14 +2411,14 @@ pub impl @json.ToJson for DnsRecordResponseDNSKEYMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseDS {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseDSData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseDSData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2471,14 +2471,14 @@ pub impl @json.ToJson for DnsRecordResponseDSMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseHTTPS {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseHTTPSData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseHTTPSData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2530,14 +2530,14 @@ pub impl @json.ToJson for DnsRecordResponseHTTPSMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseLOC {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseLOCData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseLOCData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2628,13 +2628,13 @@ pub impl @json.ToJson for DnsRecordResponseLOCMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseMX {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @jsonkit.Presence[String]
   priority : Int32?
   type_ : String
   comment_modified_on : String?
@@ -2672,14 +2672,14 @@ pub impl @json.ToJson for DnsRecordResponseMXMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseNAPTR {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseNAPTRData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseNAPTRData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2734,13 +2734,13 @@ pub impl @json.ToJson for DnsRecordResponseNAPTRMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseNS {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @jsonkit.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2820,13 +2820,13 @@ pub impl @json.ToJson for DnsRecordResponseOPENPGPKEYMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponsePTR {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @jsonkit.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2863,14 +2863,14 @@ pub impl @json.ToJson for DnsRecordResponsePTRMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSMIMEA {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSMIMEAData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseSMIMEAData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2923,14 +2923,14 @@ pub impl @json.ToJson for DnsRecordResponseSMIMEAMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSRV {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSRVData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseSRVData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -2983,14 +2983,14 @@ pub impl @json.ToJson for DnsRecordResponseSRVMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSSHFP {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSSHFPData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseSSHFPData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -3042,14 +3042,14 @@ pub impl @json.ToJson for DnsRecordResponseSSHFPMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSVCB {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSVCBData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseSVCBData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -3101,14 +3101,14 @@ pub impl @json.ToJson for DnsRecordResponseSVCBMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseTLSA {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseTLSAData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseTLSAData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -3161,13 +3161,13 @@ pub impl @json.ToJson for DnsRecordResponseTLSAMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseTXT {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @jsonkit.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -3204,14 +3204,14 @@ pub impl @json.ToJson for DnsRecordResponseTXTMeta
 
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseURI {
-  comment : String?
+  comment : @jsonkit.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @jsonkit.Presence[Bool]
+  settings : @jsonkit.Presence[DnsRecordSettings]
+  tags : @jsonkit.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseURIData?
+  content : @jsonkit.Presence[String]
+  data : @jsonkit.Presence[DnsRecordResponseURIData]
   priority : Int32?
   type_ : String
   comment_modified_on : String?
@@ -3525,11 +3525,11 @@ pub impl @json.ToJson for InternalDnsBase
 
 #derive(Eq, @debug.Debug)
 pub(all) struct InternalDnsResponse {
-  reference_zone_id : String
+  reference_zone_id : String?
 }
 pub fn InternalDnsResponse::equal(Self, Self) -> Bool
 pub fn InternalDnsResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn InternalDnsResponse::new(reference_zone_id~ : String) -> Self
+pub fn InternalDnsResponse::new(reference_zone_id? : String) -> Self
 pub fn InternalDnsResponse::not_equal(Self, Self) -> Bool
 pub fn InternalDnsResponse::to_json(Self) -> @json.Json
 pub fn InternalDnsResponse::to_repr(Self) -> @debug.Repr
@@ -3879,17 +3879,17 @@ pub impl @json.ToJson for SVCBRecordData
 
 #derive(Eq, @debug.Debug)
 pub(all) struct Soa {
-  expire : Int32
-  min_ttl : Int32
-  mname : String?
-  refresh : Int32
-  retry : Int32
-  rname : String
-  ttl : Int32
+  expire : Int32?
+  min_ttl : Int32?
+  mname : @jsonkit.Presence[String]
+  refresh : Int32?
+  retry : Int32?
+  rname : String?
+  ttl : Int32?
 }
 pub fn Soa::equal(Self, Self) -> Bool
 pub fn Soa::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn Soa::new(expire~ : Int32, min_ttl~ : Int32, refresh~ : Int32, retry~ : Int32, rname~ : String, ttl~ : Int32, mname? : String) -> Self
+pub fn Soa::new(expire? : Int32, min_ttl? : Int32, mname? : String, refresh? : Int32, retry? : Int32, rname? : String, ttl? : Int32) -> Self
 pub fn Soa::not_equal(Self, Self) -> Bool
 pub fn Soa::to_json(Self) -> @json.Json
 pub fn Soa::to_repr(Self) -> @debug.Repr
@@ -4011,7 +4011,7 @@ pub impl @json.ToJson for URIRecordData
 #derive(Eq, @debug.Debug)
 pub(all) struct Zone {
   account : ZoneAccount
-  activated_on : String?
+  activated_on : @jsonkit.Presence[String]
   cname_suffix : String?
   created_on : String
   development_mode : Int32
@@ -4020,9 +4020,9 @@ pub(all) struct Zone {
   modified_on : String
   name : String
   name_servers : Array[String]
-  original_dnshost : String?
-  original_name_servers : Array[String]?
-  original_registrar : String?
+  original_dnshost : @jsonkit.Presence[String]
+  original_name_servers : @jsonkit.Presence[Array[String]]
+  original_registrar : @jsonkit.Presence[String]
   owner : ZoneOwner
   paused : Bool?
   permissions : Array[String]?

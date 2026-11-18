@@ -5,8 +5,10 @@ import {
   "gaato/mttp/backend",
   "gaato/mttp/codings",
   "gaato/mttp/runtime" @adapter,
+  "gaato/mttp_core" @http,
   "moonbitlang/core/async",
   "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/env",
 } for "test"
 

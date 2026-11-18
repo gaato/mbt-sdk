@@ -49,6 +49,25 @@ actions:
     update:
       x-moonbit-text-accept: text/plain
   - target: "$.components.schemas['dns-records_dns-record-response']"
-    description: Cloudflare can return null for unpopulated record fields. Apply the nullable fields to response branches only, because requests share their source schemas.
+    description: Python types/dns/record_response.py and its inherited record models allow null for these unpopulated fields on standard records. Retain C1's null handling for all record response branches, because the branch schemas are also used for requests.
     update:
       x-moonbit-nullable-fields: [comment, content, data, proxied, settings, tags]
+  - target: "$.components.schemas['dns-records_dns-record-response'].required"
+    description: Python types/dns/record_response.py inherits Optional fields from the record models. Remove the response-only requirement so the decoder accepts omission as well as null.
+    remove: true
+  - target: "$.components.schemas['dns-records_dns-record-response']"
+    description: Python types/dns/record_response.py requires record name, type and TTL. OpenpgpkeyRecord also requires five fields that the other response models inherit as Optional.
+    update:
+      required: [name, type, ttl]
+      x-moonbit-required-fields-by-tag:
+        OPENPGPKEY: [comment, content, proxied, settings, tags]
+  - target: "$.components.schemas['zones_zone'].required"
+    description: Python types/zones/zone.py Zone defaults activated_on, original_dnshost, original_name_servers and original_registrar to None. The spec already allows null for each field.
+    remove: true
+  - target: "$.components.schemas['zones_zone']"
+    description: Python types/zones/zone.py Zone requires these identity, metadata and timestamp fields.
+    update:
+      required: [id, name, development_mode, owner, account, meta, name_servers, created_on, modified_on, plan]
+  - target: "$.components.schemas['dns-settings_internal_dns_response','dns-settings_soa-response'].allOf[1].required"
+    description: Python types/dns/settings/zone_get_response.py and zone_edit_response.py default reference_zone_id and every SOA field to None. Remove the response-only requirements and keep the shared PATCH property definitions.
+    remove: true

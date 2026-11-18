@@ -8996,13 +8996,13 @@ pub impl @json.FromJson for DnsRecordResponseAMeta with fn from_json(
 /// Generated representation of DnsRecordResponseA.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseA {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @sdkjson.Presence[String]
   private_routing : Bool?
   type_ : String
   comment_modified_on : String?
@@ -9042,13 +9042,13 @@ pub fn DnsRecordResponseA::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseA {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
+    content: @sdkjson.Presence::from_option(content),
     private_routing,
     type_,
     comment_modified_on,
@@ -9069,13 +9069,13 @@ pub extend DnsRecordResponseA with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseA with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("content", self.content)
   .opt("private_routing", self.private_routing)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
@@ -9097,13 +9097,13 @@ pub extend DnsRecordResponseA with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseA with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
+    content: @sdkjson.presence_field(obj, "content", path),
     private_routing: @sdkjson.opt_field(obj, "private_routing", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
@@ -9186,13 +9186,13 @@ pub impl @json.FromJson for DnsRecordResponseAAAAMeta with fn from_json(
 /// Generated representation of DnsRecordResponseAAAA.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseAAAA {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @sdkjson.Presence[String]
   private_routing : Bool?
   type_ : String
   comment_modified_on : String?
@@ -9232,13 +9232,13 @@ pub fn DnsRecordResponseAAAA::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseAAAA {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
+    content: @sdkjson.Presence::from_option(content),
     private_routing,
     type_,
     comment_modified_on,
@@ -9259,13 +9259,13 @@ pub extend DnsRecordResponseAAAA with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseAAAA with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("content", self.content)
   .opt("private_routing", self.private_routing)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
@@ -9287,13 +9287,13 @@ pub extend DnsRecordResponseAAAA with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseAAAA with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
+    content: @sdkjson.presence_field(obj, "content", path),
     private_routing: @sdkjson.opt_field(obj, "private_routing", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
@@ -9423,13 +9423,13 @@ pub impl @json.FromJson for DnsRecordResponseCNAMEMeta with fn from_json(
 /// Generated representation of DnsRecordResponseCNAME.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseCNAME {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordResponseCNAMESettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordResponseCNAMESettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @sdkjson.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -9467,13 +9467,13 @@ pub fn DnsRecordResponseCNAME::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseCNAME {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
+    content: @sdkjson.Presence::from_option(content),
     type_,
     comment_modified_on,
     created_on,
@@ -9493,13 +9493,13 @@ pub extend DnsRecordResponseCNAME with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseCNAME with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("content", self.content)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -9523,13 +9523,13 @@ pub impl @json.FromJson for DnsRecordResponseCNAME with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
+    content: @sdkjson.presence_field(obj, "content", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -9611,13 +9611,13 @@ pub impl @json.FromJson for DnsRecordResponseMXMeta with fn from_json(
 /// Generated representation of DnsRecordResponseMX.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseMX {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @sdkjson.Presence[String]
   priority : Int32?
   type_ : String
   comment_modified_on : String?
@@ -9657,13 +9657,13 @@ pub fn DnsRecordResponseMX::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseMX {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
+    content: @sdkjson.Presence::from_option(content),
     priority,
     type_,
     comment_modified_on,
@@ -9684,13 +9684,13 @@ pub extend DnsRecordResponseMX with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseMX with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("content", self.content)
   .opt("priority", self.priority)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
@@ -9712,13 +9712,13 @@ pub extend DnsRecordResponseMX with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseMX with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
+    content: @sdkjson.presence_field(obj, "content", path),
     priority: @sdkjson.opt_field(obj, "priority", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
@@ -9801,13 +9801,13 @@ pub impl @json.FromJson for DnsRecordResponseNSMeta with fn from_json(
 /// Generated representation of DnsRecordResponseNS.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseNS {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @sdkjson.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -9845,13 +9845,13 @@ pub fn DnsRecordResponseNS::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseNS {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
+    content: @sdkjson.Presence::from_option(content),
     type_,
     comment_modified_on,
     created_on,
@@ -9871,13 +9871,13 @@ pub extend DnsRecordResponseNS with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseNS with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("content", self.content)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -9898,13 +9898,13 @@ pub extend DnsRecordResponseNS with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseNS with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
+    content: @sdkjson.presence_field(obj, "content", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -10174,13 +10174,13 @@ pub impl @json.FromJson for DnsRecordResponsePTRMeta with fn from_json(
 /// Generated representation of DnsRecordResponsePTR.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponsePTR {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @sdkjson.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -10218,13 +10218,13 @@ pub fn DnsRecordResponsePTR::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponsePTR {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
+    content: @sdkjson.Presence::from_option(content),
     type_,
     comment_modified_on,
     created_on,
@@ -10244,13 +10244,13 @@ pub extend DnsRecordResponsePTR with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponsePTR with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("content", self.content)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -10271,13 +10271,13 @@ pub extend DnsRecordResponsePTR with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponsePTR with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
+    content: @sdkjson.presence_field(obj, "content", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -10359,13 +10359,13 @@ pub impl @json.FromJson for DnsRecordResponseTXTMeta with fn from_json(
 /// Generated representation of DnsRecordResponseTXT.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseTXT {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
+  content : @sdkjson.Presence[String]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -10403,13 +10403,13 @@ pub fn DnsRecordResponseTXT::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseTXT {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
+    content: @sdkjson.Presence::from_option(content),
     type_,
     comment_modified_on,
     created_on,
@@ -10429,13 +10429,13 @@ pub extend DnsRecordResponseTXT with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseTXT with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("content", self.content)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -10456,13 +10456,13 @@ pub extend DnsRecordResponseTXT with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseTXT with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
+    content: @sdkjson.presence_field(obj, "content", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -10603,14 +10603,14 @@ pub impl @json.FromJson for DnsRecordResponseCAAMeta with fn from_json(
 /// Generated representation of DnsRecordResponseCAA.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseCAA {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseCAAData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseCAAData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -10649,14 +10649,14 @@ pub fn DnsRecordResponseCAA::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseCAA {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -10676,14 +10676,14 @@ pub extend DnsRecordResponseCAA with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseCAA with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -10704,14 +10704,14 @@ pub extend DnsRecordResponseCAA with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseCAA with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -10856,14 +10856,14 @@ pub impl @json.FromJson for DnsRecordResponseCERTMeta with fn from_json(
 /// Generated representation of DnsRecordResponseCERT.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseCERT {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseCERTData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseCERTData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -10902,14 +10902,14 @@ pub fn DnsRecordResponseCERT::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseCERT {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -10929,14 +10929,14 @@ pub extend DnsRecordResponseCERT with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseCERT with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -10957,14 +10957,14 @@ pub extend DnsRecordResponseCERT with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseCERT with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -11109,14 +11109,14 @@ pub impl @json.FromJson for DnsRecordResponseDNSKEYMeta with fn from_json(
 /// Generated representation of DnsRecordResponseDNSKEY.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseDNSKEY {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseDNSKEYData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseDNSKEYData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -11155,14 +11155,14 @@ pub fn DnsRecordResponseDNSKEY::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseDNSKEY {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -11182,14 +11182,14 @@ pub extend DnsRecordResponseDNSKEY with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseDNSKEY with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -11213,14 +11213,14 @@ pub impl @json.FromJson for DnsRecordResponseDNSKEY with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -11365,14 +11365,14 @@ pub impl @json.FromJson for DnsRecordResponseDSMeta with fn from_json(
 /// Generated representation of DnsRecordResponseDS.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseDS {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseDSData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseDSData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -11411,14 +11411,14 @@ pub fn DnsRecordResponseDS::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseDS {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -11438,14 +11438,14 @@ pub extend DnsRecordResponseDS with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseDS with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -11466,14 +11466,14 @@ pub extend DnsRecordResponseDS with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseDS with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -11614,14 +11614,14 @@ pub impl @json.FromJson for DnsRecordResponseHTTPSMeta with fn from_json(
 /// Generated representation of DnsRecordResponseHTTPS.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseHTTPS {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseHTTPSData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseHTTPSData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -11660,14 +11660,14 @@ pub fn DnsRecordResponseHTTPS::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseHTTPS {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -11687,14 +11687,14 @@ pub extend DnsRecordResponseHTTPS with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseHTTPS with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -11718,14 +11718,14 @@ pub impl @json.FromJson for DnsRecordResponseHTTPS with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -12029,14 +12029,14 @@ pub impl @json.FromJson for DnsRecordResponseLOCMeta with fn from_json(
 /// Generated representation of DnsRecordResponseLOC.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseLOC {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseLOCData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseLOCData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -12075,14 +12075,14 @@ pub fn DnsRecordResponseLOC::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseLOC {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -12102,14 +12102,14 @@ pub extend DnsRecordResponseLOC with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseLOC with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -12130,14 +12130,14 @@ pub extend DnsRecordResponseLOC with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseLOC with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -12290,14 +12290,14 @@ pub impl @json.FromJson for DnsRecordResponseNAPTRMeta with fn from_json(
 /// Generated representation of DnsRecordResponseNAPTR.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseNAPTR {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseNAPTRData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseNAPTRData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -12336,14 +12336,14 @@ pub fn DnsRecordResponseNAPTR::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseNAPTR {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -12363,14 +12363,14 @@ pub extend DnsRecordResponseNAPTR with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseNAPTR with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -12394,14 +12394,14 @@ pub impl @json.FromJson for DnsRecordResponseNAPTR with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -12546,14 +12546,14 @@ pub impl @json.FromJson for DnsRecordResponseSMIMEAMeta with fn from_json(
 /// Generated representation of DnsRecordResponseSMIMEA.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSMIMEA {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSMIMEAData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseSMIMEAData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -12592,14 +12592,14 @@ pub fn DnsRecordResponseSMIMEA::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseSMIMEA {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -12619,14 +12619,14 @@ pub extend DnsRecordResponseSMIMEA with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseSMIMEA with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -12650,14 +12650,14 @@ pub impl @json.FromJson for DnsRecordResponseSMIMEA with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -12802,14 +12802,14 @@ pub impl @json.FromJson for DnsRecordResponseSRVMeta with fn from_json(
 /// Generated representation of DnsRecordResponseSRV.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSRV {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSRVData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseSRVData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -12848,14 +12848,14 @@ pub fn DnsRecordResponseSRV::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseSRV {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -12875,14 +12875,14 @@ pub extend DnsRecordResponseSRV with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseSRV with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -12903,14 +12903,14 @@ pub extend DnsRecordResponseSRV with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseSRV with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -13051,14 +13051,14 @@ pub impl @json.FromJson for DnsRecordResponseSSHFPMeta with fn from_json(
 /// Generated representation of DnsRecordResponseSSHFP.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSSHFP {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSSHFPData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseSSHFPData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -13097,14 +13097,14 @@ pub fn DnsRecordResponseSSHFP::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseSSHFP {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -13124,14 +13124,14 @@ pub extend DnsRecordResponseSSHFP with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseSSHFP with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -13155,14 +13155,14 @@ pub impl @json.FromJson for DnsRecordResponseSSHFP with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -13303,14 +13303,14 @@ pub impl @json.FromJson for DnsRecordResponseSVCBMeta with fn from_json(
 /// Generated representation of DnsRecordResponseSVCB.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseSVCB {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseSVCBData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseSVCBData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -13349,14 +13349,14 @@ pub fn DnsRecordResponseSVCB::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseSVCB {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -13376,14 +13376,14 @@ pub extend DnsRecordResponseSVCB with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseSVCB with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -13404,14 +13404,14 @@ pub extend DnsRecordResponseSVCB with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseSVCB with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -13556,14 +13556,14 @@ pub impl @json.FromJson for DnsRecordResponseTLSAMeta with fn from_json(
 /// Generated representation of DnsRecordResponseTLSA.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseTLSA {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseTLSAData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseTLSAData]
   type_ : String
   comment_modified_on : String?
   created_on : String
@@ -13602,14 +13602,14 @@ pub fn DnsRecordResponseTLSA::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseTLSA {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     type_,
     comment_modified_on,
     created_on,
@@ -13629,14 +13629,14 @@ pub extend DnsRecordResponseTLSA with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseTLSA with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
   .field("created_on", self.created_on)
@@ -13657,14 +13657,14 @@ pub extend DnsRecordResponseTLSA with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseTLSA with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
     created_on: required_field(obj, "created_on", path),
@@ -13801,14 +13801,14 @@ pub impl @json.FromJson for DnsRecordResponseURIMeta with fn from_json(
 /// Generated representation of DnsRecordResponseURI.
 #derive(Eq, @debug.Debug)
 pub(all) struct DnsRecordResponseURI {
-  comment : String?
+  comment : @sdkjson.Presence[String]
   name : String
-  proxied : Bool?
-  settings : DnsRecordSettings?
-  tags : Array[String]?
+  proxied : @sdkjson.Presence[Bool]
+  settings : @sdkjson.Presence[DnsRecordSettings]
+  tags : @sdkjson.Presence[Array[String]]
   ttl : Int32
-  content : String?
-  data : DnsRecordResponseURIData?
+  content : @sdkjson.Presence[String]
+  data : @sdkjson.Presence[DnsRecordResponseURIData]
   priority : Int32?
   type_ : String
   comment_modified_on : String?
@@ -13849,14 +13849,14 @@ pub fn DnsRecordResponseURI::new(
   tags_modified_on? : String,
 ) -> DnsRecordResponseURI {
   {
-    comment,
+    comment: @sdkjson.Presence::from_option(comment),
     name,
-    proxied,
-    settings,
-    tags,
+    proxied: @sdkjson.Presence::from_option(proxied),
+    settings: @sdkjson.Presence::from_option(settings),
+    tags: @sdkjson.Presence::from_option(tags),
     ttl,
-    content,
-    data,
+    content: @sdkjson.Presence::from_option(content),
+    data: @sdkjson.Presence::from_option(data),
     priority,
     type_,
     comment_modified_on,
@@ -13877,14 +13877,14 @@ pub extend DnsRecordResponseURI with ToJson::{to_json}
 ///|
 pub impl ToJson for DnsRecordResponseURI with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("comment", nullable_presence(self.comment.map(value => value)))
+  .presence("comment", self.comment)
   .field("name", self.name)
-  .presence("proxied", nullable_presence(self.proxied.map(value => value)))
-  .presence("settings", nullable_presence(self.settings.map(value => value)))
-  .presence("tags", nullable_presence(self.tags.map(value => value)))
+  .presence("proxied", self.proxied)
+  .presence("settings", self.settings)
+  .presence("tags", self.tags)
   .field("ttl", self.ttl)
-  .presence("content", nullable_presence(self.content.map(value => value)))
-  .presence("data", nullable_presence(self.data.map(value => value)))
+  .presence("content", self.content)
+  .presence("data", self.data)
   .opt("priority", self.priority)
   .field("type", self.type_)
   .opt("comment_modified_on", self.comment_modified_on)
@@ -13906,14 +13906,14 @@ pub extend DnsRecordResponseURI with @json.FromJson::{from_json}
 pub impl @json.FromJson for DnsRecordResponseURI with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    comment: decode_nullable_field(obj, "comment", path),
+    comment: @sdkjson.presence_field(obj, "comment", path),
     name: required_field(obj, "name", path),
-    proxied: decode_nullable_field(obj, "proxied", path),
-    settings: decode_nullable_field(obj, "settings", path),
-    tags: decode_nullable_field(obj, "tags", path),
+    proxied: @sdkjson.presence_field(obj, "proxied", path),
+    settings: @sdkjson.presence_field(obj, "settings", path),
+    tags: @sdkjson.presence_field(obj, "tags", path),
     ttl: required_field(obj, "ttl", path),
-    content: decode_nullable_field(obj, "content", path),
-    data: decode_nullable_field(obj, "data", path),
+    content: @sdkjson.presence_field(obj, "content", path),
+    data: @sdkjson.presence_field(obj, "data", path),
     priority: @sdkjson.opt_field(obj, "priority", path),
     type_: required_field(obj, "type", path),
     comment_modified_on: @sdkjson.opt_field(obj, "comment_modified_on", path),
@@ -14964,7 +14964,7 @@ pub impl @json.FromJson for ZoneMode with fn from_json(value, path) {
 /// Generated representation of InternalDnsResponse.
 #derive(Eq, @debug.Debug)
 pub(all) struct InternalDnsResponse {
-  reference_zone_id : String
+  reference_zone_id : String?
 }
 
 ///|
@@ -14977,7 +14977,7 @@ pub extend InternalDnsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a InternalDnsResponse with omitted optional fields absent.
 pub fn InternalDnsResponse::new(
-  reference_zone_id~ : String,
+  reference_zone_id? : String,
 ) -> InternalDnsResponse {
   { reference_zone_id, }
 }
@@ -14990,7 +14990,7 @@ pub extend InternalDnsResponse with ToJson::{to_json}
 ///|
 pub impl ToJson for InternalDnsResponse with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .field("reference_zone_id", self.reference_zone_id)
+  .opt("reference_zone_id", self.reference_zone_id)
   .build()
 }
 
@@ -15002,7 +15002,7 @@ pub extend InternalDnsResponse with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for InternalDnsResponse with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { reference_zone_id: required_field(obj, "reference_zone_id", path), }
+  { reference_zone_id: @sdkjson.opt_field(obj, "reference_zone_id", path), }
 }
 
 ///|
@@ -15010,13 +15010,13 @@ pub impl @json.FromJson for InternalDnsResponse with fn from_json(value, path) {
 /// Generated representation of Soa.
 #derive(Eq, @debug.Debug)
 pub(all) struct Soa {
-  expire : Int32
-  min_ttl : Int32
-  mname : String?
-  refresh : Int32
-  retry : Int32
-  rname : String
-  ttl : Int32
+  expire : Int32?
+  min_ttl : Int32?
+  mname : @sdkjson.Presence[String]
+  refresh : Int32?
+  retry : Int32?
+  rname : String?
+  ttl : Int32?
 }
 
 ///|
@@ -15029,15 +15029,23 @@ pub extend Soa with @debug.Debug::{to_repr}
 ///
 /// Creates a Soa with omitted optional fields absent.
 pub fn Soa::new(
-  expire~ : Int32,
-  min_ttl~ : Int32,
-  refresh~ : Int32,
-  retry~ : Int32,
-  rname~ : String,
-  ttl~ : Int32,
+  expire? : Int32,
+  min_ttl? : Int32,
   mname? : String,
+  refresh? : Int32,
+  retry? : Int32,
+  rname? : String,
+  ttl? : Int32,
 ) -> Soa {
-  { expire, min_ttl, mname, refresh, retry, rname, ttl, }
+  {
+    expire,
+    min_ttl,
+    mname: @sdkjson.Presence::from_option(mname),
+    refresh,
+    retry,
+    rname,
+    ttl,
+  }
 }
 
 ///|
@@ -15048,13 +15056,13 @@ pub extend Soa with ToJson::{to_json}
 ///|
 pub impl ToJson for Soa with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .field("expire", self.expire)
-  .field("min_ttl", self.min_ttl)
-  .presence("mname", nullable_presence(self.mname.map(value => value)))
-  .field("refresh", self.refresh)
-  .field("retry", self.retry)
-  .field("rname", self.rname)
-  .field("ttl", self.ttl)
+  .opt("expire", self.expire)
+  .opt("min_ttl", self.min_ttl)
+  .presence("mname", self.mname)
+  .opt("refresh", self.refresh)
+  .opt("retry", self.retry)
+  .opt("rname", self.rname)
+  .opt("ttl", self.ttl)
   .build()
 }
 
@@ -15067,13 +15075,13 @@ pub extend Soa with @json.FromJson::{from_json}
 pub impl @json.FromJson for Soa with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    expire: required_field(obj, "expire", path),
-    min_ttl: required_field(obj, "min_ttl", path),
-    mname: decode_nullable_field(obj, "mname", path),
-    refresh: required_field(obj, "refresh", path),
-    retry: required_field(obj, "retry", path),
-    rname: required_field(obj, "rname", path),
-    ttl: required_field(obj, "ttl", path),
+    expire: @sdkjson.opt_field(obj, "expire", path),
+    min_ttl: @sdkjson.opt_field(obj, "min_ttl", path),
+    mname: @sdkjson.presence_field(obj, "mname", path),
+    refresh: @sdkjson.opt_field(obj, "refresh", path),
+    retry: @sdkjson.opt_field(obj, "retry", path),
+    rname: @sdkjson.opt_field(obj, "rname", path),
+    ttl: @sdkjson.opt_field(obj, "ttl", path),
   }
 }
 
@@ -16386,7 +16394,7 @@ pub impl @json.FromJson for ZoneTenantUnit with fn from_json(value, path) {
 #derive(Eq, @debug.Debug)
 pub(all) struct Zone {
   account : ZoneAccount
-  activated_on : String?
+  activated_on : @sdkjson.Presence[String]
   cname_suffix : String?
   created_on : String
   development_mode : Int32
@@ -16395,9 +16403,9 @@ pub(all) struct Zone {
   modified_on : String
   name : String
   name_servers : Array[String]
-  original_dnshost : String?
-  original_name_servers : Array[String]?
-  original_registrar : String?
+  original_dnshost : @sdkjson.Presence[String]
+  original_name_servers : @sdkjson.Presence[Array[String]]
+  original_registrar : @sdkjson.Presence[String]
   owner : ZoneOwner
   paused : Bool?
   permissions : Array[String]?
@@ -16446,7 +16454,7 @@ pub fn Zone::new(
 ) -> Zone {
   {
     account,
-    activated_on,
+    activated_on: @sdkjson.Presence::from_option(activated_on),
     cname_suffix,
     created_on,
     development_mode,
@@ -16455,9 +16463,9 @@ pub fn Zone::new(
     modified_on,
     name,
     name_servers,
-    original_dnshost,
-    original_name_servers,
-    original_registrar,
+    original_dnshost: @sdkjson.Presence::from_option(original_dnshost),
+    original_name_servers: @sdkjson.Presence::from_option(original_name_servers),
+    original_registrar: @sdkjson.Presence::from_option(original_registrar),
     owner,
     paused,
     permissions,
@@ -16480,10 +16488,7 @@ pub extend Zone with ToJson::{to_json}
 pub impl ToJson for Zone with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("account", self.account)
-  .presence(
-    "activated_on",
-    nullable_presence(self.activated_on.map(value => value)),
-  )
+  .presence("activated_on", self.activated_on)
   .opt("cname_suffix", self.cname_suffix)
   .field("created_on", self.created_on)
   .field("development_mode", self.development_mode)
@@ -16492,18 +16497,9 @@ pub impl ToJson for Zone with fn to_json(self) {
   .field("modified_on", self.modified_on)
   .field("name", self.name)
   .field("name_servers", self.name_servers)
-  .presence(
-    "original_dnshost",
-    nullable_presence(self.original_dnshost.map(value => value)),
-  )
-  .presence(
-    "original_name_servers",
-    nullable_presence(self.original_name_servers.map(value => value)),
-  )
-  .presence(
-    "original_registrar",
-    nullable_presence(self.original_registrar.map(value => value)),
-  )
+  .presence("original_dnshost", self.original_dnshost)
+  .presence("original_name_servers", self.original_name_servers)
+  .presence("original_registrar", self.original_registrar)
   .field("owner", self.owner)
   .opt("paused", self.paused)
   .opt("permissions", self.permissions)
@@ -16527,7 +16523,7 @@ pub impl @json.FromJson for Zone with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     account: required_field(obj, "account", path),
-    activated_on: decode_nullable_field(obj, "activated_on", path),
+    activated_on: @sdkjson.presence_field(obj, "activated_on", path),
     cname_suffix: @sdkjson.opt_field(obj, "cname_suffix", path),
     created_on: required_field(obj, "created_on", path),
     development_mode: required_field(obj, "development_mode", path),
@@ -16536,11 +16532,11 @@ pub impl @json.FromJson for Zone with fn from_json(value, path) {
     modified_on: required_field(obj, "modified_on", path),
     name: required_field(obj, "name", path),
     name_servers: required_field(obj, "name_servers", path),
-    original_dnshost: decode_nullable_field(obj, "original_dnshost", path),
-    original_name_servers: decode_nullable_field(
+    original_dnshost: @sdkjson.presence_field(obj, "original_dnshost", path),
+    original_name_servers: @sdkjson.presence_field(
       obj, "original_name_servers", path,
     ),
-    original_registrar: decode_nullable_field(obj, "original_registrar", path),
+    original_registrar: @sdkjson.presence_field(obj, "original_registrar", path),
     owner: required_field(obj, "owner", path),
     paused: @sdkjson.opt_field(obj, "paused", path),
     permissions: @sdkjson.opt_field(obj, "permissions", path),

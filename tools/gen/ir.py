@@ -1355,6 +1355,15 @@ class IRBuilder:
         groups: dict[str, list[int]] = {}
         for position, (tag, _, _) in enumerate(entries):
             groups.setdefault(tag, []).append(position)
+        required_by_tag = schema.get("x-moonbit-required-fields-by-tag", {})
+        if not isinstance(required_by_tag, dict) or any(
+            len(groups.get(tag, ())) != 1 or not isinstance(fields, list)
+            or not fields or not all(isinstance(field, str) and field for field in fields)
+            for tag, fields in required_by_tag.items()
+        ):
+            self.add_diag(pointer, "invalid required fields by union tag",
+                          "map an unambiguous discriminator tag to a nonempty field list")
+            return TypeRef("Json")
         secondary: dict[int, tuple[str, str]] = {}
         required_fields: dict[int, tuple[str, ...]] = {}
         group_order: dict[str, list[int]] = {}
@@ -1498,13 +1507,23 @@ class IRBuilder:
             if second_name is not None:
                 preserved.add(second_name)
             tag_optional = self._discriminator_optional(choice, property_name)
-            # A response can share a branch with a write body while allowing
-            # null in fields the server cannot populate for some records.
+            # Refine the union's copy of the branch so other uses of the
+            # referenced schema keep their original presence constraints.
+            overrides: dict[str, Any] = {}
             if nullable_fields and properties is not None:
                 nullable_overrides = {field: dict(properties[field], nullable=True)
                                       for field in nullable_fields if field in properties and field not in preserved}
                 if nullable_overrides:
-                    choice = {"type": "object", "allOf": [choice, {"properties": nullable_overrides}]}
+                    overrides["properties"] = nullable_overrides
+            if tag in required_by_tag:
+                required_overrides = required_by_tag[tag]
+                if set(required_overrides) <= (properties or {}).keys() - preserved:
+                    overrides.update(type="object", required=required_overrides)
+                else:
+                    self.add_diag(pointer, f"invalid required fields for union tag {tag!r}",
+                                  "require only fields present in the branch besides the discriminator")
+            if overrides:
+                choice = {"type": "object", "allOf": [choice, overrides]}
             item_type = self.compile_type(
                 choice,
                 name + variant_name,

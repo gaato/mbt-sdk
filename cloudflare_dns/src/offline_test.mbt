@@ -70,6 +70,15 @@ test "DNS record pages retain nullable record response fields" {
     }
     @json.Json::object(fields)
   }
+  let omit_optional_record_fields = fn() {
+    let fixture = record_fixture({ "type": "SRV" })
+    guard fixture is Object(fields) else { abort("expected a record object") }
+    let fields = fields.copy()
+    for key in ["comment", "content", "data", "proxied", "settings", "tags"] {
+      fields.remove(key)
+    }
+    @json.Json::object(fields)
+  }
   let backend = @client.from_fn((_, _) => {
     json_reply({
       "success": true,
@@ -78,6 +87,7 @@ test "DNS record pages retain nullable record response fields" {
           "comment", "proxied", "settings", "tags", "comment_modified_on",
         ]),
         nullable_record("SRV", ["content", "data", "tags_modified_on"]),
+        omit_optional_record_fields(),
       ],
       "result_info": { "page": 1, "total_pages": 1 },
     })
@@ -92,7 +102,13 @@ test "DNS record pages retain nullable record response fields" {
     let first = pages.next_page()
     guard first
       is Ok(
-        Some([@gen.DnsRecordResponse::A(a), @gen.DnsRecordResponse::SRV(srv)]),
+        Some(
+          [
+            @gen.DnsRecordResponse::A(a),
+            @gen.DnsRecordResponse::SRV(srv),
+            @gen.DnsRecordResponse::SRV(omitted),
+          ],
+        ),
       ) else {
       fail(@debug.to_string(first))
     }
@@ -107,6 +123,12 @@ test "DNS record pages retain nullable record response fields" {
       },
     )
     assert_true(Json(srv) is { "content": Null, "data": Null, .. })
+    assert_true(omitted.comment is Absent)
+    assert_true(omitted.content is Absent)
+    assert_true(omitted.data is Absent)
+    assert_true(omitted.proxied is Absent)
+    assert_true(omitted.settings is Absent)
+    assert_true(omitted.tags is Absent)
     assert_true(pages.next_page() is Ok(None))
   })
 }
