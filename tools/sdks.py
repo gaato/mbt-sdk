@@ -20,7 +20,8 @@ ARRAYS = 'census_args offline_packages'.split()
 OPTIONAL = {'command', 'report_census_args', 'base_url', 'auth', 'base_url_reason',
             'base_url_spec', 'auth_reason', 'auth_spec', 'client_layer', 'extra_imports',
             'operation_wrappers', 'retry', 'idempotency_headers', 'behavior_note', 'server_urls',
-            'timeout_ms', 'total_timeout_ms', 'selection'}
+            'timeout_ms', 'total_timeout_ms', 'selection', 'rate_limit_prefix', 'legacy_generic_stream',
+            'legacy_multipart_boundary'}
 
 
 def require(ok, message):
@@ -46,6 +47,8 @@ def validate_sdk(sdk, seen=None):
     sdk.setdefault('client_layer', False)
     require(type(sdk['client_layer']) is bool, f'{label}: client_layer must be boolean')
     require(type(sdk.get('operation_wrappers', True)) is bool, f'{label}: operation_wrappers must be boolean')
+    require(type(sdk.get('legacy_generic_stream', False)) is bool, f'{label}: legacy_generic_stream must be boolean')
+    require(type(sdk.get('legacy_multipart_boundary', False)) is bool, f'{label}: legacy_multipart_boundary must be boolean')
     for key in ('extra_imports', 'idempotency_headers', 'server_urls'):
         require(isinstance(sdk.get(key, []), list) and all(isinstance(v, str) and v.strip() for v in sdk.get(key, [])), f'{label}: invalid {key}')
     if sdk['client_layer']:
@@ -66,7 +69,7 @@ def validate_sdk(sdk, seen=None):
     require(sdk['spec_fetch'] in ('plain', 'gzip'), f'{label}: invalid spec_fetch')
     require(not sdk['spec_watch'] or (sdk['generator'] in ('openapi', 'discovery') and sdk['spec_url'].startswith('https://')),
             f'{label}: spec_watch needs an OpenAPI or Discovery HTTPS source')
-    for key in ('base_url', 'base_url_reason', 'auth_reason', 'base_url_spec'):
+    for key in ('base_url', 'base_url_reason', 'auth_reason', 'base_url_spec', 'rate_limit_prefix'):
         if key in sdk:
             require(isinstance(sdk[key], str) and sdk[key].strip(), f'{label}: {key} must be nonempty')
     if 'auth' in sdk:
@@ -128,22 +131,33 @@ def spec_groups(sdks):
 def validate_auth(auth, label):
     require(isinstance(auth, dict), f'{label}: invalid auth')
     kind = auth.get('kind')
-    require(kind in ('none', 'bearer', 'basic', 'header', 'query', 'alternatives'), f'{label}: invalid auth kind')
+    require(kind in ('none', 'bearer', 'basic', 'header', 'query', 'header_bundle', 'alternatives'), f'{label}: invalid auth kind')
     if kind == 'alternatives':
         require(set(auth) == {'kind', 'schemes'} and isinstance(auth['schemes'], list) and len(auth['schemes']) >= 2, f'{label}: invalid auth alternatives')
         for scheme in auth['schemes']:
             require(scheme.get('kind') != 'alternatives', f'{label}: nested auth alternatives')
             validate_auth(scheme, label)
     else:
-        require(set(auth) == ({'kind', 'name'} if kind in ('header', 'query') else {'kind'}), f'{label}: unknown/missing auth keys')
+        keys = {'kind'} | ({'name'} if kind in ('header', 'query') else {'headers'} if kind == 'header_bundle' else set())
+        require(set(auth) - {'variant'} == keys, f'{label}: unknown/missing auth keys')
+        if 'variant' in auth:
+            require(isinstance(auth['variant'], str) and re.fullmatch(r'[A-Z][A-Za-z0-9]*', auth['variant']), f'{label}: invalid auth variant')
         if kind in ('header', 'query'):
             require(isinstance(auth['name'], str) and auth['name'].strip(), f'{label}: empty auth name')
+        if kind == 'header_bundle':
+            headers = auth['headers']
+            require(isinstance(headers, dict) and len(headers) >= 2 and
+                    all(re.fullmatch(r'[a-z][a-z0-9_]*', field) and isinstance(header, str) and
+                        re.fullmatch(r"[!#$%&'*+.\^_`|~0-9A-Za-z-]+", header)
+                        for field, header in headers.items()) and
+                    len({header.lower() for header in headers.values()}) == len(headers),
+                    f'{label}: invalid auth header bundle')
 
 
 def validate_retry(retry, label):
     if retry is None:
         return
-    allowed = {'retries', 'methods', 'statuses', 'status_overrides', 'sent_failures', 'unprocessed_failures', 'override_header', 'retry_after', 'retry_after_cap_ms', 'retry_after_cap', 'zero_means_backoff', 'backoff_base_ms', 'backoff_max_ms', 'jitter'}
+    allowed = {'retries', 'methods', 'statuses', 'status_overrides', 'sent_failures', 'unprocessed_failures', 'override_header', 'retry_after', 'retry_after_cap_ms', 'retry_after_cap', 'zero_means_backoff', 'backoff_base_ms', 'backoff_max_ms', 'jitter', 'guard_response_retries'}
     require(isinstance(retry, dict) and not set(retry) - allowed, f'{label}: unknown retry fields')
     for key in ('retries', 'backoff_base_ms', 'backoff_max_ms'):
         if key in retry:
@@ -153,11 +167,14 @@ def validate_retry(retry, label):
         require(value in ('idempotent', 'any', 'never') if isinstance(value, str) else isinstance(value, list) and all(v in ('GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'POST', 'PATCH') for v in value), f'{label}: invalid retry {key}')
     for status in retry.get('statuses', []):
         require((type(status) is int and 100 <= status <= 599) or (isinstance(status, list) and len(status) == 2 and all(type(s) is int for s in status) and 100 <= status[0] <= status[1] <= 599), f'{label}: invalid retry status')
-    require(isinstance(retry.get('status_overrides', []), list), f'{label}: status_overrides must be an array')
-    for rule in retry.get('status_overrides', []):
-        require(isinstance(rule, dict) and set(rule) == {'methods', 'statuses'}, f'{label}: invalid status override')
-        require(isinstance(rule['methods'], list) and bool(rule['methods']) and isinstance(rule['statuses'], list) and bool(rule['statuses']), f'{label}: status override requires methods and statuses arrays')
-        validate_retry(rule, label)
+    for field in ('status_overrides', 'guard_response_retries'):
+        require(isinstance(retry.get(field, []), list), f'{label}: {field} must be an array')
+        for rule in retry.get(field, []):
+            require(isinstance(rule, dict) and set(rule) == {'methods', 'statuses'} and
+                    isinstance(rule['methods'], list) and bool(rule['methods']) and
+                    isinstance(rule['statuses'], list) and bool(rule['statuses']),
+                    f'{label}: {field} requires methods and statuses arrays')
+            validate_retry(rule, label)
     require(retry.get('retry_after', 'ms_then_header') in ('ignore', 'header', 'ms_then_header'), f'{label}: invalid retry_after')
     cap = retry.get('retry_after_cap_ms', 60000)
     require(cap == 'none' or type(cap) is int and 0 <= cap <= 2147483647, f'{label}: invalid retry cap')

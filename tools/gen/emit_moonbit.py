@@ -413,7 +413,11 @@ def _tagged_union(declaration: TaggedUnion) -> str:
     lines.extend(_doc("Encodes this tagged union as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
     lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  match self {"])
-    lines.extend(f"    {declaration.name}::{variant.name}(value) => {_to_json(variant.type, 'value')}" for variant in declaration.variants)
+    for variant in declaration.variants:
+        value = _to_json(variant.type, 'value')
+        if declaration.encode_inferred_tag:
+            value = f'encode_inferred_tag({value}, {_moon_string(declaration.discriminator)}, {_moon_string(variant.tag)})'
+        lines.append(f"    {declaration.name}::{variant.name}(value) => {value}")
     lines.extend([f"    {declaration.name}::{declaration.fallback}(_, value) => value", "  }", "}"])
     lines.extend(_doc("Decodes this tagged union from JSON.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
@@ -1036,7 +1040,7 @@ def _operation(operation: Operation, response_codec_name: str | None = None) -> 
         else:
             assert field.type is not None
             parameters.append(f"{field.moon_name} : {field.type.moon_type()}")
-    if operation.multipart_fields:
+    if operation.multipart_fields and not operation.auto_multipart_boundary:
         parameters.append(f"{local['boundary']} : String")
     parameters.extend(f"{parameter.moon_name}? : {parameter.type.moon_type()}" for parameter in optional)
     for field in optional_multipart:
@@ -1191,15 +1195,19 @@ def _operation(operation: Operation, response_codec_name: str | None = None) -> 
                     else:
                         assert field.type is not None
                         lines.append(f"  if {value} is Some(value) {{ {parts}.push(@multipart.Part::json({name}, {_to_json(field.type, 'value')})) }}")
-            boundary_arg = 'boundary~' if local['boundary'] == 'boundary' else 'boundary=' + local['boundary']
-            lines.append(f"  @multipart.body({request}, {parts}, {boundary_arg})")
+            if operation.auto_multipart_boundary:
+                lines.append(f"  multipart_with_boundary_({request}, {parts})")
+            else:
+                boundary_arg = 'boundary~' if local['boundary'] == 'boundary' else 'boundary=' + local['boundary']
+                lines.append(f"  @multipart.body({request}, {parts}, {boundary_arg})")
         else:
             lines.append(f"  {request}")
         lines.append("}")
     else:
         lines.extend([f"  {expression}", "}"])
     if operation.response_type is not None:
-        custom_response = _uses_string_integer(operation.response_type)
+        envelope = operation.response_envelope
+        custom_response = _uses_string_integer(operation.response_type) or bool(envelope)
         if custom_response:
             codec = response_codec_name or pascal_case(operation.moon_name) + "ResponseDecoder"
             # FromJson supplies the opaque JsonPath, including its root. A private
@@ -1207,8 +1215,31 @@ def _operation(operation: Operation, response_codec_name: str | None = None) -> 
             lines.extend([
                 "///|", f"priv struct {codec}({operation.response_type.moon_type()})",
                 "///|", f"impl @json.FromJson for {codec} with fn from_json(value, path) {{",
-                f"  {codec}::{codec}({_custom_from_json(operation.response_type, 'value', 'path')})", "}",
             ])
+            if envelope:
+                key = _moon_string(envelope)
+                has_result = operation.response_type.kind != 'Unit'
+                binding = 'fields' if has_result or operation.required_envelope_metadata else '_'
+                lines.append(f'  guard value is Object({binding}) else {{ raise path.error("response envelope must be an object") }}')
+                if has_result:
+                    lookup = f'@sdkjson.field(fields, {key}, path)'
+                    if operation.response_type.kind == 'optional' and not operation.response_result_required:
+                        lookup = f'fields.get({key}).unwrap_or(@json.Json::null())'
+                    lines.extend([f'  let value : Json = {lookup}', f'  let path = path.add_key({key})'])
+                else:
+                    for field, field_type in operation.required_envelope_metadata:
+                        lines.append(f'  let _ : {field_type} = @sdkjson.field(fields, {_moon_string(field)}, path)')
+            if envelope and operation.response_type.kind == 'Unit':
+                decoded = '()'
+            elif _uses_string_integer(operation.response_type):
+                decoded = _custom_from_json(operation.response_type, 'value', 'path')
+            elif envelope and operation.response_type.kind == 'optional':
+                # Wire nullability is null-or-value. Core Option's JSON codec
+                # expects a singleton array for a present value.
+                decoded = 'match value { Null => None; other => Some(@json.from_json(other, path~)) }'
+            else:
+                decoded = '@json.from_json(value, path~)'
+            lines.extend([f"  {codec}::{codec}({decoded})", "}"])
         json_decode_name = operation.moon_name + "_decode_json"
         lines.extend(_doc(f"Decodes a parsed successful {operation.operation_id} response.", ""))
         lines.extend(
@@ -1267,6 +1298,47 @@ fn normalize_resource_name(
     raise ValidationError(parameter~, message="resource name does not match " + pattern)
   }
   normalized
+}'''
+
+
+AUTO_MULTIPART_HELPER = r'''///|
+// A decimal prefix of an occurrence also blocks its shorter boundary.
+// Each scan advances beyond the marker, with at most 20 digit steps per match.
+fn multipart_conflicts_(bytes : Bytes, prefix : Bytes, conflicts : Map[UInt64, Unit]) -> Unit {
+  for offset = 0; offset < bytes.length(); {
+    guard bytes[offset:].find(prefix) is Some(index) else { break }
+    let digits = offset + index + prefix.length()
+    for i = digits, serial = 0UL; i < bytes.length(); {
+      let byte = bytes[i]
+      if byte < b'0' || byte > b'9' { break }
+      let digit = (byte.to_int() - b'0'.to_int()).to_uint64()
+      if serial > (18446744073709551615UL - digit) / 10UL { break }
+      let serial = serial * 10UL + digit
+      conflicts[serial] = ()
+      if serial == 0UL { break }
+      continue i + 1, serial
+    }
+    continue digits
+  }
+}
+
+///|
+// The facade builds buffered parts. Select the first unused suffix after
+// scanning the complete bytes of each part once.
+fn multipart_with_boundary_(request : @http.Request, parts : Array[@multipart.Part]) -> @http.Request raise @multipart.MultipartError {
+  let marker = "moonbit-sdk-"
+  let prefix = @http.encode_utf8(marker)
+  let conflicts : Map[UInt64, Unit] = Map([])
+  for part in parts {
+    if part.body is @http.Body::Bytes(bytes) {
+      multipart_conflicts_(bytes, prefix, conflicts)
+    }
+  }
+  for serial = 0UL; ; serial = serial + 1UL {
+    if !conflicts.contains(serial) {
+      return @multipart.body(request, parts, boundary=marker + serial.to_string())
+    }
+  }
 }'''
 
 
@@ -1490,6 +1562,16 @@ def emit(ir: IR) -> dict[str, str]:
         elif isinstance(declaration, Newtype):
             declarations.append(_newtype(declaration))
     helpers: list[str] = []
+    if any(isinstance(declaration, TaggedUnion) and declaration.encode_inferred_tag for declaration in ir.declarations):
+        helpers.append('''///|
+// The selected constructor supplies the tag even when the source declares it
+// optional on a referenced payload.
+fn encode_inferred_tag(value : Json, key : String, tag : String) -> Json {
+  guard value is Object(fields) else { abort("tagged payload must encode as an object") }
+  let fields = fields.copy()
+  fields[key] = Json(tag)
+  @json.Json::object(fields)
+}''')
     if needs_required_field:
         helpers.append(REQUIRED_FIELD_HELPER)
     if has_int64:
@@ -1565,7 +1647,7 @@ fn json_array_matches(
     used_names = {declaration.name for declaration in ir.declarations}
     for operation in ir.operations:
         codec = None
-        if operation.response_type is not None and _uses_string_integer(operation.response_type):
+        if operation.response_type is not None and (_uses_string_integer(operation.response_type) or operation.response_envelope):
             base = pascal_case(operation.moon_name) + "ResponseDecoder"
             codec = base
             index = 2
@@ -1575,6 +1657,8 @@ fn json_array_matches(
             used_names.add(codec)
         operation_sources.append(_operation(operation, response_codec_name=codec))
     operation_helpers: list[str] = []
+    if any(operation.auto_multipart_boundary for operation in ir.operations):
+        operation_helpers.append(AUTO_MULTIPART_HELPER)
     if any(parameter.resource_name for operation in ir.operations for parameter in operation.parameters):
         operation_helpers.append(RESOURCE_NAME_HELPER)
     if any(operation.parameters or operation.multipart_fields for operation in ir.operations):

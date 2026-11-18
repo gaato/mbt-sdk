@@ -1,0 +1,54 @@
+overlay: 1.0.0
+info:
+  title: Cloudflare DNS and Zones client conventions
+  version: 1.0.0
+actions:
+  - target: "$"
+    description: The REST API puts JSON successes in result and reports structured messages at the top level.
+    update:
+      x-moonbit-envelope: {result: result, success: success, errors: errors, messages: messages}
+      x-moonbit-operation-naming: fern
+      x-moonbit-require-auth: true
+      x-moonbit-nonraising-decoders: true
+  - target: "$.security"
+    description: Rewrite the alternating token, legacy two-header credential and deprecated service-key requirements.
+    remove: true
+  - target: "$.components.securitySchemes"
+    description: Model email and key as one credential using the two OpenAPI header schemes.
+    update:
+      api_token:
+        x-moonbit-auth-variant: ApiToken
+      global_api_key:
+        type: x-moonbit-header-bundle
+        x-moonbit-auth-variant: GlobalApiKey
+        headers: {email: X-Auth-Email, key: X-Auth-Key}
+  - target: "$"
+    description: The token and legacy global key are alternatives. Service keys stopped working in September 2026.
+    update:
+      security: [{api_token: []}, {global_api_key: []}]
+  - target: >-
+      $['paths']['/zones','/zones/{zone_id}','/zones/{zone_id}/activation_check','/zones/{zone_id}/dns_records','/zones/{zone_id}/dns_records/batch','/zones/{zone_id}/dns_records/export','/zones/{zone_id}/dns_records/import','/zones/{zone_id}/dns_records/scan/review','/zones/{zone_id}/dns_records/scan/trigger','/zones/{zone_id}/dns_records/{dns_record_id}','/zones/{zone_id}/dns_settings','/zones/{zone_id}/dnssec'][?@.security].security
+    description: Inherit the reviewed alternatives. The upstream pair is one credential, and three-way AND requirements in the feed are defective.
+    remove: true
+  - target: "$.paths['/zones','/zones/{zone_id}/dns_records'].get"
+    description: The two collections use page and per_page with result_info.total_pages when returned.
+    update:
+      x-moonbit-paginate: {kind: page, param: page, items: result, next: result_info.total_pages}
+  - target: "$.paths['/zones/{zone_id}/activation_check'].put"
+    description: Use the intent of the documented activation-check trigger.
+    update:
+      x-moonbit-name: trigger_zone_activation_check
+  - target: "$.paths['/zones/{zone_id}/dns_records/import'].post.requestBody.content['multipart/form-data'].schema.properties.proxied"
+    description: The multipart wire values true and false represent one boolean.
+    update:
+      type: boolean
+      default: false
+      example: true
+  - target: "$.paths['/zones/{zone_id}/dns_records/export'].get"
+    description: Request the documented BIND text variant.
+    update:
+      x-moonbit-text-accept: text/plain
+  - target: "$.components.schemas['dns-records_dns-record-response']"
+    description: Cloudflare can return null for unpopulated record fields. Apply the nullable fields to response branches only, because requests share their source schemas.
+    update:
+      x-moonbit-nullable-fields: [comment, content, data, proxied, settings, tags]

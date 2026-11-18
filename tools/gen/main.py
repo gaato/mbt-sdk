@@ -138,13 +138,14 @@ def run(argv: list[str] | None = None) -> int:
         auth_headers = set()
         if args.client_sdk:
             from tools import sdks
-            from tools.gen.client_layer import auth_choices
+            from tools.gen.client_layer import auth_choices, auth_header_names
             sdk = next(s for s in sdks.load() if s['name'] == args.client_sdk)
             if not sdk.get('client_layer'):
                 raise ValueError('client layer is not enabled in the ledger')
             if sdk['out'] != sdk['dir'] + '/src':
-                auth_headers = {'authorization'} | {a['name'].lower() for a in auth_choices(sdk['auth']) if a['kind'] == 'header'}
-        builder = IRBuilder(doc, args.package, derive_operation_ids=args.derive_operation_ids, auth_headers=auth_headers)
+                auth_headers = auth_header_names(auth_choices(sdk['auth']))
+        builder = IRBuilder(doc, args.package, derive_operation_ids=args.derive_operation_ids, auth_headers=auth_headers,
+                            auto_multipart_boundary=bool(args.client_sdk and not sdk.get('legacy_multipart_boundary')))
         ir = builder.build()
     except GenerationError as error:
         for diagnostic in error.diagnostics:

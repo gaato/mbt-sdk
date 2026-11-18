@@ -1,0 +1,4521 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/cloudflare_dns/gen"
+
+import {
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "gaato/mttp_core/jsonkit",
+  "gaato/mttp_core/multipart",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn dns_records_for_a_zone_apply_dns_scan_results_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsScanReviewResult, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_apply_dns_scan_results_decode_json(@json.Json) -> DnsScanReviewResult raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_apply_dns_scan_results_request(String, DnsScanReview) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_batch_dns_records_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsBatchResult, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_batch_dns_records_decode_json(@json.Json) -> DnsBatchResult raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_batch_dns_records_request(String, DnsBatch, include_shadow_metadata? : Bool) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_create_dns_record_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsRecordResponse, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_create_dns_record_decode_json(@json.Json) -> DnsRecordResponse raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_create_dns_record_request(String, DnsRecord, include_shadow_metadata? : Bool) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_delete_dns_record_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsRecordDeletion, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_delete_dns_record_decode_json(@json.Json) -> DnsRecordDeletion raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_delete_dns_record_request(String, String) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_dns_record_details_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsRecordResponse, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_dns_record_details_decode_json(@json.Json) -> DnsRecordResponse raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_dns_record_details_request(String, String, include_shadow_metadata? : Bool) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_export_dns_records_request(String) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_import_dns_records_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsImportResult, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_import_dns_records_decode_json(@json.Json) -> DnsImportResult raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_import_dns_records_request(String, String, proxied? : Bool) -> @mttp_core.Request raise @multipart.MultipartError
+
+pub fn dns_records_for_a_zone_list_dns_records_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[DnsRecordResponse], @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_list_dns_records_decode_json(@json.Json) -> Array[DnsRecordResponse] raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_list_dns_records_request(String, name? : String, name_exact? : String, name_contains? : String, name_startswith? : String, name_endswith? : String, type_? : DnsRecordType, content? : String, content_exact? : String, content_contains? : String, content_startswith? : String, content_endswith? : String, proxied? : Bool, match_? : DnsRecordMatch, comment? : String, comment_present? : String, comment_absent? : String, comment_exact? : String, comment_contains? : String, comment_startswith? : String, comment_endswith? : String, tag? : String, tag_present? : String, tag_absent? : String, tag_exact? : String, tag_contains? : String, tag_startswith? : String, tag_endswith? : String, search? : String, tag_match? : DnsRecordTagMatch, page? : Int32, per_page? : Int32, order? : DnsRecordOrder, direction? : DnsRecordDirection, include_shadow_metadata? : Bool, shadowed_by_name? : String, shadowing_name? : String) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_patch_dns_record_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsRecordResponse, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_patch_dns_record_decode_json(@json.Json) -> DnsRecordResponse raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_patch_dns_record_request(String, String, DnsRecordPatch, include_shadow_metadata? : Bool) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_review_dns_scan_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[DnsRecordResponse], @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_review_dns_scan_decode_json(@json.Json) -> Array[DnsRecordResponse] raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_review_dns_scan_request(String) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_trigger_dns_scan_decode(@mttp_core.ResponseHead, Bytes) -> Result[Unit, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_trigger_dns_scan_decode_json(@json.Json) -> Unit raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_trigger_dns_scan_request(String) -> @mttp_core.Request
+
+pub fn dns_records_for_a_zone_update_dns_record_decode(@mttp_core.ResponseHead, Bytes) -> Result[DnsRecordResponse, @client.ResponseFailure]
+
+pub fn dns_records_for_a_zone_update_dns_record_decode_json(@json.Json) -> DnsRecordResponse raise @json.JsonDecodeError
+
+pub fn dns_records_for_a_zone_update_dns_record_request(String, String, DnsRecord, include_shadow_metadata? : Bool) -> @mttp_core.Request
+
+pub fn dns_settings_for_a_zone_list_dns_settings_decode(@mttp_core.ResponseHead, Bytes) -> Result[ZoneDnsSettings, @client.ResponseFailure]
+
+pub fn dns_settings_for_a_zone_list_dns_settings_decode_json(@json.Json) -> ZoneDnsSettings raise @json.JsonDecodeError
+
+pub fn dns_settings_for_a_zone_list_dns_settings_request(String) -> @mttp_core.Request
+
+pub fn dns_settings_for_a_zone_update_dns_settings_decode(@mttp_core.ResponseHead, Bytes) -> Result[ZoneDnsSettings, @client.ResponseFailure]
+
+pub fn dns_settings_for_a_zone_update_dns_settings_decode_json(@json.Json) -> ZoneDnsSettings raise @json.JsonDecodeError
+
+pub fn dns_settings_for_a_zone_update_dns_settings_request(String, ZoneDnsSettingsPatch) -> @mttp_core.Request
+
+pub fn dnssec_delete_dnssec_records_decode(@mttp_core.ResponseHead, Bytes) -> Result[String, @client.ResponseFailure]
+
+pub fn dnssec_delete_dnssec_records_decode_json(@json.Json) -> String raise @json.JsonDecodeError
+
+pub fn dnssec_delete_dnssec_records_request(String) -> @mttp_core.Request
+
+pub fn dnssec_dnssec_details_decode(@mttp_core.ResponseHead, Bytes) -> Result[Dnssec, @client.ResponseFailure]
+
+pub fn dnssec_dnssec_details_decode_json(@json.Json) -> Dnssec raise @json.JsonDecodeError
+
+pub fn dnssec_dnssec_details_request(String) -> @mttp_core.Request
+
+pub fn dnssec_edit_dnssec_status_decode(@mttp_core.ResponseHead, Bytes) -> Result[Dnssec, @client.ResponseFailure]
+
+pub fn dnssec_edit_dnssec_status_decode_json(@json.Json) -> Dnssec raise @json.JsonDecodeError
+
+pub fn dnssec_edit_dnssec_status_request(String, DnssecPatch) -> @mttp_core.Request
+
+pub fn put_zones_zone_id_activation_check_decode(@mttp_core.ResponseHead, Bytes) -> Result[ZoneActivation, @client.ResponseFailure]
+
+pub fn put_zones_zone_id_activation_check_decode_json(@json.Json) -> ZoneActivation raise @json.JsonDecodeError
+
+pub fn put_zones_zone_id_activation_check_request(String) -> @mttp_core.Request
+
+pub fn zones_0_delete_decode(@mttp_core.ResponseHead, Bytes) -> Result[ZoneDeletion?, @client.ResponseFailure]
+
+pub fn zones_0_delete_decode_json(@json.Json) -> ZoneDeletion? raise @json.JsonDecodeError
+
+pub fn zones_0_delete_request(String) -> @mttp_core.Request
+
+pub fn zones_0_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[Zone, @client.ResponseFailure]
+
+pub fn zones_0_get_decode_json(@json.Json) -> Zone raise @json.JsonDecodeError
+
+pub fn zones_0_get_request(String) -> @mttp_core.Request
+
+pub fn zones_0_patch_decode(@mttp_core.ResponseHead, Bytes) -> Result[Zone, @client.ResponseFailure]
+
+pub fn zones_0_patch_decode_json(@json.Json) -> Zone raise @json.JsonDecodeError
+
+pub fn zones_0_patch_request(String, ZonePatch) -> @mttp_core.Request
+
+pub fn zones_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[Zone], @client.ResponseFailure]
+
+pub fn zones_get_decode_json(@json.Json) -> Array[Zone] raise @json.JsonDecodeError
+
+pub fn zones_get_request(name? : String, status? : ZoneListStatus, type_? : Array[ZoneListType], account_id? : String, account_name? : String, page? : Int32, per_page? : Int32, order? : ZoneOrder, direction? : ZoneDirection, match_? : ZoneMatch) -> @mttp_core.Request
+
+pub fn zones_post_decode(@mttp_core.ResponseHead, Bytes) -> Result[Zone, @client.ResponseFailure]
+
+pub fn zones_post_decode_json(@json.Json) -> Zone raise @json.JsonDecodeError
+
+pub fn zones_post_request(ZoneCreate) -> @mttp_core.Request
+
+// Errors
+
+// Types and methods
+#derive(Eq, @debug.Debug)
+pub(all) struct AAAARecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  private_routing : Bool?
+  type_ : String?
+}
+pub fn AAAARecord::equal(Self, Self) -> Bool
+pub fn AAAARecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn AAAARecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, private_routing? : Bool, type_? : String) -> Self
+pub fn AAAARecord::not_equal(Self, Self) -> Bool
+pub fn AAAARecord::to_json(Self) -> @json.Json
+pub fn AAAARecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AAAARecord
+pub impl @json.ToJson for AAAARecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ARecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  private_routing : Bool?
+  type_ : String?
+}
+pub fn ARecord::equal(Self, Self) -> Bool
+pub fn ARecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ARecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, private_routing? : Bool, type_? : String) -> Self
+pub fn ARecord::not_equal(Self, Self) -> Bool
+pub fn ARecord::to_json(Self) -> @json.Json
+pub fn ARecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ARecord
+pub impl @json.ToJson for ARecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordDelete {
+  id : String
+}
+pub fn BatchRecordDelete::equal(Self, Self) -> Bool
+pub fn BatchRecordDelete::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordDelete::new(id~ : String) -> Self
+pub fn BatchRecordDelete::not_equal(Self, Self) -> Bool
+pub fn BatchRecordDelete::to_json(Self) -> @json.Json
+pub fn BatchRecordDelete::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordDelete
+pub impl @json.ToJson for BatchRecordDelete
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchRecordPatch {
+  A(BatchRecordPatchA)
+  AAAA(BatchRecordPatchAAAA)
+  CNAME(BatchRecordPatchCNAME)
+  MX(BatchRecordPatchMX)
+  NS(BatchRecordPatchNS)
+  OPENPGPKEY(BatchRecordPatchOPENPGPKEY)
+  PTR(BatchRecordPatchPTR)
+  TXT(BatchRecordPatchTXT)
+  CAA(BatchRecordPatchCAA)
+  CERT(BatchRecordPatchCERT)
+  DNSKEY(BatchRecordPatchDNSKEY)
+  DS(BatchRecordPatchDS)
+  HTTPS(BatchRecordPatchHTTPS)
+  LOC(BatchRecordPatchLOC)
+  NAPTR(BatchRecordPatchNAPTR)
+  SMIMEA(BatchRecordPatchSMIMEA)
+  SRV(BatchRecordPatchSRV)
+  SSHFP(BatchRecordPatchSSHFP)
+  SVCB(BatchRecordPatchSVCB)
+  TLSA(BatchRecordPatchTLSA)
+  URI(BatchRecordPatchURI)
+  Unknown(String, @json.Json)
+}
+pub fn BatchRecordPatch::equal(Self, Self) -> Bool
+pub fn BatchRecordPatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatch::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatch::to_json(Self) -> @json.Json
+pub fn BatchRecordPatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatch
+pub impl @json.ToJson for BatchRecordPatch
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  private_routing : Bool?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchA::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, private_routing? : Bool, type_? : String) -> Self
+pub fn BatchRecordPatchA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchA::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchA
+pub impl @json.ToJson for BatchRecordPatchA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchAAAA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  private_routing : Bool?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchAAAA::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchAAAA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchAAAA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, private_routing? : Bool, type_? : String) -> Self
+pub fn BatchRecordPatchAAAA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchAAAA::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchAAAA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchAAAA
+pub impl @json.ToJson for BatchRecordPatchAAAA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchCAA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchCAAData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchCAA::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCAA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchCAA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchCAAData, type_? : String) -> Self
+pub fn BatchRecordPatchCAA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCAA::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchCAA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchCAA
+pub impl @json.ToJson for BatchRecordPatchCAA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchCAAData {
+  flags : Int32?
+  tag : String?
+  value : String?
+}
+pub fn BatchRecordPatchCAAData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCAAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchCAAData::new(flags? : Int32, tag? : String, value? : String) -> Self
+pub fn BatchRecordPatchCAAData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCAAData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchCAAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchCAAData
+pub impl @json.ToJson for BatchRecordPatchCAAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchCERT {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchCERTData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchCERT::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCERT::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchCERT::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchCERTData, type_? : String) -> Self
+pub fn BatchRecordPatchCERT::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCERT::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchCERT::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchCERT
+pub impl @json.ToJson for BatchRecordPatchCERT
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchCERTData {
+  algorithm : Int32?
+  certificate : String?
+  key_tag : Int32?
+  type_ : Int32?
+}
+pub fn BatchRecordPatchCERTData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCERTData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchCERTData::new(algorithm? : Int32, certificate? : String, key_tag? : Int32, type_? : Int32) -> Self
+pub fn BatchRecordPatchCERTData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCERTData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchCERTData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchCERTData
+pub impl @json.ToJson for BatchRecordPatchCERTData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchCNAME {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : BatchRecordPatchCNAMESettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchCNAME::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCNAME::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchCNAME::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : BatchRecordPatchCNAMESettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPatchCNAME::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCNAME::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchCNAME::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchCNAME
+pub impl @json.ToJson for BatchRecordPatchCNAME
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchCNAMESettings {
+  flatten_cname : Bool?
+}
+pub fn BatchRecordPatchCNAMESettings::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCNAMESettings::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchCNAMESettings::new(flatten_cname? : Bool) -> Self
+pub fn BatchRecordPatchCNAMESettings::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchCNAMESettings::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchCNAMESettings::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchCNAMESettings
+pub impl @json.ToJson for BatchRecordPatchCNAMESettings
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchDNSKEY {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchDNSKEYData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchDNSKEY::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDNSKEY::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchDNSKEY::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchDNSKEYData, type_? : String) -> Self
+pub fn BatchRecordPatchDNSKEY::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDNSKEY::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchDNSKEY::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchDNSKEY
+pub impl @json.ToJson for BatchRecordPatchDNSKEY
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchDNSKEYData {
+  algorithm : Int32?
+  flags : Int32?
+  protocol : Int32?
+  public_key : String?
+}
+pub fn BatchRecordPatchDNSKEYData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDNSKEYData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchDNSKEYData::new(algorithm? : Int32, flags? : Int32, protocol? : Int32, public_key? : String) -> Self
+pub fn BatchRecordPatchDNSKEYData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDNSKEYData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchDNSKEYData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchDNSKEYData
+pub impl @json.ToJson for BatchRecordPatchDNSKEYData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchDS {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchDSData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchDS::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchDS::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchDSData, type_? : String) -> Self
+pub fn BatchRecordPatchDS::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDS::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchDS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchDS
+pub impl @json.ToJson for BatchRecordPatchDS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchDSData {
+  algorithm : Int32?
+  digest : String?
+  digest_type : Int32?
+  key_tag : Int32?
+}
+pub fn BatchRecordPatchDSData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDSData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchDSData::new(algorithm? : Int32, digest? : String, digest_type? : Int32, key_tag? : Int32) -> Self
+pub fn BatchRecordPatchDSData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchDSData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchDSData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchDSData
+pub impl @json.ToJson for BatchRecordPatchDSData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchHTTPS {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchHTTPSData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchHTTPS::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchHTTPS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchHTTPS::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchHTTPSData, type_? : String) -> Self
+pub fn BatchRecordPatchHTTPS::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchHTTPS::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchHTTPS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchHTTPS
+pub impl @json.ToJson for BatchRecordPatchHTTPS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchHTTPSData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn BatchRecordPatchHTTPSData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchHTTPSData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchHTTPSData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn BatchRecordPatchHTTPSData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchHTTPSData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchHTTPSData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchHTTPSData
+pub impl @json.ToJson for BatchRecordPatchHTTPSData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchLOC {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchLOCData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchLOC::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOC::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchLOC::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchLOCData, type_? : String) -> Self
+pub fn BatchRecordPatchLOC::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOC::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchLOC::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchLOC
+pub impl @json.ToJson for BatchRecordPatchLOC
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchLOCData {
+  altitude : Double?
+  lat_degrees : Int32?
+  lat_direction : BatchRecordPatchLOCDataLatDirection?
+  lat_minutes : Int32?
+  lat_seconds : Double?
+  long_degrees : Int32?
+  long_direction : BatchRecordPatchLOCDataLongDirection?
+  long_minutes : Int32?
+  long_seconds : Double?
+  precision_horz : Double?
+  precision_vert : Double?
+  size : Double?
+}
+pub fn BatchRecordPatchLOCData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOCData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchLOCData::new(altitude? : Double, lat_degrees? : Int32, lat_direction? : BatchRecordPatchLOCDataLatDirection, lat_minutes? : Int32, lat_seconds? : Double, long_degrees? : Int32, long_direction? : BatchRecordPatchLOCDataLongDirection, long_minutes? : Int32, long_seconds? : Double, precision_horz? : Double, precision_vert? : Double, size? : Double) -> Self
+pub fn BatchRecordPatchLOCData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOCData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchLOCData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchLOCData
+pub impl @json.ToJson for BatchRecordPatchLOCData
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchRecordPatchLOCDataLatDirection {
+  N
+  S
+  Custom(String)
+}
+pub fn BatchRecordPatchLOCDataLatDirection::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOCDataLatDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchLOCDataLatDirection::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOCDataLatDirection::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchLOCDataLatDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchLOCDataLatDirection
+pub impl @json.ToJson for BatchRecordPatchLOCDataLatDirection
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchRecordPatchLOCDataLongDirection {
+  E
+  W
+  Custom(String)
+}
+pub fn BatchRecordPatchLOCDataLongDirection::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOCDataLongDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchLOCDataLongDirection::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchLOCDataLongDirection::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchLOCDataLongDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchLOCDataLongDirection
+pub impl @json.ToJson for BatchRecordPatchLOCDataLongDirection
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchMX {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  priority : Int32?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchMX::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchMX::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchMX::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, priority? : Int32, type_? : String) -> Self
+pub fn BatchRecordPatchMX::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchMX::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchMX::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchMX
+pub impl @json.ToJson for BatchRecordPatchMX
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchNAPTR {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchNAPTRData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchNAPTR::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchNAPTR::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchNAPTR::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchNAPTRData, type_? : String) -> Self
+pub fn BatchRecordPatchNAPTR::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchNAPTR::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchNAPTR::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchNAPTR
+pub impl @json.ToJson for BatchRecordPatchNAPTR
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchNAPTRData {
+  flags : String?
+  order : Int32?
+  preference : Int32?
+  regex : String?
+  replacement : String?
+  service : String?
+}
+pub fn BatchRecordPatchNAPTRData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchNAPTRData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchNAPTRData::new(flags? : String, order? : Int32, preference? : Int32, regex? : String, replacement? : String, service? : String) -> Self
+pub fn BatchRecordPatchNAPTRData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchNAPTRData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchNAPTRData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchNAPTRData
+pub impl @json.ToJson for BatchRecordPatchNAPTRData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchNS {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchNS::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchNS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchNS::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPatchNS::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchNS::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchNS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchNS
+pub impl @json.ToJson for BatchRecordPatchNS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchOPENPGPKEY {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchOPENPGPKEY::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchOPENPGPKEY::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchOPENPGPKEY::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPatchOPENPGPKEY::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchOPENPGPKEY::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchOPENPGPKEY::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchOPENPGPKEY
+pub impl @json.ToJson for BatchRecordPatchOPENPGPKEY
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchPTR {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchPTR::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchPTR::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchPTR::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPatchPTR::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchPTR::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchPTR::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchPTR
+pub impl @json.ToJson for BatchRecordPatchPTR
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSMIMEA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchSMIMEAData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchSMIMEA::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSMIMEA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSMIMEA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchSMIMEAData, type_? : String) -> Self
+pub fn BatchRecordPatchSMIMEA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSMIMEA::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSMIMEA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSMIMEA
+pub impl @json.ToJson for BatchRecordPatchSMIMEA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSMIMEAData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn BatchRecordPatchSMIMEAData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSMIMEAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSMIMEAData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn BatchRecordPatchSMIMEAData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSMIMEAData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSMIMEAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSMIMEAData
+pub impl @json.ToJson for BatchRecordPatchSMIMEAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSRV {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchSRVData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchSRV::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSRV::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSRV::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchSRVData, type_? : String) -> Self
+pub fn BatchRecordPatchSRV::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSRV::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSRV::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSRV
+pub impl @json.ToJson for BatchRecordPatchSRV
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSRVData {
+  port : Int32?
+  priority : Int32?
+  target : String?
+  weight : Int32?
+}
+pub fn BatchRecordPatchSRVData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSRVData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSRVData::new(port? : Int32, priority? : Int32, target? : String, weight? : Int32) -> Self
+pub fn BatchRecordPatchSRVData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSRVData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSRVData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSRVData
+pub impl @json.ToJson for BatchRecordPatchSRVData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSSHFP {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchSSHFPData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchSSHFP::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSSHFP::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSSHFP::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchSSHFPData, type_? : String) -> Self
+pub fn BatchRecordPatchSSHFP::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSSHFP::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSSHFP::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSSHFP
+pub impl @json.ToJson for BatchRecordPatchSSHFP
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSSHFPData {
+  algorithm : Int32?
+  fingerprint : String?
+  type_ : Int32?
+}
+pub fn BatchRecordPatchSSHFPData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSSHFPData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSSHFPData::new(algorithm? : Int32, fingerprint? : String, type_? : Int32) -> Self
+pub fn BatchRecordPatchSSHFPData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSSHFPData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSSHFPData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSSHFPData
+pub impl @json.ToJson for BatchRecordPatchSSHFPData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSVCB {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchSVCBData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchSVCB::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSVCB::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSVCB::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchSVCBData, type_? : String) -> Self
+pub fn BatchRecordPatchSVCB::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSVCB::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSVCB::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSVCB
+pub impl @json.ToJson for BatchRecordPatchSVCB
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchSVCBData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn BatchRecordPatchSVCBData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSVCBData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchSVCBData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn BatchRecordPatchSVCBData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchSVCBData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchSVCBData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchSVCBData
+pub impl @json.ToJson for BatchRecordPatchSVCBData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchTLSA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchTLSAData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchTLSA::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchTLSA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchTLSA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchTLSAData, type_? : String) -> Self
+pub fn BatchRecordPatchTLSA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchTLSA::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchTLSA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchTLSA
+pub impl @json.ToJson for BatchRecordPatchTLSA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchTLSAData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn BatchRecordPatchTLSAData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchTLSAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchTLSAData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn BatchRecordPatchTLSAData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchTLSAData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchTLSAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchTLSAData
+pub impl @json.ToJson for BatchRecordPatchTLSAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchTXT {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchTXT::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchTXT::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchTXT::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPatchTXT::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchTXT::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchTXT::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchTXT
+pub impl @json.ToJson for BatchRecordPatchTXT
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchURI {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPatchURIData?
+  priority : Int32?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPatchURI::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchURI::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchURI::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPatchURIData, priority? : Int32, type_? : String) -> Self
+pub fn BatchRecordPatchURI::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchURI::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchURI::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchURI
+pub impl @json.ToJson for BatchRecordPatchURI
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPatchURIData {
+  target : String?
+  weight : Int32?
+}
+pub fn BatchRecordPatchURIData::equal(Self, Self) -> Bool
+pub fn BatchRecordPatchURIData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPatchURIData::new(target? : String, weight? : Int32) -> Self
+pub fn BatchRecordPatchURIData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPatchURIData::to_json(Self) -> @json.Json
+pub fn BatchRecordPatchURIData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPatchURIData
+pub impl @json.ToJson for BatchRecordPatchURIData
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchRecordPut {
+  A(BatchRecordPutA)
+  AAAA(BatchRecordPutAAAA)
+  CNAME(BatchRecordPutCNAME)
+  MX(BatchRecordPutMX)
+  NS(BatchRecordPutNS)
+  OPENPGPKEY(BatchRecordPutOPENPGPKEY)
+  PTR(BatchRecordPutPTR)
+  TXT(BatchRecordPutTXT)
+  CAA(BatchRecordPutCAA)
+  CERT(BatchRecordPutCERT)
+  DNSKEY(BatchRecordPutDNSKEY)
+  DS(BatchRecordPutDS)
+  HTTPS(BatchRecordPutHTTPS)
+  LOC(BatchRecordPutLOC)
+  NAPTR(BatchRecordPutNAPTR)
+  SMIMEA(BatchRecordPutSMIMEA)
+  SRV(BatchRecordPutSRV)
+  SSHFP(BatchRecordPutSSHFP)
+  SVCB(BatchRecordPutSVCB)
+  TLSA(BatchRecordPutTLSA)
+  URI(BatchRecordPutURI)
+  Unknown(String, @json.Json)
+}
+pub fn BatchRecordPut::equal(Self, Self) -> Bool
+pub fn BatchRecordPut::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPut::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPut::to_json(Self) -> @json.Json
+pub fn BatchRecordPut::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPut
+pub impl @json.ToJson for BatchRecordPut
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  private_routing : Bool?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutA::equal(Self, Self) -> Bool
+pub fn BatchRecordPutA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, private_routing? : Bool, type_? : String) -> Self
+pub fn BatchRecordPutA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutA::to_json(Self) -> @json.Json
+pub fn BatchRecordPutA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutA
+pub impl @json.ToJson for BatchRecordPutA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutAAAA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  private_routing : Bool?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutAAAA::equal(Self, Self) -> Bool
+pub fn BatchRecordPutAAAA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutAAAA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, private_routing? : Bool, type_? : String) -> Self
+pub fn BatchRecordPutAAAA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutAAAA::to_json(Self) -> @json.Json
+pub fn BatchRecordPutAAAA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutAAAA
+pub impl @json.ToJson for BatchRecordPutAAAA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutCAA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutCAAData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutCAA::equal(Self, Self) -> Bool
+pub fn BatchRecordPutCAA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutCAA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutCAAData, type_? : String) -> Self
+pub fn BatchRecordPutCAA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutCAA::to_json(Self) -> @json.Json
+pub fn BatchRecordPutCAA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutCAA
+pub impl @json.ToJson for BatchRecordPutCAA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutCAAData {
+  flags : Int32?
+  tag : String?
+  value : String?
+}
+pub fn BatchRecordPutCAAData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutCAAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutCAAData::new(flags? : Int32, tag? : String, value? : String) -> Self
+pub fn BatchRecordPutCAAData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutCAAData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutCAAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutCAAData
+pub impl @json.ToJson for BatchRecordPutCAAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutCERT {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutCERTData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutCERT::equal(Self, Self) -> Bool
+pub fn BatchRecordPutCERT::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutCERT::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutCERTData, type_? : String) -> Self
+pub fn BatchRecordPutCERT::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutCERT::to_json(Self) -> @json.Json
+pub fn BatchRecordPutCERT::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutCERT
+pub impl @json.ToJson for BatchRecordPutCERT
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutCERTData {
+  algorithm : Int32?
+  certificate : String?
+  key_tag : Int32?
+  type_ : Int32?
+}
+pub fn BatchRecordPutCERTData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutCERTData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutCERTData::new(algorithm? : Int32, certificate? : String, key_tag? : Int32, type_? : Int32) -> Self
+pub fn BatchRecordPutCERTData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutCERTData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutCERTData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutCERTData
+pub impl @json.ToJson for BatchRecordPutCERTData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutCNAME {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : BatchRecordPutCNAMESettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutCNAME::equal(Self, Self) -> Bool
+pub fn BatchRecordPutCNAME::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutCNAME::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : BatchRecordPutCNAMESettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPutCNAME::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutCNAME::to_json(Self) -> @json.Json
+pub fn BatchRecordPutCNAME::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutCNAME
+pub impl @json.ToJson for BatchRecordPutCNAME
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutCNAMESettings {
+  flatten_cname : Bool?
+}
+pub fn BatchRecordPutCNAMESettings::equal(Self, Self) -> Bool
+pub fn BatchRecordPutCNAMESettings::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutCNAMESettings::new(flatten_cname? : Bool) -> Self
+pub fn BatchRecordPutCNAMESettings::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutCNAMESettings::to_json(Self) -> @json.Json
+pub fn BatchRecordPutCNAMESettings::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutCNAMESettings
+pub impl @json.ToJson for BatchRecordPutCNAMESettings
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutDNSKEY {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutDNSKEYData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutDNSKEY::equal(Self, Self) -> Bool
+pub fn BatchRecordPutDNSKEY::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutDNSKEY::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutDNSKEYData, type_? : String) -> Self
+pub fn BatchRecordPutDNSKEY::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutDNSKEY::to_json(Self) -> @json.Json
+pub fn BatchRecordPutDNSKEY::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutDNSKEY
+pub impl @json.ToJson for BatchRecordPutDNSKEY
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutDNSKEYData {
+  algorithm : Int32?
+  flags : Int32?
+  protocol : Int32?
+  public_key : String?
+}
+pub fn BatchRecordPutDNSKEYData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutDNSKEYData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutDNSKEYData::new(algorithm? : Int32, flags? : Int32, protocol? : Int32, public_key? : String) -> Self
+pub fn BatchRecordPutDNSKEYData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutDNSKEYData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutDNSKEYData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutDNSKEYData
+pub impl @json.ToJson for BatchRecordPutDNSKEYData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutDS {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutDSData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutDS::equal(Self, Self) -> Bool
+pub fn BatchRecordPutDS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutDS::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutDSData, type_? : String) -> Self
+pub fn BatchRecordPutDS::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutDS::to_json(Self) -> @json.Json
+pub fn BatchRecordPutDS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutDS
+pub impl @json.ToJson for BatchRecordPutDS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutDSData {
+  algorithm : Int32?
+  digest : String?
+  digest_type : Int32?
+  key_tag : Int32?
+}
+pub fn BatchRecordPutDSData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutDSData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutDSData::new(algorithm? : Int32, digest? : String, digest_type? : Int32, key_tag? : Int32) -> Self
+pub fn BatchRecordPutDSData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutDSData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutDSData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutDSData
+pub impl @json.ToJson for BatchRecordPutDSData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutHTTPS {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutHTTPSData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutHTTPS::equal(Self, Self) -> Bool
+pub fn BatchRecordPutHTTPS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutHTTPS::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutHTTPSData, type_? : String) -> Self
+pub fn BatchRecordPutHTTPS::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutHTTPS::to_json(Self) -> @json.Json
+pub fn BatchRecordPutHTTPS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutHTTPS
+pub impl @json.ToJson for BatchRecordPutHTTPS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutHTTPSData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn BatchRecordPutHTTPSData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutHTTPSData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutHTTPSData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn BatchRecordPutHTTPSData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutHTTPSData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutHTTPSData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutHTTPSData
+pub impl @json.ToJson for BatchRecordPutHTTPSData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutLOC {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutLOCData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutLOC::equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOC::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutLOC::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutLOCData, type_? : String) -> Self
+pub fn BatchRecordPutLOC::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOC::to_json(Self) -> @json.Json
+pub fn BatchRecordPutLOC::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutLOC
+pub impl @json.ToJson for BatchRecordPutLOC
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutLOCData {
+  altitude : Double?
+  lat_degrees : Int32?
+  lat_direction : BatchRecordPutLOCDataLatDirection?
+  lat_minutes : Int32?
+  lat_seconds : Double?
+  long_degrees : Int32?
+  long_direction : BatchRecordPutLOCDataLongDirection?
+  long_minutes : Int32?
+  long_seconds : Double?
+  precision_horz : Double?
+  precision_vert : Double?
+  size : Double?
+}
+pub fn BatchRecordPutLOCData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOCData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutLOCData::new(altitude? : Double, lat_degrees? : Int32, lat_direction? : BatchRecordPutLOCDataLatDirection, lat_minutes? : Int32, lat_seconds? : Double, long_degrees? : Int32, long_direction? : BatchRecordPutLOCDataLongDirection, long_minutes? : Int32, long_seconds? : Double, precision_horz? : Double, precision_vert? : Double, size? : Double) -> Self
+pub fn BatchRecordPutLOCData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOCData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutLOCData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutLOCData
+pub impl @json.ToJson for BatchRecordPutLOCData
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchRecordPutLOCDataLatDirection {
+  N
+  S
+  Custom(String)
+}
+pub fn BatchRecordPutLOCDataLatDirection::equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOCDataLatDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutLOCDataLatDirection::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOCDataLatDirection::to_json(Self) -> @json.Json
+pub fn BatchRecordPutLOCDataLatDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutLOCDataLatDirection
+pub impl @json.ToJson for BatchRecordPutLOCDataLatDirection
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchRecordPutLOCDataLongDirection {
+  E
+  W
+  Custom(String)
+}
+pub fn BatchRecordPutLOCDataLongDirection::equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOCDataLongDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutLOCDataLongDirection::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutLOCDataLongDirection::to_json(Self) -> @json.Json
+pub fn BatchRecordPutLOCDataLongDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutLOCDataLongDirection
+pub impl @json.ToJson for BatchRecordPutLOCDataLongDirection
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutMX {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  priority : Int32?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutMX::equal(Self, Self) -> Bool
+pub fn BatchRecordPutMX::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutMX::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, priority? : Int32, type_? : String) -> Self
+pub fn BatchRecordPutMX::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutMX::to_json(Self) -> @json.Json
+pub fn BatchRecordPutMX::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutMX
+pub impl @json.ToJson for BatchRecordPutMX
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutNAPTR {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutNAPTRData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutNAPTR::equal(Self, Self) -> Bool
+pub fn BatchRecordPutNAPTR::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutNAPTR::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutNAPTRData, type_? : String) -> Self
+pub fn BatchRecordPutNAPTR::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutNAPTR::to_json(Self) -> @json.Json
+pub fn BatchRecordPutNAPTR::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutNAPTR
+pub impl @json.ToJson for BatchRecordPutNAPTR
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutNAPTRData {
+  flags : String?
+  order : Int32?
+  preference : Int32?
+  regex : String?
+  replacement : String?
+  service : String?
+}
+pub fn BatchRecordPutNAPTRData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutNAPTRData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutNAPTRData::new(flags? : String, order? : Int32, preference? : Int32, regex? : String, replacement? : String, service? : String) -> Self
+pub fn BatchRecordPutNAPTRData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutNAPTRData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutNAPTRData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutNAPTRData
+pub impl @json.ToJson for BatchRecordPutNAPTRData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutNS {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutNS::equal(Self, Self) -> Bool
+pub fn BatchRecordPutNS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutNS::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPutNS::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutNS::to_json(Self) -> @json.Json
+pub fn BatchRecordPutNS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutNS
+pub impl @json.ToJson for BatchRecordPutNS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutOPENPGPKEY {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutOPENPGPKEY::equal(Self, Self) -> Bool
+pub fn BatchRecordPutOPENPGPKEY::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutOPENPGPKEY::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPutOPENPGPKEY::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutOPENPGPKEY::to_json(Self) -> @json.Json
+pub fn BatchRecordPutOPENPGPKEY::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutOPENPGPKEY
+pub impl @json.ToJson for BatchRecordPutOPENPGPKEY
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutPTR {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutPTR::equal(Self, Self) -> Bool
+pub fn BatchRecordPutPTR::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutPTR::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPutPTR::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutPTR::to_json(Self) -> @json.Json
+pub fn BatchRecordPutPTR::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutPTR
+pub impl @json.ToJson for BatchRecordPutPTR
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSMIMEA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutSMIMEAData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutSMIMEA::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSMIMEA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSMIMEA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutSMIMEAData, type_? : String) -> Self
+pub fn BatchRecordPutSMIMEA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSMIMEA::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSMIMEA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSMIMEA
+pub impl @json.ToJson for BatchRecordPutSMIMEA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSMIMEAData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn BatchRecordPutSMIMEAData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSMIMEAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSMIMEAData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn BatchRecordPutSMIMEAData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSMIMEAData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSMIMEAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSMIMEAData
+pub impl @json.ToJson for BatchRecordPutSMIMEAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSRV {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutSRVData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutSRV::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSRV::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSRV::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutSRVData, type_? : String) -> Self
+pub fn BatchRecordPutSRV::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSRV::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSRV::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSRV
+pub impl @json.ToJson for BatchRecordPutSRV
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSRVData {
+  port : Int32?
+  priority : Int32?
+  target : String?
+  weight : Int32?
+}
+pub fn BatchRecordPutSRVData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSRVData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSRVData::new(port? : Int32, priority? : Int32, target? : String, weight? : Int32) -> Self
+pub fn BatchRecordPutSRVData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSRVData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSRVData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSRVData
+pub impl @json.ToJson for BatchRecordPutSRVData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSSHFP {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutSSHFPData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutSSHFP::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSSHFP::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSSHFP::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutSSHFPData, type_? : String) -> Self
+pub fn BatchRecordPutSSHFP::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSSHFP::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSSHFP::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSSHFP
+pub impl @json.ToJson for BatchRecordPutSSHFP
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSSHFPData {
+  algorithm : Int32?
+  fingerprint : String?
+  type_ : Int32?
+}
+pub fn BatchRecordPutSSHFPData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSSHFPData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSSHFPData::new(algorithm? : Int32, fingerprint? : String, type_? : Int32) -> Self
+pub fn BatchRecordPutSSHFPData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSSHFPData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSSHFPData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSSHFPData
+pub impl @json.ToJson for BatchRecordPutSSHFPData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSVCB {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutSVCBData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutSVCB::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSVCB::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSVCB::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutSVCBData, type_? : String) -> Self
+pub fn BatchRecordPutSVCB::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSVCB::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSVCB::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSVCB
+pub impl @json.ToJson for BatchRecordPutSVCB
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutSVCBData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn BatchRecordPutSVCBData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutSVCBData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutSVCBData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn BatchRecordPutSVCBData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutSVCBData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutSVCBData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutSVCBData
+pub impl @json.ToJson for BatchRecordPutSVCBData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutTLSA {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutTLSAData?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutTLSA::equal(Self, Self) -> Bool
+pub fn BatchRecordPutTLSA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutTLSA::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutTLSAData, type_? : String) -> Self
+pub fn BatchRecordPutTLSA::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutTLSA::to_json(Self) -> @json.Json
+pub fn BatchRecordPutTLSA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutTLSA
+pub impl @json.ToJson for BatchRecordPutTLSA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutTLSAData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn BatchRecordPutTLSAData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutTLSAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutTLSAData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn BatchRecordPutTLSAData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutTLSAData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutTLSAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutTLSAData
+pub impl @json.ToJson for BatchRecordPutTLSAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutTXT {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutTXT::equal(Self, Self) -> Bool
+pub fn BatchRecordPutTXT::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutTXT::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn BatchRecordPutTXT::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutTXT::to_json(Self) -> @json.Json
+pub fn BatchRecordPutTXT::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutTXT
+pub impl @json.ToJson for BatchRecordPutTXT
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutURI {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : BatchRecordPutURIData?
+  priority : Int32?
+  type_ : String?
+  id : String
+}
+pub fn BatchRecordPutURI::equal(Self, Self) -> Bool
+pub fn BatchRecordPutURI::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutURI::new(id~ : String, comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : BatchRecordPutURIData, priority? : Int32, type_? : String) -> Self
+pub fn BatchRecordPutURI::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutURI::to_json(Self) -> @json.Json
+pub fn BatchRecordPutURI::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutURI
+pub impl @json.ToJson for BatchRecordPutURI
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchRecordPutURIData {
+  target : String?
+  weight : Int32?
+}
+pub fn BatchRecordPutURIData::equal(Self, Self) -> Bool
+pub fn BatchRecordPutURIData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn BatchRecordPutURIData::new(target? : String, weight? : Int32) -> Self
+pub fn BatchRecordPutURIData::not_equal(Self, Self) -> Bool
+pub fn BatchRecordPutURIData::to_json(Self) -> @json.Json
+pub fn BatchRecordPutURIData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchRecordPutURIData
+pub impl @json.ToJson for BatchRecordPutURIData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CAARecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : CAARecordData?
+  type_ : String?
+}
+pub fn CAARecord::equal(Self, Self) -> Bool
+pub fn CAARecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn CAARecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : CAARecordData, type_? : String) -> Self
+pub fn CAARecord::not_equal(Self, Self) -> Bool
+pub fn CAARecord::to_json(Self) -> @json.Json
+pub fn CAARecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CAARecord
+pub impl @json.ToJson for CAARecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CAARecordData {
+  flags : Int32?
+  tag : String?
+  value : String?
+}
+pub fn CAARecordData::equal(Self, Self) -> Bool
+pub fn CAARecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn CAARecordData::new(flags? : Int32, tag? : String, value? : String) -> Self
+pub fn CAARecordData::not_equal(Self, Self) -> Bool
+pub fn CAARecordData::to_json(Self) -> @json.Json
+pub fn CAARecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CAARecordData
+pub impl @json.ToJson for CAARecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CERTRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : CERTRecordData?
+  type_ : String?
+}
+pub fn CERTRecord::equal(Self, Self) -> Bool
+pub fn CERTRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn CERTRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : CERTRecordData, type_? : String) -> Self
+pub fn CERTRecord::not_equal(Self, Self) -> Bool
+pub fn CERTRecord::to_json(Self) -> @json.Json
+pub fn CERTRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CERTRecord
+pub impl @json.ToJson for CERTRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CERTRecordData {
+  algorithm : Int32?
+  certificate : String?
+  key_tag : Int32?
+  type_ : Int32?
+}
+pub fn CERTRecordData::equal(Self, Self) -> Bool
+pub fn CERTRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn CERTRecordData::new(algorithm? : Int32, certificate? : String, key_tag? : Int32, type_? : Int32) -> Self
+pub fn CERTRecordData::not_equal(Self, Self) -> Bool
+pub fn CERTRecordData::to_json(Self) -> @json.Json
+pub fn CERTRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CERTRecordData
+pub impl @json.ToJson for CERTRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CNAMERecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : CNAMERecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+}
+pub fn CNAMERecord::equal(Self, Self) -> Bool
+pub fn CNAMERecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn CNAMERecord::new(comment? : String, name? : String, proxied? : Bool, settings? : CNAMERecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn CNAMERecord::not_equal(Self, Self) -> Bool
+pub fn CNAMERecord::to_json(Self) -> @json.Json
+pub fn CNAMERecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CNAMERecord
+pub impl @json.ToJson for CNAMERecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CNAMERecordSettings {
+  flatten_cname : Bool?
+}
+pub fn CNAMERecordSettings::equal(Self, Self) -> Bool
+pub fn CNAMERecordSettings::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn CNAMERecordSettings::new(flatten_cname? : Bool) -> Self
+pub fn CNAMERecordSettings::not_equal(Self, Self) -> Bool
+pub fn CNAMERecordSettings::to_json(Self) -> @json.Json
+pub fn CNAMERecordSettings::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CNAMERecordSettings
+pub impl @json.ToJson for CNAMERecordSettings
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DNSKEYRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : DNSKEYRecordData?
+  type_ : String?
+}
+pub fn DNSKEYRecord::equal(Self, Self) -> Bool
+pub fn DNSKEYRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DNSKEYRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : DNSKEYRecordData, type_? : String) -> Self
+pub fn DNSKEYRecord::not_equal(Self, Self) -> Bool
+pub fn DNSKEYRecord::to_json(Self) -> @json.Json
+pub fn DNSKEYRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DNSKEYRecord
+pub impl @json.ToJson for DNSKEYRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DNSKEYRecordData {
+  algorithm : Int32?
+  flags : Int32?
+  protocol : Int32?
+  public_key : String?
+}
+pub fn DNSKEYRecordData::equal(Self, Self) -> Bool
+pub fn DNSKEYRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DNSKEYRecordData::new(algorithm? : Int32, flags? : Int32, protocol? : Int32, public_key? : String) -> Self
+pub fn DNSKEYRecordData::not_equal(Self, Self) -> Bool
+pub fn DNSKEYRecordData::to_json(Self) -> @json.Json
+pub fn DNSKEYRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DNSKEYRecordData
+pub impl @json.ToJson for DNSKEYRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DSRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : DSRecordData?
+  type_ : String?
+}
+pub fn DSRecord::equal(Self, Self) -> Bool
+pub fn DSRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DSRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : DSRecordData, type_? : String) -> Self
+pub fn DSRecord::not_equal(Self, Self) -> Bool
+pub fn DSRecord::to_json(Self) -> @json.Json
+pub fn DSRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DSRecord
+pub impl @json.ToJson for DSRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DSRecordData {
+  algorithm : Int32?
+  digest : String?
+  digest_type : Int32?
+  key_tag : Int32?
+}
+pub fn DSRecordData::equal(Self, Self) -> Bool
+pub fn DSRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DSRecordData::new(algorithm? : Int32, digest? : String, digest_type? : Int32, key_tag? : Int32) -> Self
+pub fn DSRecordData::not_equal(Self, Self) -> Bool
+pub fn DSRecordData::to_json(Self) -> @json.Json
+pub fn DSRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DSRecordData
+pub impl @json.ToJson for DSRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsBatch {
+  deletes : Array[BatchRecordDelete]?
+  patches : Array[BatchRecordPatch]?
+  posts : Array[DnsRecord]?
+  puts : Array[BatchRecordPut]?
+}
+pub fn DnsBatch::equal(Self, Self) -> Bool
+pub fn DnsBatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsBatch::new(deletes? : Array[BatchRecordDelete], patches? : Array[BatchRecordPatch], posts? : Array[DnsRecord], puts? : Array[BatchRecordPut]) -> Self
+pub fn DnsBatch::not_equal(Self, Self) -> Bool
+pub fn DnsBatch::to_json(Self) -> @json.Json
+pub fn DnsBatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsBatch
+pub impl @json.ToJson for DnsBatch
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsBatchResult {
+  deletes : Array[DnsRecordResponse]?
+  patches : Array[DnsRecordResponse]?
+  posts : Array[DnsRecordResponse]?
+  puts : Array[DnsRecordResponse]?
+}
+pub fn DnsBatchResult::equal(Self, Self) -> Bool
+pub fn DnsBatchResult::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsBatchResult::new(deletes? : Array[DnsRecordResponse], patches? : Array[DnsRecordResponse], posts? : Array[DnsRecordResponse], puts? : Array[DnsRecordResponse]) -> Self
+pub fn DnsBatchResult::not_equal(Self, Self) -> Bool
+pub fn DnsBatchResult::to_json(Self) -> @json.Json
+pub fn DnsBatchResult::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsBatchResult
+pub impl @json.ToJson for DnsBatchResult
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsImportResult {
+  recs_added : Int32?
+  total_records_parsed : Int32?
+}
+pub fn DnsImportResult::equal(Self, Self) -> Bool
+pub fn DnsImportResult::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsImportResult::new(recs_added? : Int32, total_records_parsed? : Int32) -> Self
+pub fn DnsImportResult::not_equal(Self, Self) -> Bool
+pub fn DnsImportResult::to_json(Self) -> @json.Json
+pub fn DnsImportResult::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsImportResult
+pub impl @json.ToJson for DnsImportResult
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecord {
+  A(ARecord)
+  AAAA(AAAARecord)
+  CNAME(CNAMERecord)
+  MX(MXRecord)
+  NS(NSRecord)
+  OPENPGPKEY(OPENPGPKEYRecord)
+  PTR(PTRRecord)
+  TXT(TXTRecord)
+  CAA(CAARecord)
+  CERT(CERTRecord)
+  DNSKEY(DNSKEYRecord)
+  DS(DSRecord)
+  HTTPS(HTTPSRecord)
+  LOC(LOCRecord)
+  NAPTR(NAPTRRecord)
+  SMIMEA(SMIMEARecord)
+  SRV(SRVRecord)
+  SSHFP(SSHFPRecord)
+  SVCB(SVCBRecord)
+  TLSA(TLSARecord)
+  URI(URIRecord)
+  Unknown(String, @json.Json)
+}
+pub fn DnsRecord::equal(Self, Self) -> Bool
+pub fn DnsRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecord::not_equal(Self, Self) -> Bool
+pub fn DnsRecord::to_json(Self) -> @json.Json
+pub fn DnsRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecord
+pub impl @json.ToJson for DnsRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordDeletion {
+  id : String?
+}
+pub fn DnsRecordDeletion::equal(Self, Self) -> Bool
+pub fn DnsRecordDeletion::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordDeletion::new(id? : String) -> Self
+pub fn DnsRecordDeletion::not_equal(Self, Self) -> Bool
+pub fn DnsRecordDeletion::to_json(Self) -> @json.Json
+pub fn DnsRecordDeletion::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordDeletion
+pub impl @json.ToJson for DnsRecordDeletion
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordDirection {
+  Asc
+  Desc
+  Custom(String)
+}
+pub fn DnsRecordDirection::equal(Self, Self) -> Bool
+pub fn DnsRecordDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordDirection::not_equal(Self, Self) -> Bool
+pub fn DnsRecordDirection::to_json(Self) -> @json.Json
+pub fn DnsRecordDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordDirection
+pub impl @json.ToJson for DnsRecordDirection
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordMatch {
+  Any
+  All
+  Custom(String)
+}
+pub fn DnsRecordMatch::equal(Self, Self) -> Bool
+pub fn DnsRecordMatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordMatch::not_equal(Self, Self) -> Bool
+pub fn DnsRecordMatch::to_json(Self) -> @json.Json
+pub fn DnsRecordMatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordMatch
+pub impl @json.ToJson for DnsRecordMatch
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordOrder {
+  Type
+  Name
+  Content
+  Ttl
+  Proxied
+  Custom(String)
+}
+pub fn DnsRecordOrder::equal(Self, Self) -> Bool
+pub fn DnsRecordOrder::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordOrder::not_equal(Self, Self) -> Bool
+pub fn DnsRecordOrder::to_json(Self) -> @json.Json
+pub fn DnsRecordOrder::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordOrder
+pub impl @json.ToJson for DnsRecordOrder
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordPatch {
+  A(ARecord)
+  AAAA(AAAARecord)
+  CNAME(CNAMERecord)
+  MX(MXRecord)
+  NS(NSRecord)
+  OPENPGPKEY(OPENPGPKEYRecord)
+  PTR(PTRRecord)
+  TXT(TXTRecord)
+  CAA(CAARecord)
+  CERT(CERTRecord)
+  DNSKEY(DNSKEYRecord)
+  DS(DSRecord)
+  HTTPS(HTTPSRecord)
+  LOC(LOCRecord)
+  NAPTR(NAPTRRecord)
+  SMIMEA(SMIMEARecord)
+  SRV(SRVRecord)
+  SSHFP(SSHFPRecord)
+  SVCB(SVCBRecord)
+  TLSA(TLSARecord)
+  URI(URIRecord)
+  Unknown(String, @json.Json)
+}
+pub fn DnsRecordPatch::equal(Self, Self) -> Bool
+pub fn DnsRecordPatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordPatch::not_equal(Self, Self) -> Bool
+pub fn DnsRecordPatch::to_json(Self) -> @json.Json
+pub fn DnsRecordPatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordPatch
+pub impl @json.ToJson for DnsRecordPatch
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordResponse {
+  A(DnsRecordResponseA)
+  AAAA(DnsRecordResponseAAAA)
+  CNAME(DnsRecordResponseCNAME)
+  MX(DnsRecordResponseMX)
+  NS(DnsRecordResponseNS)
+  OPENPGPKEY(DnsRecordResponseOPENPGPKEY)
+  PTR(DnsRecordResponsePTR)
+  TXT(DnsRecordResponseTXT)
+  CAA(DnsRecordResponseCAA)
+  CERT(DnsRecordResponseCERT)
+  DNSKEY(DnsRecordResponseDNSKEY)
+  DS(DnsRecordResponseDS)
+  HTTPS(DnsRecordResponseHTTPS)
+  LOC(DnsRecordResponseLOC)
+  NAPTR(DnsRecordResponseNAPTR)
+  SMIMEA(DnsRecordResponseSMIMEA)
+  SRV(DnsRecordResponseSRV)
+  SSHFP(DnsRecordResponseSSHFP)
+  SVCB(DnsRecordResponseSVCB)
+  TLSA(DnsRecordResponseTLSA)
+  URI(DnsRecordResponseURI)
+  Unknown(String, @json.Json)
+}
+pub fn DnsRecordResponse::equal(Self, Self) -> Bool
+pub fn DnsRecordResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponse::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponse::to_json(Self) -> @json.Json
+pub fn DnsRecordResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponse
+pub impl @json.ToJson for DnsRecordResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseA {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  private_routing : Bool?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseAMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseA::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseA::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseAMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, private_routing? : Bool, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseA::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseA::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseA
+pub impl @json.ToJson for DnsRecordResponseA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseAAAA {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  private_routing : Bool?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseAAAAMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseAAAA::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseAAAA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseAAAA::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseAAAAMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, private_routing? : Bool, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseAAAA::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseAAAA::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseAAAA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseAAAA
+pub impl @json.ToJson for DnsRecordResponseAAAA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseAAAAMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseAAAAMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseAAAAMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseAAAAMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseAAAAMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseAAAAMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseAAAAMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseAAAAMeta
+pub impl @json.ToJson for DnsRecordResponseAAAAMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseAMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseAMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseAMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseAMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseAMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseAMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseAMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseAMeta
+pub impl @json.ToJson for DnsRecordResponseAMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCAA {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseCAAData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseCAAMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseCAA::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCAA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCAA::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseCAAMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseCAAData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseCAA::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCAA::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCAA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCAA
+pub impl @json.ToJson for DnsRecordResponseCAA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCAAData {
+  flags : Int32?
+  tag : String?
+  value : String?
+}
+pub fn DnsRecordResponseCAAData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCAAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCAAData::new(flags? : Int32, tag? : String, value? : String) -> Self
+pub fn DnsRecordResponseCAAData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCAAData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCAAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCAAData
+pub impl @json.ToJson for DnsRecordResponseCAAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCAAMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseCAAMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCAAMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCAAMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseCAAMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCAAMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCAAMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCAAMeta
+pub impl @json.ToJson for DnsRecordResponseCAAMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCERT {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseCERTData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseCERTMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseCERT::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCERT::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCERT::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseCERTMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseCERTData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseCERT::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCERT::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCERT::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCERT
+pub impl @json.ToJson for DnsRecordResponseCERT
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCERTData {
+  algorithm : Int32?
+  certificate : String?
+  key_tag : Int32?
+  type_ : Int32?
+}
+pub fn DnsRecordResponseCERTData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCERTData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCERTData::new(algorithm? : Int32, certificate? : String, key_tag? : Int32, type_? : Int32) -> Self
+pub fn DnsRecordResponseCERTData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCERTData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCERTData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCERTData
+pub impl @json.ToJson for DnsRecordResponseCERTData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCERTMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseCERTMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCERTMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCERTMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseCERTMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCERTMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCERTMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCERTMeta
+pub impl @json.ToJson for DnsRecordResponseCERTMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCNAME {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordResponseCNAMESettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseCNAMEMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseCNAME::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCNAME::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCNAME::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseCNAMEMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordResponseCNAMESettings, tags? : Array[String], content? : String, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseCNAME::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCNAME::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCNAME::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCNAME
+pub impl @json.ToJson for DnsRecordResponseCNAME
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCNAMEMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseCNAMEMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCNAMEMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCNAMEMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseCNAMEMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCNAMEMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCNAMEMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCNAMEMeta
+pub impl @json.ToJson for DnsRecordResponseCNAMEMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseCNAMESettings {
+  flatten_cname : Bool?
+}
+pub fn DnsRecordResponseCNAMESettings::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCNAMESettings::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseCNAMESettings::new(flatten_cname? : Bool) -> Self
+pub fn DnsRecordResponseCNAMESettings::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseCNAMESettings::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseCNAMESettings::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseCNAMESettings
+pub impl @json.ToJson for DnsRecordResponseCNAMESettings
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseDNSKEY {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseDNSKEYData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseDNSKEYMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseDNSKEY::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDNSKEY::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseDNSKEY::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseDNSKEYMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseDNSKEYData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseDNSKEY::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDNSKEY::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseDNSKEY::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseDNSKEY
+pub impl @json.ToJson for DnsRecordResponseDNSKEY
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseDNSKEYData {
+  algorithm : Int32?
+  flags : Int32?
+  protocol : Int32?
+  public_key : String?
+}
+pub fn DnsRecordResponseDNSKEYData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDNSKEYData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseDNSKEYData::new(algorithm? : Int32, flags? : Int32, protocol? : Int32, public_key? : String) -> Self
+pub fn DnsRecordResponseDNSKEYData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDNSKEYData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseDNSKEYData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseDNSKEYData
+pub impl @json.ToJson for DnsRecordResponseDNSKEYData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseDNSKEYMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseDNSKEYMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDNSKEYMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseDNSKEYMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseDNSKEYMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDNSKEYMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseDNSKEYMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseDNSKEYMeta
+pub impl @json.ToJson for DnsRecordResponseDNSKEYMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseDS {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseDSData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseDSMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseDS::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseDS::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseDSMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseDSData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseDS::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDS::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseDS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseDS
+pub impl @json.ToJson for DnsRecordResponseDS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseDSData {
+  algorithm : Int32?
+  digest : String?
+  digest_type : Int32?
+  key_tag : Int32?
+}
+pub fn DnsRecordResponseDSData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDSData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseDSData::new(algorithm? : Int32, digest? : String, digest_type? : Int32, key_tag? : Int32) -> Self
+pub fn DnsRecordResponseDSData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDSData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseDSData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseDSData
+pub impl @json.ToJson for DnsRecordResponseDSData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseDSMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseDSMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDSMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseDSMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseDSMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseDSMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseDSMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseDSMeta
+pub impl @json.ToJson for DnsRecordResponseDSMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseHTTPS {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseHTTPSData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseHTTPSMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseHTTPS::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseHTTPS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseHTTPS::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseHTTPSMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseHTTPSData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseHTTPS::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseHTTPS::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseHTTPS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseHTTPS
+pub impl @json.ToJson for DnsRecordResponseHTTPS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseHTTPSData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn DnsRecordResponseHTTPSData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseHTTPSData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseHTTPSData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn DnsRecordResponseHTTPSData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseHTTPSData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseHTTPSData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseHTTPSData
+pub impl @json.ToJson for DnsRecordResponseHTTPSData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseHTTPSMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseHTTPSMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseHTTPSMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseHTTPSMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseHTTPSMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseHTTPSMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseHTTPSMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseHTTPSMeta
+pub impl @json.ToJson for DnsRecordResponseHTTPSMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseLOC {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseLOCData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseLOCMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseLOC::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOC::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseLOC::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseLOCMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseLOCData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseLOC::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOC::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseLOC::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseLOC
+pub impl @json.ToJson for DnsRecordResponseLOC
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseLOCData {
+  altitude : Double?
+  lat_degrees : Int32?
+  lat_direction : DnsRecordResponseLOCDataLatDirection?
+  lat_minutes : Int32?
+  lat_seconds : Double?
+  long_degrees : Int32?
+  long_direction : DnsRecordResponseLOCDataLongDirection?
+  long_minutes : Int32?
+  long_seconds : Double?
+  precision_horz : Double?
+  precision_vert : Double?
+  size : Double?
+}
+pub fn DnsRecordResponseLOCData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseLOCData::new(altitude? : Double, lat_degrees? : Int32, lat_direction? : DnsRecordResponseLOCDataLatDirection, lat_minutes? : Int32, lat_seconds? : Double, long_degrees? : Int32, long_direction? : DnsRecordResponseLOCDataLongDirection, long_minutes? : Int32, long_seconds? : Double, precision_horz? : Double, precision_vert? : Double, size? : Double) -> Self
+pub fn DnsRecordResponseLOCData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseLOCData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseLOCData
+pub impl @json.ToJson for DnsRecordResponseLOCData
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordResponseLOCDataLatDirection {
+  N
+  S
+  Unknown(String)
+}
+pub fn DnsRecordResponseLOCDataLatDirection::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCDataLatDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseLOCDataLatDirection::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCDataLatDirection::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseLOCDataLatDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseLOCDataLatDirection
+pub impl @json.ToJson for DnsRecordResponseLOCDataLatDirection
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordResponseLOCDataLongDirection {
+  E
+  W
+  Unknown(String)
+}
+pub fn DnsRecordResponseLOCDataLongDirection::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCDataLongDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseLOCDataLongDirection::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCDataLongDirection::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseLOCDataLongDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseLOCDataLongDirection
+pub impl @json.ToJson for DnsRecordResponseLOCDataLongDirection
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseLOCMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseLOCMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseLOCMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseLOCMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseLOCMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseLOCMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseLOCMeta
+pub impl @json.ToJson for DnsRecordResponseLOCMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseMX {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  priority : Int32?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseMXMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseMX::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseMX::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseMX::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseMXMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, priority? : Int32, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseMX::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseMX::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseMX::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseMX
+pub impl @json.ToJson for DnsRecordResponseMX
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseMXMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseMXMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseMXMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseMXMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseMXMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseMXMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseMXMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseMXMeta
+pub impl @json.ToJson for DnsRecordResponseMXMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseNAPTR {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseNAPTRData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseNAPTRMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseNAPTR::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNAPTR::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseNAPTR::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseNAPTRMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseNAPTRData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseNAPTR::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNAPTR::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseNAPTR::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseNAPTR
+pub impl @json.ToJson for DnsRecordResponseNAPTR
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseNAPTRData {
+  flags : String?
+  order : Int32?
+  preference : Int32?
+  regex : String?
+  replacement : String?
+  service : String?
+}
+pub fn DnsRecordResponseNAPTRData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNAPTRData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseNAPTRData::new(flags? : String, order? : Int32, preference? : Int32, regex? : String, replacement? : String, service? : String) -> Self
+pub fn DnsRecordResponseNAPTRData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNAPTRData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseNAPTRData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseNAPTRData
+pub impl @json.ToJson for DnsRecordResponseNAPTRData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseNAPTRMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseNAPTRMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNAPTRMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseNAPTRMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseNAPTRMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNAPTRMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseNAPTRMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseNAPTRMeta
+pub impl @json.ToJson for DnsRecordResponseNAPTRMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseNS {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseNSMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseNS::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNS::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseNS::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseNSMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseNS::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNS::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseNS::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseNS
+pub impl @json.ToJson for DnsRecordResponseNS
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseNSMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseNSMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNSMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseNSMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseNSMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseNSMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseNSMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseNSMeta
+pub impl @json.ToJson for DnsRecordResponseNSMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseOPENPGPKEY {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseOPENPGPKEYMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseOPENPGPKEY::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseOPENPGPKEY::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseOPENPGPKEY::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseOPENPGPKEYMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseOPENPGPKEY::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseOPENPGPKEY::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseOPENPGPKEY::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseOPENPGPKEY
+pub impl @json.ToJson for DnsRecordResponseOPENPGPKEY
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseOPENPGPKEYMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseOPENPGPKEYMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseOPENPGPKEYMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseOPENPGPKEYMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseOPENPGPKEYMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseOPENPGPKEYMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseOPENPGPKEYMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseOPENPGPKEYMeta
+pub impl @json.ToJson for DnsRecordResponseOPENPGPKEYMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponsePTR {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponsePTRMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponsePTR::equal(Self, Self) -> Bool
+pub fn DnsRecordResponsePTR::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponsePTR::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponsePTRMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponsePTR::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponsePTR::to_json(Self) -> @json.Json
+pub fn DnsRecordResponsePTR::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponsePTR
+pub impl @json.ToJson for DnsRecordResponsePTR
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponsePTRMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponsePTRMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponsePTRMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponsePTRMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponsePTRMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponsePTRMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponsePTRMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponsePTRMeta
+pub impl @json.ToJson for DnsRecordResponsePTRMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSMIMEA {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseSMIMEAData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseSMIMEAMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseSMIMEA::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSMIMEA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSMIMEA::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseSMIMEAMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseSMIMEAData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseSMIMEA::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSMIMEA::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSMIMEA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSMIMEA
+pub impl @json.ToJson for DnsRecordResponseSMIMEA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSMIMEAData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn DnsRecordResponseSMIMEAData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSMIMEAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSMIMEAData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn DnsRecordResponseSMIMEAData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSMIMEAData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSMIMEAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSMIMEAData
+pub impl @json.ToJson for DnsRecordResponseSMIMEAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSMIMEAMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseSMIMEAMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSMIMEAMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSMIMEAMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseSMIMEAMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSMIMEAMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSMIMEAMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSMIMEAMeta
+pub impl @json.ToJson for DnsRecordResponseSMIMEAMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSRV {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseSRVData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseSRVMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseSRV::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSRV::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSRV::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseSRVMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseSRVData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseSRV::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSRV::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSRV::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSRV
+pub impl @json.ToJson for DnsRecordResponseSRV
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSRVData {
+  port : Int32?
+  priority : Int32?
+  target : String?
+  weight : Int32?
+}
+pub fn DnsRecordResponseSRVData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSRVData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSRVData::new(port? : Int32, priority? : Int32, target? : String, weight? : Int32) -> Self
+pub fn DnsRecordResponseSRVData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSRVData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSRVData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSRVData
+pub impl @json.ToJson for DnsRecordResponseSRVData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSRVMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseSRVMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSRVMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSRVMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseSRVMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSRVMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSRVMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSRVMeta
+pub impl @json.ToJson for DnsRecordResponseSRVMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSSHFP {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseSSHFPData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseSSHFPMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseSSHFP::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSSHFP::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSSHFP::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseSSHFPMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseSSHFPData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseSSHFP::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSSHFP::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSSHFP::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSSHFP
+pub impl @json.ToJson for DnsRecordResponseSSHFP
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSSHFPData {
+  algorithm : Int32?
+  fingerprint : String?
+  type_ : Int32?
+}
+pub fn DnsRecordResponseSSHFPData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSSHFPData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSSHFPData::new(algorithm? : Int32, fingerprint? : String, type_? : Int32) -> Self
+pub fn DnsRecordResponseSSHFPData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSSHFPData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSSHFPData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSSHFPData
+pub impl @json.ToJson for DnsRecordResponseSSHFPData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSSHFPMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseSSHFPMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSSHFPMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSSHFPMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseSSHFPMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSSHFPMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSSHFPMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSSHFPMeta
+pub impl @json.ToJson for DnsRecordResponseSSHFPMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSVCB {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseSVCBData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseSVCBMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseSVCB::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSVCB::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSVCB::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseSVCBMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseSVCBData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseSVCB::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSVCB::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSVCB::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSVCB
+pub impl @json.ToJson for DnsRecordResponseSVCB
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSVCBData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn DnsRecordResponseSVCBData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSVCBData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSVCBData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn DnsRecordResponseSVCBData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSVCBData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSVCBData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSVCBData
+pub impl @json.ToJson for DnsRecordResponseSVCBData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseSVCBMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseSVCBMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSVCBMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseSVCBMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseSVCBMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseSVCBMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseSVCBMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseSVCBMeta
+pub impl @json.ToJson for DnsRecordResponseSVCBMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseTLSA {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseTLSAData?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseTLSAMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseTLSA::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTLSA::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseTLSA::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseTLSAMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseTLSAData, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseTLSA::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTLSA::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseTLSA::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseTLSA
+pub impl @json.ToJson for DnsRecordResponseTLSA
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseTLSAData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn DnsRecordResponseTLSAData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTLSAData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseTLSAData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn DnsRecordResponseTLSAData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTLSAData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseTLSAData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseTLSAData
+pub impl @json.ToJson for DnsRecordResponseTLSAData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseTLSAMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseTLSAMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTLSAMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseTLSAMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseTLSAMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTLSAMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseTLSAMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseTLSAMeta
+pub impl @json.ToJson for DnsRecordResponseTLSAMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseTXT {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseTXTMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseTXT::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTXT::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseTXT::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseTXTMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseTXT::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTXT::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseTXT::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseTXT
+pub impl @json.ToJson for DnsRecordResponseTXT
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseTXTMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseTXTMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTXTMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseTXTMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseTXTMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseTXTMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseTXTMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseTXTMeta
+pub impl @json.ToJson for DnsRecordResponseTXTMeta
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseURI {
+  comment : String?
+  name : String
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32
+  content : String?
+  data : DnsRecordResponseURIData?
+  priority : Int32?
+  type_ : String
+  comment_modified_on : String?
+  created_on : String
+  id : String
+  meta : DnsRecordResponseURIMeta
+  modified_on : String
+  proxiable : Bool
+  tags_modified_on : String?
+}
+pub fn DnsRecordResponseURI::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseURI::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseURI::new(name~ : String, ttl~ : Int32, type_~ : String, created_on~ : String, id~ : String, meta~ : DnsRecordResponseURIMeta, modified_on~ : String, proxiable~ : Bool, comment? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], content? : String, data? : DnsRecordResponseURIData, priority? : Int32, comment_modified_on? : String, tags_modified_on? : String) -> Self
+pub fn DnsRecordResponseURI::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseURI::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseURI::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseURI
+pub impl @json.ToJson for DnsRecordResponseURI
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseURIData {
+  target : String?
+  weight : Int32?
+}
+pub fn DnsRecordResponseURIData::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseURIData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseURIData::new(target? : String, weight? : Int32) -> Self
+pub fn DnsRecordResponseURIData::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseURIData::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseURIData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseURIData
+pub impl @json.ToJson for DnsRecordResponseURIData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordResponseURIMeta {
+  dead_glue : Bool?
+  is_glue : Bool?
+  shadowed_by : Array[String]?
+  shadowed_records_count : Int32?
+}
+pub fn DnsRecordResponseURIMeta::equal(Self, Self) -> Bool
+pub fn DnsRecordResponseURIMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordResponseURIMeta::new(dead_glue? : Bool, is_glue? : Bool, shadowed_by? : Array[String], shadowed_records_count? : Int32) -> Self
+pub fn DnsRecordResponseURIMeta::not_equal(Self, Self) -> Bool
+pub fn DnsRecordResponseURIMeta::to_json(Self) -> @json.Json
+pub fn DnsRecordResponseURIMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordResponseURIMeta
+pub impl @json.ToJson for DnsRecordResponseURIMeta
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordScanBatchAccept {
+  A(ARecord)
+  AAAA(AAAARecord)
+  CNAME(CNAMERecord)
+  MX(MXRecord)
+  NS(NSRecord)
+  OPENPGPKEY(OPENPGPKEYRecord)
+  PTR(PTRRecord)
+  TXT(TXTRecord)
+  CAA(CAARecord)
+  CERT(CERTRecord)
+  DNSKEY(DNSKEYRecord)
+  DS(DSRecord)
+  HTTPS(HTTPSRecord)
+  LOC(LOCRecord)
+  NAPTR(NAPTRRecord)
+  SMIMEA(SMIMEARecord)
+  SRV(SRVRecord)
+  SSHFP(SSHFPRecord)
+  SVCB(SVCBRecord)
+  TLSA(TLSARecord)
+  URI(URIRecord)
+  Unknown(String, @json.Json)
+}
+pub fn DnsRecordScanBatchAccept::equal(Self, Self) -> Bool
+pub fn DnsRecordScanBatchAccept::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordScanBatchAccept::not_equal(Self, Self) -> Bool
+pub fn DnsRecordScanBatchAccept::to_json(Self) -> @json.Json
+pub fn DnsRecordScanBatchAccept::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordScanBatchAccept
+pub impl @json.ToJson for DnsRecordScanBatchAccept
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordScanBatchReject {
+  id : String
+}
+pub fn DnsRecordScanBatchReject::equal(Self, Self) -> Bool
+pub fn DnsRecordScanBatchReject::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordScanBatchReject::new(id~ : String) -> Self
+pub fn DnsRecordScanBatchReject::not_equal(Self, Self) -> Bool
+pub fn DnsRecordScanBatchReject::to_json(Self) -> @json.Json
+pub fn DnsRecordScanBatchReject::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordScanBatchReject
+pub impl @json.ToJson for DnsRecordScanBatchReject
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsRecordSettings {
+  ipv4_only : Bool?
+  ipv6_only : Bool?
+}
+pub fn DnsRecordSettings::equal(Self, Self) -> Bool
+pub fn DnsRecordSettings::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordSettings::new(ipv4_only? : Bool, ipv6_only? : Bool) -> Self
+pub fn DnsRecordSettings::not_equal(Self, Self) -> Bool
+pub fn DnsRecordSettings::to_json(Self) -> @json.Json
+pub fn DnsRecordSettings::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordSettings
+pub impl @json.ToJson for DnsRecordSettings
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordTagMatch {
+  Any
+  All
+  Custom(String)
+}
+pub fn DnsRecordTagMatch::equal(Self, Self) -> Bool
+pub fn DnsRecordTagMatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordTagMatch::not_equal(Self, Self) -> Bool
+pub fn DnsRecordTagMatch::to_json(Self) -> @json.Json
+pub fn DnsRecordTagMatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordTagMatch
+pub impl @json.ToJson for DnsRecordTagMatch
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnsRecordType {
+  A
+  AAAA
+  CAA
+  CERT
+  CNAME
+  DNSKEY
+  DS
+  HTTPS
+  LOC
+  MX
+  NAPTR
+  NS
+  OPENPGPKEY
+  PTR
+  SMIMEA
+  SRV
+  SSHFP
+  SVCB
+  TLSA
+  TXT
+  URI
+  Custom(String)
+}
+pub fn DnsRecordType::equal(Self, Self) -> Bool
+pub fn DnsRecordType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsRecordType::not_equal(Self, Self) -> Bool
+pub fn DnsRecordType::to_json(Self) -> @json.Json
+pub fn DnsRecordType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsRecordType
+pub impl @json.ToJson for DnsRecordType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsScanReview {
+  accepts : Array[DnsRecordScanBatchAccept]?
+  rejects : Array[DnsRecordScanBatchReject]?
+}
+pub fn DnsScanReview::equal(Self, Self) -> Bool
+pub fn DnsScanReview::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsScanReview::new(accepts? : Array[DnsRecordScanBatchAccept], rejects? : Array[DnsRecordScanBatchReject]) -> Self
+pub fn DnsScanReview::not_equal(Self, Self) -> Bool
+pub fn DnsScanReview::to_json(Self) -> @json.Json
+pub fn DnsScanReview::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsScanReview
+pub impl @json.ToJson for DnsScanReview
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnsScanReviewResult {
+  accepts : Array[DnsRecordResponse]?
+  rejects : Array[String]?
+}
+pub fn DnsScanReviewResult::equal(Self, Self) -> Bool
+pub fn DnsScanReviewResult::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnsScanReviewResult::new(accepts? : Array[DnsRecordResponse], rejects? : Array[String]) -> Self
+pub fn DnsScanReviewResult::not_equal(Self, Self) -> Bool
+pub fn DnsScanReviewResult::to_json(Self) -> @json.Json
+pub fn DnsScanReviewResult::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnsScanReviewResult
+pub impl @json.ToJson for DnsScanReviewResult
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Dnssec {
+  algorithm : @jsonkit.Presence[String]
+  digest : @jsonkit.Presence[String]
+  digest_algorithm : @jsonkit.Presence[String]
+  digest_type : @jsonkit.Presence[String]
+  dnssec_multi_signer : Bool?
+  dnssec_presigned : Bool?
+  dnssec_use_nsec3 : Bool?
+  ds : @jsonkit.Presence[String]
+  flags : @jsonkit.Presence[Int32]
+  key_tag : @jsonkit.Presence[Int32]
+  key_type : @jsonkit.Presence[String]
+  modified_on : @jsonkit.Presence[String]
+  public_key : @jsonkit.Presence[String]
+  status : DnssecStatus?
+}
+pub fn Dnssec::equal(Self, Self) -> Bool
+pub fn Dnssec::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn Dnssec::new(algorithm? : String, digest? : String, digest_algorithm? : String, digest_type? : String, dnssec_multi_signer? : Bool, dnssec_presigned? : Bool, dnssec_use_nsec3? : Bool, ds? : String, flags? : Int32, key_tag? : Int32, key_type? : String, modified_on? : String, public_key? : String, status? : DnssecStatus) -> Self
+pub fn Dnssec::not_equal(Self, Self) -> Bool
+pub fn Dnssec::to_json(Self) -> @json.Json
+pub fn Dnssec::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Dnssec
+pub impl @json.ToJson for Dnssec
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DnssecPatch {
+  dnssec_multi_signer : Bool?
+  dnssec_presigned : Bool?
+  dnssec_use_nsec3 : Bool?
+  status : DnssecPatchStatus?
+}
+pub fn DnssecPatch::equal(Self, Self) -> Bool
+pub fn DnssecPatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnssecPatch::new(dnssec_multi_signer? : Bool, dnssec_presigned? : Bool, dnssec_use_nsec3? : Bool, status? : DnssecPatchStatus) -> Self
+pub fn DnssecPatch::not_equal(Self, Self) -> Bool
+pub fn DnssecPatch::to_json(Self) -> @json.Json
+pub fn DnssecPatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnssecPatch
+pub impl @json.ToJson for DnssecPatch
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnssecPatchStatus {
+  Active
+  Disabled
+  Custom(String)
+}
+pub fn DnssecPatchStatus::equal(Self, Self) -> Bool
+pub fn DnssecPatchStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnssecPatchStatus::not_equal(Self, Self) -> Bool
+pub fn DnssecPatchStatus::to_json(Self) -> @json.Json
+pub fn DnssecPatchStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnssecPatchStatus
+pub impl @json.ToJson for DnssecPatchStatus
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DnssecStatus {
+  Active
+  Pending
+  Disabled
+  PendingDisabled
+  Error
+  Unknown(String)
+}
+pub fn DnssecStatus::equal(Self, Self) -> Bool
+pub fn DnssecStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn DnssecStatus::not_equal(Self, Self) -> Bool
+pub fn DnssecStatus::to_json(Self) -> @json.Json
+pub fn DnssecStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DnssecStatus
+pub impl @json.ToJson for DnssecStatus
+
+#derive(Eq, @debug.Debug)
+pub(all) struct HTTPSRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : HTTPSRecordData?
+  type_ : String?
+}
+pub fn HTTPSRecord::equal(Self, Self) -> Bool
+pub fn HTTPSRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn HTTPSRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : HTTPSRecordData, type_? : String) -> Self
+pub fn HTTPSRecord::not_equal(Self, Self) -> Bool
+pub fn HTTPSRecord::to_json(Self) -> @json.Json
+pub fn HTTPSRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for HTTPSRecord
+pub impl @json.ToJson for HTTPSRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct HTTPSRecordData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn HTTPSRecordData::equal(Self, Self) -> Bool
+pub fn HTTPSRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn HTTPSRecordData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn HTTPSRecordData::not_equal(Self, Self) -> Bool
+pub fn HTTPSRecordData::to_json(Self) -> @json.Json
+pub fn HTTPSRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for HTTPSRecordData
+pub impl @json.ToJson for HTTPSRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct InternalDnsBase {
+  reference_zone_id : String?
+}
+pub fn InternalDnsBase::equal(Self, Self) -> Bool
+pub fn InternalDnsBase::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn InternalDnsBase::new(reference_zone_id? : String) -> Self
+pub fn InternalDnsBase::not_equal(Self, Self) -> Bool
+pub fn InternalDnsBase::to_json(Self) -> @json.Json
+pub fn InternalDnsBase::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for InternalDnsBase
+pub impl @json.ToJson for InternalDnsBase
+
+#derive(Eq, @debug.Debug)
+pub(all) struct InternalDnsResponse {
+  reference_zone_id : String
+}
+pub fn InternalDnsResponse::equal(Self, Self) -> Bool
+pub fn InternalDnsResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn InternalDnsResponse::new(reference_zone_id~ : String) -> Self
+pub fn InternalDnsResponse::not_equal(Self, Self) -> Bool
+pub fn InternalDnsResponse::to_json(Self) -> @json.Json
+pub fn InternalDnsResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for InternalDnsResponse
+pub impl @json.ToJson for InternalDnsResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LOCRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : LOCRecordData?
+  type_ : String?
+}
+pub fn LOCRecord::equal(Self, Self) -> Bool
+pub fn LOCRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn LOCRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : LOCRecordData, type_? : String) -> Self
+pub fn LOCRecord::not_equal(Self, Self) -> Bool
+pub fn LOCRecord::to_json(Self) -> @json.Json
+pub fn LOCRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LOCRecord
+pub impl @json.ToJson for LOCRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LOCRecordData {
+  altitude : Double?
+  lat_degrees : Int32?
+  lat_direction : LOCRecordDataLatDirection?
+  lat_minutes : Int32?
+  lat_seconds : Double?
+  long_degrees : Int32?
+  long_direction : LOCRecordDataLongDirection?
+  long_minutes : Int32?
+  long_seconds : Double?
+  precision_horz : Double?
+  precision_vert : Double?
+  size : Double?
+}
+pub fn LOCRecordData::equal(Self, Self) -> Bool
+pub fn LOCRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn LOCRecordData::new(altitude? : Double, lat_degrees? : Int32, lat_direction? : LOCRecordDataLatDirection, lat_minutes? : Int32, lat_seconds? : Double, long_degrees? : Int32, long_direction? : LOCRecordDataLongDirection, long_minutes? : Int32, long_seconds? : Double, precision_horz? : Double, precision_vert? : Double, size? : Double) -> Self
+pub fn LOCRecordData::not_equal(Self, Self) -> Bool
+pub fn LOCRecordData::to_json(Self) -> @json.Json
+pub fn LOCRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LOCRecordData
+pub impl @json.ToJson for LOCRecordData
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum LOCRecordDataLatDirection {
+  N
+  S
+  Unknown(String)
+}
+pub fn LOCRecordDataLatDirection::equal(Self, Self) -> Bool
+pub fn LOCRecordDataLatDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn LOCRecordDataLatDirection::not_equal(Self, Self) -> Bool
+pub fn LOCRecordDataLatDirection::to_json(Self) -> @json.Json
+pub fn LOCRecordDataLatDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LOCRecordDataLatDirection
+pub impl @json.ToJson for LOCRecordDataLatDirection
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum LOCRecordDataLongDirection {
+  E
+  W
+  Unknown(String)
+}
+pub fn LOCRecordDataLongDirection::equal(Self, Self) -> Bool
+pub fn LOCRecordDataLongDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn LOCRecordDataLongDirection::not_equal(Self, Self) -> Bool
+pub fn LOCRecordDataLongDirection::to_json(Self) -> @json.Json
+pub fn LOCRecordDataLongDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LOCRecordDataLongDirection
+pub impl @json.ToJson for LOCRecordDataLongDirection
+
+#derive(Eq, @debug.Debug)
+pub(all) struct MXRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  priority : Int32?
+  type_ : String?
+}
+pub fn MXRecord::equal(Self, Self) -> Bool
+pub fn MXRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn MXRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, priority? : Int32, type_? : String) -> Self
+pub fn MXRecord::not_equal(Self, Self) -> Bool
+pub fn MXRecord::to_json(Self) -> @json.Json
+pub fn MXRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for MXRecord
+pub impl @json.ToJson for MXRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct NAPTRRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : NAPTRRecordData?
+  type_ : String?
+}
+pub fn NAPTRRecord::equal(Self, Self) -> Bool
+pub fn NAPTRRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn NAPTRRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : NAPTRRecordData, type_? : String) -> Self
+pub fn NAPTRRecord::not_equal(Self, Self) -> Bool
+pub fn NAPTRRecord::to_json(Self) -> @json.Json
+pub fn NAPTRRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for NAPTRRecord
+pub impl @json.ToJson for NAPTRRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct NAPTRRecordData {
+  flags : String?
+  order : Int32?
+  preference : Int32?
+  regex : String?
+  replacement : String?
+  service : String?
+}
+pub fn NAPTRRecordData::equal(Self, Self) -> Bool
+pub fn NAPTRRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn NAPTRRecordData::new(flags? : String, order? : Int32, preference? : Int32, regex? : String, replacement? : String, service? : String) -> Self
+pub fn NAPTRRecordData::not_equal(Self, Self) -> Bool
+pub fn NAPTRRecordData::to_json(Self) -> @json.Json
+pub fn NAPTRRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for NAPTRRecordData
+pub impl @json.ToJson for NAPTRRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct NSRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+}
+pub fn NSRecord::equal(Self, Self) -> Bool
+pub fn NSRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn NSRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn NSRecord::not_equal(Self, Self) -> Bool
+pub fn NSRecord::to_json(Self) -> @json.Json
+pub fn NSRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for NSRecord
+pub impl @json.ToJson for NSRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct OPENPGPKEYRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+}
+pub fn OPENPGPKEYRecord::equal(Self, Self) -> Bool
+pub fn OPENPGPKEYRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn OPENPGPKEYRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn OPENPGPKEYRecord::not_equal(Self, Self) -> Bool
+pub fn OPENPGPKEYRecord::to_json(Self) -> @json.Json
+pub fn OPENPGPKEYRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for OPENPGPKEYRecord
+pub impl @json.ToJson for OPENPGPKEYRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PTRRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+}
+pub fn PTRRecord::equal(Self, Self) -> Bool
+pub fn PTRRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn PTRRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn PTRRecord::not_equal(Self, Self) -> Bool
+pub fn PTRRecord::to_json(Self) -> @json.Json
+pub fn PTRRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PTRRecord
+pub impl @json.ToJson for PTRRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SMIMEARecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : SMIMEARecordData?
+  type_ : String?
+}
+pub fn SMIMEARecord::equal(Self, Self) -> Bool
+pub fn SMIMEARecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SMIMEARecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : SMIMEARecordData, type_? : String) -> Self
+pub fn SMIMEARecord::not_equal(Self, Self) -> Bool
+pub fn SMIMEARecord::to_json(Self) -> @json.Json
+pub fn SMIMEARecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SMIMEARecord
+pub impl @json.ToJson for SMIMEARecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SMIMEARecordData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn SMIMEARecordData::equal(Self, Self) -> Bool
+pub fn SMIMEARecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SMIMEARecordData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn SMIMEARecordData::not_equal(Self, Self) -> Bool
+pub fn SMIMEARecordData::to_json(Self) -> @json.Json
+pub fn SMIMEARecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SMIMEARecordData
+pub impl @json.ToJson for SMIMEARecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SRVRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : SRVRecordData?
+  type_ : String?
+}
+pub fn SRVRecord::equal(Self, Self) -> Bool
+pub fn SRVRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SRVRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : SRVRecordData, type_? : String) -> Self
+pub fn SRVRecord::not_equal(Self, Self) -> Bool
+pub fn SRVRecord::to_json(Self) -> @json.Json
+pub fn SRVRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SRVRecord
+pub impl @json.ToJson for SRVRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SRVRecordData {
+  port : Int32?
+  priority : Int32?
+  target : String?
+  weight : Int32?
+}
+pub fn SRVRecordData::equal(Self, Self) -> Bool
+pub fn SRVRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SRVRecordData::new(port? : Int32, priority? : Int32, target? : String, weight? : Int32) -> Self
+pub fn SRVRecordData::not_equal(Self, Self) -> Bool
+pub fn SRVRecordData::to_json(Self) -> @json.Json
+pub fn SRVRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SRVRecordData
+pub impl @json.ToJson for SRVRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SSHFPRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : SSHFPRecordData?
+  type_ : String?
+}
+pub fn SSHFPRecord::equal(Self, Self) -> Bool
+pub fn SSHFPRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SSHFPRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : SSHFPRecordData, type_? : String) -> Self
+pub fn SSHFPRecord::not_equal(Self, Self) -> Bool
+pub fn SSHFPRecord::to_json(Self) -> @json.Json
+pub fn SSHFPRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SSHFPRecord
+pub impl @json.ToJson for SSHFPRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SSHFPRecordData {
+  algorithm : Int32?
+  fingerprint : String?
+  type_ : Int32?
+}
+pub fn SSHFPRecordData::equal(Self, Self) -> Bool
+pub fn SSHFPRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SSHFPRecordData::new(algorithm? : Int32, fingerprint? : String, type_? : Int32) -> Self
+pub fn SSHFPRecordData::not_equal(Self, Self) -> Bool
+pub fn SSHFPRecordData::to_json(Self) -> @json.Json
+pub fn SSHFPRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SSHFPRecordData
+pub impl @json.ToJson for SSHFPRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SVCBRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : SVCBRecordData?
+  type_ : String?
+}
+pub fn SVCBRecord::equal(Self, Self) -> Bool
+pub fn SVCBRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SVCBRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : SVCBRecordData, type_? : String) -> Self
+pub fn SVCBRecord::not_equal(Self, Self) -> Bool
+pub fn SVCBRecord::to_json(Self) -> @json.Json
+pub fn SVCBRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SVCBRecord
+pub impl @json.ToJson for SVCBRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SVCBRecordData {
+  priority : Int32?
+  target : String?
+  value : String?
+}
+pub fn SVCBRecordData::equal(Self, Self) -> Bool
+pub fn SVCBRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SVCBRecordData::new(priority? : Int32, target? : String, value? : String) -> Self
+pub fn SVCBRecordData::not_equal(Self, Self) -> Bool
+pub fn SVCBRecordData::to_json(Self) -> @json.Json
+pub fn SVCBRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SVCBRecordData
+pub impl @json.ToJson for SVCBRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Soa {
+  expire : Int32
+  min_ttl : Int32
+  mname : String?
+  refresh : Int32
+  retry : Int32
+  rname : String
+  ttl : Int32
+}
+pub fn Soa::equal(Self, Self) -> Bool
+pub fn Soa::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn Soa::new(expire~ : Int32, min_ttl~ : Int32, refresh~ : Int32, retry~ : Int32, rname~ : String, ttl~ : Int32, mname? : String) -> Self
+pub fn Soa::not_equal(Self, Self) -> Bool
+pub fn Soa::to_json(Self) -> @json.Json
+pub fn Soa::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Soa
+pub impl @json.ToJson for Soa
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SoaPatch {
+  expire : Int32?
+  min_ttl : Int32?
+  mname : @jsonkit.Presence[String]
+  refresh : Int32?
+  retry : Int32?
+  rname : String?
+  ttl : Int32?
+}
+pub fn SoaPatch::equal(Self, Self) -> Bool
+pub fn SoaPatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn SoaPatch::new(expire? : Int32, min_ttl? : Int32, mname? : String, refresh? : Int32, retry? : Int32, rname? : String, ttl? : Int32) -> Self
+pub fn SoaPatch::not_equal(Self, Self) -> Bool
+pub fn SoaPatch::to_json(Self) -> @json.Json
+pub fn SoaPatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SoaPatch
+pub impl @json.ToJson for SoaPatch
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TLSARecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : TLSARecordData?
+  type_ : String?
+}
+pub fn TLSARecord::equal(Self, Self) -> Bool
+pub fn TLSARecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn TLSARecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : TLSARecordData, type_? : String) -> Self
+pub fn TLSARecord::not_equal(Self, Self) -> Bool
+pub fn TLSARecord::to_json(Self) -> @json.Json
+pub fn TLSARecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TLSARecord
+pub impl @json.ToJson for TLSARecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TLSARecordData {
+  certificate : String?
+  matching_type : Int32?
+  selector : Int32?
+  usage : Int32?
+}
+pub fn TLSARecordData::equal(Self, Self) -> Bool
+pub fn TLSARecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn TLSARecordData::new(certificate? : String, matching_type? : Int32, selector? : Int32, usage? : Int32) -> Self
+pub fn TLSARecordData::not_equal(Self, Self) -> Bool
+pub fn TLSARecordData::to_json(Self) -> @json.Json
+pub fn TLSARecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TLSARecordData
+pub impl @json.ToJson for TLSARecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TXTRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  type_ : String?
+}
+pub fn TXTRecord::equal(Self, Self) -> Bool
+pub fn TXTRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn TXTRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, type_? : String) -> Self
+pub fn TXTRecord::not_equal(Self, Self) -> Bool
+pub fn TXTRecord::to_json(Self) -> @json.Json
+pub fn TXTRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TXTRecord
+pub impl @json.ToJson for TXTRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct URIRecord {
+  comment : String?
+  name : String?
+  proxied : Bool?
+  settings : DnsRecordSettings?
+  tags : Array[String]?
+  ttl : Int32?
+  content : String?
+  data : URIRecordData?
+  priority : Int32?
+  type_ : String?
+}
+pub fn URIRecord::equal(Self, Self) -> Bool
+pub fn URIRecord::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn URIRecord::new(comment? : String, name? : String, proxied? : Bool, settings? : DnsRecordSettings, tags? : Array[String], ttl? : Int32, content? : String, data? : URIRecordData, priority? : Int32, type_? : String) -> Self
+pub fn URIRecord::not_equal(Self, Self) -> Bool
+pub fn URIRecord::to_json(Self) -> @json.Json
+pub fn URIRecord::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for URIRecord
+pub impl @json.ToJson for URIRecord
+
+#derive(Eq, @debug.Debug)
+pub(all) struct URIRecordData {
+  target : String?
+  weight : Int32?
+}
+pub fn URIRecordData::equal(Self, Self) -> Bool
+pub fn URIRecordData::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn URIRecordData::new(target? : String, weight? : Int32) -> Self
+pub fn URIRecordData::not_equal(Self, Self) -> Bool
+pub fn URIRecordData::to_json(Self) -> @json.Json
+pub fn URIRecordData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for URIRecordData
+pub impl @json.ToJson for URIRecordData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Zone {
+  account : ZoneAccount
+  activated_on : String?
+  cname_suffix : String?
+  created_on : String
+  development_mode : Int32
+  id : String
+  meta : ZoneMeta
+  modified_on : String
+  name : String
+  name_servers : Array[String]
+  original_dnshost : String?
+  original_name_servers : Array[String]?
+  original_registrar : String?
+  owner : ZoneOwner
+  paused : Bool?
+  permissions : Array[String]?
+  plan : ZonePlan
+  status : ZoneStatus?
+  tenant : ZoneTenant?
+  tenant_unit : ZoneTenantUnit?
+  type_ : ZoneType?
+  vanity_name_servers : Array[String]?
+  verification_key : String?
+}
+pub fn Zone::equal(Self, Self) -> Bool
+pub fn Zone::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn Zone::new(account~ : ZoneAccount, created_on~ : String, development_mode~ : Int32, id~ : String, meta~ : ZoneMeta, modified_on~ : String, name~ : String, name_servers~ : Array[String], owner~ : ZoneOwner, plan~ : ZonePlan, activated_on? : String, cname_suffix? : String, original_dnshost? : String, original_name_servers? : Array[String], original_registrar? : String, paused? : Bool, permissions? : Array[String], status? : ZoneStatus, tenant? : ZoneTenant, tenant_unit? : ZoneTenantUnit, type_? : ZoneType, vanity_name_servers? : Array[String], verification_key? : String) -> Self
+pub fn Zone::not_equal(Self, Self) -> Bool
+pub fn Zone::to_json(Self) -> @json.Json
+pub fn Zone::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Zone
+pub impl @json.ToJson for Zone
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneAccount {
+  id : String?
+  name : String?
+}
+pub fn ZoneAccount::equal(Self, Self) -> Bool
+pub fn ZoneAccount::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneAccount::new(id? : String, name? : String) -> Self
+pub fn ZoneAccount::not_equal(Self, Self) -> Bool
+pub fn ZoneAccount::to_json(Self) -> @json.Json
+pub fn ZoneAccount::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneAccount
+pub impl @json.ToJson for ZoneAccount
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneActivation {
+  id : String?
+}
+pub fn ZoneActivation::equal(Self, Self) -> Bool
+pub fn ZoneActivation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneActivation::new(id? : String) -> Self
+pub fn ZoneActivation::not_equal(Self, Self) -> Bool
+pub fn ZoneActivation::to_json(Self) -> @json.Json
+pub fn ZoneActivation::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneActivation
+pub impl @json.ToJson for ZoneActivation
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneCreate {
+  account : ZoneCreateAccount
+  name : String
+  type_ : ZoneType?
+}
+pub fn ZoneCreate::equal(Self, Self) -> Bool
+pub fn ZoneCreate::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneCreate::new(account~ : ZoneCreateAccount, name~ : String, type_? : ZoneType) -> Self
+pub fn ZoneCreate::not_equal(Self, Self) -> Bool
+pub fn ZoneCreate::to_json(Self) -> @json.Json
+pub fn ZoneCreate::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneCreate
+pub impl @json.ToJson for ZoneCreate
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneCreateAccount {
+  id : String?
+}
+pub fn ZoneCreateAccount::equal(Self, Self) -> Bool
+pub fn ZoneCreateAccount::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneCreateAccount::new(id? : String) -> Self
+pub fn ZoneCreateAccount::not_equal(Self, Self) -> Bool
+pub fn ZoneCreateAccount::to_json(Self) -> @json.Json
+pub fn ZoneCreateAccount::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneCreateAccount
+pub impl @json.ToJson for ZoneCreateAccount
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneDeletion {
+  id : String
+}
+pub fn ZoneDeletion::equal(Self, Self) -> Bool
+pub fn ZoneDeletion::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneDeletion::new(id~ : String) -> Self
+pub fn ZoneDeletion::not_equal(Self, Self) -> Bool
+pub fn ZoneDeletion::to_json(Self) -> @json.Json
+pub fn ZoneDeletion::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneDeletion
+pub impl @json.ToJson for ZoneDeletion
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneDirection {
+  Asc
+  Desc
+  Custom(String)
+}
+pub fn ZoneDirection::equal(Self, Self) -> Bool
+pub fn ZoneDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneDirection::not_equal(Self, Self) -> Bool
+pub fn ZoneDirection::to_json(Self) -> @json.Json
+pub fn ZoneDirection::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneDirection
+pub impl @json.ToJson for ZoneDirection
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneDnsSettings {
+  flatten_all_cnames : Bool
+  internal_dns : InternalDnsResponse
+  multi_provider : Bool
+  ns_ttl : Int32
+  secondary_overrides : Bool
+  soa : Soa
+  zone_mode : ZoneMode
+  nameservers : ZoneNameservers
+}
+pub fn ZoneDnsSettings::equal(Self, Self) -> Bool
+pub fn ZoneDnsSettings::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneDnsSettings::new(flatten_all_cnames~ : Bool, internal_dns~ : InternalDnsResponse, multi_provider~ : Bool, ns_ttl~ : Int32, secondary_overrides~ : Bool, soa~ : Soa, zone_mode~ : ZoneMode, nameservers~ : ZoneNameservers) -> Self
+pub fn ZoneDnsSettings::not_equal(Self, Self) -> Bool
+pub fn ZoneDnsSettings::to_json(Self) -> @json.Json
+pub fn ZoneDnsSettings::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneDnsSettings
+pub impl @json.ToJson for ZoneDnsSettings
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneDnsSettingsPatch {
+  flatten_all_cnames : Bool?
+  internal_dns : InternalDnsBase?
+  multi_provider : Bool?
+  ns_ttl : Int32?
+  secondary_overrides : Bool?
+  soa : SoaPatch?
+  zone_mode : ZoneMode?
+  nameservers : ZoneDnsSettingsPatchNameservers?
+}
+pub fn ZoneDnsSettingsPatch::equal(Self, Self) -> Bool
+pub fn ZoneDnsSettingsPatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneDnsSettingsPatch::new(flatten_all_cnames? : Bool, internal_dns? : InternalDnsBase, multi_provider? : Bool, ns_ttl? : Int32, secondary_overrides? : Bool, soa? : SoaPatch, zone_mode? : ZoneMode, nameservers? : ZoneDnsSettingsPatchNameservers) -> Self
+pub fn ZoneDnsSettingsPatch::not_equal(Self, Self) -> Bool
+pub fn ZoneDnsSettingsPatch::to_json(Self) -> @json.Json
+pub fn ZoneDnsSettingsPatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneDnsSettingsPatch
+pub impl @json.ToJson for ZoneDnsSettingsPatch
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneDnsSettingsPatchNameservers {
+  DnsSettingsZoneNameserversCloudflare(ZoneNameserversCloudflare)
+  DnsSettingsZoneNameserversCustomExisting(ZoneNameserversCustomExisting)
+  DnsSettingsZoneNameserversCustomSet(ZoneNameserversCustomSet)
+  Unknown(String, @json.Json)
+}
+pub fn ZoneDnsSettingsPatchNameservers::equal(Self, Self) -> Bool
+pub fn ZoneDnsSettingsPatchNameservers::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneDnsSettingsPatchNameservers::not_equal(Self, Self) -> Bool
+pub fn ZoneDnsSettingsPatchNameservers::to_json(Self) -> @json.Json
+pub fn ZoneDnsSettingsPatchNameservers::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneDnsSettingsPatchNameservers
+pub impl @json.ToJson for ZoneDnsSettingsPatchNameservers
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneListStatus {
+  Initializing
+  Pending
+  Active
+  Moved
+  Custom(String)
+}
+pub fn ZoneListStatus::equal(Self, Self) -> Bool
+pub fn ZoneListStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneListStatus::not_equal(Self, Self) -> Bool
+pub fn ZoneListStatus::to_json(Self) -> @json.Json
+pub fn ZoneListStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneListStatus
+pub impl @json.ToJson for ZoneListStatus
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneListType {
+  Full
+  Partial
+  Secondary
+  Internal
+  Custom(String)
+}
+pub fn ZoneListType::equal(Self, Self) -> Bool
+pub fn ZoneListType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneListType::not_equal(Self, Self) -> Bool
+pub fn ZoneListType::to_json(Self) -> @json.Json
+pub fn ZoneListType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneListType
+pub impl @json.ToJson for ZoneListType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneMatch {
+  Any
+  All
+  Custom(String)
+}
+pub fn ZoneMatch::equal(Self, Self) -> Bool
+pub fn ZoneMatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneMatch::not_equal(Self, Self) -> Bool
+pub fn ZoneMatch::to_json(Self) -> @json.Json
+pub fn ZoneMatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneMatch
+pub impl @json.ToJson for ZoneMatch
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneMeta {
+  cdn_only : Bool?
+  custom_certificate_quota : Int32?
+  dns_only : Bool?
+  foundation_dns : Bool?
+  page_rule_quota : Int32?
+  phishing_detected : Bool?
+  step : Int32?
+}
+pub fn ZoneMeta::equal(Self, Self) -> Bool
+pub fn ZoneMeta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneMeta::new(cdn_only? : Bool, custom_certificate_quota? : Int32, dns_only? : Bool, foundation_dns? : Bool, page_rule_quota? : Int32, phishing_detected? : Bool, step? : Int32) -> Self
+pub fn ZoneMeta::not_equal(Self, Self) -> Bool
+pub fn ZoneMeta::to_json(Self) -> @json.Json
+pub fn ZoneMeta::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneMeta
+pub impl @json.ToJson for ZoneMeta
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneMode {
+  Standard
+  CdnOnly
+  DnsOnly
+  Unknown(String)
+}
+pub fn ZoneMode::equal(Self, Self) -> Bool
+pub fn ZoneMode::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneMode::not_equal(Self, Self) -> Bool
+pub fn ZoneMode::to_json(Self) -> @json.Json
+pub fn ZoneMode::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneMode
+pub impl @json.ToJson for ZoneMode
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneNameservers {
+  DnsSettingsZoneNameserversCloudflare(ZoneNameserversCloudflare)
+  DnsSettingsZoneNameserversCustomExisting(ZoneNameserversCustomExisting)
+  DnsSettingsZoneNameserversCustomSet(ZoneNameserversCustomSet)
+  Unknown(String, @json.Json)
+}
+pub fn ZoneNameservers::equal(Self, Self) -> Bool
+pub fn ZoneNameservers::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneNameservers::not_equal(Self, Self) -> Bool
+pub fn ZoneNameservers::to_json(Self) -> @json.Json
+pub fn ZoneNameservers::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneNameservers
+pub impl @json.ToJson for ZoneNameservers
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneNameserversCloudflare {
+  type_ : ZoneNameserversCloudflareType
+}
+pub fn ZoneNameserversCloudflare::equal(Self, Self) -> Bool
+pub fn ZoneNameserversCloudflare::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneNameserversCloudflare::new(type_~ : ZoneNameserversCloudflareType) -> Self
+pub fn ZoneNameserversCloudflare::not_equal(Self, Self) -> Bool
+pub fn ZoneNameserversCloudflare::to_json(Self) -> @json.Json
+pub fn ZoneNameserversCloudflare::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneNameserversCloudflare
+pub impl @json.ToJson for ZoneNameserversCloudflare
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneNameserversCloudflareType {
+  CloudflareStandard
+  CloudflareAdvanced
+  Unknown(String)
+}
+pub fn ZoneNameserversCloudflareType::equal(Self, Self) -> Bool
+pub fn ZoneNameserversCloudflareType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneNameserversCloudflareType::not_equal(Self, Self) -> Bool
+pub fn ZoneNameserversCloudflareType::to_json(Self) -> @json.Json
+pub fn ZoneNameserversCloudflareType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneNameserversCloudflareType
+pub impl @json.ToJson for ZoneNameserversCloudflareType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneNameserversCustomExisting {
+  ns_set : Int32?
+  type_ : ZoneNameserversCustomExistingType
+}
+pub fn ZoneNameserversCustomExisting::equal(Self, Self) -> Bool
+pub fn ZoneNameserversCustomExisting::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneNameserversCustomExisting::new(type_~ : ZoneNameserversCustomExistingType, ns_set? : Int32) -> Self
+pub fn ZoneNameserversCustomExisting::not_equal(Self, Self) -> Bool
+pub fn ZoneNameserversCustomExisting::to_json(Self) -> @json.Json
+pub fn ZoneNameserversCustomExisting::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneNameserversCustomExisting
+pub impl @json.ToJson for ZoneNameserversCustomExisting
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneNameserversCustomExistingType {
+  CustomAccount
+  CustomTenant
+  CustomZone
+  Unknown(String)
+}
+pub fn ZoneNameserversCustomExistingType::equal(Self, Self) -> Bool
+pub fn ZoneNameserversCustomExistingType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneNameserversCustomExistingType::not_equal(Self, Self) -> Bool
+pub fn ZoneNameserversCustomExistingType::to_json(Self) -> @json.Json
+pub fn ZoneNameserversCustomExistingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneNameserversCustomExistingType
+pub impl @json.ToJson for ZoneNameserversCustomExistingType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneNameserversCustomSet {
+  nameserver_set_id : String
+  type_ : String
+}
+pub fn ZoneNameserversCustomSet::equal(Self, Self) -> Bool
+pub fn ZoneNameserversCustomSet::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneNameserversCustomSet::new(nameserver_set_id~ : String, type_~ : String) -> Self
+pub fn ZoneNameserversCustomSet::not_equal(Self, Self) -> Bool
+pub fn ZoneNameserversCustomSet::to_json(Self) -> @json.Json
+pub fn ZoneNameserversCustomSet::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneNameserversCustomSet
+pub impl @json.ToJson for ZoneNameserversCustomSet
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneOrder {
+  Name
+  Status
+  AccountId
+  AccountName
+  PlanId
+  Custom(String)
+}
+pub fn ZoneOrder::equal(Self, Self) -> Bool
+pub fn ZoneOrder::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneOrder::not_equal(Self, Self) -> Bool
+pub fn ZoneOrder::to_json(Self) -> @json.Json
+pub fn ZoneOrder::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneOrder
+pub impl @json.ToJson for ZoneOrder
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneOwner {
+  id : String?
+  name : String?
+  type_ : String?
+}
+pub fn ZoneOwner::equal(Self, Self) -> Bool
+pub fn ZoneOwner::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneOwner::new(id? : String, name? : String, type_? : String) -> Self
+pub fn ZoneOwner::not_equal(Self, Self) -> Bool
+pub fn ZoneOwner::to_json(Self) -> @json.Json
+pub fn ZoneOwner::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneOwner
+pub impl @json.ToJson for ZoneOwner
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZonePatch {
+  paused : Bool?
+  plan : ZonePatchPlan?
+  type_ : ZonePatchType?
+  vanity_name_servers : Array[String]?
+}
+pub fn ZonePatch::equal(Self, Self) -> Bool
+pub fn ZonePatch::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZonePatch::new(paused? : Bool, plan? : ZonePatchPlan, type_? : ZonePatchType, vanity_name_servers? : Array[String]) -> Self
+pub fn ZonePatch::not_equal(Self, Self) -> Bool
+pub fn ZonePatch::to_json(Self) -> @json.Json
+pub fn ZonePatch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZonePatch
+pub impl @json.ToJson for ZonePatch
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZonePatchPlan {
+  id : String?
+}
+pub fn ZonePatchPlan::equal(Self, Self) -> Bool
+pub fn ZonePatchPlan::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZonePatchPlan::new(id? : String) -> Self
+pub fn ZonePatchPlan::not_equal(Self, Self) -> Bool
+pub fn ZonePatchPlan::to_json(Self) -> @json.Json
+pub fn ZonePatchPlan::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZonePatchPlan
+pub impl @json.ToJson for ZonePatchPlan
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZonePatchType {
+  Full
+  Partial
+  Secondary
+  Internal
+  Custom(String)
+}
+pub fn ZonePatchType::equal(Self, Self) -> Bool
+pub fn ZonePatchType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZonePatchType::not_equal(Self, Self) -> Bool
+pub fn ZonePatchType::to_json(Self) -> @json.Json
+pub fn ZonePatchType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZonePatchType
+pub impl @json.ToJson for ZonePatchType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZonePlan {
+  can_subscribe : Bool?
+  currency : String?
+  externally_managed : Bool?
+  frequency : String?
+  id : String?
+  is_subscribed : Bool?
+  legacy_discount : Bool?
+  legacy_id : String?
+  name : String?
+  price : Double?
+}
+pub fn ZonePlan::equal(Self, Self) -> Bool
+pub fn ZonePlan::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZonePlan::new(can_subscribe? : Bool, currency? : String, externally_managed? : Bool, frequency? : String, id? : String, is_subscribed? : Bool, legacy_discount? : Bool, legacy_id? : String, name? : String, price? : Double) -> Self
+pub fn ZonePlan::not_equal(Self, Self) -> Bool
+pub fn ZonePlan::to_json(Self) -> @json.Json
+pub fn ZonePlan::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZonePlan
+pub impl @json.ToJson for ZonePlan
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneStatus {
+  Initializing
+  Pending
+  Active
+  Moved
+  Unknown(String)
+}
+pub fn ZoneStatus::equal(Self, Self) -> Bool
+pub fn ZoneStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneStatus::not_equal(Self, Self) -> Bool
+pub fn ZoneStatus::to_json(Self) -> @json.Json
+pub fn ZoneStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneStatus
+pub impl @json.ToJson for ZoneStatus
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneTenant {
+  id : String?
+  name : String?
+}
+pub fn ZoneTenant::equal(Self, Self) -> Bool
+pub fn ZoneTenant::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneTenant::new(id? : String, name? : String) -> Self
+pub fn ZoneTenant::not_equal(Self, Self) -> Bool
+pub fn ZoneTenant::to_json(Self) -> @json.Json
+pub fn ZoneTenant::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneTenant
+pub impl @json.ToJson for ZoneTenant
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ZoneTenantUnit {
+  id : String?
+}
+pub fn ZoneTenantUnit::equal(Self, Self) -> Bool
+pub fn ZoneTenantUnit::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneTenantUnit::new(id? : String) -> Self
+pub fn ZoneTenantUnit::not_equal(Self, Self) -> Bool
+pub fn ZoneTenantUnit::to_json(Self) -> @json.Json
+pub fn ZoneTenantUnit::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneTenantUnit
+pub impl @json.ToJson for ZoneTenantUnit
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ZoneType {
+  Full
+  Partial
+  Secondary
+  Internal
+  Unknown(String)
+}
+pub fn ZoneType::equal(Self, Self) -> Bool
+pub fn ZoneType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ZoneType::not_equal(Self, Self) -> Bool
+pub fn ZoneType::to_json(Self) -> @json.Json
+pub fn ZoneType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ZoneType
+pub impl @json.ToJson for ZoneType
+
+// Type aliases
+
+// Traits

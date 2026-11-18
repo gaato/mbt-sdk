@@ -78,9 +78,11 @@ def census(
             operations = len(select(doc, selection))
         auth_headers = set()
         if sdk and sdk.get('client_layer') and sdk['out'] != sdk['dir'] + '/src':
-            from tools.gen.client_layer import auth_choices
-            auth_headers = {'authorization'} | {a['name'].lower() for a in auth_choices(sdk['auth']) if a['kind'] == 'header'}
-        builder = IRBuilder(doc, sdk['package'] if sdk else "census/generated", derive_operation_ids=sdk['derive_operation_ids'] if sdk else True, auth_headers=auth_headers)
+            from tools.gen.client_layer import auth_choices, auth_header_names
+            auth_headers = auth_header_names(auth_choices(sdk['auth']))
+        has_client = bool(client_layer or sdk and sdk.get('client_layer'))
+        builder = IRBuilder(doc, sdk['package'] if sdk else "census/generated", derive_operation_ids=sdk['derive_operation_ids'] if sdk else True, auth_headers=auth_headers,
+                            auto_multipart_boundary=has_client and not (sdk or {}).get('legacy_multipart_boundary', False))
         ir = builder.build()
         emit(ir)
         if client_layer or sdk and sdk.get('client_layer'):

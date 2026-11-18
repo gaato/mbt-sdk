@@ -159,6 +159,7 @@ pub async fn[T] __CLIENT__::call(self : __CLIENT__, request : @http.Request, dec
   }
 }
 
+// BEGIN SSE
 ///|
 /// Consumes SSE events; stop finishes at a protocol sentinel and closes the body.
 /// Callback errors propagate. Streaming bodies are never replayed after consumption.
@@ -198,3 +199,4 @@ async fn __CLIENT__::stream_with_head(self : __CLIENT__, request : @http.Request
     error => raise error
   }
 }
+// END SSE

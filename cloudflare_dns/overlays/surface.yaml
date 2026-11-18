@@ -1,0 +1,110 @@
+overlay: 1.0.0
+info:
+  title: Cloudflare DNS and Zones module vocabulary
+  version: 1.0.0
+actions:
+  - target: "$"
+    description: The module already supplies the API namespace. Strip feed prefixes when names remain unique.
+    update:
+      x-moonbit-strip-type-prefixes: [dns-records, dns-settings, dnssec, zones, zone-activation]
+  - target: "$.components.schemas"
+    description: Name reusable payloads by their resource and role. Distinguish DNS record filters from zone filters.
+    update:
+      dns-records_dns-record-post: {x-moonbit-type-name: DnsRecord}
+      dns-records_dns-record-patch: {x-moonbit-type-name: DnsRecordPatch}
+      dns-records_dns-record-response: {x-moonbit-type-name: DnsRecordResponse}
+      dns-records_dns-record-batch-delete: {x-moonbit-type-name: BatchRecordDelete}
+      dns-records_dns-record-batch-patch: {x-moonbit-type-name: BatchRecordPatch}
+      dns-records_dns-record-batch-put: {x-moonbit-type-name: BatchRecordPut}
+      dns-records_dns-request-batch-object: {x-moonbit-type-name: DnsBatch}
+      dns-records_dns-response-batch-object: {x-moonbit-type-name: DnsBatchResult}
+      dns-records_dns-request-review-scan-object: {x-moonbit-type-name: DnsScanReview}
+      dns-records_dns-response-review-scan-object: {x-moonbit-type-name: DnsScanReviewResult}
+      dns-records_type: {x-moonbit-type-name: DnsRecordType}
+      dns-records_settings: {x-moonbit-type-name: DnsRecordSettings}
+      dns-records_direction: {x-moonbit-type-name: DnsRecordDirection}
+      dns-records_match: {x-moonbit-type-name: DnsRecordMatch}
+      dns-records_order: {x-moonbit-type-name: DnsRecordOrder}
+      dns-records_tag_match: {x-moonbit-type-name: DnsRecordTagMatch}
+      zones_zone: {x-moonbit-type-name: Zone}
+      zones_type: {x-moonbit-type-name: ZoneType}
+      dnssec_dnssec: {x-moonbit-type-name: Dnssec}
+      dnssec_status: {x-moonbit-type-name: DnssecStatus}
+      dns-settings_dns-settings-zone-patch: {x-moonbit-type-name: ZoneDnsSettingsPatch}
+      dns-settings_dns-settings-zone-response: {x-moonbit-type-name: ZoneDnsSettings}
+      dns-settings_soa-base: {x-moonbit-type-name: SoaPatch}
+      dns-settings_soa-response: {x-moonbit-type-name: Soa}
+  - target: "$.components.schemas['dns-records_dns-request-batch-object'].properties.posts.items"
+    description: A batch post has exactly the create body shape. Reuse the same tagged union.
+    update:
+      $ref: "#/components/schemas/dns-records_dns-record-post"
+  - target: "$.paths['/zones'].post.requestBody.content['application/json'].schema"
+    description: Name the collection POST body after its purpose.
+    update: {x-moonbit-type-name: ZoneCreate}
+  - target: "$.paths['/zones/{zone_id}'].patch.requestBody.content['application/json'].schema"
+    description: Name the PATCH body after its resource and verb.
+    update: {x-moonbit-type-name: ZonePatch}
+  - target: "$.paths['/zones/{zone_id}/dnssec'].patch.requestBody.content['application/json'].schema"
+    description: Distinguish the editable DNSSEC fields from the full returned state.
+    update: {x-moonbit-type-name: DnssecPatch}
+  - target: "$.components.schemas['zones_api-response-single-id'].allOf[1].properties.result"
+    description: The result carries the deleted zone ID when present.
+    update: {x-moonbit-type-name: ZoneDeletion}
+  - target: "$.paths['/zones/{zone_id}/activation_check'].put.responses['200'].content['application/json'].schema.allOf[1].properties.result"
+    description: The activation trigger returns an identifier.
+    update: {x-moonbit-type-name: ZoneActivation}
+  - target: "$.paths['/zones/{zone_id}/dns_records/{dns_record_id}'].delete.responses['200'].content['application/json'].schema.properties.result"
+    description: The result carries the deleted record ID.
+    update: {x-moonbit-type-name: DnsRecordDeletion}
+  - target: "$.components.schemas['dns-records_dns_response_import_scan'].allOf[1].properties.result"
+    description: Name the BIND import counters for callers of this slice.
+    update: {x-moonbit-type-name: DnsImportResult}
+  - target: "$.paths['/zones'].get.parameters[?@.name == 'type'].schema.items"
+    description: Zone list types have their own wire values distinct from the create body.
+    update: {x-moonbit-type-name: ZoneListType}
+  - target: "$.paths['/zones'].get.parameters[?@.name == 'status'].schema"
+    description: Distinguish the zone status filter from a returned status.
+    update: {x-moonbit-type-name: ZoneListStatus}
+  - target: "$.paths['/zones'].get.parameters[?@.name == 'order'].schema"
+    description: Describe the zone ordering query enum.
+    update: {x-moonbit-type-name: ZoneOrder}
+  - target: "$.paths['/zones'].get.parameters[?@.name == 'direction'].schema"
+    description: Describe the zone sort direction query enum.
+    update: {x-moonbit-type-name: ZoneDirection}
+  - target: "$.paths['/zones'].get.parameters[?@.name == 'match'].schema"
+    description: Describe how the zone list combines its filters.
+    update: {x-moonbit-type-name: ZoneMatch}
+  - target: "$.paths['/zones'].get.parameters[?@.name == 'page' || @.name == 'per_page'].schema"
+    description: Page indexes and page sizes count whole pages or records.
+    update: {type: integer}
+  - target: "$.components.schemas['dns-records_page','dns-records_per_page','dns-records_priority','dns-records_ttl','dns-settings_ns_ttl','dnssec_flags','dnssec_key_tag']"
+    description: Page arguments, TTL seconds, priority and DNSSEC flag or tag numbers are integers.
+    update: {type: integer}
+  - target: "$.components.schemas['dns-records_ttl'].anyOf[*]"
+    description: Both automatic TTL and the explicit seconds range use whole values.
+    update: {type: integer}
+  - target: "$.components.schemas['zones_result_info'].properties[*]"
+    description: Zone pagination metadata contains indexes and counts.
+    update: {type: integer}
+  - target: "$.components.schemas['dns-records_api-response-collection'].allOf[1].properties.result_info.properties[*]"
+    description: DNS pagination metadata contains indexes and counts.
+    update: {type: integer}
+  - target: "$.components.schemas['dns-records_dns_response_import_scan'].allOf[1].properties.result.properties[*]"
+    description: Import totals count individual records.
+    update: {type: integer}
+  - target: "$.components.schemas['zones_zone'].properties.development_mode"
+    description: The documented development-mode interval is a signed count of seconds.
+    update: {type: integer}
+  - target: "$.components.schemas['dns-settings_soa-base'].properties['expire','min_ttl','refresh','retry','ttl']"
+    description: SOA timer intervals and TTL count whole seconds.
+    update: {type: integer}
+  - target: >-
+      $.components.schemas['dns-records_CAARecord','dns-records_CERTRecord','dns-records_DNSKEYRecord','dns-records_DSRecord','dns-records_HTTPSRecord','dns-records_NAPTRRecord','dns-records_SMIMEARecord','dns-records_SRVRecord','dns-records_SSHFPRecord','dns-records_SVCBRecord','dns-records_TLSARecord','dns-records_URIRecord'].allOf[1].properties.data.properties[?@.type == 'number']
+    description: These DNS data fields are numeric protocol codes, flags, ports, priorities or weights.
+    update: {type: integer}
+  - target: "$.components.schemas['dns-records_LOCRecord'].allOf[1].properties.data.properties['lat_degrees','lat_minutes','long_degrees','long_minutes']"
+    description: LOC degrees and minutes are integer components. Seconds and precision can be fractional.
+    update: {type: integer}
+  - target: "$.paths['/zones/{zone_id}/dns_records/import'].post.requestBody.content['multipart/form-data'].schema.properties.file"
+    description: Expose the BIND zone file label while retaining the multipart wire part name file.
+    update: {x-moonbit-parameter-name: zone_file}

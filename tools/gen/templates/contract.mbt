@@ -36,7 +36,9 @@ test "generated header whitespace is a validation failure before I/O" {
   for value in [" leading", "trailing\t"] {
     let request = @http.Request::post("/contract-test").header("idempotency-key", value)
     assert_true(@driver.run_sync(() => sdk.send(request)) is Err(Validation(parameter="headers", ..)))
+// BEGIN SSE
     assert_true(@driver.run_sync(() => sdk.stream(request, _ => ())) is Err(Validation(parameter="headers", ..)))
+// END SSE
   }
   assert_eq(count.val, 0)
 }
@@ -55,11 +57,14 @@ test "generated client returns a transport failure for invalid runtime default h
   let request = @http.Request::get("/contract-test")
   @driver.run_sync(() => {
     assert_true(sdk.send(request) is Err(Transport(@http.TransportError(kind=Invalid, phase=Pool, ..))))
+// BEGIN SSE
     assert_true(sdk.stream(request, _ => abort("invalid request reached the SSE callback")) is Err(Transport(@http.TransportError(kind=Invalid, phase=Pool, ..))))
+// END SSE
   })
   assert_eq(count.val, 0)
 }
 
+// BEGIN SSE
 ///|
 test "generated stream propagates nested request validation from its callback" {
   let clock = @sim.FakeClock::new()
@@ -79,6 +84,7 @@ test "generated stream propagates nested request validation from its callback" {
   })
 }
 
+// END SSE
 ///|
 test "generated base override, paginator termination and SSE stop" {
   let count = Ref(0)
@@ -99,6 +105,7 @@ test "generated base override, paginator termination and SSE stop" {
     assert_true(pages.next_page() is Ok(None))
   })
   assert_eq(count.val, 2)
+// BEGIN SSE
   let seen : Ref[Array[String]] = Ref([])
   let driver = @driver.Driver::new()
   let source = @sim.Feed::bytes(driver, [b"data: one\n\n", b"data: stop\n\n", b"data: unreachable\n\n"])
@@ -110,6 +117,7 @@ test "generated base override, paginator termination and SSE stop" {
   assert_eq(seen.val, ["one"])
   assert_eq(source.closes(), 1)
   assert_eq(source.reads(), 2)
+// END SSE
 }
 
 ///|

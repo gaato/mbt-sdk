@@ -243,3 +243,62 @@ servers, errors, retry policy, pagination and SSE stop/closure. The behavior-not
 gate requires a dated, completed survey for published or enabled SDKs. An
 unpublished entry may use `behavior_note = "pending: <reason>"` while a separate
 research task owns the survey; publication cannot use that deferral.
+
+## Options for enveloped OpenAPI resources
+
+An overlay may name a security variant with `x-moonbit-auth-variant`.
+`type: x-moonbit-header-bundle` defines one credential with a `headers` map
+from constructor field names to wire header names. Its ledger alternative
+uses `kind = "header_bundle"`, the same headers, and an optional `variant`.
+Each header is validated, marked and redacted. A facade with
+`x-moonbit-require-auth: true` requires an explicit credential.
+
+`x-moonbit-operation-naming: fern` uses Fern's method and dotted group to
+name facade methods. Nested groups drop trailing scope names `zone` and
+`account`. Create and singleton CRUD methods use a singular resource name.
+A `scan-<verb>` becomes `<verb>_<resource>_scan`. An operation's explicit
+`x-moonbit-name` takes precedence.
+
+`x-moonbit-envelope` maps the schema's result, success, errors and messages
+keys to their on-wire names. The facade reports a false success flag as an
+HTTP failure with its response head, bounded bytes and structured messages.
+Typed success decoders return the configured result. Use the generic
+`send` when you need the full successful envelope.
+
+Typed operations and paginators reuse the parse that checks the success flag.
+A declared JSON envelope without a result validates its required metadata
+before returning Unit. An omitted result decodes to None when the result is
+both nullable and optional. `x-moonbit-nullable-fields` can mark fields of a
+tagged response union nullable while keeping referenced write schemas intact.
+
+```yaml
+x-moonbit-paginate: {kind: page, param: page, items: result, next: result_info.total_pages}
+```
+
+Numbered pages begin at the query page or page one and preserve the other
+filters, including per-page size. The reported total page count ends the
+iterator. Without a total, an empty result ends it.
+
+The retry table can include `guard_response_retries` method/status rules.
+They keep a positive server override inside a response-replay boundary for
+selected methods. Transport decisions still follow the retry policy.
+`rate_limit_prefix` may give several modules a shared provider prefix.
+
+For generated type names, `x-moonbit-strip-type-prefixes` lists schema
+namespace prefixes that can drop when the shortened declaration is unique.
+A collision keeps the original name and produces a census note. A schema's
+`x-moonbit-type-name` supplies an explicit MoonBit declaration name. Envelope
+schemas and metadata reachable only from the wire wrapper are omitted from
+the public vocabulary. The raw reply still preserves them.
+
+Multipart clients label required parts and choose a boundary absent from
+the complete bytes of every buffered part. The builder collects conflicts in
+one scan per part before choosing the first free suffix. `x-moonbit-parameter-name` on a
+multipart field changes the MoonBit argument label while retaining the part's
+wire name. Vocabulary-only generators still accept a caller-provided boundary.
+A ledger entry with `legacy_multipart_boundary = true` preserves an existing
+client's explicit boundary argument.
+
+A client gets the generic SSE method when a selected operation declares an
+SSE success medium or selects the typed SSE adapter. Existing clients can
+pin `legacy_generic_stream = true` in the ledger to preserve their interface.

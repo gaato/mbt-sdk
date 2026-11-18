@@ -51,8 +51,23 @@ def _merge_objects(
             diagnostics.append(Diagnostic(part_pointer, f"unresolved local $ref {raw.get('$ref')}", "fix the reference in overlays/fix.yaml"))
             continue
         part = merge_all_of(part, part_pointer, doc, diagnostics, notes, active)
-        if not isinstance(part, dict) or not (part.get("type") == "object" or "properties" in part):
+        is_object = isinstance(part, dict) and (part.get("type") == "object" or "properties" in part)
+        if not is_object and isinstance(part, dict) and ("oneOf" in part or "anyOf" in part):
+            # A union of object branches is itself object-shaped even when
+            # the schema omits an explicit type beside oneOf/anyOf.
+            from .ir import _primitive_shape
+            try:
+                is_object = _primitive_shape(part, lambda ref: resolve_local(doc, ref)) == "object"
+            except (KeyError, TypeError):
+                pass
+        if not is_object:
             diagnostics.append(Diagnostic(part_pointer, "allOf member is not an object schema", "replace or remove the allOf member in overlays/fix.yaml"))
+            continue
+        union_keys = {"oneOf", "anyOf"}
+        prior_union = {key: result[key] for key in union_keys & result.keys()}
+        member_union = {key: part[key] for key in union_keys & part.keys()}
+        if len(member_union) > 1 or (prior_union and member_union and prior_union != member_union):
+            diagnostics.append(Diagnostic(part_pointer, "unsupported union intersection", "express the intersection as a single union in overlays/fix.yaml"))
             continue
         for name, value in part.get("properties", {}).items():
             if name in properties and properties[name] != value:
@@ -102,12 +117,17 @@ def merge_all_of(
     if "allOf" in schema:
         parts = schema['allOf']
         docs = {'description', 'title', 'example', 'examples', 'default', 'nullable'}
-        if isinstance(parts, list) and len(parts) == 1 and isinstance(parts[0], dict) and '$ref' in parts[0] and not (set(schema) - docs - {'allOf'}):
+        if isinstance(parts, list) and len(parts) == 1 and isinstance(parts[0], dict) and '$ref' in parts[0]:
             try:
                 target = resolve_local(doc, parts[0]['$ref'])
             except (KeyError, TypeError):
                 target = None
-            if isinstance(target, dict) and isinstance(target.get('type'), str) and target['type'] in {'array', 'string', 'integer', 'number', 'boolean'}:
+            if isinstance(target, dict) and isinstance(target.get('type'), str) and target['type'] in {'array', 'string', 'integer', 'number', 'boolean'} and not any(
+                key not in docs and not key.startswith('x-') and not (target['type'] == 'array' and key in {'minLength', 'maxLength'})
+                for key in schema.keys() - {'allOf'}
+            ):
+                # Extension annotations and string-only keywords cannot turn
+                # an array/primitive reference into an object intersection.
                 merged = merge_all_of(target, _pointer_join(_pointer_join(pointer, 'allOf'), 0), doc, diagnostics, notes, active)
                 return {**merged, **{key: value for key, value in schema.items() if key != 'allOf'}}
         schema = _merge_objects(parts, schema, pointer, doc, diagnostics, notes, active)

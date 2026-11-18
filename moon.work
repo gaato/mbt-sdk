@@ -13,4 +13,5 @@ members = [
   "jina",
   "replicate",
   "gemini",
+  "cloudflare_dns",
 ]

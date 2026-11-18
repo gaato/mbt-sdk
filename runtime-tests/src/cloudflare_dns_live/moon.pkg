@@ -1,0 +1,17 @@
+// Keep real DNS calls in an explicit native-only test package so offline gates
+// never execute them and the REST SDK can depend on mttp_core alone.
+import {
+  "gaato/cloudflare_dns",
+  "gaato/mttp/backend",
+  "gaato/mttp/codings",
+  "gaato/mttp/runtime" @adapter,
+  "moonbitlang/core/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/env",
+} for "test"
+
+supported_targets = "native"
+
+options(
+  "allow-experimental-packages": [ "moonbitlang/core/async" ],
+)

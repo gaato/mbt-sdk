@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from collections import Counter
+from dataclasses import asdict, dataclass, fields, is_dataclass, replace
 from enum import Enum
 import re
 from typing import Any, Iterable
@@ -114,6 +115,7 @@ class TaggedUnion:
     fallback: str = "Unknown"
     # Some wire unions select their variant by a required field, without a tag value.
     field_discriminator: bool = False
+    encode_inferred_tag: bool = False
 
 
 @dataclass(frozen=True)
@@ -180,6 +182,10 @@ class Operation:
     response_type: TypeRef | None
     description: str = ""
     source_path: str = ""
+    response_envelope: str = ""
+    auto_multipart_boundary: bool = False
+    response_result_required: bool = True
+    required_envelope_metadata: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -487,23 +493,126 @@ def header_api_key_names(doc: dict[str, Any]) -> set[str]:
     }
 
 
+def envelope_fields(doc: dict[str, Any]) -> dict[str, str]:
+    fields = doc.get('x-moonbit-envelope', {})
+    if not isinstance(fields, dict) or fields and (
+        set(fields) != {'result', 'success', 'errors', 'messages'}
+        or any(not isinstance(value, str) or not value for value in fields.values())
+        or len(set(fields.values())) != len(fields)
+    ):
+        raise ValueError('x-moonbit-envelope requires four distinct response field names: result, success, errors, messages')
+    return fields
+
+
+def declaration_refs(declaration: Declaration) -> Iterable[TypeRef]:
+    if isinstance(declaration, Struct):
+        return (field.type for field in declaration.fields)
+    if isinstance(declaration, Newtype):
+        return (declaration.inner,)
+    if isinstance(declaration, StringEnum):
+        return ()
+    return (variant.type for variant in declaration.variants if variant.type is not None)
+
+
+def reachable_declarations(declarations: list[Declaration], operations: list[Operation]) -> list[Declaration]:
+    by_name = {declaration.name: declaration for declaration in declarations}
+    reachable = set()
+
+    def visit(ref: TypeRef | None):
+        if ref is None:
+            return
+        if ref.item is not None:
+            visit(ref.item)
+        if ref.kind == "named" and ref.name in by_name and ref.name not in reachable:
+            reachable.add(ref.name)
+            for nested in declaration_refs(by_name[ref.name]):
+                visit(nested)
+
+    for operation in operations:
+        visit(operation.request_type)
+        visit(operation.response_type)
+        for parameter in operation.parameters:
+            visit(parameter.type)
+        for field in operation.multipart_fields:
+            visit(field.type)
+    return [declaration for declaration in declarations if declaration.name in reachable]
+
+
+def rename_types(value, names: dict[str, str]):
+    """Rename declarations and references together, leaving wire names alone."""
+    if isinstance(value, tuple):
+        return tuple(rename_types(item, names) for item in value)
+    if is_dataclass(value):
+        updates = {field.name: rename_types(getattr(value, field.name), names) for field in fields(value)}
+        if isinstance(value, (Struct, StringEnum, UntaggedUnion, TaggedUnion, ExternalUnion, Newtype)) or (
+            isinstance(value, TypeRef) and value.kind == "named"
+        ):
+            updates["name"] = names.get(value.name, value.name)
+        return replace(value, **updates)
+    return value
+
+
 class IRBuilder:
-    def __init__(self, doc: dict[str, Any], package: str, *, derive_operation_ids: bool = False, auth_headers: set[str] | None = None):
+    def __init__(self, doc: dict[str, Any], package: str, *, derive_operation_ids: bool = False, auth_headers: set[str] | None = None,
+                 auto_multipart_boundary: bool = False):
         self.auth_headers = auth_headers or set()
         self.credential_headers = header_api_key_names(doc) | {"authorization", "proxy-authorization", "cookie"}
         self.doc = doc
+        self.envelope = envelope_fields(doc)
+        self.auto_multipart_boundary = auto_multipart_boundary
         self.package = package
         self.derive_operation_ids = derive_operation_ids
         self.diagnostics: list[Diagnostic] = []
         self.notes: list[Note] = []
         self.declarations: list[Declaration] = []
         self.declaration_names: set[str] = set()
+        self.declaration_pointers: dict[str, str] = {}
+        self.explicit_type_pointers: set[str] = set()
         self.component_usage: dict[str, set[str]] = {}
         self.component_pointers: dict[str, str] = {}
         self._building: set[str] = set()
         self._building_stack: list[str] = []
         self._component_types: dict[str, TypeRef] = {}
         self._discriminator_fields: dict[str, set[str]] = {}
+
+    def schema_type_name(self, schema: dict[str, Any], fallback: str, pointer: str) -> str:
+        value = schema.get("x-moonbit-type-name")
+        if value is None:
+            return fallback
+        if not isinstance(value, str) or not re.fullmatch(r"[A-Z][A-Za-z0-9]*", value) or value in RESERVED_TYPES:
+            self.add_diag(pointer, "invalid x-moonbit-type-name", "use a non-reserved MoonBit type identifier")
+            return fallback
+        self.explicit_type_pointers.add(pointer)
+        return value
+
+    def strip_type_prefixes(self, ir: IR) -> IR:
+        prefixes = self.doc.get("x-moonbit-strip-type-prefixes", [])
+        if not isinstance(prefixes, list) or not all(
+            isinstance(prefix, str) and re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]*", prefix) for prefix in prefixes
+        ):
+            raise ValueError("x-moonbit-strip-type-prefixes requires a list of namespace prefixes")
+        if not prefixes:
+            return ir
+        prefixes = sorted({pascal_case(prefix) for prefix in prefixes}, key=lambda value: (-len(value), value))
+        originals = {declaration.name for declaration in ir.declarations}
+        proposed = {}
+        for name in sorted(originals):
+            pointer = self.declaration_pointers[name]
+            if any(pointer == root or pointer.startswith(root + "/") for root in self.explicit_type_pointers):
+                continue
+            for prefix in prefixes:
+                suffix = name.removeprefix(prefix)
+                if suffix != name and suffix and (suffix[0].isupper() or suffix[0].isdigit()):
+                    proposed[name] = type_name(suffix)
+                    break
+        counts = Counter(proposed.values())
+        names = {}
+        for name, candidate in proposed.items():
+            if candidate in originals or counts[candidate] > 1:
+                self.add_note(self.declaration_pointers[name], f"type prefix kept on {name}: {candidate} is already claimed")
+            else:
+                names[name] = candidate
+        return rename_types(ir, names) if names else ir
 
     def resolve(self, ref: str) -> dict[str, Any]:
         if not ref.startswith("#/"):
@@ -1083,6 +1192,7 @@ class IRBuilder:
                 )
             return
         self.declaration_names.add(declaration.name)
+        self.declaration_pointers[declaration.name] = pointer
         self.declarations.append(declaration)
 
     def _enum_type(self, schema: dict[str, Any], name: str, usage: set[str], pointer: str) -> TypeRef:
@@ -1140,6 +1250,7 @@ class IRBuilder:
             return TypeRef("named", name=name)
         discriminator = schema.get("discriminator")
         mapping = discriminator.get("mapping") if isinstance(discriminator, dict) else None
+        encode_inferred_tag = False
         if not isinstance(mapping, dict):
             expanded: list[dict[str, Any]] = []
             for choice in choices:
@@ -1149,7 +1260,20 @@ class IRBuilder:
                     break
                 expanded.extend(nested)
             if expanded:
+                encode_inferred_tag = len(expanded) > len(choices) and discriminator is None and (
+                    self._single_value_property(expanded, require_unique=True) is not None
+                )
                 choices = expanded
+                shared = {key: schema[key] for key in ('properties', 'required') if key in schema}
+                if shared and discriminator is None and self._single_value_property(choices, require_unique=True):
+                    # Intersect each tagged branch with the common object fields.
+                    # This retains IDs and metadata on both bulk writes and replies.
+                    shared['type'] = 'object'
+                    choices = [{'allOf': [choice, shared], 'type': 'object'} for choice in choices]
+        nullable_fields = schema.get("x-moonbit-nullable-fields", [])
+        if not isinstance(nullable_fields, list) or not all(isinstance(field, str) and field for field in nullable_fields):
+            self.add_diag(pointer, "invalid nullable union fields", "list field names in x-moonbit-nullable-fields")
+            return TypeRef("Json")
         entries: list[tuple[str, dict[str, Any], int]] = []
         entry_tags: dict[int, tuple[str, ...]] = {}
         set_valued = False
@@ -1373,6 +1497,14 @@ class IRBuilder:
             preserved = {property_name}
             if second_name is not None:
                 preserved.add(second_name)
+            tag_optional = self._discriminator_optional(choice, property_name)
+            # A response can share a branch with a write body while allowing
+            # null in fields the server cannot populate for some records.
+            if nullable_fields and properties is not None:
+                nullable_overrides = {field: dict(properties[field], nullable=True)
+                                      for field in nullable_fields if field in properties and field not in preserved}
+                if nullable_overrides:
+                    choice = {"type": "object", "allOf": [choice, {"properties": nullable_overrides}]}
             item_type = self.compile_type(
                 choice,
                 name + variant_name,
@@ -1391,7 +1523,7 @@ class IRBuilder:
                     accepted_tags,
                 )
             )
-            if self._discriminator_optional(choice, property_name):
+            if tag_optional:
                 optional_tag_variants.append(variant_name)
         default_variant = None
         if len(optional_tag_variants) == 1:
@@ -1403,7 +1535,8 @@ class IRBuilder:
                 f"discriminator {property_name!r} is optional in several variants ({', '.join(optional_tag_variants)}); a payload without it does not decode",
             )
         self._add_declaration(
-            TaggedUnion(name, property_name, tuple(variants), schema.get("description", ""), default_variant, _fallback_name("Unknown", names)),
+            TaggedUnion(name, property_name, tuple(variants), schema.get("description", ""), default_variant, _fallback_name("Unknown", names),
+                        encode_inferred_tag=encode_inferred_tag),
             pointer,
         )
         return TypeRef("named", name=name)
@@ -1418,6 +1551,13 @@ class IRBuilder:
             if all(item.get("type") == "string" for item in resolved) and any("enum" in item for item in resolved):
                 return TypeRef("String")
         resolved_choices = [self.resolve(item["$ref"]) if "$ref" in item else item for item in choices]
+        if key == "anyOf" and schema.get("type") in ("integer", "number") and all(
+            item.get("type") == schema["type"] and not ({"oneOf", "anyOf", "allOf"} & item.keys())
+            for item in resolved_choices
+        ):
+            # Numeric ranges and numeric enum literals share the primitive
+            # codec. The factory leaves value constraints to the server.
+            return self.compile_type({k: v for k, v in schema.items() if k != key}, name, usage, pointer)
         if all(_is_string_schema(item, self.resolve) for item in resolved_choices):
             enum_values: list[str] = []
             unconstrained = False
@@ -1589,14 +1729,15 @@ class IRBuilder:
         pointer = f"/components/schemas/{name.replace('~', '~0').replace('/', '~1')}"
         if name in self._component_types:
             return self._component_types[name]
+        schema = self.doc["components"]["schemas"][name]
+        generated_name = self.schema_type_name(schema, type_name(name), pointer)
         if name in self._building:
-            return TypeRef("named", name=type_name(name))
+            return TypeRef("named", name=generated_name)
         self._building.add(name)
         self._building_stack.append(name)
-        schema = self.doc["components"]["schemas"][name]
         result = self.compile_type(
             schema,
-            type_name(name),
+            generated_name,
             self.component_usage.get(name, set()),
             pointer,
             named_component=True,
@@ -1607,7 +1748,7 @@ class IRBuilder:
         inner = result
         while inner.item is not None:
             inner = inner.item
-        if inner.kind == "named" and inner.name == type_name(name) and inner.name not in self.declaration_names:
+        if inner.kind == "named" and inner.name == generated_name and inner.name not in self.declaration_names:
             self.add_diag(pointer, "recursive type alias cannot be represented", "use an object wrapper or explicitly preserve raw JSON in the overlay")
         self._component_types[name] = result
         return result
@@ -1621,6 +1762,8 @@ class IRBuilder:
         named_component: bool = False,
         preserve_constants: set[str] | None = None,
     ) -> TypeRef:
+        if not named_component:
+            name = self.schema_type_name(schema, name, pointer)
         original_union = 'anyOf' in schema or 'oneOf' in schema
         schema, nullable = _split_nullable(schema)
         if schema.get("x-moonbit-json") is True:
@@ -1645,7 +1788,8 @@ class IRBuilder:
                 ),
                 self._building_stack[-1],
             )
-            return TypeRef("named", name=type_name(component))
+            target = self.doc["components"]["schemas"][component]
+            return TypeRef("named", name=self.schema_type_name(target, type_name(component), pointer))
         if "allOf" in schema:
             from .normalize import merge_all_of
 
@@ -1696,6 +1840,8 @@ class IRBuilder:
         if "oneOf" in schema or "anyOf" in schema:
             return self._union_type(schema, name, usage, pointer)
         enum = schema.get("enum")
+        if schema.get("type") is None and isinstance(enum, list) and enum and all(isinstance(value, str) for value in enum):
+            schema = {**schema, "type": "string"}
         if schema.get("type") == "string" and isinstance(enum, list) and len(enum) > 1:
             return self._enum_type(schema, name, usage, pointer)
         kind = schema.get("type")
@@ -1877,7 +2023,11 @@ class IRBuilder:
                         if not isinstance(field_schema, dict):
                             self.add_diag(field_pointer, "multipart field has no schema", "add a supported field schema")
                             continue
-                        moon_name = snake_case(json_name)
+                        field_label = field_schema.get("x-moonbit-parameter-name", json_name)
+                        if not isinstance(field_label, str) or not field_label.strip():
+                            self.add_diag(field_pointer, "invalid multipart parameter name", "use a nonempty x-moonbit-parameter-name")
+                            continue
+                        moon_name = snake_case(field_label)
                         binary_kind = self._binary_kind(field_schema)
                         if binary_kind is not None:
                             field_type = None
@@ -1910,14 +2060,49 @@ class IRBuilder:
                     schema = media.get("schema")
                     if isinstance(schema, dict):
                         response_schemas.append((schema, pointer_join(media_pointer, "schema")))
-        if not response_schemas:
-            response_type = None
-        else:
-            response_type = self.compile_type(response_schemas[0][0], pascal_case(operation_id) + "Response", {"response"}, response_schemas[0][1])
+        response_type = None
+        response_envelope = ''
+        response_result_required = True
+        required_envelope_metadata = ()
+        if response_schemas:
+            schema, schema_pointer = response_schemas[0]
             if any(schema != response_schemas[0][0] for schema, _ in response_schemas[1:]):
                 self.add_diag(pointer_join(pointer, "responses"), "multiple distinct success response schemas are not supported", "make the success schemas consistent in overlays/fix.yaml")
+            if self.envelope:
+                envelope = self._dereference(schema)
+                # Only the envelope's fields matter to the success decoder;
+                # siblings such as messages and pagination stay on the wire.
+                properties = self._properties(envelope)
+                if properties is None:
+                    self.add_diag(schema_pointer, "response envelope must be an object", "fix the envelope declaration or schema")
+                else:
+                    response_envelope = self.envelope['result']
+                    schema = properties.get(response_envelope)
+                    required = self._required_fields(envelope) or set()
+                    response_result_required = response_envelope in required
+                    if schema is None:
+                        response_type = TypeRef("Unit")
+                        required_envelope_metadata = tuple(
+                            (self.envelope[key], kind)
+                            for key, kind in (('success', 'Bool'), ('errors', 'Array[Json]'), ('messages', 'Array[Json]'))
+                            if self.envelope[key] in required
+                        )
+                    schema_pointer = pointer_join(pointer_join(schema_pointer, 'properties'), response_envelope)
+            if schema is not None:
+                response_type = self.compile_type(schema, pascal_case(operation_id) + "Response", {"response"}, schema_pointer)
+                if response_envelope and response_type.kind != "optional" and self._schema_nullable(schema):
+                    response_type = TypeRef("optional", item=response_type)
         request_path = operation.get("x-moonbit-request-path", path)
-        return Operation(operation_id, snake_case(operation_id), method.upper(), request_path, tuple(parameters), request_type, tuple(multipart_fields), response_type, operation.get("summary", operation.get("description", "")), path if request_path != path else "")
+        return Operation(
+            operation_id, snake_case(operation_id), method.upper(), request_path,
+            tuple(parameters), request_type, tuple(multipart_fields), response_type,
+            description=operation.get("summary", operation.get("description", "")),
+            source_path=path if request_path != path else "",
+            response_envelope=response_envelope,
+            auto_multipart_boundary=bool(multipart_fields) and self.auto_multipart_boundary,
+            response_result_required=response_result_required,
+            required_envelope_metadata=required_envelope_metadata,
+        )
 
     def build(self) -> IR:
         validate_openapi_version(self.doc)
@@ -1944,7 +2129,8 @@ class IRBuilder:
         operations = [item for path, method, operation, parameters in selected if (item := self._compile_operation(path, method, operation, parameters)) is not None]
         if self.diagnostics:
             raise GenerationError(self.diagnostics)
-        return IR(self.package, tuple(self.declarations), tuple(operations))
+        declarations = reachable_declarations(self.declarations, operations) if self.envelope else self.declarations
+        return self.strip_type_prefixes(IR(self.package, tuple(declarations), tuple(operations)))
 
 
 def derive_operation_id(method: str, path: str) -> str:

@@ -87,6 +87,7 @@ spec_watch = false
 [[sdk]]
 name = "petstore3"
 client_layer = true
+legacy_generic_stream = true
 base_url = "https://petstore3.swagger.io/api/v3"
 base_url_spec = "/api/v3"
 base_url_reason = "The relative server is resolved against the pinned specification origin so the fixture is usable without a hosting page."
@@ -129,6 +130,7 @@ spec_watch = false
 [[sdk]]
 name = "jina"
 client_layer = true
+legacy_generic_stream = true
 timeout_ms = 60000
 dir = "jina"
 module = "gaato/jina"
@@ -151,6 +153,8 @@ spec_watch = false
 [[sdk]]
 name = "replicate"
 client_layer = true
+legacy_generic_stream = true
+legacy_multipart_boundary = true
 timeout_ms = 70000
 dir = "replicate"
 module = "gaato/replicate"
@@ -219,3 +223,63 @@ zero_means_backoff = false
 backoff_base_ms = 1000
 backoff_max_ms = 60000
 jitter = [1000, 2000]
+
+[[sdk]]
+name = "cloudflare_dns"
+dir = "cloudflare_dns"
+module = "gaato/cloudflare_dns"
+generator = "openapi"
+spec_file = "specs/cloudflare/openapi.json"
+spec_url = "https://raw.githubusercontent.com/cloudflare/api-schemas/main/openapi.json"
+spec_fetch = "plain"
+include_all = false
+derive_operation_ids = false
+client_layer = true
+package = "gaato/cloudflare_dns/gen"
+out = "cloudflare_dns/src/gen"
+census_args = []
+offline_packages = ["cloudflare_dns/src", "cloudflare_dns/src/gen"]
+base_url = "https://api.cloudflare.com/client/v4"
+auth = { kind = "alternatives", schemes = [{ kind = "bearer", variant = "ApiToken" }, { kind = "header_bundle", variant = "GlobalApiKey", headers = { email = "X-Auth-Email", key = "X-Auth-Key" } }] }
+auth_reason = "The OpenAPI email and key pair is one credential. The deprecated service key is removed and three-way AND requirements are normalized by the overlay."
+auth_spec = { api_email = { in = "header", name = "X-Auth-Email", type = "apiKey" }, api_key = { in = "header", name = "X-Auth-Key", type = "apiKey" }, api_token = { scheme = "bearer", type = "http" }, user_service_key = { in = "header", name = "X-Auth-User-Service-Key", type = "apiKey" } }
+timeout_ms = 60000
+rate_limit_prefix = "cloudflare"
+publish = false
+spec_watch = true
+
+[sdk.selection]
+operations = [
+  "zones-get", "zones-post", "zones-0-delete", "zones-0-get", "zones-0-patch",
+  "put-zones-zone_id-activation_check",
+  "dns-records-for-a-zone-list-dns-records",
+  "dns-records-for-a-zone-create-dns-record",
+  "dns-records-for-a-zone-batch-dns-records",
+  "dns-records-for-a-zone-export-dns-records",
+  "dns-records-for-a-zone-import-dns-records",
+  "dns-records-for-a-zone-review-dns-scan",
+  "dns-records-for-a-zone-apply-dns-scan-results",
+  "dns-records-for-a-zone-trigger-dns-scan",
+  "dns-records-for-a-zone-delete-dns-record",
+  "dns-records-for-a-zone-dns-record-details",
+  "dns-records-for-a-zone-patch-dns-record",
+  "dns-records-for-a-zone-update-dns-record",
+  "dns-settings-for-a-zone-list-dns-settings",
+  "dns-settings-for-a-zone-update-dns-settings",
+  "dnssec-delete-dnssec-records", "dnssec-dnssec-details", "dnssec-edit-dnssec-status",
+]
+
+[sdk.retry]
+retries = 2
+methods = ["GET", "HEAD", "PUT", "DELETE"]
+statuses = [408, 409, 429, [500, 599]]
+status_overrides = [{ methods = ["POST", "PATCH"], statuses = [429] }]
+guard_response_retries = [{ methods = ["POST", "PATCH"], statuses = [429] }]
+sent_failures = ["GET", "HEAD", "PUT", "DELETE"]
+unprocessed_failures = true
+override_header = "x-should-retry"
+retry_after = "ms_then_header"
+retry_after_cap_ms = "none"
+backoff_base_ms = 500
+backoff_max_ms = 8000
+jitter = [750, 1000]
