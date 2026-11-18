@@ -1084,11 +1084,10 @@ def _operation(operation: Operation, response_codec_name: str | None = None) -> 
                     lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for key, value in values {", f"        {url} = @http.append_query({url}, {name} + \"[\" + key + \"]\", parameter_value(value))", "      }", "    None => ()", "  }"])
             elif parameter.type.kind == "array":
                 if parameter.style == 'form-comma':
-                    joined = f'{parameter.moon_name}.map(value => parameter_value(value)).join(",")'
                     if parameter.required:
-                        lines.append(f'  {url} = @http.append_query({url}, {name}, {joined})')
+                        lines.append(f'  {url} = append_comma_query_({url}, {name}, {parameter.moon_name})')
                     else:
-                        lines.extend([f'  match {parameter.moon_name} {{', f'    Some(values) => {url} = @http.append_query({url}, {name}, values.map(value => parameter_value(value)).join(","))', '    None => ()', '  }'])
+                        lines.extend([f'  match {parameter.moon_name} {{', f'    Some(values) => {url} = append_comma_query_({url}, {name}, values)', '    None => ()', '  }'])
                 elif parameter.required:
                     lines.extend([f"  for value in {parameter.moon_name} {{", f"    {url} = @http.append_query({url}, {name}, parameter_value(value))", "  }"])
                 else:
@@ -1284,6 +1283,20 @@ fn[T : ToJson] parameter_value(value : T) -> String {
       }
     other => other.stringify()
   }
+}'''
+
+
+# Parameter normalization strips trailing underscores except on keywords.
+COMMA_QUERY_HELPER = r'''///|
+fn[T : ToJson] append_comma_query_(url : String, name : String, values : Array[T]) -> String {
+  // append_query encodes the whole value, including the separators.
+  let (target, fragment) = match url.find("#") {
+    Some(index) => (url[:index].to_owned(), url[index:].to_owned())
+    None => (url, "")
+  }
+  let separator = if target.contains("?") { "&" } else { "?" }
+  let value = values.map(item => @http.percent_encode(parameter_value(item))).join(",")
+  target + separator + @http.percent_encode(name) + "=" + value + fragment
 }'''
 
 
@@ -1566,6 +1579,9 @@ fn json_array_matches(
         operation_helpers.append(RESOURCE_NAME_HELPER)
     if any(operation.parameters or operation.multipart_fields for operation in ir.operations):
         operation_helpers.append(PARAMETER_VALUE_HELPER)
+    if any(parameter.location == "query" and parameter.style == "form-comma" and parameter.type.kind == "array"
+           for operation in ir.operations for parameter in operation.parameters):
+        operation_helpers.append(COMMA_QUERY_HELPER)
     if any(operation.response_type is not None for operation in ir.operations):
         operation_helpers.append(DECODE_HELPERS)
     operations = qualify(HEADER + "\n\n".join(operation_helpers + operation_sources) + "\n", collisions=collisions)

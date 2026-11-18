@@ -15,11 +15,14 @@ from test_generator import document, operation
 
 
 class F8RobustnessTests(unittest.TestCase):
-    def sample(self, doc, source, *, executable=False):
+    def sample(self, doc, source, *, executable=False, driven=False):
         ir = IRBuilder(doc, 'gaato/sample/gen').build()
         files = emit(ir)
         if not executable:
             files['regression_wbtest.mbt'] = source
+        if driven:
+            files['moon.pkg'] += ('\nimport { "gaato/mttp_core/driver" } for "wbtest"\n'
+                                  'options("allow-experimental-packages": ["gaato/mttp_core/driver"])\n')
         with tempfile.TemporaryDirectory(prefix='f8-shapes-') as directory:
             root = Path(directory)
             (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
@@ -109,11 +112,113 @@ test "array allOf wrapper" {
 
     def test_form_explode_false_arrays_join_once_and_escape(self):
         params = [{'name': name, 'in': 'query', 'required': required, 'style': 'form', 'explode': False,
-                   'schema': {'type': 'array', 'items': {'type': 'string'}}} for name, required in [('ids', True), ('optional', False)]]
+                   'schema': {'type': 'array', 'items': {'type': 'string'}}} for name, required in [('ids', True), ('other&key', False)]]
         self.sample(document(operation(parameters=params)), '''///|
-test "comma joined arrays" {
-  assert_eq(test_operation_request(["a", "b"]).url, "/test?ids=a%2Cb")
-  assert_eq(test_operation_request([], optional=["x y", "z"]).url, "/test?ids=&optional=x%20y%2Cz")
+priv struct RecordingBackend {
+  targets : Array[String]
+}
+
+///|
+impl @http.Backend for RecordingBackend with fn send(self, request, options) {
+  request.validate()
+  options.validate()
+  let url = try! @http.Url::parse(request.url)
+  self.targets.push(url.path + "?" + url.query.unwrap_or(""))
+  @http.Response::new(200)
+}
+
+///|
+test "comma delimiters survive to the request target" {
+  let targets = []
+  let backend : &@http.Backend = RecordingBackend::{ targets, }
+  let options = @http.SendOptions::default()
+  @driver.run_sync(() => {
+    ignore(backend.send(test_operation_request(["a,b", "c"]), options))
+    ignore(backend.send(test_operation_request(["a", "b", "c"]), options))
+    ignore(backend.send(test_operation_request([], other_key=["x y", "%2C#&=+é"]), options))
+  })
+  assert_eq(targets, [
+    "/test?ids=a%2Cb,c",
+    "/test?ids=a,b,c",
+    "/test?ids=&other%26key=x%20y,%252C%23%26%3D%2B%C3%A9",
+  ])
+}
+''', driven=True)
+
+    def test_form_explode_false_accepts_named_scalars(self):
+        schemas = {
+            'Color': {'type': 'string', 'enum': ['red', 'blue']},
+            'Limit': {'type': 'integer', 'x-moonbit-type': 'Limit'},
+        }
+        color = {'$ref': '#/components/schemas/Color'}
+        params = [
+            {'name': name, 'in': 'query', 'style': 'form', 'explode': False, 'schema': schema}
+            for name, schema in [
+                ('colors', {'type': 'array', 'items': color}),
+                ('color', color),
+                ('limit', {'$ref': '#/components/schemas/Limit'}),
+            ]
+        ]
+        self.sample(document(operation(parameters=params), schemas), '''///|
+test "named query scalars use their JSON values" {
+  let limit : Limit = @json.from_json(Json(42))
+  let request = test_operation_request(colors=[Color::Red, Color::Blue], color=Color::Red, limit~)
+  assert_eq(request.url, "/test?colors=red,blue&color=red&limit=42")
+}
+''')
+
+    def test_form_explode_false_still_rejects_objects(self):
+        obj = {'type': 'object', 'properties': {'key': {'type': 'string'}}}
+        ref = {'$ref': '#/components/schemas/Filter'}
+        for schema in (ref, {'type': 'object'}, {'type': 'object', 'additionalProperties': {'type': 'string'}}):
+            with self.subTest(schema=schema), self.assertRaisesRegex(GenerationError, 'not objects'):
+                parameter = {'name': 'filter', 'in': 'query', 'explode': False, 'schema': schema}
+                IRBuilder(document(operation(parameters=[parameter]), {'Filter': obj}), 'gaato/sample/gen').build()
+
+    def test_form_explode_false_rejects_unions_with_nonscalar_variants(self):
+        for variant in (
+            {'type': 'object', 'properties': {'key': {'type': 'string'}}},
+            {'type': 'array', 'items': {'type': 'string'}},
+        ):
+            with self.subTest(variant=variant):
+                schema = {'oneOf': [{'type': 'string'}, variant]}
+                parameter = {'name': 'filter', 'in': 'query', 'explode': False, 'schema': schema}
+                doc = document(operation(parameters=[parameter]))
+                with self.assertRaisesRegex(GenerationError, '/paths/~1test/post/parameters/0: .*scalar variants'):
+                    IRBuilder(doc, 'gaato/sample/gen').build()
+
+    def test_form_explode_false_scalar_union_compiles_and_serializes(self):
+        schema = {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
+        parameter = {'name': 'filter', 'in': 'query', 'explode': False, 'schema': schema}
+        self.sample(document(operation(parameters=[parameter])), '''///|
+test "scalar union query values" {
+  assert_eq(test_operation_request(filter=TestOperationFilter::Text("a,b")).url, "/test?filter=a%2Cb")
+  assert_eq(test_operation_request(filter=TestOperationFilter::Int(42)).url, "/test?filter=42")
+}
+''')
+
+    def test_form_explode_false_helper_cannot_be_shadowed(self):
+        params = [
+            {'name': name, 'in': 'query', 'required': required, 'explode': False,
+             'schema': {'type': 'array', 'items': {'type': 'string'}}}
+            for name, required in [('appendCommaQuery', True), ('append_comma_query_', False)]
+        ]
+        # Exercise both spellings in separate operations, since they normalize alike.
+        doc = document(operation(parameters=params[:1]))
+        doc['paths']['/other'] = {'post': operation(operation_id='other', parameters=params[1:])}
+        self.sample(doc, '''///|
+test "query labels cannot shadow the comma helper" {
+  assert_eq(test_operation_request(["a,b", "c"]).url, "/test?appendCommaQuery=a%2Cb,c")
+  assert_eq(other_request(append_comma_query=["a", "b"]).url, "/other?append_comma_query_=a,b")
+}
+''')
+
+    def test_form_explode_false_honors_raw_json_with_missing_ref(self):
+        schema = {'$ref': '#/components/schemas/Unavailable', 'x-moonbit-json': True}
+        parameter = {'name': 'filter', 'in': 'query', 'explode': False, 'schema': schema}
+        self.sample(document(operation(parameters=[parameter])), '''///|
+test "explicit raw JSON query value bypasses unresolved schema" {
+  assert_eq(test_operation_request(filter=Json("a,b")).url, "/test?filter=a%2Cb")
 }
 ''')
 

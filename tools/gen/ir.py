@@ -1736,6 +1736,39 @@ class IRBuilder:
         self.add_diag(pointer, f"unsupported schema construct (type={kind!r})", "add an explicit supported type or x-moonbit-json: true with justification")
         return TypeRef("Json")
 
+    def _form_comma_parameter_error(self, ref: TypeRef, schema: dict[str, Any]) -> str | None:
+        while ref.kind == 'optional':
+            assert ref.item is not None
+            ref = ref.item
+        object_error = 'form explode=false supports scalar or array query parameters, not objects'
+        union_error = 'form explode=false supports only scalar variants in query unions'
+        if ref.kind == 'map':
+            return object_error
+        if ref.kind == 'named':
+            declaration = next((item for item in self.declarations if item.name == ref.name), None)
+            if isinstance(declaration, UntaggedUnion):
+                if any(variant.shape not in ('string', 'number', 'boolean') for variant in declaration.variants):
+                    return union_error
+            if isinstance(declaration, ExternalUnion):
+                if any(variant.type is not None for variant in declaration.variants):
+                    return union_error
+            # String enums and primitive newtypes retain their scalar JSON shape.
+            if isinstance(declaration, (Struct, TaggedUnion)):
+                return object_error
+        if ref.kind == 'Json':
+            # Free-form object schemas can lower to Json without a declaration.
+            normalized, _ = _split_nullable(schema)
+            target = normalized.get('$ref')
+            if isinstance(target, str) and target.startswith('#/components/schemas/'):
+                try:
+                    normalized = self.resolve(target)
+                except (KeyError, TypeError, IndexError):
+                    # An explicit raw JSON override can bypass reference validation.
+                    return None
+            if normalized.get('type') == 'object' or 'properties' in normalized or 'additionalProperties' in normalized:
+                return object_error
+        return None
+
     def _compile_operation(
         self,
         path: str,
@@ -1788,8 +1821,9 @@ class IRBuilder:
                 continue
             parameter_names.add(moon_name)
             param_type = self.compile_type(schema, pascal_case(operation_id) + pascal_case(parameter.get("name", "parameter")), {"request"}, pointer_join(parameter_pointer, "schema"))
-            if location == 'query' and parameter.get('style', 'form') == 'form' and parameter.get('explode') is False and param_type.kind in ('map', 'named'):
-                self.add_diag(parameter_pointer, 'form explode=false supports scalar or array query parameters, not objects', 'use a scalar/array or an explicitly supported deepObject map')
+            if location == 'query' and parameter.get('style', 'form') == 'form' and parameter.get('explode') is False:
+                if reason := self._form_comma_parameter_error(param_type, schema):
+                    self.add_diag(parameter_pointer, reason, 'use a scalar/array or an explicitly supported deepObject map')
             if location == "query" and parameter.get("style", "form") == "deepObject" and param_type.kind != "map":
                 self.add_diag(
                     parameter_pointer,

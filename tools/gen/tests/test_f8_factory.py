@@ -125,6 +125,114 @@ class F8FactoryTests(unittest.TestCase):
             self.assertIn('| second | 0 |', body)
             self.assertNotIn('bump', ' '.join(str(c) for c in calls))
 
+    def test_watch_budgets_log_tails_across_all_consumers(self):
+        stages = ('generation', 'interfaces', 'census', 'gates')
+        names = [f'consumer-{i:02}' for i in range(24)]
+        entries = [dict(name=name, dir=name, spec_file='spec.json') for name in names]
+        logs = {}
+
+        def execute(command, **kwargs):
+            log = Path(kwargs['stdout'].name)
+            content = (log.stem + ' ' + 'é' * 400 + '\n') * 50 + f'TAIL {log.stem}\n'
+            if log.stem == f'{names[0]}-generation':
+                content = 'short log\n'
+            logs[log.name] = content
+            kwargs['stdout'].write(content)
+            return subprocess.CompletedProcess(command, 1)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            log_dir = root / 'logs'
+            with patch('tools.spec_watch.subprocess.run', execute):
+                code = spec_watch.run_group(entries, 'spec.json', root, log_dir, 'fake')
+            self.assertEqual(code, 1)
+            body = (log_dir / 'body.md').read_text()
+            self.assertLessEqual(len(body.encode('utf-8')), 60_000)
+            self.assertIn('short log', body)
+            for name in names:
+                self.assertIn(f'| {name} | 1 | 1 | 1 | 1 | 0 |', body)
+                for stage in stages:
+                    if name == names[0] and stage == 'generation':
+                        continue
+                    tail = f'TAIL {name}-{stage}'
+                    self.assertIn(tail, body)
+            # Each long log contributes a comparable excerpt, in addition to its tail.
+            counts = [excerpt.count('é') for excerpt in body.split('```text')[1:] if 'TAIL ' in excerpt]
+            self.assertEqual(len(counts), len(names) * len(stages) - 1)
+            self.assertGreater(min(counts), 100)
+            self.assertLessEqual(max(counts) - min(counts), 5)
+            for filename, content in logs.items():
+                self.assertEqual((log_dir / filename).read_text(), content)
+
+    def test_watch_omits_notes_log_from_previous_run(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            sdk_dir = root / 'sample'
+            (sdk_dir / 'src').mkdir(parents=True)
+            (sdk_dir / 'CHANGELOG.md').touch()
+            (root / 'spec.json').write_text('{}')
+            generated = sdk_dir / 'src/generated.mbt'
+            logs = root / 'logs'
+            entries = [dict(name='sample', dir='sample', spec_file='spec.json')]
+
+            def execute(command, **kwargs):
+                if command[0] == 'scripts/release.sh':
+                    kwargs['stdout'].write('notes from first run\n')
+                elif command[1] == 'scripts/generate.sh':
+                    generated.write_text('same generated output')
+                return subprocess.CompletedProcess(command, 0)
+
+            with patch('tools.spec_watch.subprocess.run', execute):
+                self.assertEqual(spec_watch.run_group(entries, 'spec.json', root, logs, 'fake'), 0)
+                self.assertIn('notes from first run', (logs / 'body.md').read_text())
+                self.assertEqual(spec_watch.run_group(entries, 'spec.json', root, logs, 'fake'), 0)
+            self.assertIn('| sample | 0 | 0 | 0 | 0 | 0 |', (logs / 'body.md').read_text())
+            self.assertNotIn('notes from first run', (logs / 'body.md').read_text())
+            self.assertFalse((logs / 'sample-notes.log').exists())
+
+    def test_watch_pr_can_open_without_an_artifact_url(self):
+        workflow = yaml.safe_load((ROOT / '.github/workflows/spec-watch.yml').read_text())
+        steps = {step.get('id'): step for step in workflow['jobs']['watch']['steps']}
+        upload, pr = steps['logs'], steps['pr']
+        with self.subTest('upload errors leave the job eligible to open a PR'):
+            self.assertIs(upload.get('continue-on-error'), True)
+            self.assertEqual(pr['if'], "steps.fetch.outputs.changed == 'true'")
+        self.assertEqual(pr['env']['LOG_URL'], '${{ steps.logs.outputs.artifact-url }}')
+
+        # Execute the actual PR step body with local stubs for both CLI tools.
+        stubs = '''
+git() {
+  if [ "$1" = ls-remote ]; then return 2; fi
+  return 0
+}
+gh() {
+  [ "$1 $2" = 'pr create' ] || return 1
+  while [ "$#" -gt 0 ] && [ "$1" != --body-file ]; do shift; done
+  cp "$2" "$RUNNER_TEMP/pr-body.md"
+  echo https://example.invalid/pr/123
+}
+'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'consumers').mkdir()
+            bounded_body = '| sample | 1 | 0 | 0 | 0 | 0 |\n'
+            for artifact in ('', 'https://example.invalid/artifacts/42'):
+                with self.subTest(artifact=artifact):
+                    (root / 'consumers/body.md').write_text(bounded_body)
+                    output = root / 'output'
+                    output.write_text('')
+                    result = subprocess.run(
+                        ['bash', '-e', '-c', stubs + pr['run']], cwd=root,
+                        env=dict(PATH='/usr/bin:/bin', RUNNER_TEMP=str(root), PROVIDER='sample',
+                                 NEW_SHA='0123456789abcdef0123456789abcdef', SPEC_PATH='spec/openapi.json',
+                                 MODULE_DIRS='["sample"]', GITHUB_OUTPUT=str(output), LOG_URL=artifact),
+                        capture_output=True, text=True,
+                    )
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn('number=123', output.read_text())
+                    expected = bounded_body + (f'\n\n[Full consumer logs]({artifact})\n' if artifact else '')
+                    self.assertEqual((root / 'pr-body.md').read_text(), expected)
+
     def test_weekly_real_bump_fixture_minor_patch_skip_and_explicit(self):
         with tempfile.TemporaryDirectory(prefix='f8-weekly-fixture-') as temporary:
             root = Path(temporary)
