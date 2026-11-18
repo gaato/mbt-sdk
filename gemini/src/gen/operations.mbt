@@ -102,6 +102,138 @@ fn[T : @json.FromJson] decode_response(
 
 ///|
 ///
+/// Gets the metadata for the given `File`. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
+pub fn files_get_request(name : String) -> @http.Request raise ValidationError {
+  let name = normalize_resource_name(
+    parameter_value(name),
+    "name",
+    "^files/[^/]+$",
+    "files/",
+  )
+  @http.Request::get(
+    "/v1beta/" + @http.percent_encode_path(parameter_value(name)),
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful files_get response.
+pub fn files_get_decode_json(value : Json) -> File raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful files_get response.
+pub fn files_get_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[File, @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Deletes the `File`. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage The caller handles the response as @http.Response.
+pub fn files_delete_request(
+  name : String,
+) -> @http.Request raise ValidationError {
+  let name = normalize_resource_name(
+    parameter_value(name),
+    "name",
+    "^files/[^/]+$",
+    "files/",
+  )
+  @http.Request::delete(
+    "/v1beta/" + @http.percent_encode_path(parameter_value(name)),
+  )
+}
+
+///|
+///
+/// Lists the metadata for `File`s owned by the requesting project. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
+pub fn files_list_request(
+  page_size? : Int32,
+  page_token? : String,
+) -> @http.Request {
+  let mut url = "/v1beta/files"
+  match page_size {
+    Option::Some(value) =>
+      url = @http.append_query(url, "pageSize", parameter_value(value))
+    Option::None => ()
+  }
+  match page_token {
+    Option::Some(value) =>
+      url = @http.append_query(url, "pageToken", parameter_value(value))
+    Option::None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful files_list response.
+pub fn files_list_decode_json(
+  value : Json,
+) -> ListFilesResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful files_list response.
+pub fn files_list_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ListFilesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Creates a `File`. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
+pub fn media_upload_request(body : CreateFileRequest) -> @http.Request {
+  @http.Request::post("/v1beta/files").body_json(@json.Json::Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful media_upload response.
+pub fn media_upload_decode_json(
+  value : Json,
+) -> CreateFileResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful media_upload response.
+pub fn media_upload_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CreateFileResponse, @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Deletes CachedContent resource. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage The caller handles the response as @http.Response.
+pub fn cached_contents_delete_request(
+  name : String,
+) -> @http.Request raise ValidationError {
+  let name = normalize_resource_name(
+    parameter_value(name),
+    "name",
+    "^cachedContents/[^/]+$",
+    "cachedContents/",
+  )
+  @http.Request::delete(
+    "/v1beta/" + @http.percent_encode_path(parameter_value(name)),
+  )
+}
+
+///|
+///
 /// Updates CachedContent resource (only expiration is updatable). OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
 pub fn cached_contents_patch_request(
   name : String,
@@ -212,23 +344,6 @@ pub fn cached_contents_create_decode(
 
 ///|
 ///
-/// Deletes CachedContent resource. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage The caller handles the response as @http.Response.
-pub fn cached_contents_delete_request(
-  name : String,
-) -> @http.Request raise ValidationError {
-  let name = normalize_resource_name(
-    parameter_value(name),
-    "name",
-    "^cachedContents/[^/]+$",
-    "cachedContents/",
-  )
-  @http.Request::delete(
-    "/v1beta/" + @http.percent_encode_path(parameter_value(name)),
-  )
-}
-
-///|
-///
 /// Reads CachedContent resource. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
 pub fn cached_contents_get_request(
   name : String,
@@ -304,118 +419,6 @@ pub fn models_embed_content_decode(
 
 ///|
 ///
-/// Gets information about a specific `Model` such as its version number, token limits, [parameters](https://aistudio.google.com/docs/prompting-strategies#model-parameters) and other metadata. Refer to the [Gemini models guide](https://aistudio.google.com/docs/models) for detailed model information.
-pub fn models_get_request(name : String) -> @http.Request raise ValidationError {
-  let name = normalize_resource_name(
-    parameter_value(name),
-    "name",
-    "^models/[^/]+$",
-    "models/",
-  )
-  @http.Request::get(
-    "/v1beta/" + @http.percent_encode_path(parameter_value(name)),
-  )
-}
-
-///|
-///
-/// Decodes a parsed successful models_get response.
-pub fn models_get_decode_json(
-  value : Json,
-) -> Model raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful models_get response.
-pub fn models_get_decode(
-  head : @http.ResponseHead,
-  body : Bytes,
-) -> Result[Model, @client.ResponseFailure] {
-  decode_response(head, body)
-}
-
-///|
-///
-/// Generates a [streamed response](https://aistudio.google.com/docs/text-generation#streaming-responses) from the model given an input `GenerateContentRequest`.
-pub fn models_stream_generate_content_request(
-  model : String,
-  body : GenerateContentRequest,
-) -> @http.Request raise ValidationError {
-  let model = normalize_resource_name(
-    parameter_value(model),
-    "model",
-    "^models/[^/]+$",
-    "models/",
-  )
-  @http.Request::post(
-    "/v1beta/" +
-    @http.percent_encode_path(parameter_value(model)) +
-    ":streamGenerateContent",
-  ).body_json(@json.Json::Json(body))
-}
-
-///|
-///
-/// Decodes a parsed successful models_stream_generate_content response.
-pub fn models_stream_generate_content_decode_json(
-  value : Json,
-) -> GenerateContentResponse raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful models_stream_generate_content response.
-pub fn models_stream_generate_content_decode(
-  head : @http.ResponseHead,
-  body : Bytes,
-) -> Result[GenerateContentResponse, @client.ResponseFailure] {
-  decode_response(head, body)
-}
-
-///|
-///
-/// Runs a model's tokenizer on input `Content` and returns the token count. Refer to the [tokens guide](https://aistudio.google.com/docs/tokens) to learn more about tokens.
-pub fn models_count_tokens_request(
-  model : String,
-  body : CountTokensRequest,
-) -> @http.Request raise ValidationError {
-  let model = normalize_resource_name(
-    parameter_value(model),
-    "model",
-    "^models/[^/]+$",
-    "models/",
-  )
-  @http.Request::post(
-    "/v1beta/" +
-    @http.percent_encode_path(parameter_value(model)) +
-    ":countTokens",
-  ).body_json(@json.Json::Json(body))
-}
-
-///|
-///
-/// Decodes a parsed successful models_count_tokens response.
-pub fn models_count_tokens_decode_json(
-  value : Json,
-) -> CountTokensResponse raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful models_count_tokens response.
-pub fn models_count_tokens_decode(
-  head : @http.ResponseHead,
-  body : Bytes,
-) -> Result[CountTokensResponse, @client.ResponseFailure] {
-  decode_response(head, body)
-}
-
-///|
-///
 /// Generates multiple embedding vectors from the input `Content` which consists of a batch of strings represented as `EmbedContentRequest` objects.
 pub fn models_batch_embed_contents_request(
   model : String,
@@ -450,46 +453,6 @@ pub fn models_batch_embed_contents_decode(
   head : @http.ResponseHead,
   body : Bytes,
 ) -> Result[BatchEmbedContentsResponse, @client.ResponseFailure] {
-  decode_response(head, body)
-}
-
-///|
-///
-/// Lists the [`Model`s](https://aistudio.google.com/docs/models) available through the Gemini API.
-pub fn models_list_request(
-  page_token? : String,
-  page_size? : Int32,
-) -> @http.Request {
-  let mut url = "/v1beta/models"
-  match page_token {
-    Option::Some(value) =>
-      url = @http.append_query(url, "pageToken", parameter_value(value))
-    Option::None => ()
-  }
-  match page_size {
-    Option::Some(value) =>
-      url = @http.append_query(url, "pageSize", parameter_value(value))
-    Option::None => ()
-  }
-  @http.Request::get(url)
-}
-
-///|
-///
-/// Decodes a parsed successful models_list response.
-pub fn models_list_decode_json(
-  value : Json,
-) -> ListModelsResponse raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful models_list response.
-pub fn models_list_decode(
-  head : @http.ResponseHead,
-  body : Bytes,
-) -> Result[ListModelsResponse, @client.ResponseFailure] {
   decode_response(head, body)
 }
 
@@ -534,46 +497,59 @@ pub fn models_generate_content_decode(
 
 ///|
 ///
-/// Creates a `File`. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
-pub fn media_upload_request(body : CreateFileRequest) -> @http.Request {
-  @http.Request::post("/v1beta/files").body_json(@json.Json::Json(body))
+/// Generates a [streamed response](https://aistudio.google.com/docs/text-generation#streaming-responses) from the model given an input `GenerateContentRequest`.
+pub fn models_stream_generate_content_request(
+  model : String,
+  body : GenerateContentRequest,
+) -> @http.Request raise ValidationError {
+  let model = normalize_resource_name(
+    parameter_value(model),
+    "model",
+    "^models/[^/]+$",
+    "models/",
+  )
+  @http.Request::post(
+    "/v1beta/" +
+    @http.percent_encode_path(parameter_value(model)) +
+    ":streamGenerateContent",
+  ).body_json(@json.Json::Json(body))
 }
 
 ///|
 ///
-/// Decodes a parsed successful media_upload response.
-pub fn media_upload_decode_json(
+/// Decodes a parsed successful models_stream_generate_content response.
+pub fn models_stream_generate_content_decode_json(
   value : Json,
-) -> CreateFileResponse raise @json.JsonDecodeError {
+) -> GenerateContentResponse raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
 ///|
 ///
-/// Decodes a successful media_upload response.
-pub fn media_upload_decode(
+/// Decodes a successful models_stream_generate_content response.
+pub fn models_stream_generate_content_decode(
   head : @http.ResponseHead,
   body : Bytes,
-) -> Result[CreateFileResponse, @client.ResponseFailure] {
+) -> Result[GenerateContentResponse, @client.ResponseFailure] {
   decode_response(head, body)
 }
 
 ///|
 ///
-/// Lists the metadata for `File`s owned by the requesting project. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
-pub fn files_list_request(
-  page_token? : String,
+/// Lists the [`Model`s](https://aistudio.google.com/docs/models) available through the Gemini API.
+pub fn models_list_request(
   page_size? : Int32,
+  page_token? : String,
 ) -> @http.Request {
-  let mut url = "/v1beta/files"
-  match page_token {
-    Option::Some(value) =>
-      url = @http.append_query(url, "pageToken", parameter_value(value))
-    Option::None => ()
-  }
+  let mut url = "/v1beta/models"
   match page_size {
     Option::Some(value) =>
       url = @http.append_query(url, "pageSize", parameter_value(value))
+    Option::None => ()
+  }
+  match page_token {
+    Option::Some(value) =>
+      url = @http.append_query(url, "pageToken", parameter_value(value))
     Option::None => ()
   }
   @http.Request::get(url)
@@ -581,32 +557,32 @@ pub fn files_list_request(
 
 ///|
 ///
-/// Decodes a parsed successful files_list response.
-pub fn files_list_decode_json(
+/// Decodes a parsed successful models_list response.
+pub fn models_list_decode_json(
   value : Json,
-) -> ListFilesResponse raise @json.JsonDecodeError {
+) -> ListModelsResponse raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
 ///|
 ///
-/// Decodes a successful files_list response.
-pub fn files_list_decode(
+/// Decodes a successful models_list response.
+pub fn models_list_decode(
   head : @http.ResponseHead,
   body : Bytes,
-) -> Result[ListFilesResponse, @client.ResponseFailure] {
+) -> Result[ListModelsResponse, @client.ResponseFailure] {
   decode_response(head, body)
 }
 
 ///|
 ///
-/// Gets the metadata for the given `File`. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage
-pub fn files_get_request(name : String) -> @http.Request raise ValidationError {
+/// Gets information about a specific `Model` such as its version number, token limits, [parameters](https://aistudio.google.com/docs/prompting-strategies#model-parameters) and other metadata. Refer to the [Gemini models guide](https://aistudio.google.com/docs/models) for detailed model information.
+pub fn models_get_request(name : String) -> @http.Request raise ValidationError {
   let name = normalize_resource_name(
     parameter_value(name),
     "name",
-    "^files/[^/]+$",
-    "files/",
+    "^models/[^/]+$",
+    "models/",
   )
   @http.Request::get(
     "/v1beta/" + @http.percent_encode_path(parameter_value(name)),
@@ -615,34 +591,58 @@ pub fn files_get_request(name : String) -> @http.Request raise ValidationError {
 
 ///|
 ///
-/// Decodes a parsed successful files_get response.
-pub fn files_get_decode_json(value : Json) -> File raise @json.JsonDecodeError {
+/// Decodes a parsed successful models_get response.
+pub fn models_get_decode_json(
+  value : Json,
+) -> Model raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
 ///|
 ///
-/// Decodes a successful files_get response.
-pub fn files_get_decode(
+/// Decodes a successful models_get response.
+pub fn models_get_decode(
   head : @http.ResponseHead,
   body : Bytes,
-) -> Result[File, @client.ResponseFailure] {
+) -> Result[Model, @client.ResponseFailure] {
   decode_response(head, body)
 }
 
 ///|
 ///
-/// Deletes the `File`. OAuth scope `https://www.googleapis.com/auth/devstorage.read_only`: View your data in Google Cloud Storage The caller handles the response as @http.Response.
-pub fn files_delete_request(
-  name : String,
+/// Runs a model's tokenizer on input `Content` and returns the token count. Refer to the [tokens guide](https://aistudio.google.com/docs/tokens) to learn more about tokens.
+pub fn models_count_tokens_request(
+  model : String,
+  body : CountTokensRequest,
 ) -> @http.Request raise ValidationError {
-  let name = normalize_resource_name(
-    parameter_value(name),
-    "name",
-    "^files/[^/]+$",
-    "files/",
+  let model = normalize_resource_name(
+    parameter_value(model),
+    "model",
+    "^models/[^/]+$",
+    "models/",
   )
-  @http.Request::delete(
-    "/v1beta/" + @http.percent_encode_path(parameter_value(name)),
-  )
+  @http.Request::post(
+    "/v1beta/" +
+    @http.percent_encode_path(parameter_value(model)) +
+    ":countTokens",
+  ).body_json(@json.Json::Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful models_count_tokens response.
+pub fn models_count_tokens_decode_json(
+  value : Json,
+) -> CountTokensResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful models_count_tokens response.
+pub fn models_count_tokens_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CountTokensResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }

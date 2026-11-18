@@ -45,158 +45,6 @@ fn typed_error(
 ) -> ErrorBody? {
   try {
     let json = @json.parse(@utf8.decode(body))
-    if operation == "cached_contents_patch" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_patch" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_list" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_list" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_create" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_create" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_delete" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_delete" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_get" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "cached_contents_get" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_embed_content" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_embed_content" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_get" && head.status >= 400 && head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_get" && head.status >= 500 && head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_stream_generate_content" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_stream_generate_content" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_count_tokens" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_count_tokens" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_batch_embed_contents" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_batch_embed_contents" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_list" && head.status >= 400 && head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_list" && head.status >= 500 && head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_generate_content" &&
-      head.status >= 400 &&
-      head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "models_generate_content" &&
-      head.status >= 500 &&
-      head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "media_upload" && head.status >= 400 && head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "media_upload" && head.status >= 500 && head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "files_list" && head.status >= 400 && head.status < 500 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
-    if operation == "files_list" && head.status >= 500 && head.status < 600 {
-      let value : GoogleError = @json.from_json(json)
-      return Option::Some(ErrorBody::GoogleError(value))
-    }
     if operation == "files_get" && head.status >= 400 && head.status < 500 {
       let value : GoogleError = @json.from_json(json)
       return Option::Some(ErrorBody::GoogleError(value))
@@ -210,6 +58,158 @@ fn typed_error(
       return Option::Some(ErrorBody::GoogleError(value))
     }
     if operation == "files_delete" && head.status >= 500 && head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "files_list" && head.status >= 400 && head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "files_list" && head.status >= 500 && head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "media_upload" && head.status >= 400 && head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "media_upload" && head.status >= 500 && head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_delete" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_delete" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_patch" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_patch" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_list" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_list" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_create" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_create" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_get" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "cached_contents_get" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_embed_content" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_embed_content" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_batch_embed_contents" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_batch_embed_contents" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_generate_content" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_generate_content" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_stream_generate_content" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_stream_generate_content" &&
+      head.status >= 500 &&
+      head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_list" && head.status >= 400 && head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_list" && head.status >= 500 && head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_get" && head.status >= 400 && head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_get" && head.status >= 500 && head.status < 600 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_count_tokens" &&
+      head.status >= 400 &&
+      head.status < 500 {
+      let value : GoogleError = @json.from_json(json)
+      return Option::Some(ErrorBody::GoogleError(value))
+    }
+    if operation == "models_count_tokens" &&
+      head.status >= 500 &&
+      head.status < 600 {
       let value : GoogleError = @json.from_json(json)
       return Option::Some(ErrorBody::GoogleError(value))
     }
