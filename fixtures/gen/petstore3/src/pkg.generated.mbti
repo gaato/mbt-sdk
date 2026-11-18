@@ -117,7 +117,7 @@ pub(all) struct ApiResponse {
   message : String?
 }
 pub fn ApiResponse::equal(Self, Self) -> Bool
-pub fn ApiResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ApiResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ApiResponse::new(code? : Int32, type_? : String, message? : String) -> Self
 pub fn ApiResponse::not_equal(Self, Self) -> Bool
 pub fn ApiResponse::to_json(Self) -> @json.Json
@@ -139,7 +139,7 @@ pub(all) struct Category {
   name : String?
 }
 pub fn Category::equal(Self, Self) -> Bool
-pub fn Category::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Category::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Category::new(id? : Int64, name? : String) -> Self
 pub fn Category::not_equal(Self, Self) -> Bool
 pub fn Category::to_json(Self) -> @json.Json
@@ -160,6 +160,7 @@ pub(all) enum Failure {
   Http(HttpFailure)
   Transport(@mttp_core.TransportError)
   Decode(@client.ResponseFailure)
+  Validation(operation~ : String, parameter~ : String, message~ : String)
 }
 pub fn Failure::to_repr(Self) -> @debug.Repr
 
@@ -172,7 +173,7 @@ pub(all) enum FindPetsByStatusStatus {
   Custom(String)
 }
 pub fn FindPetsByStatusStatus::equal(Self, Self) -> Bool
-pub fn FindPetsByStatusStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FindPetsByStatusStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FindPetsByStatusStatus::not_equal(Self, Self) -> Bool
 pub fn FindPetsByStatusStatus::to_json(Self) -> @json.Json
 pub fn FindPetsByStatusStatus::to_repr(Self) -> @debug.Repr
@@ -198,7 +199,7 @@ pub(all) struct Order {
   complete : Bool?
 }
 pub fn Order::equal(Self, Self) -> Bool
-pub fn Order::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Order::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Order::new(id? : Int64, pet_id? : Int64, quantity? : Int32, ship_date? : String, status? : OrderStatus, complete? : Bool) -> Self
 pub fn Order::not_equal(Self, Self) -> Bool
 pub fn Order::to_json(Self) -> @json.Json
@@ -215,7 +216,7 @@ pub(all) enum OrderStatus {
   Unknown(String)
 }
 pub fn OrderStatus::equal(Self, Self) -> Bool
-pub fn OrderStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OrderStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OrderStatus::not_equal(Self, Self) -> Bool
 pub fn OrderStatus::to_json(Self) -> @json.Json
 pub fn OrderStatus::to_repr(Self) -> @debug.Repr
@@ -237,7 +238,7 @@ pub(all) struct Pet {
   status : PetStatus?
 }
 pub fn Pet::equal(Self, Self) -> Bool
-pub fn Pet::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Pet::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Pet::new(name~ : String, photo_urls~ : Array[String], id? : Int64, category? : Category, tags? : Array[Tag], status? : PetStatus) -> Self
 pub fn Pet::not_equal(Self, Self) -> Bool
 pub fn Pet::to_json(Self) -> @json.Json
@@ -254,7 +255,7 @@ pub(all) enum PetStatus {
   Unknown(String)
 }
 pub fn PetStatus::equal(Self, Self) -> Bool
-pub fn PetStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PetStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn PetStatus::not_equal(Self, Self) -> Bool
 pub fn PetStatus::to_json(Self) -> @json.Json
 pub fn PetStatus::to_repr(Self) -> @debug.Repr
@@ -298,7 +299,7 @@ pub(all) struct Tag {
   name : String?
 }
 pub fn Tag::equal(Self, Self) -> Bool
-pub fn Tag::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Tag::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Tag::new(id? : Int64, name? : String) -> Self
 pub fn Tag::not_equal(Self, Self) -> Bool
 pub fn Tag::to_json(Self) -> @json.Json
@@ -318,7 +319,7 @@ pub(all) struct User {
   user_status : Int32?
 }
 pub fn User::equal(Self, Self) -> Bool
-pub fn User::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn User::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn User::new(id? : Int64, username? : String, first_name? : String, last_name? : String, email? : String, password? : String, phone? : String, user_status? : Int32) -> Self
 pub fn User::not_equal(Self, Self) -> Bool
 pub fn User::to_json(Self) -> @json.Json

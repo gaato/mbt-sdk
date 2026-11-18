@@ -34,11 +34,8 @@ case "$(moon version --all)" in *"$(cat moonbit-version)"*) pinned=1 ;; esac
 note() { echo "note: $* (this toolchain is not moonbit-version's)" >&2; }
 
 # `moon fmt --check`. Off the pinned toolchain, a difference that only adds or
-# drops a comma at the end of lines is a note: MoonBit's formatter after 0.10.20
-# puts a trailing comma after the last item of a list it breaks over lines,
-# where 0.10.20's removes it, and an enum constructor whose payload is too
-# long for one line (generated code, ChatEvent::ToolCallDelta) has no form
-# both accept. Any other difference fails.
+# drops a comma at the end of lines is a note. Formatter releases can change
+# trailing commas in multiline lists. Any other difference fails.
 fmt_check() {
   echo "+ moon fmt --check $*"
   local out
@@ -95,7 +92,7 @@ run timeout 120 moon test "${offline_packages[@]}" --target wasm
 
 run "${py[@]}" -m unittest discover -s tools/gen/tests -v
 # The generators format their output with the running moonfmt, so off the
-# pinned toolchain the trailing commas above make their output differ (exit
+# pinned toolchain those formatting differences can change the output (exit
 # status 1); any other failure still fails.
 if [ "$pinned" = 1 ]; then
   run scripts/generate.sh "${sdks[@]}" --check

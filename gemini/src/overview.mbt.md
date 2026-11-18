@@ -144,12 +144,17 @@ backend. Buffered responses use the runtime's default size limit. File upload
 buffers its entire input; service file and project quotas still apply.
 
 Failures are `Http` (operation, status, headers, diagnostic bytes and optional
-typed `GoogleError`), `Transport` (kind and phase) or `Decode`. Match with a
-default arm. Safety blocking may be a successful response with feedback and
+typed `GoogleError`), `Transport` (kind and phase), `Decode` or `Validation`.
+Explicit SDK header values with surrounding whitespace return `Validation`
+before I/O. Invalid defaults on a supplied Client return `Transport` with
+kind `Invalid` and phase `Pool`.
+Match with a default arm. Safety blocking may be a successful response with feedback and
 no candidate, so inspect `prompt_feedback` and candidate finish reasons.
 Generic `call` decoders return `Result` without raising; streaming callback
-exceptions propagate. With `from_client`, add `x-goog-api-key` to the runtime
-redirect credential headers yourself. Query keys appear in URLs and logs.
+exceptions propagate. The SDK marks its credential header names even with
+`from_client`, including names on runtime defaults. Redirects that change host, port or scheme
+strip them, except for a same-host HTTP port 80 to HTTPS port 443 upgrade.
+HTTPS to HTTP is refused by default. Query keys appear in URLs and logs.
 
 The SDK supports wasm-gc, JavaScript and native; transport support depends on
 the backend. It covers the native generateContent API; Live, Interactions,

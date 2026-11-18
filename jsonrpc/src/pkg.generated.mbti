@@ -58,7 +58,7 @@ pub(all) enum RequestId {
   Null
 }
 pub fn RequestId::equal(Self, Self) -> Bool
-pub fn RequestId::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RequestId::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn RequestId::hash(Self) -> Int32
 pub fn RequestId::hash_combine(Self, Hasher) -> Unit
 pub fn RequestId::not_equal(Self, Self) -> Bool
@@ -74,7 +74,7 @@ pub(all) struct RpcError {
   data : @json.Json?
 }
 pub fn RpcError::equal(Self, Self) -> Bool
-pub fn RpcError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RpcError::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn RpcError::internal_error(message? : String) -> Self
 pub fn RpcError::invalid_params(message? : String) -> Self
 pub fn RpcError::invalid_request(message? : String) -> Self

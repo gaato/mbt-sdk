@@ -42,14 +42,102 @@ test "generated default URL, bucket, HTTP and transport failures" {
     @driver.run_sync(() => sdk.send(@http.Request::post("/contract-test"))) {
     Result::Err(
       Failure::Transport(
-        @http.TransportError::TransportError(kind~, phase~, ..)
-      )
+        @http.TransportError::TransportError(kind~, phase~, ..),
+      ),
     ) => {
       try! assert_true(kind is Network)
       try! assert_true(phase is Body)
     }
     _ => fail("expected transport failure")
   }
+}
+
+///|
+test "generated header whitespace is a validation failure before I/O" {
+  let count = Ref::Ref(0)
+  let backend = @client.from_fn((_, _) => {
+    count.val += 1
+    @http.Response::new(200)
+  })
+  let sdk = Badhttp::new(backend, @sim.FakeClock::new())
+  for value in [" leading", "trailing\t"] {
+    let request = @http.Request::post("/contract-test").header(
+      "idempotency-key", value,
+    )
+    try! assert_true(
+      @driver.run_sync(() => sdk.send(request))
+      is Result::Err(Failure::Validation(parameter="headers", ..)),
+    )
+    try! assert_true(
+      @driver.run_sync(() => sdk.stream(request, _ => ()))
+      is Result::Err(Failure::Validation(parameter="headers", ..)),
+    )
+  }
+  try! assert_eq(count.val, 0)
+}
+
+///|
+test "generated client returns a transport failure for invalid runtime default headers" {
+  let count = Ref::Ref(0)
+  let backend = @client.from_fn((_, _) => {
+    count.val += 1
+    @http.Response::new(200)
+  })
+  let runtime = @client.Client::new(
+    backend,
+    @sim.FakeClock::new(),
+    headers=@http.Headers::of([("x-test", " invalid")]),
+  )
+  let sdk = Badhttp::from_client(runtime)
+  let request = @http.Request::get("/contract-test")
+  @driver.run_sync(() => {
+    try! assert_true(
+      sdk.send(request)
+      is Result::Err(
+        Failure::Transport(
+          @http.TransportError::TransportError(kind=Invalid, phase=Pool, ..),
+        ),
+      ),
+    )
+    try! assert_true(
+      sdk.stream(request, _ => abort("invalid request reached the SSE callback"))
+      is Result::Err(
+        Failure::Transport(
+          @http.TransportError::TransportError(kind=Invalid, phase=Pool, ..),
+        ),
+      ),
+    )
+  })
+  try! assert_eq(count.val, 0)
+}
+
+///|
+test "generated stream propagates nested request validation from its callback" {
+  let clock = @sim.FakeClock::new()
+  let backend = @client.from_fn((_, _) => {
+    @http.Response::new(200, body=@http.Body::Bytes(b"data: callback\n\n"))
+  })
+  let nested_backend = @client.from_fn((_, _) => {
+    abort("invalid nested request reached the backend")
+  })
+  let nested = @client.Client::new(nested_backend, clock)
+  let sdk = Badhttp::new(backend, clock)
+  @driver.run_sync(() => {
+    let invalid = @http.Request::get("https://nested.example").header(
+      "x-test", " invalid",
+    )
+    let outer = sdk.stream(@http.Request::get("/contract-test"), _ => {
+      ignore(nested.send(@client.request(invalid).response(@client.as_bytes())))
+    }) catch {
+      @http.TransportError::TransportError(kind=Invalid, phase=Pool, ..) =>
+        return
+      error => raise error
+    }
+    fail(
+      "expected the nested request error to raise, got " +
+      @debug.to_string(outer),
+    )
+  })
 }
 
 ///|

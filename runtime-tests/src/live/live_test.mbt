@@ -23,13 +23,18 @@ fn live_transport() -> &@http.Backend {
 
 ///|
 fn credential(name : String, provider : String) -> String? {
-  match @env.get_env_var(name) {
-    Some(value) if !value.trim().is_empty() => Some(value)
-    _ => {
+  match optional_credential(name) {
+    Some(value) => Some(value)
+    None => {
       println("skip: \{provider}: \{name} is missing or empty")
       None
     }
   }
+}
+
+///|
+fn optional_credential(name : String) -> String? {
+  optional_setting(name).map(value => value.trim().to_owned())
 }
 
 ///|
@@ -338,7 +343,7 @@ async test "live local OpenAI-compatible Chat Completions API" {
       )
       return
     }
-    let headers = match optional_setting("OPENAI_COMPAT_API_KEY") {
+    let headers = match optional_credential("OPENAI_COMPAT_API_KEY") {
       Some(key) => @http.Headers::of([("authorization", "Bearer " + key)])
       None => @http.Headers::empty()
     }
@@ -459,7 +464,7 @@ async test "live local Anthropic-compatible Messages API" {
     }
     let transport = live_transport()
     let clock = @adapter.AsyncClock::new()
-    let client = match optional_setting("ANTHROPIC_COMPAT_API_KEY") {
+    let client = match optional_credential("ANTHROPIC_COMPAT_API_KEY") {
       Some(key) =>
         @anthropic_sdk.Anthropic::new(
           api_key=key,

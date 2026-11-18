@@ -86,7 +86,8 @@ return consumed response bytes. Raw uploads take bytes and a content type.
 
 Text responses return strings; operations without a response body return Unit.
 Failures distinguish `Http` (operation, status, headers, bytes and optional error JSON),
-`Transport` (the original transport error with its phase), and `Decode`.
+`Transport` (the original runtime error, including invalid Client defaults),
+`Decode`, and `Validation` for invalid SDK input.
 Match with a default arm. Unexpected callback errors propagate.
 The client supports wasm-gc, JavaScript and native targets, subject to the
 chosen backend. See the

@@ -54,7 +54,7 @@ let extra_drivers : Array[String] = ["conformance/src", "runtime-tests/src"]
 
 ///|
 let network_drivers : Array[String] = [
-  "runtime-tests/src/live", "runtime-tests/src/badhttp",
+  "runtime-tests/src/live", "runtime-tests/src/gemini_live", "runtime-tests/src/badhttp",
 ]
 
 ///|
@@ -154,7 +154,7 @@ async fn measure() -> String {
     }
   }
   if @fs.exists("_build/native/debug/test") {
-    @fs.rmdir("_build/native/debug/test", recursive=true)
+    @fs.remove("_build/native/debug/test", recursive=true)
   }
   let cc = match @env.get_env_var("MOON_CC") {
     Some(cc) if cc != "" => cc

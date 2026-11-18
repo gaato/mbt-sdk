@@ -22,7 +22,7 @@ class F8RobustnessTests(unittest.TestCase):
             files['regression_wbtest.mbt'] = source
         with tempfile.TemporaryDirectory(prefix='f8-shapes-') as directory:
             root = Path(directory)
-            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(files))
             if executable:
                 (root / 'src/main').mkdir()

@@ -254,33 +254,28 @@ async fn GitHub::graphql_exchange(
       .opt("operationName", operation_name)
       .build(),
     )
-  self.client.send(
-    @client.ClientRequest::new(
-      request,
-      http_reader().map_with_head((result, head) => {
-        let body = match result {
-          Ok(body) => body
-          Err(error) => return Err(error)
-        }
-        try {
-          let response : BufferedResponse = { head, body, }
-          let envelope = graphql_envelope(response)
-          check_graphql_reply(envelope, response, mutation~)
-          Ok((response, envelope))
-        } catch {
-          ExpectedFailure(error) => Err(error)
-          error => raise error
-        }
-      }),
-    ).attribute(
-      @client.rate_limit_bucket,
-      if mutation {
-        graphql_mutation_bucket
-      } else {
-        graphql_bucket
-      },
-    ),
-    decide_retry=(attempt, context) => self.retry_decision(attempt, context),
+  self.send_marked(
+    request,
+    http_reader().map_with_head((result, head) => {
+      let body = match result {
+        Ok(body) => body
+        Err(error) => return Err(error)
+      }
+      try {
+        let response : BufferedResponse = { head, body, }
+        let envelope = graphql_envelope(response)
+        check_graphql_reply(envelope, response, mutation~)
+        Ok((response, envelope))
+      } catch {
+        ExpectedFailure(error) => Err(error)
+        error => raise error
+      }
+    }),
+    if mutation {
+      graphql_mutation_bucket
+    } else {
+      graphql_bucket
+    },
   ).body
   |> result => {
     match result {

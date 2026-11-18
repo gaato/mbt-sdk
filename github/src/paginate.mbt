@@ -25,7 +25,10 @@ pub fn[T] GitHub::paginator(
             }
         }
       }),
-    )
+    ) catch {
+      ExpectedFailure(error) => return Err(error)
+      error => raise error
+    }
     match reply.body {
       Err(error) => Err(error)
       Ok(items) =>

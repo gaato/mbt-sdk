@@ -60,16 +60,23 @@ def build(doc=None, **kwargs):
 
 
 class ClientLayerTests(unittest.TestCase):
+    def test_published_redirect_docs_describe_current_behavior(self):
+        for module in ('openai', 'anthropic', 'github', 'gemini'):
+            with self.subTest(module=module):
+                overview = (sdks.ROOT / module / 'src/overview.mbt.md').read_text()
+                self.assertNotRegex(overview, r'(?i)\bmttp_core\s+\d+\.\d+\.\d+\b')
+                self.assertIn('HTTP port 80 to HTTPS port 443', ' '.join(overview.split()))
+
     def test_auth_kinds_and_redaction_and_signature_filter(self):
         files, ir = build()
         source = files['client_gen.mbt']
-        for text in ['request.bearer(value)', 'request.basic(username, password)', 'request.set_header("X-Api-Key", value)', 'request.query("api_key", value)', 'credential_headers.push("x-api-key")']:
+        for text in ['request.credential("authorization", "Bearer " + value)', 'request.basic(username, password)', 'request.credential("X-Api-Key", value)', 'request.query("api_key", value)', 'credential_headers.push("x-api-key")']:
             self.assertIn(text, source)
         self.assertNotIn('x_api_key', files['operations_gen.mbt'])
         self.assertEqual(ir.operations[0].parameters, ())
         self.assertIn('"public_get" => (false, "")', source)
         self.assertIn('Query credentials appear in redirect history and observer URLs.', source)
-        self.assertIn('from_client cannot enforce', source)
+        self.assertIn('same-host HTTP port 80 to HTTPS port 443 upgrade', source)
 
     def test_servers_retry_errors_raw_sse_pagination_and_bucket(self):
         files, _ = build()
@@ -258,10 +265,19 @@ test "raw wrapper preserves upload bytes and marks caller idempotency key" {
     _ => fail("raw wrapper failed")
   }
 }
+
+///|
+test "generated raw wrapper rejects whitespace in an explicit idempotency key" {
+  let backend = @client.from_fn((_, _) => abort("invalid idempotency key reached the backend"))
+  let sdk = Sample::new(backend, @sim.FakeClock::new())
+  assert_true(@driver.run_sync(() => sdk.raw(
+    b"upload", content_type="application/octet-stream", idempotency_key="key ",
+  )) is Err(Validation(operation="raw", parameter="headers", ..)))
+}
 '''
         with tempfile.TemporaryDirectory(prefix='f2-client-') as tmp:
             tmp = Path(tmp)
-            (tmp / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (tmp / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             # Moon owns this module's dependency directory. A repository symlink
             # is dangling on a fresh checkout and blocks Moon's mkdir with EEXIST.
             _write(tmp / 'src/gen', _format(emit(ir)))

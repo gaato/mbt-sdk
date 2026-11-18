@@ -98,3 +98,105 @@ test "mttp decode failures retain real response headers and bytes" {
     backend.verify()
   })
 }
+
+///|
+test "OpenAI from_client strips and redacts authorization with an empty redirect credential list" {
+  let origin = "https://openai.example"
+  let other = "https://other.example/models"
+  let seen = []
+  let backend = @client.from_fn((request, _) => {
+    seen.push(request)
+    if request.url.has_prefix(origin) {
+      @http.Response::new(302, headers=@http.Headers::of([("location", other)]))
+    } else {
+      @http.Response::new(200, body=Bytes(b"{\"object\":\"list\",\"data\":[]}"))
+    }
+  })
+  let runtime = @client.Client::new(
+    backend,
+    @mock.FakeClock::new(),
+    base_url=origin,
+    headers=@http.Headers::of([("authorization", "Bearer fixture-token")]),
+    redirect={ ..@client.RedirectConfig::default(), credential_headers: [], },
+  )
+  let sdk = @openai.OpenAI::from_client(runtime)
+  assert_true(@driver.run_sync(() => sdk.list_models()) is Ok(_))
+  assert_eq(seen.length(), 2)
+  assert_eq(seen[0].headers.get("authorization"), Some("Bearer fixture-token"))
+  assert_true(
+    seen[0].attributes
+    .get(@http.credential_headers)
+    .unwrap_or([])
+    .contains("authorization"),
+  )
+  assert_false(
+    @client.request(seen[0])
+    .response(@client.as_bytes())
+    .to_curl()
+    .contains("fixture-token"),
+  )
+  assert_eq(seen[1].url, other)
+  assert_eq(seen[1].headers.get("authorization"), None)
+}
+
+///|
+test "OpenAI rejects explicit header whitespace as validation before I/O" {
+  let backend = @testing.BackendStub::new()
+  let clock = @mock.FakeClock::new()
+  let tenant = @openai.OpenAI::new(
+    api_key="fixture",
+    backend,
+    clock,
+    organization=" org",
+  )
+  let project = @openai.OpenAI::new(
+    api_key="fixture",
+    backend,
+    clock,
+    project="proj\t",
+  )
+  let key = @openai.OpenAI::new(api_key=" fixture", backend, clock)
+  for sdk in [tenant, project, key] {
+    assert_true(
+      @driver.run_sync(() => sdk.list_models())
+      is Err(@openai.OpenAIFailure::Validation(_)),
+    )
+  }
+  assert_true(backend.sent().is_empty())
+}
+
+///|
+test "OpenAI propagates nested request validation from a streaming callback" {
+  let backend = @testing.BackendStub::new().expect(
+    _ => true,
+    @testing.Canned::bytes(
+      200,
+      body=b"data: {\"id\":\"c\",\"object\":\"chat.completion.chunk\",\"created\":1750000000,\"model\":\"m\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"hello\"},\"finish_reason\":null}]}\n\n",
+    ),
+  )
+  let clock = @mock.FakeClock::new()
+  let sdk = @openai.OpenAI::new(api_key="fixture-key", backend, clock)
+  let nested_backend = @testing.BackendStub::new()
+  let nested = @client.Client::new(nested_backend, clock)
+  @driver.run_sync(() => {
+    let request = @http.Request::get("https://nested.example").header(
+      "x-test", " invalid",
+    )
+    let outer = sdk.stream_chat_completion(
+      @openai.ChatRequest::new(model="m", messages=[]),
+      _ => {
+        ignore(
+          nested.send(@client.request(request).response(@client.as_bytes())),
+        )
+      },
+    ) catch {
+      @http.TransportError(kind=Invalid, phase=Pool, ..) => return
+      error => raise error
+    }
+    fail(
+      "expected the nested request error to raise, got \{@debug.to_string(outer)}",
+    )
+  })
+  backend.verify()
+  assert_true(nested_backend.sent().is_empty())
+}

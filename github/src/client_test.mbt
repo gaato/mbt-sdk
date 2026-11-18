@@ -143,3 +143,162 @@ test "downloads follow the 302 without the token unless redirect_limit is 0" {
     backend.verify()
   })
 }
+
+///|
+test "GitHub from_client strips and redacts authorization for REST and GraphQL" {
+  let origin = "https://github.example"
+  let other = "https://other.example/next"
+  for graphql in [false, true] {
+    let seen = []
+    let backend = @client.from_fn((request, _) => {
+      seen.push(request)
+      if request.url.has_prefix(origin) {
+        @http.Response::new(
+          307,
+          headers=@http.Headers::of([("location", other)]),
+        )
+      } else {
+        @http.Response::new(200, body=Bytes(b"{\"data\":{}}"))
+      }
+    })
+    let runtime = @client.Client::new(
+      backend,
+      @mock.FakeClock::new(),
+      base_url=origin,
+      headers=@http.Headers::of([("authorization", "Bearer fixture-token")]),
+      redirect={ ..@client.RedirectConfig::default(), credential_headers: [], },
+    )
+    let sdk = @github.GitHub::from_client(
+      runtime,
+      graphql_url=origin + "/graphql",
+    )
+    @driver.run_sync(() => {
+      if graphql {
+        assert_true(sdk.graphql(query="{ viewer { login } }") is Ok(_))
+      } else {
+        assert_true(sdk.send(@http.Request::get("/rest")) is Ok(_))
+      }
+    })
+    assert_eq(seen.length(), 2)
+    assert_eq(
+      seen[0].headers.get("authorization"),
+      Some("Bearer fixture-token"),
+    )
+    assert_true(
+      seen[0].attributes
+      .get(@http.credential_headers)
+      .unwrap_or([])
+      .contains("authorization"),
+    )
+    assert_false(
+      @client.request(seen[0])
+      .response(@client.as_bytes())
+      .to_curl()
+      .contains("fixture-token"),
+    )
+    assert_eq(seen[1].url, other)
+    assert_eq(seen[1].headers.get("authorization"), None)
+  }
+}
+
+///|
+test "GitHub rejects explicit header whitespace as validation before I/O" {
+  let backend = @testing.BackendStub::new()
+  let clock = @mock.FakeClock::new()
+  let agent = @github.GitHub::new(backend, clock, user_agent="fixture\t")
+  let version = @github.GitHub::new(backend, clock, api_version=" 2022-11-28")
+  let token = @github.GitHub::new(backend, clock, token=" fixture")
+  let sdk = @github.GitHub::new(backend, clock)
+  let request = @http.Request::get("/rest")
+  @driver.run_sync(() => {
+    for invalid in [agent, version, token] {
+      assert_true(
+        invalid.send(request) is Err(@github.GitHubFailure::Validation(_)),
+      )
+      assert_true(
+        invalid.graphql(query="{ viewer { login } }")
+        is Err(@github.GitHubFailure::Validation(_)),
+      )
+    }
+    assert_true(
+      sdk.send(request.header("user-agent", " override"))
+      is Err(@github.GitHubFailure::Validation(_)),
+    )
+  })
+  assert_true(backend.sent().is_empty())
+}
+
+///|
+test "GitHub propagates request validation raised by a response decoder" {
+  let backend = @testing.BackendStub::new().expect(
+    _ => true,
+    @testing.Canned::bytes(200, body=b"{}"),
+  )
+  let sdk = @github.GitHub::new(backend, @mock.FakeClock::new())
+  @driver.run_sync(() => {
+    let nested = @http.Request::get("https://nested.example").header(
+      "x-test", " invalid",
+    )
+    let outer : Result[Unit, @github.GitHubFailure] = sdk.call(
+      @http.Request::get("/rest"),
+      (_, _) => {
+        nested.validate()
+        Ok(())
+      },
+    ) catch {
+      @http.TransportError(kind=Invalid, phase=Pool, ..) => return
+      error => raise error
+    }
+    fail(
+      "expected the nested request error to raise, got \{@debug.to_string(outer)}",
+    )
+  })
+  backend.verify()
+}
+
+///|
+priv struct NestedRequestBody {
+  client : @client.Client
+}
+
+///|
+impl @http.BodyStream for NestedRequestBody with fn read_some(self) {
+  let request = @http.Request::get("https://nested.example").header(
+    "x-test", " invalid",
+  )
+  ignore(
+    self.client.send(@client.request(request).response(@client.as_bytes())),
+  ) catch {
+    @http.TransportError(..) as error => raise error
+    _ => abort("unexpected nested request error")
+  }
+  None
+}
+
+///|
+impl @http.BodyStream for NestedRequestBody with fn close(_) {
+  ()
+}
+
+///|
+test "GitHub propagates a nested request error raised while reading its response" {
+  let clock = @mock.FakeClock::new()
+  let nested_backend = @testing.BackendStub::new()
+  let body = NestedRequestBody::{
+    client: @client.Client::new(nested_backend, clock),
+  }
+  let backend = @client.from_fn((_, _) => {
+    @http.Response::new(200, body=Stream(@http.StreamBody::new(body)))
+  })
+  let sdk = @github.GitHub::new(backend, clock)
+  @driver.run_sync(() => {
+    let outer = sdk.send(@http.Request::get("/rest")).map(reply => reply.status) catch {
+        @http.TransportError(kind=Invalid, phase=Pool, ..) => return
+        error => raise error
+      }
+    fail(
+      "expected the nested request error to raise, got \{@debug.to_string(outer)}",
+    )
+  })
+  assert_true(nested_backend.sent().is_empty())
+}

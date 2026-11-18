@@ -41,7 +41,7 @@ pub(all) struct ErrorResponse {
   errors : @jsonkit.Presence[Array[FieldError]]
 }
 pub fn ErrorResponse::equal(Self, Self) -> Bool
-pub fn ErrorResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ErrorResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ErrorResponse::new(detail~ : String, code? : String, request_id? : String, errors? : Array[FieldError]) -> Self
 pub fn ErrorResponse::not_equal(Self, Self) -> Bool
 pub fn ErrorResponse::to_json(Self) -> @json.Json
@@ -55,6 +55,7 @@ pub(all) enum Failure {
   Http(HttpFailure)
   Transport(@mttp_core.TransportError)
   Decode(@client.ResponseFailure)
+  Validation(operation~ : String, parameter~ : String, message~ : String)
 }
 pub fn Failure::to_repr(Self) -> @debug.Repr
 
@@ -66,7 +67,7 @@ pub(all) struct FieldError {
   input : @jsonkit.Presence[@json.Json]
 }
 pub fn FieldError::equal(Self, Self) -> Bool
-pub fn FieldError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FieldError::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FieldError::new(field~ : String, message~ : String, type_~ : String, input? : @json.Json) -> Self
 pub fn FieldError::not_equal(Self, Self) -> Bool
 pub fn FieldError::to_json(Self) -> @json.Json
@@ -115,7 +116,7 @@ pub(all) struct OpenAIError {
   request_id : @jsonkit.Presence[String]
 }
 pub fn OpenAIError::equal(Self, Self) -> Bool
-pub fn OpenAIError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OpenAIError::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OpenAIError::new(message~ : String, type_~ : String, param? : String, code? : String, request_id? : String) -> Self
 pub fn OpenAIError::not_equal(Self, Self) -> Bool
 pub fn OpenAIError::to_json(Self) -> @json.Json
@@ -128,7 +129,7 @@ pub(all) struct OpenAIErrorResponse {
   error : OpenAIError
 }
 pub fn OpenAIErrorResponse::equal(Self, Self) -> Bool
-pub fn OpenAIErrorResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OpenAIErrorResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OpenAIErrorResponse::new(error~ : OpenAIError) -> Self
 pub fn OpenAIErrorResponse::not_equal(Self, Self) -> Bool
 pub fn OpenAIErrorResponse::to_json(Self) -> @json.Json

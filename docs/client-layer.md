@@ -131,10 +131,14 @@ parameters or multipart formals. The allocator checks each candidate again,
 so the choice is deterministic. It moves generated names aside without
 changing an API parameter's label.
 
-Header API keys are added, lowercased, to the constructor's redirect credential
-list. `from_client` cannot enforce this: configure those headers in its
-`RedirectConfig` yourself. Supply credentials through `Auth`, keeping default
-runtime headers credential-free so public operations can disable authentication.
+From mttp_core 0.3.0, the SDK marks its declared credential header names on
+each request. With `from_client`, this covers matching Client defaults even
+when SDK auth is anonymous. The constructor also includes its header
+API keys in the runtime redirect credential list. Marked headers are removed
+when a redirect changes host, port or scheme, except for a same-host HTTP
+port 80 to HTTPS port 443 upgrade. HTTPS to HTTP is refused by default.
+`to_curl` redacts marked values. Supply credentials through `Auth`, keeping
+default runtime headers credential-free so public operations can disable authentication.
 Query credentials appear in redirect history and observer URLs. Absolute
 pagination URLs outside the operation's origin receive no construction-time
 credentials. Debug representations redact credentials.
@@ -160,6 +164,16 @@ only `@client.max_error_body` diagnostic bytes on failure.
 Cancellation and unknown user callback errors propagate. A Refused
 failure means the request was **not processed**, rather than implying no bytes
 were sent.
+
+Explicit SDK request header values retain their bytes. Invalid values, including
+those with surrounding whitespace, return `Failure::Validation` before I/O.
+The supplied Client validates its defaults. Its header errors return
+`Failure::Transport` with kind `Invalid` and phase `Pool`, like other
+runtime transport failures carried in the result. User callback errors
+propagate unchanged. Header parameters declared as API keys carry the
+credential mark even on raw builders.
+Statuses 600–999 are HTTP failures like 5xx. Provider defaults retry them
+only through an explicit override such as `x-should-retry: true`.
 
 Ledger `idempotency_headers` (or overlay `x-moonbit-idempotency-headers`) mark
 requests replay-safe only when a nonempty header is supplied. They never invent

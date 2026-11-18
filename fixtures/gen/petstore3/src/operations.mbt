@@ -221,7 +221,7 @@ pub fn delete_pet_request(pet_id : Int64, api_key? : String) -> @http.Request {
   )
   match api_key {
     Option::Some(value) =>
-      request = request.header("api_key", parameter_value(value))
+      request = request.credential("api_key", parameter_value(value))
     Option::None => ()
   }
   request

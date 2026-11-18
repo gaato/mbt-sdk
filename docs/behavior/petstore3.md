@@ -10,7 +10,8 @@ flows. Operation security chooses which credential applies; public operations
 receive no construction-time credentials.
 
 Without a documented provider retry rule the generated client uses mttp_core's
-conservative policy. No default timeout is invented. The `api_key` header is
-removed on cross-origin redirects by the backend-plus-clock constructor.
-Callers supplying their own runtime Client must configure that credential
-header themselves. All contract tests use an offline backend.
+conservative policy. No default timeout is imposed. From mttp_core 0.3.0,
+the facade marks `api_key` on each request, including with a supplied Client.
+The runtime drops it when the host, port or scheme changes, except for a
+same-host HTTP port 80 to HTTPS port 443 upgrade. HTTPS to HTTP is refused
+by default. All contract tests use an offline backend.

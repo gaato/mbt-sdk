@@ -19,6 +19,11 @@ are optional unless the field is required, and keep a wildcard arm.
 
 - Generated code now qualifies constructor references; no public API change.
 - **Regenerated from the upstream spec fetched 2026-11-17** (sha256 `7696dbb0d6d6`). Changes are batched for the next weekly release; see the generated interface diff.
+- **Build with MoonBit 0.10.21 and mttp_core 0.3.0.** Invalid explicit header values, including surrounding whitespace, return validation failures before I/O.
+
+### Security
+
+- **Mark x-api-key and Authorization on each request.** Caller-owned Clients strip the marked headers on cross-host redirects and redact them in curl diagnostics. The same-host default-port HTTP-to-HTTPS exception still applies.
 
 ## [0.17.0] - 2026-11-12
 
@@ -30,7 +35,7 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ### Security
 
-- **The API key is no longer sent to another origin on a redirect.** Since 0.16.0 the client follows redirects (gaato/mttp 0.2's default), and mttp removes only `authorization`, `proxy-authorization` and `cookie` when a redirect changes the origin, so with the default `x-api-key` authentication a cross-origin redirect from the API or a compatible gateway forwarded the key to the other origin. `Anthropic::new` now removes `x-api-key` as well; a same-origin redirect still carries it. 0.15.0 and earlier did not follow redirects. A client wrapped with `Anthropic::from_client` keeps its own redirect configuration: add `x-api-key` to its `credential_headers`.
+- **The API key is no longer sent to a different host on a redirect.** Since 0.16.0 the client follows redirects (gaato/mttp 0.2's default), and mttp removes only `authorization`, `proxy-authorization` and `cookie` when a redirect changes the origin, so with the default `x-api-key` authentication a cross-origin redirect from the API or a compatible gateway forwarded the key to the other origin. `Anthropic::new` now removes `x-api-key` as well; a same-origin redirect still carries it. 0.15.0 and earlier did not follow redirects. In 0.16.1, callers of `Anthropic::from_client` still had to include `x-api-key` in the redirect configuration. The [Unreleased] entry describes the new per-request protection.
 
 ## [0.16.0] - 2026-11-12
 

@@ -5,6 +5,8 @@ runs it and reads provider settings from the environment or
 `~/.config/moonbit-sdks/env`. Remote tests make actual provider requests and may
 incur charges. A provider without a key is skipped, and a skipped run is not
 evidence of compatibility with the official service.
+The live harness trims surrounding whitespace from credentials loaded from
+the environment, including settings sourced by the launcher.
 
 ## OpenAI-compatible providers
 

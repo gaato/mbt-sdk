@@ -9246,7 +9246,7 @@ pub impl ToJson for CodeSecurityConfigurationCodeScanningDefaultSetupOptionsRunn
     CodeSecurityConfigurationCodeScanningDefaultSetupOptionsRunnerType::NotSet =>
       "not_set"
     CodeSecurityConfigurationCodeScanningDefaultSetupOptionsRunnerType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -9713,7 +9713,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningDelegatedBypassOption
     CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::ROLE =>
       "ROLE"
     CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -9794,7 +9794,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningDelegatedBypassOption
     CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemMode::EXEMPT =>
       "EXEMPT"
     CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemMode::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -10261,7 +10261,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningGenericSecretsPushPro
     CodeSecurityConfigurationSecretScanningGenericSecretsPushProtection::NotSet =>
       "not_set"
     CodeSecurityConfigurationSecretScanningGenericSecretsPushProtection::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -21025,7 +21025,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningDelegatedBypassOptionsRevie
     SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::ROLE =>
       "ROLE"
     SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -21106,7 +21106,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningDelegatedBypassOptionsRevie
     SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode::EXEMPT =>
       "EXEMPT"
     SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -32597,7 +32597,7 @@ pub impl ToJson for OrganizationCopilotCodeReviewSettingsDefaultReviewEffortMana
     OrganizationCopilotCodeReviewSettingsDefaultReviewEffortManagedBy::Organization =>
       "organization"
     OrganizationCopilotCodeReviewSettingsDefaultReviewEffortManagedBy::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -39016,7 +39016,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationWithSelectedRepositoriesRegis
     OrgPrivateRegistryConfigurationWithSelectedRepositoriesRegistryType::TerraformRegistry =>
       "terraform_registry"
     OrgPrivateRegistryConfigurationWithSelectedRepositoriesRegistryType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -39167,7 +39167,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationWithSelectedRepositoriesAuthT
     OrgPrivateRegistryConfigurationWithSelectedRepositoriesAuthType::Anonymous =>
       "anonymous"
     OrgPrivateRegistryConfigurationWithSelectedRepositoriesAuthType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -39275,7 +39275,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationWithSelectedRepositoriesVisib
     OrgPrivateRegistryConfigurationWithSelectedRepositoriesVisibility::Selected =>
       "selected"
     OrgPrivateRegistryConfigurationWithSelectedRepositoriesVisibility::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -58952,7 +58952,7 @@ pub impl ToJson for ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItem
     ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItemStatus::Pending =>
       "pending"
     ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItemStatus::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -88565,7 +88565,7 @@ pub impl ToJson for RepositoryRuleDetailedPullRequestParametersAllowedMergeMetho
     RepositoryRuleDetailedPullRequestParametersAllowedMergeMethodsItem::Rebase =>
       "rebase"
     RepositoryRuleDetailedPullRequestParametersAllowedMergeMethodsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -89622,7 +89622,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitAuthorEmailPatternParametersOper
     RepositoryRuleDetailedCommitAuthorEmailPatternParametersOperator::Regex =>
       "regex"
     RepositoryRuleDetailedCommitAuthorEmailPatternParametersOperator::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -89785,7 +89785,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitAuthorEmailPatternRulesetSourceT
     RepositoryRuleDetailedCommitAuthorEmailPatternRulesetSourceType::Organization =>
       "Organization"
     RepositoryRuleDetailedCommitAuthorEmailPatternRulesetSourceType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -91988,7 +91988,7 @@ pub impl ToJson for RepositoryRuleDetailedLicenseComplianceScanningRulesetSource
     RepositoryRuleDetailedLicenseComplianceScanningRulesetSourceType::Organization =>
       "Organization"
     RepositoryRuleDetailedLicenseComplianceScanningRulesetSourceType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -92633,7 +92633,7 @@ pub impl ToJson for RepositoryRuleDetailedFileExtensionRestrictionRulesetSourceT
     RepositoryRuleDetailedFileExtensionRestrictionRulesetSourceType::Organization =>
       "Organization"
     RepositoryRuleDetailedFileExtensionRestrictionRulesetSourceType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -94772,7 +94772,7 @@ pub impl ToJson for RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue 
     RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue::Int(value) =>
       @json.Json::Json(value)
     RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue::TextArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -103510,7 +103510,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIntervalC
     AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -103595,7 +103595,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIntervalW
     AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -103771,7 +103771,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueOpen
     AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -103924,7 +103924,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueLabe
     AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -104081,7 +104081,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersWorkflowR
     AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -104242,7 +104242,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -104399,7 +104399,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -104556,7 +104556,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -104713,7 +104713,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueComm
     AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -104870,7 +104870,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -104951,7 +104951,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -105127,7 +105127,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussio
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -105284,7 +105284,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussio
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -105441,7 +105441,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussio
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -105522,7 +105522,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussio
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -105693,7 +105693,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueAssi
     AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -105850,7 +105850,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -106011,7 +106011,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersSubIssueA
     AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -106164,7 +106164,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -106321,7 +106321,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -106482,7 +106482,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -106642,7 +106642,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -106727,7 +106727,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -106892,7 +106892,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -107049,7 +107049,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueClos
     AgentAutomationsListAutomationsResponseItemTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersIssueClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -107202,7 +107202,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueReop
     AgentAutomationsListAutomationsResponseItemTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersIssueReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -107355,7 +107355,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -107512,7 +107512,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -107669,7 +107669,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestConvertedToDraftWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -107826,7 +107826,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewDismissedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -107983,7 +107983,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewThreadResolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -108140,7 +108140,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullReque
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewThreadUnresolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -108297,7 +108297,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersAutomatio
     AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -108453,7 +108453,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersAutomatio
     AgentAutomationsListAutomationsResponseItemTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsListAutomationsResponseItemTriggersAutomationFailedReasonsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -108538,7 +108538,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersAutomatio
     AgentAutomationsListAutomationsResponseItemTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersAutomationFailedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -108699,7 +108699,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersCodeScann
     AgentAutomationsListAutomationsResponseItemTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersCodeScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -108848,7 +108848,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersSecretSca
     AgentAutomationsListAutomationsResponseItemTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersSecretScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -108997,7 +108997,7 @@ pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDependabo
     AgentAutomationsListAutomationsResponseItemTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationsResponseItemTriggersDependabotAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -109729,7 +109729,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -109814,7 +109814,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -109990,7 +109990,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -110143,7 +110143,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -110300,7 +110300,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -110461,7 +110461,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -110618,7 +110618,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -110775,7 +110775,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -110932,7 +110932,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -111089,7 +111089,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -111170,7 +111170,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -111346,7 +111346,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -111503,7 +111503,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -111660,7 +111660,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -111741,7 +111741,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -111912,7 +111912,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -112069,7 +112069,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -112230,7 +112230,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -112383,7 +112383,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -112540,7 +112540,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -112701,7 +112701,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -112861,7 +112861,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -112946,7 +112946,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -113111,7 +113111,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -113268,7 +113268,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -113421,7 +113421,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -113574,7 +113574,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -113731,7 +113731,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -113888,7 +113888,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestConvertedToDraftWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -114045,7 +114045,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewDismissedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -114202,7 +114202,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewThreadResolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -114359,7 +114359,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewThreadUnresolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -114516,7 +114516,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -114672,7 +114672,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationFailedReasonsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -114757,7 +114757,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationFailedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -114918,7 +114918,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersCodeScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -115067,7 +115067,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSecretScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -115216,7 +115216,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTr
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDependabotAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -115871,7 +115871,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIntervalC
     AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -115956,7 +115956,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIntervalW
     AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -116132,7 +116132,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpen
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -116285,7 +116285,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabe
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -116442,7 +116442,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowR
     AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -116603,7 +116603,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -116760,7 +116760,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -116917,7 +116917,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -117074,7 +117074,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueComm
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -117231,7 +117231,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -117312,7 +117312,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -117488,7 +117488,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussio
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -117645,7 +117645,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussio
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -117802,7 +117802,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussio
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -117883,7 +117883,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussio
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -118054,7 +118054,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssi
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -118211,7 +118211,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -118372,7 +118372,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueA
     AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -118525,7 +118525,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -118682,7 +118682,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -118843,7 +118843,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -119003,7 +119003,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -119088,7 +119088,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -119253,7 +119253,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -119410,7 +119410,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueClos
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueClosedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -119563,7 +119563,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueReop
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersIssueReopenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -119716,7 +119716,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestClosedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -119873,7 +119873,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReopenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -120030,7 +120030,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestConvertedToDraftWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -120187,7 +120187,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewDismissedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -120344,7 +120344,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewThreadResolvedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -120501,7 +120501,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullReque
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewThreadUnresolvedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -120658,7 +120658,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersAutomatio
     AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -120814,7 +120814,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersAutomatio
     AgentAutomationsCreateRepoAutomationRequestTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsCreateRepoAutomationRequestTriggersAutomationFailedReasonsItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -120899,7 +120899,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersAutomatio
     AgentAutomationsCreateRepoAutomationRequestTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersAutomationFailedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -121060,7 +121060,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersCodeScann
     AgentAutomationsCreateRepoAutomationRequestTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersCodeScanningAlertWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -121209,7 +121209,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersSecretSca
     AgentAutomationsCreateRepoAutomationRequestTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersSecretScanningAlertWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -121358,7 +121358,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDependabo
     AgentAutomationsCreateRepoAutomationRequestTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationRequestTriggersDependabotAlertWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -122015,7 +122015,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersInterval
     AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -122100,7 +122100,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersInterval
     AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -122276,7 +122276,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpe
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -122429,7 +122429,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueLab
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -122586,7 +122586,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersWorkflow
     AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -122747,7 +122747,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -122904,7 +122904,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -123061,7 +123061,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -123218,7 +123218,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueCom
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -123375,7 +123375,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -123456,7 +123456,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -123632,7 +123632,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussi
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -123789,7 +123789,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussi
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -123946,7 +123946,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussi
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -124027,7 +124027,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussi
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -124198,7 +124198,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueAss
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -124355,7 +124355,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -124516,7 +124516,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersSubIssue
     AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -124669,7 +124669,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -124826,7 +124826,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -124987,7 +124987,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -125147,7 +125147,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -125232,7 +125232,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -125397,7 +125397,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -125554,7 +125554,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueClo
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -125707,7 +125707,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueReo
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersIssueReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -125860,7 +125860,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -126017,7 +126017,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -126174,7 +126174,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestConvertedToDraftWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -126331,7 +126331,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewDismissedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -126488,7 +126488,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewThreadResolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -126645,7 +126645,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequ
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewThreadUnresolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -126802,7 +126802,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersAutomati
     AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -126958,7 +126958,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersAutomati
     AgentAutomationsCreateRepoAutomationResponseTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsCreateRepoAutomationResponseTriggersAutomationFailedReasonsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -127043,7 +127043,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersAutomati
     AgentAutomationsCreateRepoAutomationResponseTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersAutomationFailedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -127204,7 +127204,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersCodeScan
     AgentAutomationsCreateRepoAutomationResponseTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersCodeScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -127353,7 +127353,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersSecretSc
     AgentAutomationsCreateRepoAutomationResponseTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersSecretScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -127502,7 +127502,7 @@ pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDependab
     AgentAutomationsCreateRepoAutomationResponseTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsCreateRepoAutomationResponseTriggersDependabotAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -128094,7 +128094,7 @@ pub impl ToJson for AgentAutomationsListAvailableRepoAutomationToolsResponseTool
     AgentAutomationsListAvailableRepoAutomationToolsResponseToolGroupsItemToolsItemScope::Write =>
       "write"
     AgentAutomationsListAvailableRepoAutomationToolsResponseToolGroupsItemToolsItemScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -128786,13 +128786,13 @@ pub impl @json.FromJson for AgentAutomationsListAvailableRepoAutomationTriggersR
 #non_exhaustive
 pub(all) enum AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchema {
   String(
-    AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchemaString
+    AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchemaString,
   )
   Array(
-    AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchemaArray
+    AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchemaArray,
   )
   Integer(
-    AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchemaInteger
+    AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchemaInteger,
   )
   Unknown(String, Json)
 }
@@ -128821,17 +128821,17 @@ pub impl ToJson for AgentAutomationsListAvailableRepoAutomationTriggersResponseI
 ) {
   match self {
     AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchema::String(
-      value
+      value,
     ) => @json.Json::Json(value)
     AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchema::Array(
-      value
+      value,
     ) => @json.Json::Json(value)
     AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchema::Integer(
-      value
+      value,
     ) => @json.Json::Json(value)
     AgentAutomationsListAvailableRepoAutomationTriggersResponseItemFieldsItemSchema::Unknown(
       _,
-      value
+      value,
     ) => value
   }
 }
@@ -129135,7 +129135,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIntervalCad
     AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -129220,7 +129220,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIntervalWri
     AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -129396,7 +129396,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened
     AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -129549,7 +129549,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueLabele
     AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -129706,7 +129706,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun
     AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -129867,7 +129867,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -130024,7 +130024,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -130181,7 +130181,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -130338,7 +130338,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueCommen
     AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -130495,7 +130495,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -130576,7 +130576,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -130752,7 +130752,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionO
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -130909,7 +130909,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionU
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -131066,7 +131066,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionC
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -131147,7 +131147,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionC
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -131318,7 +131318,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueAssign
     AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -131475,7 +131475,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -131636,7 +131636,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdd
     AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -131789,7 +131789,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -131946,7 +131946,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -132107,7 +132107,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -132267,7 +132267,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -132352,7 +132352,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -132517,7 +132517,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -132674,7 +132674,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueClosed
     AgentAutomationsGetRepoAutomationResponseTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersIssueClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -132827,7 +132827,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueReopen
     AgentAutomationsGetRepoAutomationResponseTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersIssueReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -132980,7 +132980,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -133137,7 +133137,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -133294,7 +133294,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestConvertedToDraftWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -133451,7 +133451,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewDismissedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -133608,7 +133608,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewThreadResolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -133765,7 +133765,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequest
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewThreadUnresolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -133922,7 +133922,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersAutomationC
     AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -134078,7 +134078,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersAutomationF
     AgentAutomationsGetRepoAutomationResponseTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsGetRepoAutomationResponseTriggersAutomationFailedReasonsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -134163,7 +134163,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersAutomationF
     AgentAutomationsGetRepoAutomationResponseTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersAutomationFailedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -134324,7 +134324,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersCodeScannin
     AgentAutomationsGetRepoAutomationResponseTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersCodeScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -134473,7 +134473,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersSecretScann
     AgentAutomationsGetRepoAutomationResponseTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersSecretScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -134622,7 +134622,7 @@ pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDependabotA
     AgentAutomationsGetRepoAutomationResponseTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsGetRepoAutomationResponseTriggersDependabotAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -135214,7 +135214,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIntervalCad
     AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -135299,7 +135299,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIntervalWri
     AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -135475,7 +135475,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened
     AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -135628,7 +135628,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueLabele
     AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -135785,7 +135785,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun
     AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -135946,7 +135946,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -136103,7 +136103,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -136260,7 +136260,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -136417,7 +136417,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueCommen
     AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -136574,7 +136574,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -136655,7 +136655,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -136831,7 +136831,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionO
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -136988,7 +136988,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionU
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -137145,7 +137145,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionC
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -137226,7 +137226,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionC
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -137397,7 +137397,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueAssign
     AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -137554,7 +137554,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -137715,7 +137715,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdd
     AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -137868,7 +137868,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -138025,7 +138025,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -138186,7 +138186,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -138346,7 +138346,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -138431,7 +138431,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -138596,7 +138596,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -138753,7 +138753,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueClosed
     AgentAutomationsEditRepoAutomationRequestTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersIssueClosedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -138906,7 +138906,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueReopen
     AgentAutomationsEditRepoAutomationRequestTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersIssueReopenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -139059,7 +139059,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestClosedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -139216,7 +139216,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReopenedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -139373,7 +139373,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestConvertedToDraftWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -139530,7 +139530,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewDismissedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -139687,7 +139687,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewThreadResolvedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -139844,7 +139844,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequest
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewThreadUnresolvedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -140001,7 +140001,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersAutomationC
     AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -140157,7 +140157,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersAutomationF
     AgentAutomationsEditRepoAutomationRequestTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsEditRepoAutomationRequestTriggersAutomationFailedReasonsItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -140242,7 +140242,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersAutomationF
     AgentAutomationsEditRepoAutomationRequestTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersAutomationFailedWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -140403,7 +140403,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersCodeScannin
     AgentAutomationsEditRepoAutomationRequestTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersCodeScanningAlertWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -140552,7 +140552,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersSecretScann
     AgentAutomationsEditRepoAutomationRequestTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersSecretScanningAlertWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -140701,7 +140701,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDependabotA
     AgentAutomationsEditRepoAutomationRequestTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationRequestTriggersDependabotAlertWriteScope::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -141275,7 +141275,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIntervalCa
     AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -141360,7 +141360,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIntervalWr
     AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -141536,7 +141536,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueOpene
     AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -141689,7 +141689,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueLabel
     AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -141846,7 +141846,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRu
     AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -142007,7 +142007,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -142164,7 +142164,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -142321,7 +142321,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -142478,7 +142478,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueComme
     AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -142635,7 +142635,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -142716,7 +142716,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -142892,7 +142892,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussion
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -143049,7 +143049,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussion
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -143206,7 +143206,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussion
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -143287,7 +143287,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussion
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -143458,7 +143458,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueAssig
     AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -143615,7 +143615,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -143776,7 +143776,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAd
     AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -143929,7 +143929,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -144086,7 +144086,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -144247,7 +144247,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -144407,7 +144407,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -144492,7 +144492,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -144657,7 +144657,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -144814,7 +144814,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueClose
     AgentAutomationsEditRepoAutomationResponseTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersIssueClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -144967,7 +144967,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueReope
     AgentAutomationsEditRepoAutomationResponseTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersIssueReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -145120,7 +145120,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -145277,7 +145277,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -145434,7 +145434,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestConvertedToDraftWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -145591,7 +145591,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewDismissedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -145748,7 +145748,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewThreadResolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -145905,7 +145905,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullReques
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewThreadUnresolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -146062,7 +146062,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersAutomation
     AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -146218,7 +146218,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersAutomation
     AgentAutomationsEditRepoAutomationResponseTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsEditRepoAutomationResponseTriggersAutomationFailedReasonsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -146303,7 +146303,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersAutomation
     AgentAutomationsEditRepoAutomationResponseTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersAutomationFailedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -146464,7 +146464,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersCodeScanni
     AgentAutomationsEditRepoAutomationResponseTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersCodeScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -146613,7 +146613,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersSecretScan
     AgentAutomationsEditRepoAutomationResponseTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersSecretScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -146762,7 +146762,7 @@ pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDependabot
     AgentAutomationsEditRepoAutomationResponseTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsEditRepoAutomationResponseTriggersDependabotAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -147369,7 +147369,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemChangeType::Unknown =>
       "unknown"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemChangeType::UnknownValue(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -147593,7 +147593,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemEditorType::Unknown =>
       "unknown"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemEditorType::UnknownValue(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -147678,7 +147678,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotType::Shared =>
       "shared"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -147762,7 +147762,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIntervalCadenceItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -147847,7 +147847,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIntervalWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -148023,7 +148023,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -148176,7 +148176,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -148333,7 +148333,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersWorkflowRunWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -148494,7 +148494,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -148651,7 +148651,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestSynchronizeWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -148808,7 +148808,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestMergedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -148965,7 +148965,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -149122,7 +149122,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -149203,7 +149203,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -149379,7 +149379,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -149536,7 +149536,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionUpdatedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -149693,7 +149693,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -149774,7 +149774,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDiscussionCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -149945,7 +149945,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -150102,7 +150102,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -150263,7 +150263,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersSubIssueAddedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -150416,7 +150416,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReadyForReviewWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -150573,7 +150573,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -150734,7 +150734,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestMergeConflictWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -150894,7 +150894,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewSubmittedStatesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -150979,7 +150979,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewSubmittedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -151144,7 +151144,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewRequestedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -151301,7 +151301,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -151454,7 +151454,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersIssueReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -151607,7 +151607,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -151764,7 +151764,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -151921,7 +151921,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestConvertedToDraftWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -152078,7 +152078,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewDismissedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -152235,7 +152235,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewThreadResolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -152392,7 +152392,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersPullRequestReviewThreadUnresolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -152549,7 +152549,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersAutomationCompletedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -152705,7 +152705,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersAutomationFailedReasonsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -152790,7 +152790,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersAutomationFailedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -152951,7 +152951,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersCodeScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -153100,7 +153100,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersSecretScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -153249,7 +153249,7 @@ pub impl ToJson for AgentAutomationsListAutomationRevisionsResponseRevisionsItem
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsListAutomationRevisionsResponseRevisionsItemSnapshotTriggersDependabotAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -154410,7 +154410,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIntervalCadenceItem::Weekly =>
       "weekly"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIntervalCadenceItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -154495,7 +154495,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIntervalWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIntervalWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -154671,7 +154671,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -154824,7 +154824,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -154981,7 +154981,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersWorkflowRunWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersWorkflowRunWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -155142,7 +155142,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -155299,7 +155299,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestSynchronizeWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestSynchronizeWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -155456,7 +155456,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestMergedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestMergedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -155613,7 +155613,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -155770,7 +155770,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestCommentCommentTypesItem::ReviewComment =>
       "review_comment"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -155851,7 +155851,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -156027,7 +156027,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionOpenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionOpenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -156184,7 +156184,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionUpdatedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionUpdatedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -156341,7 +156341,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionCommentCommentTypesItem::Reply =>
       "reply"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionCommentCommentTypesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -156422,7 +156422,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionCommentWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDiscussionCommentWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -156593,7 +156593,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -156750,7 +156750,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestAssignedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestAssignedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -156911,7 +156911,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersSubIssueAddedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersSubIssueAddedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -157064,7 +157064,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReadyForReviewWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReadyForReviewWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -157221,7 +157221,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestLabeledWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestLabeledWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -157382,7 +157382,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestMergeConflictWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestMergeConflictWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -157542,7 +157542,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewSubmittedStatesItem::Commented =>
       "commented"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewSubmittedStatesItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -157627,7 +157627,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewSubmittedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewSubmittedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -157792,7 +157792,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewRequestedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewRequestedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -157949,7 +157949,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -158102,7 +158102,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersIssueReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -158255,7 +158255,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestClosedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestClosedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -158412,7 +158412,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReopenedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReopenedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -158569,7 +158569,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestConvertedToDraftWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestConvertedToDraftWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -158726,7 +158726,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewDismissedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewDismissedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -158883,7 +158883,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewThreadResolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewThreadResolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -159040,7 +159040,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewThreadUnresolvedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersPullRequestReviewThreadUnresolvedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -159197,7 +159197,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersAutomationCompletedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersAutomationCompletedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -159353,7 +159353,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersAutomationFailedReasonsItem::TimedOut =>
       "timed_out"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersAutomationFailedReasonsItem::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -159438,7 +159438,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersAutomationFailedWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersAutomationFailedWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -159599,7 +159599,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersCodeScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersCodeScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -159748,7 +159748,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersSecretScanningAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersSecretScanningAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -159897,7 +159897,7 @@ pub impl ToJson for AgentAutomationsGetAutomationRevisionResponseSnapshotTrigger
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDependabotAlertWriteScope::Repository =>
       "repository"
     AgentAutomationsGetAutomationRevisionResponseSnapshotTriggersDependabotAlertWriteScope::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -160804,7 +160804,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationTasksResponseTasksItemCrea
     AgentAutomationsListRepoAutomationTasksResponseTasksItemCreatorType::Organization =>
       "organization"
     AgentAutomationsListRepoAutomationTasksResponseTasksItemCreatorType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -161187,7 +161187,7 @@ pub impl ToJson for AgentAutomationsListRepoAutomationTasksResponseTasksItemArti
     AgentAutomationsListRepoAutomationTasksResponseTasksItemArtifactsItemType::Branch =>
       "branch"
     AgentAutomationsListRepoAutomationTasksResponseTasksItemArtifactsItemType::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -167741,7 +167741,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestAdvancedS
     CodeSecurityCreateConfigurationForEnterpriseRequestAdvancedSecurity::SecretProtection =>
       "secret_protection"
     CodeSecurityCreateConfigurationForEnterpriseRequestAdvancedSecurity::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -167920,7 +167920,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependenc
     CodeSecurityCreateConfigurationForEnterpriseRequestDependencyGraph::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestDependencyGraph::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168008,7 +168008,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependenc
     CodeSecurityCreateConfigurationForEnterpriseRequestDependencyGraphAutosubmitAction::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestDependencyGraphAutosubmitAction::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168156,7 +168156,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependabo
     CodeSecurityCreateConfigurationForEnterpriseRequestDependabotAlerts::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestDependabotAlerts::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168244,7 +168244,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependabo
     CodeSecurityCreateConfigurationForEnterpriseRequestDependabotReachability::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestDependabotReachability::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168332,7 +168332,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependabo
     CodeSecurityCreateConfigurationForEnterpriseRequestDependabotSecurityUpdates::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestDependabotSecurityUpdates::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168420,7 +168420,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestCodeScann
     CodeSecurityCreateConfigurationForEnterpriseRequestCodeScanningDefaultSetup::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestCodeScanningDefaultSetup::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168508,7 +168508,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestCodeScann
     CodeSecurityCreateConfigurationForEnterpriseRequestCodeScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestCodeScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168596,7 +168596,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretPro
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretProtection::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168684,7 +168684,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanning::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanning::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168772,7 +168772,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningPushProtection::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168860,7 +168860,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningValidityChecks::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningValidityChecks::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -168948,7 +168948,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningNonProviderPatterns::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningNonProviderPatterns::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -169036,7 +169036,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningGenericSecrets::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningGenericSecrets::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -169124,7 +169124,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningGenericSecretsPushProtection::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningGenericSecretsPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -169212,7 +169212,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -169300,7 +169300,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningExtendedMetadata::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningExtendedMetadata::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -169388,7 +169388,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestPrivateVu
     CodeSecurityCreateConfigurationForEnterpriseRequestPrivateVulnerabilityReporting::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationForEnterpriseRequestPrivateVulnerabilityReporting::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -169810,7 +169810,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestAdvancedSecu
     CodeSecurityUpdateEnterpriseConfigurationRequestAdvancedSecurity::SecretProtection =>
       "secret_protection"
     CodeSecurityUpdateEnterpriseConfigurationRequestAdvancedSecurity::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170074,7 +170074,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependencyGr
     CodeSecurityUpdateEnterpriseConfigurationRequestDependencyGraphAutosubmitAction::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestDependencyGraphAutosubmitAction::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170222,7 +170222,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependabotAl
     CodeSecurityUpdateEnterpriseConfigurationRequestDependabotAlerts::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestDependabotAlerts::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170310,7 +170310,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependabotRe
     CodeSecurityUpdateEnterpriseConfigurationRequestDependabotReachability::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestDependabotReachability::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170398,7 +170398,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependabotSe
     CodeSecurityUpdateEnterpriseConfigurationRequestDependabotSecurityUpdates::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestDependabotSecurityUpdates::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170486,7 +170486,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanning
     CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanningDefaultSetup::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanningDefaultSetup::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170574,7 +170574,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanning
     CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170662,7 +170662,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretProtec
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretProtection::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170837,7 +170837,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningPushProtection::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -170925,7 +170925,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningValidityChecks::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningValidityChecks::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -171013,7 +171013,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningNonProviderPatterns::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningNonProviderPatterns::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -171101,7 +171101,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningGenericSecrets::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningGenericSecrets::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -171189,7 +171189,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningGenericSecretsPushProtection::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningGenericSecretsPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -171277,7 +171277,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -171365,7 +171365,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningExtendedMetadata::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningExtendedMetadata::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -171453,7 +171453,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestPrivateVulne
     CodeSecurityUpdateEnterpriseConfigurationRequestPrivateVulnerabilityReporting::NotSet =>
       "not_set"
     CodeSecurityUpdateEnterpriseConfigurationRequestPrivateVulnerabilityReporting::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -172005,7 +172005,7 @@ pub impl ToJson for CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestDef
     CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestDefaultForNewRepos::Public =>
       "public"
     CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestDefaultForNewRepos::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -172164,7 +172164,7 @@ pub impl ToJson for CodeSecuritySetConfigurationAsDefaultForEnterpriseResponseDe
     CodeSecuritySetConfigurationAsDefaultForEnterpriseResponseDefaultForNewRepos::Public =>
       "public"
     CodeSecuritySetConfigurationAsDefaultForEnterpriseResponseDefaultForNewRepos::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -173190,7 +173190,7 @@ pub impl ToJson for DependabotSetRepositoryAccessDefaultLevelForEnterpriseReques
     DependabotSetRepositoryAccessDefaultLevelForEnterpriseRequestDefaultLevel::Internal =>
       "internal"
     DependabotSetRepositoryAccessDefaultLevelForEnterpriseRequestDefaultLevel::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -173822,7 +173822,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     AppsListReposAccessibleToInstallationResponseRepositoriesItemPullRequestCreationPolicy::CollaboratorsOnly =>
       "collaborators_only"
     AppsListReposAccessibleToInstallationResponseRepositoriesItemPullRequestCreationPolicy::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -173903,7 +173903,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     AppsListReposAccessibleToInstallationResponseRepositoriesItemSquashMergeCommitTitle::COMMITORPRTITLE =>
       "COMMIT_OR_PR_TITLE"
     AppsListReposAccessibleToInstallationResponseRepositoriesItemSquashMergeCommitTitle::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -173987,7 +173987,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     AppsListReposAccessibleToInstallationResponseRepositoriesItemSquashMergeCommitMessage::BLANK =>
       "BLANK"
     AppsListReposAccessibleToInstallationResponseRepositoriesItemSquashMergeCommitMessage::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -174072,7 +174072,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     AppsListReposAccessibleToInstallationResponseRepositoriesItemMergeCommitTitle::MERGEMESSAGE =>
       "MERGE_MESSAGE"
     AppsListReposAccessibleToInstallationResponseRepositoriesItemMergeCommitTitle::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -174156,7 +174156,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     AppsListReposAccessibleToInstallationResponseRepositoriesItemMergeCommitMessage::BLANK =>
       "BLANK"
     AppsListReposAccessibleToInstallationResponseRepositoriesItemMergeCommitMessage::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -177894,7 +177894,7 @@ pub impl ToJson for ActionsSetSelfHostedRunnersPermissionsOrganizationRequestEna
     ActionsSetSelfHostedRunnersPermissionsOrganizationRequestEnabledRepositories::None =>
       "none"
     ActionsSetSelfHostedRunnersPermissionsOrganizationRequestEnabledRepositories::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -181395,7 +181395,7 @@ pub impl ToJson for OrgsSetClusterDeploymentRecordsRequestDeploymentsItemRuntime
     OrgsSetClusterDeploymentRecordsRequestDeploymentsItemRuntimeRisksItem::SensitiveData =>
       "sensitive-data"
     OrgsSetClusterDeploymentRecordsRequestDeploymentsItemRuntimeRisksItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -181721,7 +181721,7 @@ pub impl ToJson for OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemS
     OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemStatus::Decommissioned =>
       "decommissioned"
     OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemStatus::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -181808,7 +181808,7 @@ pub impl ToJson for OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemR
     OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemRuntimeRisksItem::SensitiveData =>
       "sensitive-data"
     OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemRuntimeRisksItem::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -184233,7 +184233,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestDependencyGraphAutosub
     CodeSecurityCreateConfigurationRequestDependencyGraphAutosubmitAction::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestDependencyGraphAutosubmitAction::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -184633,7 +184633,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestDependabotDelegatedAle
     CodeSecurityCreateConfigurationRequestDependabotDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestDependabotDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -184808,7 +184808,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestCodeScanningDelegatedA
     CodeSecurityCreateConfigurationRequestCodeScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestCodeScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185055,7 +185055,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningPushProt
     CodeSecurityCreateConfigurationRequestSecretScanningPushProtection::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185143,7 +185143,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypass::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypass::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185228,7 +185228,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::ROLE =>
       "ROLE"
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185309,7 +185309,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode::EXEMPT =>
       "EXEMPT"
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185525,7 +185525,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningValidity
     CodeSecurityCreateConfigurationRequestSecretScanningValidityChecks::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningValidityChecks::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185613,7 +185613,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningNonProvi
     CodeSecurityCreateConfigurationRequestSecretScanningNonProviderPatterns::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningNonProviderPatterns::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185701,7 +185701,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningGenericS
     CodeSecurityCreateConfigurationRequestSecretScanningGenericSecrets::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningGenericSecrets::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185789,7 +185789,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningGenericS
     CodeSecurityCreateConfigurationRequestSecretScanningGenericSecretsPushProtection::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningGenericSecretsPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185877,7 +185877,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -185965,7 +185965,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningExtended
     CodeSecurityCreateConfigurationRequestSecretScanningExtendedMetadata::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestSecretScanningExtendedMetadata::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -186053,7 +186053,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestPrivateVulnerabilityRe
     CodeSecurityCreateConfigurationRequestPrivateVulnerabilityReporting::NotSet =>
       "not_set"
     CodeSecurityCreateConfigurationRequestPrivateVulnerabilityReporting::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -186782,7 +186782,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestDependencyGraphAutosub
     CodeSecurityUpdateConfigurationRequestDependencyGraphAutosubmitAction::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestDependencyGraphAutosubmitAction::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -187182,7 +187182,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestDependabotDelegatedAle
     CodeSecurityUpdateConfigurationRequestDependabotDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestDependabotDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -187357,7 +187357,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestCodeScanningDelegatedA
     CodeSecurityUpdateConfigurationRequestCodeScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestCodeScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -187604,7 +187604,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningPushProt
     CodeSecurityUpdateConfigurationRequestSecretScanningPushProtection::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -187692,7 +187692,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypass::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypass::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -187777,7 +187777,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::ROLE =>
       "ROLE"
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -187858,7 +187858,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode::EXEMPT =>
       "EXEMPT"
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -188074,7 +188074,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningValidity
     CodeSecurityUpdateConfigurationRequestSecretScanningValidityChecks::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningValidityChecks::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -188162,7 +188162,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningNonProvi
     CodeSecurityUpdateConfigurationRequestSecretScanningNonProviderPatterns::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningNonProviderPatterns::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -188250,7 +188250,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningGenericS
     CodeSecurityUpdateConfigurationRequestSecretScanningGenericSecrets::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningGenericSecrets::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -188338,7 +188338,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningGenericS
     CodeSecurityUpdateConfigurationRequestSecretScanningGenericSecretsPushProtection::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningGenericSecretsPushProtection::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -188426,7 +188426,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedAlertDismissal::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedAlertDismissal::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -188514,7 +188514,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningExtended
     CodeSecurityUpdateConfigurationRequestSecretScanningExtendedMetadata::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestSecretScanningExtendedMetadata::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -188602,7 +188602,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestPrivateVulnerabilityRe
     CodeSecurityUpdateConfigurationRequestPrivateVulnerabilityReporting::NotSet =>
       "not_set"
     CodeSecurityUpdateConfigurationRequestPrivateVulnerabilityReporting::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -189330,7 +189330,7 @@ pub impl ToJson for CodeSecuritySetConfigurationAsDefaultResponseDefaultForNewRe
     CodeSecuritySetConfigurationAsDefaultResponseDefaultForNewRepos::Public =>
       "public"
     CodeSecuritySetConfigurationAsDefaultResponseDefaultForNewRepos::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -190251,7 +190251,7 @@ pub impl ToJson for CopilotSpacesCreateForOrgRequestResourcesAttributesItemResou
     CopilotSpacesCreateForOrgRequestResourcesAttributesItemResourceType::UploadedTextFile =>
       "uploaded_text_file"
     CopilotSpacesCreateForOrgRequestResourcesAttributesItemResourceType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -190651,7 +190651,7 @@ pub impl ToJson for CopilotSpacesUpdateForOrgRequestResourcesAttributesItemResou
     CopilotSpacesUpdateForOrgRequestResourcesAttributesItemResourceType::UploadedTextFile =>
       "uploaded_text_file"
     CopilotSpacesUpdateForOrgRequestResourcesAttributesItemResourceType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -192470,7 +192470,7 @@ pub impl ToJson for CopilotGetCopilotCodingAgentPermissionsOrganizationResponseE
     CopilotGetCopilotCodingAgentPermissionsOrganizationResponseEnabledRepositories::None =>
       "none"
     CopilotGetCopilotCodingAgentPermissionsOrganizationResponseEnabledRepositories::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -192626,7 +192626,7 @@ pub impl ToJson for CopilotSetCopilotCodingAgentPermissionsOrganizationRequestEn
     CopilotSetCopilotCodingAgentPermissionsOrganizationRequestEnabledRepositories::None =>
       "none"
     CopilotSetCopilotCodingAgentPermissionsOrganizationRequestEnabledRepositories::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -193716,10 +193716,10 @@ pub impl ToJson for DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryId
 ) {
   match self {
     DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryIdsItem::Int(
-      value
+      value,
     ) => @json.Json::Json(value)
     DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryIdsItem::Text(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -201635,7 +201635,7 @@ pub impl ToJson for SecretScanningBulkDeleteOrgCustomPatternsRequestPostDeleteAc
     SecretScanningBulkDeleteOrgCustomPatternsRequestPostDeleteAction::ResolveAlerts =>
       "resolve_alerts"
     SecretScanningBulkDeleteOrgCustomPatternsRequestPostDeleteAction::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -201785,7 +201785,7 @@ pub impl ToJson for SecretScanningUpdateOrgPatternConfigsRequestProviderPatternS
     SecretScanningUpdateOrgPatternConfigsRequestProviderPatternSettingsItemPushProtectionSetting::Enabled =>
       "enabled"
     SecretScanningUpdateOrgPatternConfigsRequestProviderPatternSettingsItemPushProtectionSetting::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -201938,7 +201938,7 @@ pub impl ToJson for SecretScanningUpdateOrgPatternConfigsRequestCustomPatternSet
     SecretScanningUpdateOrgPatternConfigsRequestCustomPatternSettingsItemPushProtectionSetting::Enabled =>
       "enabled"
     SecretScanningUpdateOrgPatternConfigsRequestCustomPatternSettingsItemPushProtectionSetting::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -202826,7 +202826,7 @@ pub impl ToJson for HostedComputeCreateNetworkConfigurationForOrgRequestComputeS
     HostedComputeCreateNetworkConfigurationForOrgRequestComputeService::Actions =>
       "actions"
     HostedComputeCreateNetworkConfigurationForOrgRequestComputeService::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -202995,7 +202995,7 @@ pub impl ToJson for HostedComputeUpdateNetworkConfigurationForOrgRequestComputeS
     HostedComputeUpdateNetworkConfigurationForOrgRequestComputeService::Actions =>
       "actions"
     HostedComputeUpdateNetworkConfigurationForOrgRequestComputeService::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -204197,7 +204197,7 @@ pub impl ToJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestQueryS
     OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestQuerySuite::Extended =>
       "extended"
     OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestQuerySuite::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -204856,7 +204856,7 @@ pub impl ToJson for ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegated
     ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::ROLE =>
       "ROLE"
     ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -204937,7 +204937,7 @@ pub impl ToJson for ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegated
     ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode::EXEMPT =>
       "EXEMPT"
     ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -222560,7 +222560,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItemIgnoredRe
     IssuesUpdateResponseSuggestionsIssueFieldValuesItemIgnoredReason::IssueAlreadyClosed =>
       "issue_already_closed"
     IssuesUpdateResponseSuggestionsIssueFieldValuesItemIgnoredReason::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -231938,7 +231938,7 @@ pub impl ToJson for SecretScanningBulkDeleteRepoCustomPatternsRequestPostDeleteA
     SecretScanningBulkDeleteRepoCustomPatternsRequestPostDeleteAction::ResolveAlerts =>
       "resolve_alerts"
     SecretScanningBulkDeleteRepoCustomPatternsRequestPostDeleteAction::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -235765,10 +235765,10 @@ pub impl ToJson for CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSel
 ) {
   match self {
     CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSelectedRepositoryIdsItem::Int(
-      value
+      value,
     ) => @json.Json::Json(value)
     CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSelectedRepositoryIdsItem::Text(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -236247,7 +236247,7 @@ pub impl ToJson for UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestVis
     UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestVisibility::Private =>
       "private"
     UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestVisibility::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -236853,7 +236853,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemPullRequestCreationPolicy::CollaboratorsOnly =>
       "collaborators_only"
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemPullRequestCreationPolicy::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -236934,7 +236934,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemSquashMergeCommitTitle::COMMITORPRTITLE =>
       "COMMIT_OR_PR_TITLE"
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemSquashMergeCommitTitle::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -237018,7 +237018,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemSquashMergeCommitMessage::BLANK =>
       "BLANK"
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemSquashMergeCommitMessage::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -237103,7 +237103,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemMergeCommitTitle::MERGEMESSAGE =>
       "MERGE_MESSAGE"
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemMergeCommitTitle::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -237187,7 +237187,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemMergeCommitMessage::BLANK =>
       "BLANK"
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemMergeCommitMessage::Unknown(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -239002,7 +239002,7 @@ pub impl ToJson for PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedU
     PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserPackageType::Container =>
       "container"
     PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserPackageType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -239099,7 +239099,7 @@ pub impl ToJson for PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedU
     PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState::Deleted =>
       "deleted"
     PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -241575,7 +241575,7 @@ pub impl ToJson for CopilotSpacesCreateForUserRequestResourcesAttributesItemReso
     CopilotSpacesCreateForUserRequestResourcesAttributesItemResourceType::UploadedTextFile =>
       "uploaded_text_file"
     CopilotSpacesCreateForUserRequestResourcesAttributesItemResourceType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)
@@ -241970,7 +241970,7 @@ pub impl ToJson for CopilotSpacesUpdateForUserRequestResourcesAttributesItemReso
     CopilotSpacesUpdateForUserRequestResourcesAttributesItemResourceType::UploadedTextFile =>
       "uploaded_text_file"
     CopilotSpacesUpdateForUserRequestResourcesAttributesItemResourceType::Custom(
-      raw
+      raw,
     ) => raw
   }
   @json.Json::Json(raw)

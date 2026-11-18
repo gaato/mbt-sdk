@@ -367,7 +367,7 @@ pub fn get_cookies_flavor_request(
   let mut request = @http.Request::get(url)
   match cookie {
     Option::Some(value) =>
-      request = request.header("Cookie", parameter_value(value))
+      request = request.credential("Cookie", parameter_value(value))
     Option::None => ()
   }
   request

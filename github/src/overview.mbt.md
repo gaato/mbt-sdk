@@ -126,9 +126,11 @@ short-lived `location`:
   with `accept: application/zip`
 
 The client follows these redirects, up to ten hops: `send` returns the
-downloaded body, buffered up to `max_body_bytes`. On a hop to another origin
-it drops `authorization` and `cookie`, so the token is not sent to the
-download host, and it closes the intermediate bodies. For a download too large
+downloaded body, buffered up to `max_body_bytes`. The default policy removes
+`authorization` and `cookie` when the host, port or scheme changes, except on a
+same-host HTTP port 80 to HTTPS port 443 upgrade. HTTPS to HTTP is refused by
+default. The SDK marks `authorization` even with
+`from_client`, and the runtime closes intermediate bodies. For a download too large
 to buffer, build an mttp Client with `Client::new` over the same backend and
 read the body with `as_stream`; that Client follows redirects the same way.
 
@@ -154,6 +156,8 @@ pub async fn tarball_url(gh : @github.GitHub, ref_ : String) -> String? {
 A Client built with `redirect=@client.RedirectConfig::none()` and passed to
 `GitHub::from_client` returns every `3xx` this way. Host fetch redirect
 behavior has platform constraints documented by `gaato/mttp`.
+Explicit header values with surrounding whitespace return `Validation` before
+the request is sent.
 
 ## Pagination
 

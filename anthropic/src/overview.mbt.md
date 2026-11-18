@@ -74,10 +74,16 @@ construct an mttp `Client` with `max_body_bytes` and pass it
 to `from_client`. Streaming reads incrementally, with a 16 MiB per-event
 limit. Limit failures raise `TransportError(TooLarge, ...)`. HTTP and decode
 failures return `Err(Response(ResponseFailure))`, preserving the received head
-and bounded diagnostic body. Input checks return `Err(Validation(message))`.
+and bounded diagnostic body. Input checks, including surrounding whitespace
+in explicit header values, return `Err(Validation(message))` before sending.
 `api_error` extracts a provider error envelope from an `AnthropicFailure` value.
 Transport failures and unknown callback exceptions remain raised errors;
 cancellation remains a signal.
+
+The SDK marks `x-api-key` and `authorization` on each
+request, including with `from_client`. A redirect strips them when the host,
+port or scheme changes, except for a same-host HTTP port 80 to HTTPS port 443
+upgrade. HTTPS to HTTP is refused by default.
 
 ## Packages
 

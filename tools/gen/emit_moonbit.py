@@ -1113,18 +1113,19 @@ def _operation(operation: Operation, response_codec_name: str | None = None) -> 
         lines.append(f"  {binding} {request} = {expression}")
         for parameter in header_parameters:
             name = _moon_string(parameter.json_name)
+            method = "credential" if parameter.credential else "header"
             if parameter.type.kind == "array":
                 value = f'{parameter.moon_name}.map(value => parameter_value(value)).join(",")'
             else:
                 value = f"parameter_value({parameter.moon_name})"
             if parameter.required:
-                lines.append(f"  {request} = {request}.header({name}, {value})")
+                lines.append(f"  {request} = {request}.{method}({name}, {value})")
             else:
                 if parameter.type.kind == "array":
                     optional_value = 'values.map(value => parameter_value(value)).join(",")'
                 else:
                     optional_value = "parameter_value(value)"
-                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value{'s' if parameter.type.kind == 'array' else ''}) => {request} = {request}.header({name}, {optional_value})", "    None => ()", "  }"])
+                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value{'s' if parameter.type.kind == 'array' else ''}) => {request} = {request}.{method}({name}, {optional_value})", "    None => ()", "  }"])
         if operation.multipart_fields:
             lines.append(f"  let {parts} : Array[@multipart.Part] = []")
             for field in operation.multipart_fields:

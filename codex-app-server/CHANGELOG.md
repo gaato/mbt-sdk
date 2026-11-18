@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **Adopt MoonBit 0.10.21.** The process IO tests use its core/async traits.
+
 ## [0.2.0] - 2026-11-10
 
 ### Changed

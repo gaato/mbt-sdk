@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.20-65efd5b93
+  MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.21-06da1ed44
 
 jobs:
   matrix:

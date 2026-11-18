@@ -27,7 +27,7 @@ jobs:
       contents: write
     environment: mooncakes
     container:
-      image: ghcr.io/gaato/moonbit:0.10.20-65efd5b93
+      image: ghcr.io/gaato/moonbit:0.10.21-06da1ed44
     steps:
       - name: Check out the validated commit or main for a weekly batch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

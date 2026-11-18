@@ -215,7 +215,7 @@ pub(all) struct AccountGetResponse {
   username : String
 }
 pub fn AccountGetResponse::equal(Self, Self) -> Bool
-pub fn AccountGetResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AccountGetResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn AccountGetResponse::new(type_~ : AccountGetResponseType, username~ : String, avatar_url? : String, github_url? : String, name? : String) -> Self
 pub fn AccountGetResponse::not_equal(Self, Self) -> Bool
 pub fn AccountGetResponse::to_json(Self) -> @json.Json
@@ -231,7 +231,7 @@ pub(all) enum AccountGetResponseType {
   Unknown(String)
 }
 pub fn AccountGetResponseType::equal(Self, Self) -> Bool
-pub fn AccountGetResponseType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AccountGetResponseType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn AccountGetResponseType::not_equal(Self, Self) -> Bool
 pub fn AccountGetResponseType::to_json(Self) -> @json.Json
 pub fn AccountGetResponseType::to_repr(Self) -> @debug.Repr
@@ -248,7 +248,7 @@ pub(all) struct DeploymentsCreateRequest {
   version : String
 }
 pub fn DeploymentsCreateRequest::equal(Self, Self) -> Bool
-pub fn DeploymentsCreateRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn DeploymentsCreateRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn DeploymentsCreateRequest::new(hardware~ : String, max_instances~ : Int32, min_instances~ : Int32, model~ : String, name~ : String, version~ : String) -> Self
 pub fn DeploymentsCreateRequest::not_equal(Self, Self) -> Bool
 pub fn DeploymentsCreateRequest::to_json(Self) -> @json.Json
@@ -263,7 +263,7 @@ pub(all) struct DeploymentsListResponse {
   results : Array[SchemasDeploymentResponse]?
 }
 pub fn DeploymentsListResponse::equal(Self, Self) -> Bool
-pub fn DeploymentsListResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn DeploymentsListResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn DeploymentsListResponse::new(next? : String, previous? : String, results? : Array[SchemasDeploymentResponse]) -> Self
 pub fn DeploymentsListResponse::not_equal(Self, Self) -> Bool
 pub fn DeploymentsListResponse::to_json(Self) -> @json.Json
@@ -279,7 +279,7 @@ pub(all) struct DeploymentsUpdateRequest {
   version : String?
 }
 pub fn DeploymentsUpdateRequest::equal(Self, Self) -> Bool
-pub fn DeploymentsUpdateRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn DeploymentsUpdateRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn DeploymentsUpdateRequest::new(hardware? : String, max_instances? : Int32, min_instances? : Int32, version? : String) -> Self
 pub fn DeploymentsUpdateRequest::not_equal(Self, Self) -> Bool
 pub fn DeploymentsUpdateRequest::to_json(Self) -> @json.Json
@@ -294,7 +294,7 @@ pub(all) struct FilesListResponse {
   results : Array[SchemasFileResponse]?
 }
 pub fn FilesListResponse::equal(Self, Self) -> Bool
-pub fn FilesListResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FilesListResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FilesListResponse::new(next? : String, previous? : String, results? : Array[SchemasFileResponse]) -> Self
 pub fn FilesListResponse::not_equal(Self, Self) -> Bool
 pub fn FilesListResponse::to_json(Self) -> @json.Json
@@ -308,7 +308,7 @@ pub(all) struct HardwareListResponseItem {
   sku : String?
 }
 pub fn HardwareListResponseItem::equal(Self, Self) -> Bool
-pub fn HardwareListResponseItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn HardwareListResponseItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn HardwareListResponseItem::new(name? : String, sku? : String) -> Self
 pub fn HardwareListResponseItem::not_equal(Self, Self) -> Bool
 pub fn HardwareListResponseItem::to_json(Self) -> @json.Json
@@ -329,7 +329,7 @@ pub(all) struct ModelsCreateRequest {
   visibility : ModelsCreateRequestVisibility
 }
 pub fn ModelsCreateRequest::equal(Self, Self) -> Bool
-pub fn ModelsCreateRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelsCreateRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ModelsCreateRequest::new(hardware~ : String, name~ : String, owner~ : String, visibility~ : ModelsCreateRequestVisibility, cover_image_url? : String, description? : String, github_url? : String, license_url? : String, paper_url? : String) -> Self
 pub fn ModelsCreateRequest::not_equal(Self, Self) -> Bool
 pub fn ModelsCreateRequest::to_json(Self) -> @json.Json
@@ -345,7 +345,7 @@ pub(all) enum ModelsCreateRequestVisibility {
   Custom(String)
 }
 pub fn ModelsCreateRequestVisibility::equal(Self, Self) -> Bool
-pub fn ModelsCreateRequestVisibility::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelsCreateRequestVisibility::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ModelsCreateRequestVisibility::not_equal(Self, Self) -> Bool
 pub fn ModelsCreateRequestVisibility::to_json(Self) -> @json.Json
 pub fn ModelsCreateRequestVisibility::to_repr(Self) -> @debug.Repr
@@ -360,7 +360,7 @@ pub(all) enum ModelsListSortBy {
   Custom(String)
 }
 pub fn ModelsListSortBy::equal(Self, Self) -> Bool
-pub fn ModelsListSortBy::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelsListSortBy::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ModelsListSortBy::not_equal(Self, Self) -> Bool
 pub fn ModelsListSortBy::to_json(Self) -> @json.Json
 pub fn ModelsListSortBy::to_repr(Self) -> @debug.Repr
@@ -375,7 +375,7 @@ pub(all) enum ModelsListSortDirection {
   Custom(String)
 }
 pub fn ModelsListSortDirection::equal(Self, Self) -> Bool
-pub fn ModelsListSortDirection::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelsListSortDirection::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ModelsListSortDirection::not_equal(Self, Self) -> Bool
 pub fn ModelsListSortDirection::to_json(Self) -> @json.Json
 pub fn ModelsListSortDirection::to_repr(Self) -> @debug.Repr
@@ -392,7 +392,7 @@ pub(all) struct ModelsUpdateRequest {
   weights_url : String?
 }
 pub fn ModelsUpdateRequest::equal(Self, Self) -> Bool
-pub fn ModelsUpdateRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelsUpdateRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ModelsUpdateRequest::new(description? : String, github_url? : String, license_url? : String, paper_url? : String, readme? : String, weights_url? : String) -> Self
 pub fn ModelsUpdateRequest::not_equal(Self, Self) -> Bool
 pub fn ModelsUpdateRequest::to_json(Self) -> @json.Json
@@ -407,7 +407,7 @@ pub(all) struct PredictionsListResponse {
   results : Array[SchemasPredictionResponse]?
 }
 pub fn PredictionsListResponse::equal(Self, Self) -> Bool
-pub fn PredictionsListResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PredictionsListResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn PredictionsListResponse::new(next? : String, previous? : String, results? : Array[SchemasPredictionResponse]) -> Self
 pub fn PredictionsListResponse::not_equal(Self, Self) -> Bool
 pub fn PredictionsListResponse::to_json(Self) -> @json.Json
@@ -422,7 +422,7 @@ pub(all) struct SchemasCollectionListItem {
   slug : String
 }
 pub fn SchemasCollectionListItem::equal(Self, Self) -> Bool
-pub fn SchemasCollectionListItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasCollectionListItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasCollectionListItem::new(description~ : String, name~ : String, slug~ : String) -> Self
 pub fn SchemasCollectionListItem::not_equal(Self, Self) -> Bool
 pub fn SchemasCollectionListItem::to_json(Self) -> @json.Json
@@ -439,7 +439,7 @@ pub(all) struct SchemasCollectionResponse {
   slug : String
 }
 pub fn SchemasCollectionResponse::equal(Self, Self) -> Bool
-pub fn SchemasCollectionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasCollectionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasCollectionResponse::new(description~ : String, models~ : Array[SchemasModelResponse], name~ : String, slug~ : String, full_description? : String) -> Self
 pub fn SchemasCollectionResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasCollectionResponse::to_json(Self) -> @json.Json
@@ -454,7 +454,7 @@ pub(all) struct SchemasDeploymentResponse {
   owner : String?
 }
 pub fn SchemasDeploymentResponse::equal(Self, Self) -> Bool
-pub fn SchemasDeploymentResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasDeploymentResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasDeploymentResponse::new(current_release? : SchemasDeploymentResponseCurrentRelease, name? : String, owner? : String) -> Self
 pub fn SchemasDeploymentResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasDeploymentResponse::to_json(Self) -> @json.Json
@@ -472,7 +472,7 @@ pub(all) struct SchemasDeploymentResponseCurrentRelease {
   version : String?
 }
 pub fn SchemasDeploymentResponseCurrentRelease::equal(Self, Self) -> Bool
-pub fn SchemasDeploymentResponseCurrentRelease::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasDeploymentResponseCurrentRelease::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasDeploymentResponseCurrentRelease::new(configuration? : SchemasDeploymentResponseCurrentReleaseConfiguration, created_at? : String, created_by? : SchemasDeploymentResponseCurrentReleaseCreatedBy, model? : String, number? : Int32, version? : String) -> Self
 pub fn SchemasDeploymentResponseCurrentRelease::not_equal(Self, Self) -> Bool
 pub fn SchemasDeploymentResponseCurrentRelease::to_json(Self) -> @json.Json
@@ -487,7 +487,7 @@ pub(all) struct SchemasDeploymentResponseCurrentReleaseConfiguration {
   min_instances : Int32?
 }
 pub fn SchemasDeploymentResponseCurrentReleaseConfiguration::equal(Self, Self) -> Bool
-pub fn SchemasDeploymentResponseCurrentReleaseConfiguration::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasDeploymentResponseCurrentReleaseConfiguration::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasDeploymentResponseCurrentReleaseConfiguration::new(hardware? : String, max_instances? : Int32, min_instances? : Int32) -> Self
 pub fn SchemasDeploymentResponseCurrentReleaseConfiguration::not_equal(Self, Self) -> Bool
 pub fn SchemasDeploymentResponseCurrentReleaseConfiguration::to_json(Self) -> @json.Json
@@ -504,7 +504,7 @@ pub(all) struct SchemasDeploymentResponseCurrentReleaseCreatedBy {
   username : String
 }
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedBy::equal(Self, Self) -> Bool
-pub fn SchemasDeploymentResponseCurrentReleaseCreatedBy::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasDeploymentResponseCurrentReleaseCreatedBy::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedBy::new(type_~ : SchemasDeploymentResponseCurrentReleaseCreatedByType, username~ : String, avatar_url? : String, github_url? : String, name? : String) -> Self
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedBy::not_equal(Self, Self) -> Bool
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedBy::to_json(Self) -> @json.Json
@@ -520,7 +520,7 @@ pub(all) enum SchemasDeploymentResponseCurrentReleaseCreatedByType {
   Unknown(String)
 }
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedByType::equal(Self, Self) -> Bool
-pub fn SchemasDeploymentResponseCurrentReleaseCreatedByType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasDeploymentResponseCurrentReleaseCreatedByType::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedByType::not_equal(Self, Self) -> Bool
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedByType::to_json(Self) -> @json.Json
 pub fn SchemasDeploymentResponseCurrentReleaseCreatedByType::to_repr(Self) -> @debug.Repr
@@ -539,7 +539,7 @@ pub(all) struct SchemasFileResponse {
   urls : SchemasFileResponseUrls
 }
 pub fn SchemasFileResponse::equal(Self, Self) -> Bool
-pub fn SchemasFileResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasFileResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasFileResponse::new(checksums~ : SchemasFileResponseChecksums, content_type~ : String, created_at~ : String, expires_at~ : String, id~ : String, metadata~ : @json.Json, size~ : Int32, urls~ : SchemasFileResponseUrls) -> Self
 pub fn SchemasFileResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasFileResponse::to_json(Self) -> @json.Json
@@ -552,7 +552,7 @@ pub(all) struct SchemasFileResponseChecksums {
   sha256 : String?
 }
 pub fn SchemasFileResponseChecksums::equal(Self, Self) -> Bool
-pub fn SchemasFileResponseChecksums::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasFileResponseChecksums::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasFileResponseChecksums::new(sha256? : String) -> Self
 pub fn SchemasFileResponseChecksums::not_equal(Self, Self) -> Bool
 pub fn SchemasFileResponseChecksums::to_json(Self) -> @json.Json
@@ -565,7 +565,7 @@ pub(all) struct SchemasFileResponseUrls {
   get : String?
 }
 pub fn SchemasFileResponseUrls::equal(Self, Self) -> Bool
-pub fn SchemasFileResponseUrls::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasFileResponseUrls::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasFileResponseUrls::new(get? : String) -> Self
 pub fn SchemasFileResponseUrls::not_equal(Self, Self) -> Bool
 pub fn SchemasFileResponseUrls::to_json(Self) -> @json.Json
@@ -590,7 +590,7 @@ pub(all) struct SchemasModelResponse {
   visibility : SchemasModelResponseVisibility?
 }
 pub fn SchemasModelResponse::equal(Self, Self) -> Bool
-pub fn SchemasModelResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasModelResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasModelResponse::new(cover_image_url? : String, default_example? : @json.Json, description? : String, github_url? : String, is_official? : Bool, latest_version? : @json.Json, license_url? : String, name? : String, owner? : String, paper_url? : String, run_count? : Int32, url? : String, visibility? : SchemasModelResponseVisibility) -> Self
 pub fn SchemasModelResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasModelResponse::to_json(Self) -> @json.Json
@@ -606,7 +606,7 @@ pub(all) enum SchemasModelResponseVisibility {
   Unknown(String)
 }
 pub fn SchemasModelResponseVisibility::equal(Self, Self) -> Bool
-pub fn SchemasModelResponseVisibility::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasModelResponseVisibility::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasModelResponseVisibility::not_equal(Self, Self) -> Bool
 pub fn SchemasModelResponseVisibility::to_json(Self) -> @json.Json
 pub fn SchemasModelResponseVisibility::to_repr(Self) -> @debug.Repr
@@ -619,7 +619,7 @@ pub(all) struct SchemasPageResponse {
   name : String
 }
 pub fn SchemasPageResponse::equal(Self, Self) -> Bool
-pub fn SchemasPageResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPageResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPageResponse::new(href~ : String, name~ : String) -> Self
 pub fn SchemasPageResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasPageResponse::to_json(Self) -> @json.Json
@@ -634,7 +634,7 @@ pub(all) struct SchemasPaginatedCollectionResponse {
   results : Array[SchemasCollectionListItem]?
 }
 pub fn SchemasPaginatedCollectionResponse::equal(Self, Self) -> Bool
-pub fn SchemasPaginatedCollectionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPaginatedCollectionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPaginatedCollectionResponse::new(next? : String, previous? : String, results? : Array[SchemasCollectionListItem]) -> Self
 pub fn SchemasPaginatedCollectionResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasPaginatedCollectionResponse::to_json(Self) -> @json.Json
@@ -649,7 +649,7 @@ pub(all) struct SchemasPaginatedModelResponse {
   results : Array[SchemasModelResponse]?
 }
 pub fn SchemasPaginatedModelResponse::equal(Self, Self) -> Bool
-pub fn SchemasPaginatedModelResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPaginatedModelResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPaginatedModelResponse::new(next? : String, previous? : String, results? : Array[SchemasModelResponse]) -> Self
 pub fn SchemasPaginatedModelResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasPaginatedModelResponse::to_json(Self) -> @json.Json
@@ -664,7 +664,7 @@ pub(all) struct SchemasPaginatedPredictionResponse {
   results : Array[SchemasPredictionResponse]?
 }
 pub fn SchemasPaginatedPredictionResponse::equal(Self, Self) -> Bool
-pub fn SchemasPaginatedPredictionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPaginatedPredictionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPaginatedPredictionResponse::new(next? : String, previous? : String, results? : Array[SchemasPredictionResponse]) -> Self
 pub fn SchemasPaginatedPredictionResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasPaginatedPredictionResponse::to_json(Self) -> @json.Json
@@ -679,7 +679,7 @@ pub(all) struct SchemasPaginatedVersionResponse {
   results : Array[SchemasVersionResponse]?
 }
 pub fn SchemasPaginatedVersionResponse::equal(Self, Self) -> Bool
-pub fn SchemasPaginatedVersionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPaginatedVersionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPaginatedVersionResponse::new(next? : String, previous? : String, results? : Array[SchemasVersionResponse]) -> Self
 pub fn SchemasPaginatedVersionResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasPaginatedVersionResponse::to_json(Self) -> @json.Json
@@ -695,7 +695,7 @@ pub(all) struct SchemasPredictionRequest {
   webhook_events_filter : Array[SchemasPredictionRequestWebhookEventsFilterItem]?
 }
 pub fn SchemasPredictionRequest::equal(Self, Self) -> Bool
-pub fn SchemasPredictionRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPredictionRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPredictionRequest::new(input~ : @json.Json, stream? : Bool, webhook? : String, webhook_events_filter? : Array[SchemasPredictionRequestWebhookEventsFilterItem]) -> Self
 pub fn SchemasPredictionRequest::not_equal(Self, Self) -> Bool
 pub fn SchemasPredictionRequest::to_json(Self) -> @json.Json
@@ -713,7 +713,7 @@ pub(all) enum SchemasPredictionRequestWebhookEventsFilterItem {
   Custom(String)
 }
 pub fn SchemasPredictionRequestWebhookEventsFilterItem::equal(Self, Self) -> Bool
-pub fn SchemasPredictionRequestWebhookEventsFilterItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPredictionRequestWebhookEventsFilterItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPredictionRequestWebhookEventsFilterItem::not_equal(Self, Self) -> Bool
 pub fn SchemasPredictionRequestWebhookEventsFilterItem::to_json(Self) -> @json.Json
 pub fn SchemasPredictionRequestWebhookEventsFilterItem::to_repr(Self) -> @debug.Repr
@@ -741,7 +741,7 @@ pub(all) struct SchemasPredictionResponse {
   version : String
 }
 pub fn SchemasPredictionResponse::equal(Self, Self) -> Bool
-pub fn SchemasPredictionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPredictionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPredictionResponse::new(created_at~ : String, data_removed~ : Bool, id~ : String, input~ : @json.Json, model~ : String, output~ : @json.Json, status~ : SchemasPredictionResponseStatus, urls~ : SchemasPredictionResponseUrls, version~ : String, completed_at? : String, deadline? : String, deployment? : String, error? : String, logs? : String, metrics? : @json.Json, source? : SchemasPredictionResponseSource, started_at? : String) -> Self
 pub fn SchemasPredictionResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasPredictionResponse::to_json(Self) -> @json.Json
@@ -757,7 +757,7 @@ pub(all) enum SchemasPredictionResponseSource {
   Unknown(String)
 }
 pub fn SchemasPredictionResponseSource::equal(Self, Self) -> Bool
-pub fn SchemasPredictionResponseSource::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPredictionResponseSource::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPredictionResponseSource::not_equal(Self, Self) -> Bool
 pub fn SchemasPredictionResponseSource::to_json(Self) -> @json.Json
 pub fn SchemasPredictionResponseSource::to_repr(Self) -> @debug.Repr
@@ -776,7 +776,7 @@ pub(all) enum SchemasPredictionResponseStatus {
   Unknown(String)
 }
 pub fn SchemasPredictionResponseStatus::equal(Self, Self) -> Bool
-pub fn SchemasPredictionResponseStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPredictionResponseStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPredictionResponseStatus::not_equal(Self, Self) -> Bool
 pub fn SchemasPredictionResponseStatus::to_json(Self) -> @json.Json
 pub fn SchemasPredictionResponseStatus::to_repr(Self) -> @debug.Repr
@@ -791,7 +791,7 @@ pub(all) struct SchemasPredictionResponseUrls {
   web : String
 }
 pub fn SchemasPredictionResponseUrls::equal(Self, Self) -> Bool
-pub fn SchemasPredictionResponseUrls::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasPredictionResponseUrls::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasPredictionResponseUrls::new(cancel~ : String, get~ : String, web~ : String, stream? : String) -> Self
 pub fn SchemasPredictionResponseUrls::not_equal(Self, Self) -> Bool
 pub fn SchemasPredictionResponseUrls::to_json(Self) -> @json.Json
@@ -807,7 +807,7 @@ pub(all) struct SchemasSearchCollectionResponse {
   slug : String
 }
 pub fn SchemasSearchCollectionResponse::equal(Self, Self) -> Bool
-pub fn SchemasSearchCollectionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasSearchCollectionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasSearchCollectionResponse::new(description~ : String, name~ : String, slug~ : String, models? : Array[String]) -> Self
 pub fn SchemasSearchCollectionResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasSearchCollectionResponse::to_json(Self) -> @json.Json
@@ -822,7 +822,7 @@ pub(all) struct SchemasSearchModelMetadataResponse {
   tags : Array[String]?
 }
 pub fn SchemasSearchModelMetadataResponse::equal(Self, Self) -> Bool
-pub fn SchemasSearchModelMetadataResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasSearchModelMetadataResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasSearchModelMetadataResponse::new(generated_description? : String, score? : Double, tags? : Array[String]) -> Self
 pub fn SchemasSearchModelMetadataResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasSearchModelMetadataResponse::to_json(Self) -> @json.Json
@@ -838,7 +838,7 @@ pub(all) struct SchemasSearchResponse {
   query : String
 }
 pub fn SchemasSearchResponse::equal(Self, Self) -> Bool
-pub fn SchemasSearchResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasSearchResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasSearchResponse::new(collections~ : Array[SchemasSearchCollectionResponse], models~ : Array[SchemasSearchResponseModelsItem], pages~ : Array[SchemasPageResponse], query~ : String) -> Self
 pub fn SchemasSearchResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasSearchResponse::to_json(Self) -> @json.Json
@@ -852,7 +852,7 @@ pub(all) struct SchemasSearchResponseModelsItem {
   model : SchemasModelResponse
 }
 pub fn SchemasSearchResponseModelsItem::equal(Self, Self) -> Bool
-pub fn SchemasSearchResponseModelsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasSearchResponseModelsItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasSearchResponseModelsItem::new(metadata~ : SchemasSearchModelMetadataResponse, model~ : SchemasModelResponse) -> Self
 pub fn SchemasSearchResponseModelsItem::not_equal(Self, Self) -> Bool
 pub fn SchemasSearchResponseModelsItem::to_json(Self) -> @json.Json
@@ -868,7 +868,7 @@ pub(all) struct SchemasTrainingRequest {
   webhook_events_filter : Array[SchemasTrainingRequestWebhookEventsFilterItem]?
 }
 pub fn SchemasTrainingRequest::equal(Self, Self) -> Bool
-pub fn SchemasTrainingRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingRequest::new(destination~ : String, input~ : @json.Json, webhook? : String, webhook_events_filter? : Array[SchemasTrainingRequestWebhookEventsFilterItem]) -> Self
 pub fn SchemasTrainingRequest::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingRequest::to_json(Self) -> @json.Json
@@ -886,7 +886,7 @@ pub(all) enum SchemasTrainingRequestWebhookEventsFilterItem {
   Custom(String)
 }
 pub fn SchemasTrainingRequestWebhookEventsFilterItem::equal(Self, Self) -> Bool
-pub fn SchemasTrainingRequestWebhookEventsFilterItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingRequestWebhookEventsFilterItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingRequestWebhookEventsFilterItem::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingRequestWebhookEventsFilterItem::to_json(Self) -> @json.Json
 pub fn SchemasTrainingRequestWebhookEventsFilterItem::to_repr(Self) -> @debug.Repr
@@ -911,7 +911,7 @@ pub(all) struct SchemasTrainingResponse {
   version : String?
 }
 pub fn SchemasTrainingResponse::equal(Self, Self) -> Bool
-pub fn SchemasTrainingResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingResponse::new(completed_at? : String, created_at? : String, error? : String, id? : String, input? : @json.Json, logs? : String, metrics? : SchemasTrainingResponseMetrics, model? : String, output? : SchemasTrainingResponseOutput, source? : SchemasTrainingResponseSource, started_at? : String, status? : SchemasTrainingResponseStatus, urls? : SchemasTrainingResponseUrls, version? : String) -> Self
 pub fn SchemasTrainingResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingResponse::to_json(Self) -> @json.Json
@@ -925,7 +925,7 @@ pub(all) struct SchemasTrainingResponseMetrics {
   total_time : Double?
 }
 pub fn SchemasTrainingResponseMetrics::equal(Self, Self) -> Bool
-pub fn SchemasTrainingResponseMetrics::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingResponseMetrics::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingResponseMetrics::new(predict_time? : Double, total_time? : Double) -> Self
 pub fn SchemasTrainingResponseMetrics::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingResponseMetrics::to_json(Self) -> @json.Json
@@ -939,7 +939,7 @@ pub(all) struct SchemasTrainingResponseOutput {
   weights : String?
 }
 pub fn SchemasTrainingResponseOutput::equal(Self, Self) -> Bool
-pub fn SchemasTrainingResponseOutput::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingResponseOutput::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingResponseOutput::new(version? : String, weights? : String) -> Self
 pub fn SchemasTrainingResponseOutput::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingResponseOutput::to_json(Self) -> @json.Json
@@ -955,7 +955,7 @@ pub(all) enum SchemasTrainingResponseSource {
   Unknown(String)
 }
 pub fn SchemasTrainingResponseSource::equal(Self, Self) -> Bool
-pub fn SchemasTrainingResponseSource::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingResponseSource::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingResponseSource::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingResponseSource::to_json(Self) -> @json.Json
 pub fn SchemasTrainingResponseSource::to_repr(Self) -> @debug.Repr
@@ -974,7 +974,7 @@ pub(all) enum SchemasTrainingResponseStatus {
   Unknown(String)
 }
 pub fn SchemasTrainingResponseStatus::equal(Self, Self) -> Bool
-pub fn SchemasTrainingResponseStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingResponseStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingResponseStatus::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingResponseStatus::to_json(Self) -> @json.Json
 pub fn SchemasTrainingResponseStatus::to_repr(Self) -> @debug.Repr
@@ -987,7 +987,7 @@ pub(all) struct SchemasTrainingResponseUrls {
   get : String?
 }
 pub fn SchemasTrainingResponseUrls::equal(Self, Self) -> Bool
-pub fn SchemasTrainingResponseUrls::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasTrainingResponseUrls::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasTrainingResponseUrls::new(cancel? : String, get? : String) -> Self
 pub fn SchemasTrainingResponseUrls::not_equal(Self, Self) -> Bool
 pub fn SchemasTrainingResponseUrls::to_json(Self) -> @json.Json
@@ -1004,7 +1004,7 @@ pub(all) struct SchemasVersionPredictionRequest {
   webhook_events_filter : Array[SchemasVersionPredictionRequestWebhookEventsFilterItem]?
 }
 pub fn SchemasVersionPredictionRequest::equal(Self, Self) -> Bool
-pub fn SchemasVersionPredictionRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasVersionPredictionRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasVersionPredictionRequest::new(input~ : @json.Json, version~ : String, stream? : Bool, webhook? : String, webhook_events_filter? : Array[SchemasVersionPredictionRequestWebhookEventsFilterItem]) -> Self
 pub fn SchemasVersionPredictionRequest::not_equal(Self, Self) -> Bool
 pub fn SchemasVersionPredictionRequest::to_json(Self) -> @json.Json
@@ -1022,7 +1022,7 @@ pub(all) enum SchemasVersionPredictionRequestWebhookEventsFilterItem {
   Custom(String)
 }
 pub fn SchemasVersionPredictionRequestWebhookEventsFilterItem::equal(Self, Self) -> Bool
-pub fn SchemasVersionPredictionRequestWebhookEventsFilterItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasVersionPredictionRequestWebhookEventsFilterItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasVersionPredictionRequestWebhookEventsFilterItem::not_equal(Self, Self) -> Bool
 pub fn SchemasVersionPredictionRequestWebhookEventsFilterItem::to_json(Self) -> @json.Json
 pub fn SchemasVersionPredictionRequestWebhookEventsFilterItem::to_repr(Self) -> @debug.Repr
@@ -1037,7 +1037,7 @@ pub(all) struct SchemasVersionResponse {
   openapi_schema : @jsonkit.Presence[@json.Json]
 }
 pub fn SchemasVersionResponse::equal(Self, Self) -> Bool
-pub fn SchemasVersionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemasVersionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn SchemasVersionResponse::new(cog_version? : String, created_at? : String, id? : String, openapi_schema? : @json.Json) -> Self
 pub fn SchemasVersionResponse::not_equal(Self, Self) -> Bool
 pub fn SchemasVersionResponse::to_json(Self) -> @json.Json
@@ -1052,7 +1052,7 @@ pub(all) struct TrainingsListResponse {
   results : Array[SchemasTrainingResponse]?
 }
 pub fn TrainingsListResponse::equal(Self, Self) -> Bool
-pub fn TrainingsListResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TrainingsListResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn TrainingsListResponse::new(next? : String, previous? : String, results? : Array[SchemasTrainingResponse]) -> Self
 pub fn TrainingsListResponse::not_equal(Self, Self) -> Bool
 pub fn TrainingsListResponse::to_json(Self) -> @json.Json
@@ -1065,7 +1065,7 @@ pub(all) struct WebhooksDefaultSecretGetResponse {
   key : String?
 }
 pub fn WebhooksDefaultSecretGetResponse::equal(Self, Self) -> Bool
-pub fn WebhooksDefaultSecretGetResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WebhooksDefaultSecretGetResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn WebhooksDefaultSecretGetResponse::new(key? : String) -> Self
 pub fn WebhooksDefaultSecretGetResponse::not_equal(Self, Self) -> Bool
 pub fn WebhooksDefaultSecretGetResponse::to_json(Self) -> @json.Json

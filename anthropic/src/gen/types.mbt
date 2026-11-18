@@ -626,10 +626,10 @@ pub impl ToJson for RequestBashCodeExecutionToolResultBlockContent with fn to_js
 ) {
   match self {
     RequestBashCodeExecutionToolResultBlockContent::BashCodeExecutionToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestBashCodeExecutionToolResultBlockContent::BashCodeExecutionResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestBashCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
@@ -1144,12 +1144,12 @@ pub impl ToJson for RequestCodeExecutionToolResultBlockContent with fn to_json(
 ) {
   match self {
     RequestCodeExecutionToolResultBlockContent::CodeExecutionToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestCodeExecutionToolResultBlockContent::CodeExecutionResult(value) =>
       @json.Json::Json(value)
     RequestCodeExecutionToolResultBlockContent::EncryptedCodeExecutionResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
@@ -4213,16 +4213,16 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionStrReplaceResultBlock 
 #non_exhaustive
 pub(all) enum RequestTextEditorCodeExecutionToolResultBlockContent {
   TextEditorCodeExecutionToolResultError(
-    RequestTextEditorCodeExecutionToolResultError
+    RequestTextEditorCodeExecutionToolResultError,
   )
   TextEditorCodeExecutionViewResult(
-    RequestTextEditorCodeExecutionViewResultBlock
+    RequestTextEditorCodeExecutionViewResultBlock,
   )
   TextEditorCodeExecutionCreateResult(
-    RequestTextEditorCodeExecutionCreateResultBlock
+    RequestTextEditorCodeExecutionCreateResultBlock,
   )
   TextEditorCodeExecutionStrReplaceResult(
-    RequestTextEditorCodeExecutionStrReplaceResultBlock
+    RequestTextEditorCodeExecutionStrReplaceResultBlock,
   )
   Unknown(String, Json)
 }
@@ -4251,16 +4251,16 @@ pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockContent with fn
 ) {
   match self {
     RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionViewResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionCreateResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionStrReplaceResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestTextEditorCodeExecutionToolResultBlockContent::Unknown(_, value) =>
       value
@@ -6727,10 +6727,10 @@ pub extend RequestWebSearchToolResultBlockContent with ToJson::{to_json}
 pub impl ToJson for RequestWebSearchToolResultBlockContent with fn to_json(self) {
   match self {
     RequestWebSearchToolResultBlockContent::RequestWebSearchResultBlockArray(
-      value
+      value,
     ) => @json.Json::Json(value)
     RequestWebSearchToolResultBlockContent::RequestWebSearchToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -6861,7 +6861,7 @@ pub(all) enum InputContentBlock {
   ServerToolUse(RequestServerToolUseBlock)
   Text(RequestTextBlock)
   TextEditorCodeExecutionToolResult(
-    RequestTextEditorCodeExecutionToolResultBlock
+    RequestTextEditorCodeExecutionToolResultBlock,
   )
   Thinking(RequestThinkingBlock)
   ToolResult(RequestToolResultBlock)
@@ -13224,10 +13224,10 @@ pub impl ToJson for ResponseBashCodeExecutionToolResultBlockContent with fn to_j
 ) {
   match self {
     ResponseBashCodeExecutionToolResultBlockContent::BashCodeExecutionToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseBashCodeExecutionToolResultBlockContent::BashCodeExecutionResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseBashCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
@@ -13603,12 +13603,12 @@ pub impl ToJson for ResponseCodeExecutionToolResultBlockContent with fn to_json(
 ) {
   match self {
     ResponseCodeExecutionToolResultBlockContent::CodeExecutionToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseCodeExecutionToolResultBlockContent::CodeExecutionResult(value) =>
       @json.Json::Json(value)
     ResponseCodeExecutionToolResultBlockContent::EncryptedCodeExecutionResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseCodeExecutionToolResultBlockContent::Unknown(_, value) => value
   }
@@ -14548,16 +14548,16 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionStrReplaceResultBlock
 #non_exhaustive
 pub(all) enum ResponseTextEditorCodeExecutionToolResultBlockContent {
   TextEditorCodeExecutionToolResultError(
-    ResponseTextEditorCodeExecutionToolResultError
+    ResponseTextEditorCodeExecutionToolResultError,
   )
   TextEditorCodeExecutionViewResult(
-    ResponseTextEditorCodeExecutionViewResultBlock
+    ResponseTextEditorCodeExecutionViewResultBlock,
   )
   TextEditorCodeExecutionCreateResult(
-    ResponseTextEditorCodeExecutionCreateResultBlock
+    ResponseTextEditorCodeExecutionCreateResultBlock,
   )
   TextEditorCodeExecutionStrReplaceResult(
-    ResponseTextEditorCodeExecutionStrReplaceResultBlock
+    ResponseTextEditorCodeExecutionStrReplaceResultBlock,
   )
   Unknown(String, Json)
 }
@@ -14586,16 +14586,16 @@ pub impl ToJson for ResponseTextEditorCodeExecutionToolResultBlockContent with f
 ) {
   match self {
     ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionViewResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionCreateResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseTextEditorCodeExecutionToolResultBlockContent::TextEditorCodeExecutionStrReplaceResult(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseTextEditorCodeExecutionToolResultBlockContent::Unknown(_, value) =>
       value
@@ -15865,10 +15865,10 @@ pub impl ToJson for ResponseWebSearchToolResultBlockContent with fn to_json(
 ) {
   match self {
     ResponseWebSearchToolResultBlockContent::ResponseWebSearchToolResultError(
-      value
+      value,
     ) => @json.Json::Json(value)
     ResponseWebSearchToolResultBlockContent::ResponseWebSearchResultBlockArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -15986,7 +15986,7 @@ pub(all) enum ContentBlock {
   ServerToolUse(ResponseServerToolUseBlock)
   Text(ResponseTextBlock)
   TextEditorCodeExecutionToolResult(
-    ResponseTextEditorCodeExecutionToolResultBlock
+    ResponseTextEditorCodeExecutionToolResultBlock,
   )
   Thinking(ResponseThinkingBlock)
   ToolSearchToolResult(ResponseToolSearchToolResultBlock)
@@ -16420,7 +16420,7 @@ pub(all) enum ContentBlockStartEventContentBlock {
   ServerToolUse(ResponseServerToolUseBlock)
   Text(ResponseTextBlock)
   TextEditorCodeExecutionToolResult(
-    ResponseTextEditorCodeExecutionToolResultBlock
+    ResponseTextEditorCodeExecutionToolResultBlock,
   )
   Thinking(ResponseThinkingBlock)
   ToolSearchToolResult(ResponseToolSearchToolResultBlock)

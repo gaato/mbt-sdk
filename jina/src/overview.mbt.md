@@ -48,7 +48,8 @@ timeout is 60 seconds; no total timeout is set. Buffered responses default to
 a 64 MiB limit.
 
 Failures are `Http` (status, headers, bytes and an optional typed error body),
-`Transport` (the original error with its phase), or `Decode`. Match with a
+`Transport` (the original runtime error, including invalid Client defaults),
+`Decode`, or `Validation` for invalid SDK input. Match with a
 default arm because failures can gain variants. Unexpected callback errors
 propagate. `Http` includes the operation identifier; typed error variants are
 named after their schemas. Text operations return strings, binary operations

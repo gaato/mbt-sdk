@@ -438,7 +438,7 @@ class DiscoveryAdapterTests(unittest.TestCase):
         self.assertIn('.query("alt", "sse")', source)
         self.assertIn("models_stream_generate_content_decode(", source)
         self.assertIn("@utf8.encode(event.data)", source)
-        self.assertIn('request.set_header("x-goog-api-key", value)', files["client_gen.mbt"])
+        self.assertIn('request.credential("x-goog-api-key", value)', files["client_gen.mbt"])
 
     def test_census_and_watch_and_version_rejection(self):
         raw = schema_fixture()
@@ -480,7 +480,7 @@ class DiscoveryGeneratedMoonTests(unittest.TestCase):
         ir = IRBuilder(doc, 'gaato/demo/gen').build()
         with tempfile.TemporaryDirectory(prefix='field-oneof-') as tmp:
             root = Path(tmp)
-            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             _write(root / 'src', _format(emit_client(doc, ir, {
                 'name': 'demo', 'dir': 'demo', 'module': 'gaato/demo',
@@ -524,7 +524,7 @@ test "strict field oneof" {
         ir = IRBuilder(doc, 'gaato/demo/gen').build()
         with tempfile.TemporaryDirectory(prefix='discovery-default-') as tmp:
             root = Path(tmp)
-            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             (root / 'src/gen/default_wbtest.mbt').write_text('''///|
 test "string integer array missing defaults and present validation" {
@@ -553,7 +553,7 @@ test "string integer array missing defaults and present validation" {
         ir = IRBuilder(doc, 'gaato/sample/gen').build()
         with tempfile.TemporaryDirectory(prefix='discovery-error-sample-') as tmp:
             root = Path(tmp)
-            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             _write(root / 'src', _format(emit_client(doc, ir, ledger())))
             process = _install_and_test(root)
@@ -577,7 +577,7 @@ test "string integer array missing defaults and present validation" {
             root = Path(tmp)
             (root / 'moon.mod').write_text(
                 'name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n')
+                'import { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             (root / 'src/gen/nullable_wbtest.mbt').write_text(r'''///|
 test "custom-only required nullable string integer" {
@@ -647,7 +647,7 @@ test "strict response ''' + name + '''" {
             root = Path(tmp)
             (root / 'moon.mod').write_text(
                 'name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n')
+                'import { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             (root / 'src/gen/response_wbtest.mbt').write_text('\n'.join(tests))
             process = _install_and_test(root)
@@ -667,7 +667,7 @@ test "strict response ''' + name + '''" {
             root = Path(tmp)
             (root / 'moon.mod').write_text(
                 'name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n')
+                'import { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             (root / 'src/gen/uint32_wbtest.mbt').write_text(r'''///|
 test "Discovery uint32 keeps its full numeric range" {
@@ -698,7 +698,7 @@ test "Discovery uint32 keeps its full numeric range" {
                 root = Path(tmp)
                 (root / 'moon.mod').write_text(
                     'name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\n'
-                    'import { "gaato/mttp_core@0.1.0" }\n')
+                    'import { "gaato/mttp_core@0.3.0" }\n')
                 _write(root / 'src/gen', _format(emit(ir)))
                 response = ir.operations[0].response_type.moon_type()
                 values = ['-9223372036854775808', '9223372036854775807'] if kind == 'int64' else ['0', '18446744073709551615']
@@ -728,7 +728,7 @@ test "union string integers retain wire encoding" {
             root = Path(tmp)
             (root / "moon.mod").write_text(
                 'name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n',
+                'import { "gaato/mttp_core@0.3.0" }\n',
                 encoding="utf-8",
             )
             _write(root / "src/gen", _format(emit(ir)))
@@ -793,7 +793,7 @@ test "reserved path and Discovery string integers" {
             root = Path(tmp)
             (root / "moon.mod").write_text(
                 'name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n',
+                'import { "gaato/mttp_core@0.3.0" }\n',
                 encoding="utf-8",
             )
             _write(root / "src/gen", _format(emit(ir)))
@@ -835,7 +835,7 @@ test "typed SSE failures preserve response status headers and event bytes" {
             root = Path(tmp)
             (root / "moon.mod").write_text(
                 'name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n',
+                'import { "gaato/mttp_core@0.3.0" }\n',
                 encoding="utf-8",
             )
             _write(root / "src/gen", _format(emit(ir)))

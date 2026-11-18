@@ -81,7 +81,7 @@ class DiscoveryPolishTests(unittest.TestCase):
                    {'kind': 'header', 'name': 'x-goog-api-key'}, {'kind': 'query', 'name': 'key'}, {'kind': 'bearer'}]}}
         with tempfile.TemporaryDirectory(prefix='discovery-polish-') as tmp:
             root = Path(tmp)
-            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             _write(root / 'src', _format(emit_client(doc, ir, sdk)))
             (root / 'src/polish_test.mbt').write_text(CONTRACT)

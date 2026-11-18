@@ -92,7 +92,7 @@ test "operations cannot shadow client helpers" {
             root = Path(tmp)
             (root / 'moon.mod').write_text(
                 'name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n')
+                'import { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             _write(root / 'src', _format(files))
             process = subprocess.run(
@@ -197,7 +197,7 @@ test "operations cannot shadow client helpers" {
         files['contract_gen.mbt'] += SURFACE_CONTRACT
         with tempfile.TemporaryDirectory(prefix='f2b-surface-') as tmp:
             tmp = Path(tmp)
-            (tmp / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (tmp / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             _write(tmp / 'src/gen', _format(emit(ir)))
             _write(tmp / 'src', _format(files))
             process = subprocess.run(['moon', '-C', str(tmp), 'test', '--target', 'wasm-gc', '--deny-warn'], text=True, capture_output=True)

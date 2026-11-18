@@ -387,7 +387,7 @@ pub(all) enum ChatEvent {
     index~ : Int32,
     id~ : String?,
     name~ : String?,
-    arguments~ : String
+    arguments~ : String,
   )
   Finished(FinishReason)
   Usage(Usage)

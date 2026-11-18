@@ -121,5 +121,7 @@ upload/finalize, with no chunking or interrupted-session recovery. Missing,
 malformed and cross-origin session URLs fail before uploading bytes. The helper
 uses the configured origin, so it also works with an explicit base URL override.
 All other facade methods, codecs, errors, pagination, auth and retry policy are
-generated. `from_client` uses caller policies; callers must include
-`x-goog-api-key` in their redirect credential headers.
+generated. With mttp_core 0.3.0, the facade marks `x-goog-api-key` and bearer
+authorization on each request, including with `from_client`. The runtime strips
+them when the host, port or scheme changes, except for a same-host HTTP port 80
+to HTTPS port 443 upgrade. HTTPS to HTTP is refused by default.

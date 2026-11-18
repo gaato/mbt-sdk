@@ -614,3 +614,37 @@ test "Gemini retries unsent failures and strips API key on redirects" {
   )
   assert_eq(seen, [Some("offline-key"), None])
 }
+
+///|
+test "Gemini from_client marks the runtime-default key with anonymous SDK auth" {
+  let origin = "https://gemini.example"
+  let next = "https://other.example/probe"
+  let seen = []
+  let backend = @client.from_fn((request, _) => {
+    seen.push(request)
+    if request.url.has_prefix(origin) {
+      @http.Response::new(307, headers=@http.Headers::of([("location", next)]))
+    } else {
+      @http.Response::new(200)
+    }
+  })
+  let runtime = @client.Client::new(
+    backend,
+    @sim.FakeClock::new(),
+    headers=@http.Headers::of([("x-goog-api-key", "fixture-key")]),
+    redirect={ ..@client.RedirectConfig::default(), credential_headers: [], },
+  )
+  let sdk = @gemini.Gemini::from_client(runtime, base_url=origin)
+  let raw = @http.Request::get("/probe").credential(
+    "x-existing-key", "existing-key",
+  )
+  assert_true(@driver.run_sync(() => sdk.send(raw)) is Ok(_))
+  assert_eq(seen.length(), 2)
+  assert_eq(seen[0].headers.get("x-goog-api-key"), Some("fixture-key"))
+  assert_eq(seen[1].url, next)
+  assert_eq(seen[1].headers.get("x-goog-api-key"), None)
+  assert_eq(seen[1].headers.get("x-existing-key"), None)
+  let curl = @client.request(seen[0]).response(@client.as_bytes()).to_curl()
+  assert_true(curl.contains("x-goog-api-key: <redacted>"))
+  assert_false(curl.contains("fixture-key"))
+}

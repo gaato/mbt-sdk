@@ -10,7 +10,7 @@ import re
 
 from tools.gen.emit_moonbit import HEADER, emit, _operation, operation_locals
 from tools.gen.qualify import qualify
-from tools.gen.ir import IR, IRBuilder, HTTP_METHODS, Struct, json_response_media, media_type, pascal_case, snake_case, Note
+from tools.gen.ir import IR, IRBuilder, HTTP_METHODS, Struct, header_api_key_names, json_response_media, media_type, pascal_case, snake_case, Note
 
 TEMPLATES = Path(__file__).with_name('templates')
 
@@ -438,13 +438,19 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
         if a['kind'] == 'none':
             continue
         args = 'username, password' if a['kind'] == 'basic' else 'value'
-        expression = {'bearer': 'request.bearer(value)', 'basic': 'request.basic(username, password)',
-                      'header': f'request.set_header({quote(a.get("name", ""))}, value)',
+        expression = {
+                      'bearer': '''{
+  @http.Headers::of([("authorization", value)]).validate()
+  request.credential("authorization", "Bearer " + value)
+}''',
+                      'basic': 'request.basic(username, password)',
+                      'header': f'request.credential({quote(a.get("name", ""))}, value)',
                       'query': f'request.query({quote(a.get("name", ""))}, value)'}[a['kind']]
         apply.append(f'Auth::{ctor}({args}) => {expression}')
     apply.append('}')
-    credential_headers = [a['name'].lower() for a in choices if a['kind'] == 'header']
-    auth_code = auth + '\n///|\nfn ' + client + '::authenticate(self : ' + client + ', request : @http.Request) -> @http.Request {\n' + '\n'.join(apply) + '\n}\n'
+    credential_headers = sorted((auth_headers | header_api_key_names(doc)) - {'authorization'})
+    auth_effect = ' raise @http.TransportError' if any(a['kind'] == 'bearer' for a in choices) else ''
+    auth_code = auth + '\n///|\nfn ' + client + '::authenticate(self : ' + client + ', request : @http.Request) -> @http.Request' + auth_effect + ' {\n' + '\n'.join(apply) + '\n}\n'
     metadata = []
     routes = []
     error_types, error_cases = error_ir(doc, ir)
@@ -562,6 +568,7 @@ pub(all) enum Failure {
   Http(HttpFailure)
   Transport(@http.TransportError)
   Decode(@client.ResponseFailure)
+  Validation(operation~ : String, parameter~ : String, message~ : String)
 }
 ///|
 pub extend Failure with @debug.Debug::{to_repr}
@@ -570,9 +577,6 @@ pub extend Failure with @debug.Debug::{to_repr}
 #non_exhaustive
 pub(all) enum ErrorBody {
 ''' + ('\n'.join(f'  {variant}({typ})' for variant, typ in error_variants.items()) if error_variants else '  RawJson(Json)') + '\n}\n///|\npub extend ErrorBody with @debug.Debug::{to_repr}\n'
-    if any(parameter.resource_name for op in ir.operations for parameter in op.parameters):
-        failure = failure.replace('  Decode(@client.ResponseFailure)',
-            '  Decode(@client.ResponseFailure)\n  Validation(operation~ : String, parameter~ : String, message~ : String)')
     if error_cases:
         # An explicit status outranks a range, which outranks default, even when
         # the spec lists the broader schema first.
@@ -601,6 +605,7 @@ fn typed_error(operation : String, head : @http.ResponseHead, body : Bytes) -> E
         # Existing modules retain their callback contract and byte-identical output.
         runtime = runtime.replace('Result[T, @client.ResponseFailure] raise?', 'Result[T, @client.ResponseFailure]')
     runtime = runtime.replace('__CREDENTIAL_HEADERS__', '\n'.join('credential_headers.push(' + quote(n) + ')' for n in credential_headers))
+    runtime = runtime.replace('__REQUEST_CREDENTIAL_HEADERS__', ', '.join(quote(n) for n in ['authorization', *credential_headers]))
     runtime = runtime.replace('__STRIP_HEADERS__', ''.join(f'.remove({quote(h)})' for h in sorted(auth_headers)))
     runtime = runtime.replace('__IDEMPOTENCY__', '\n'.join(f'if request.headers.get({quote(h)}) is Some(value) && value != "" {{ request = request.attribute(@http.replay_safe, true) }}' for h in sdk.get('idempotency_headers', doc.get('x-moonbit-idempotency-headers', []))))
     runtime = runtime.replace('__QUERY_WARNING__', 'Query credentials appear in redirect history and observer URLs.' if any(a['kind'] == 'query' for a in choices) else 'Credentials are redacted from Debug output.')
@@ -829,24 +834,40 @@ def contract_auth(choices, client, doc=None):
         value = {'bearer': 'Bearer test-secret', 'basic': 'Basic dXNlcjpwYXNz'}.get(a['kind'], 'test-secret')
         check = f'assert_eq(request.headers.get({quote(key)}), Some({quote(value)}))' if a['kind'] != 'query' else f'assert_true(request.url.contains({quote(key + "=test-secret")}))'
         redirect_check = f'assert_eq(request.headers.get({quote(key)}), if same_origin {{ Some({quote(value)}) }} else {{ None }})' if a['kind'] != 'query' else '()'
+        diagnostics = f'''
+        assert_true(request.attributes.get(@http.credential_headers).unwrap_or([]).contains({quote(key)}))
+        let curl = @client.request(request).response(@client.as_bytes()).to_curl()
+        assert_false(curl.contains({quote(value)}))
+''' if a['kind'] != 'query' else ''
+        invalid = ''
+        if a['kind'] in ('bearer', 'header'):
+            invalid = f'''
+  let backend = @client.from_fn((_, _) => abort("invalid credentials reached the backend"))
+  for value in [" leading", "trailing\\t"] {{
+    let sdk = {client}::new(backend, @sim.FakeClock::new(), auth=Auth::{auth_constructor(a, doc)}(value))
+    assert_true(@driver.run_sync(() => sdk.send(@http.Request::get("/contract-test"))) is Err(Validation(parameter="headers", ..)))
+  }}
+'''
         tests.append(f'''///|
-test "generated auth {auth_constructor(a, doc)} and redirect boundaries" {{
+test "generated from_client auth {auth_constructor(a, doc)} and redirect boundaries" {{
   for same_origin in [true, false] {{
     let count = Ref(0)
     let backend = @client.from_fn((request, _) => {{
       count.val += 1
       if count.val == 1 {{
-        {check}
+        {check}{diagnostics}
         @http.Response::new(302, headers=@http.Headers::of([("location", if same_origin {{ "/next" }} else {{ "https://other.example/next" }})]))
       }} else {{
         {redirect_check}
         @http.Response::new(200, body=Bytes(b"ok"))
       }}
     }})
-    let sdk = {client}::new(backend, @sim.FakeClock::new(), auth={auth})
+    let config = {{ ..@client.RedirectConfig::default(), credential_headers: [] }}
+    let runtime = @client.Client::new(backend, @sim.FakeClock::new(), redirect=config)
+    let sdk = {client}::from_client(runtime, auth={auth})
     assert_true(@driver.run_sync(() => sdk.send(@http.Request::get("/contract-test"))) is Ok(_))
     assert_eq(count.val, 2)
-  }}
+  }}{invalid}
 }}
 ''')
     return '\n'.join(tests)

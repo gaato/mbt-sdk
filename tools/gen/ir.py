@@ -155,6 +155,7 @@ class Parameter:
     # Discovery canonical names require validation before reserved expansion.
     resource_name: bool = False
     pattern: str | None = None
+    credential: bool = False
 
 
 @dataclass(frozen=True)
@@ -471,9 +472,25 @@ def _string_values(schema: dict[str, Any]) -> list[str] | None:
     return None
 
 
+def header_api_key_names(doc: dict[str, Any]) -> set[str]:
+    schemes = doc.get("components", {}).get("securitySchemes", {})
+    if not isinstance(schemes, dict):
+        return set()
+    return {
+        scheme["name"].lower()
+        for scheme in schemes.values()
+        if isinstance(scheme, dict)
+        and scheme.get("type") == "apiKey"
+        and scheme.get("in") == "header"
+        and isinstance(scheme.get("name"), str)
+        and scheme["name"]
+    }
+
+
 class IRBuilder:
     def __init__(self, doc: dict[str, Any], package: str, *, derive_operation_ids: bool = False, auth_headers: set[str] | None = None):
         self.auth_headers = auth_headers or set()
+        self.credential_headers = header_api_key_names(doc) | {"authorization", "proxy-authorization", "cookie"}
         self.doc = doc
         self.package = package
         self.derive_operation_ids = derive_operation_ids
@@ -1796,6 +1813,7 @@ class IRBuilder:
                     path_segments,
                     parameter.get("x-moonbit-resource-name") is True,
                     schema.get("pattern") if parameter.get("x-moonbit-resource-name") is True else None,
+                    credential=location == "header" and parameter["name"].lower() in self.credential_headers,
                 )
             )
         request_content = operation.get("requestBody", {}).get("content", {})

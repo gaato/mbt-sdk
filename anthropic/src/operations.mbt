@@ -15,6 +15,29 @@ async fn[T, M : @client.ResponseMode] Anthropic::send_with(
   reader : @client.ResponsePlan[Result[T, @client.ResponseFailure], M],
   bucket : String,
 ) -> Result[T, AnthropicFailure] {
+  if self.bearer_error is Some(message) {
+    return Err(Validation(message))
+  }
+  try {
+    request.headers.validate()
+    @http.Headers::of(
+      self.default_headers
+      .iter()
+      .filter(pair => !request.headers.contains(pair.0))
+      .collect(),
+    ).validate()
+  } catch {
+    @http.TransportError(detail~, ..) => return Err(Validation(detail))
+  }
+  // Mark both possible defaults, including those on a caller-supplied Client.
+  let request = request.attribute(
+    @http.credential_headers,
+    [
+      ..request.attributes.get(@http.credential_headers).unwrap_or([]),
+      "x-api-key",
+      "authorization",
+    ],
+  )
   try {
     match
       @client.RequestPlan::new(request, reader)

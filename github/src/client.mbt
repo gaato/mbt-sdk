@@ -13,6 +13,8 @@ pub struct GitHub {
   priv client : @client.Client
   priv graphql_url : String
   priv retry : GitHubRetry?
+  priv default_headers : @http.Headers
+  priv bearer_error : String?
 }
 
 ///|
@@ -116,6 +118,17 @@ pub fn GitHub::new(
     ),
     graphql_url,
     retry: Some(retry),
+    default_headers: headers,
+    bearer_error: match token {
+      None => None
+      Some(token) =>
+        try {
+          @http.Headers::of([("authorization", token)]).validate()
+          None
+        } catch {
+          @http.TransportError(detail~, ..) => Some(detail)
+        }
+    },
   }
 }
 
@@ -153,7 +166,13 @@ pub fn GitHub::from_client(
   client : @client.Client,
   graphql_url~ : String = "https://api.github.com/graphql",
 ) -> GitHub {
-  { client, graphql_url, retry: None, }
+  {
+    client,
+    graphql_url,
+    retry: None,
+    default_headers: @http.Headers::empty(),
+    bearer_error: None,
+  }
 }
 
 ///|

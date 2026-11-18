@@ -184,6 +184,12 @@ remains `None`; no empty reasoning is fabricated. Additional headers, such as
 OpenRouter attribution headers, can be configured with an mttp `Client` passed
 to `OpenAI::from_client`.
 
+The SDK marks `authorization` even with `from_client`.
+Redirects strip it when the host, port or scheme changes, except for a
+same-host HTTP port 80 to HTTPS port 443 upgrade. HTTPS to HTTP is refused by
+default. Explicit header values with surrounding whitespace return
+`Validation` before sending.
+
 ## Retries
 
 Retries follow the official Python SDK: two retries of 408, 409, 429 and every
@@ -193,6 +199,8 @@ Retries follow the official Python SDK: two retries of 408, 409, 429 and every
 failure proves nothing was sent, unless replay safety is explicit. The server's `x-should-retry` is
 obeyed, waits back off from 0.5 s to 8 s, and a `Retry-After` over two
 minutes returns the last failure instead of waiting.
+Statuses 600–999 are HTTP failures like 5xx and are retried only with an
+explicit override such as `x-should-retry: true`.
 Recognized non-transient quota, insufficient-balance or disabled-account 429
 codes stop immediately, including `insufficient_quota` and Zhipu's
 `1113`, `1308`, `1310`. This also applies to custom clients and overrides

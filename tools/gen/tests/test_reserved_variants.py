@@ -44,7 +44,7 @@ test "domain types sharing builtin names" {
 '''
         with tempfile.TemporaryDirectory(prefix='f8-named-facade-') as temporary:
             root = Path(temporary)
-            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(emit(ir)))
             _write(root / 'src', _format(files))
             for args in [['update'], ['check', '--target', 'wasm-gc', '--deny-warn'], ['test', '--target', 'wasm-gc', '--deny-warn']]:
@@ -77,7 +77,7 @@ test "reserved wire constructors round trip" {
             root = Path(directory)
             (root / 'moon.mod').write_text(
                 'name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\n'
-                'import { "gaato/mttp_core@0.1.0" }\n')
+                'import { "gaato/mttp_core@0.3.0" }\n')
             _write(root / 'src/gen', _format(files))
             # Resolve each sample's own dependencies: a workspace cache must not
             # let a sample accidentally compile against a different dependency.

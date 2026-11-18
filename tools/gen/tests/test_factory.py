@@ -28,7 +28,7 @@ class FactoryTests(unittest.TestCase):
         self.doc['security'] = [{'token': []}]
         self.spec = self.root / 'input.json'
         self.spec.write_text(json.dumps(self.doc))
-        self.write('seed/moon.mod', 'name = "gaato/seed"\nversion = "0.1.0"\nimport {\n  "gaato/mttp_core@0.1.0",\n}\n')
+        self.write('seed/moon.mod', 'name = "gaato/seed"\nversion = "0.1.0"\nimport {\n  "gaato/mttp_core@0.3.0",\n}\n')
         self.write('seed/spec/spec.json', json.dumps(self.doc))
         self.write('seed/spec/SOURCE.md', '- Source: https://example.invalid/seed-spec.json\n')
         self.write('moon.work', 'members = [\n  "seed",\n]\n')

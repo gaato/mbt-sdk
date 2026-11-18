@@ -8975,10 +8975,10 @@ pub(all) enum CommandExecutionApprovalDecision {
   Accept
   AcceptForSession
   AcceptWithExecpolicyAmendment(
-    CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment
+    CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment,
   )
   ApplyNetworkPolicyAmendment(
-    CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
+    CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment,
   )
   Decline
   Cancel

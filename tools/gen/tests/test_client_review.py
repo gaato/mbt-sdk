@@ -51,7 +51,7 @@ class ClientReviewTests(unittest.TestCase):
         files['contract_gen.mbt'] += source
         with tempfile.TemporaryDirectory(prefix='f2r-review-') as directory:
             root = Path(directory)
-            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.3.0" }\n')
             generator._write(root / 'src/gen', generator._format(emit(ir)))
             generator._write(root / 'src', generator._format(files))
             result = subprocess.run(['moon', '-C', str(root), 'test', '--target', 'wasm-gc', '--deny-warn'], text=True, capture_output=True)

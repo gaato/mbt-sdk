@@ -155,3 +155,152 @@ test "redirects keep the API key on the same origin and drop it on another" {
   assert_eq(sent[1].request.url, same)
   assert_eq(sent[1].request.headers.get("x-api-key"), Some("secret"))
 }
+
+///|
+test "Anthropic from_client strips and redacts authentication with an empty redirect credential list" {
+  let origin = "https://anthropic.example"
+  let other = "https://other.example/v1/messages/count_tokens"
+  for
+    (name, value) in [
+      ("x-api-key", "fixture-key"),
+      ("authorization", "Bearer fixture-key"),
+    ] {
+    let seen = []
+    let backend = @client.from_fn((request, _) => {
+      seen.push(request)
+      if request.url.has_prefix(origin) {
+        @http.Response::new(
+          307,
+          headers=@http.Headers::of([("location", other)]),
+        )
+      } else {
+        @http.Response::new(200, body=Bytes(b"{\"input_tokens\":7}"))
+      }
+    })
+    let runtime = @client.Client::new(
+      backend,
+      @mock.FakeClock::new(),
+      base_url=origin,
+      headers=@http.Headers::of([(name, value)]),
+      redirect={ ..@client.RedirectConfig::default(), credential_headers: [], },
+    )
+    let sdk = @anthropic.Anthropic::from_client(runtime)
+    let result = @driver.run_sync(() => {
+      sdk.count_tokens(
+        @anthropic.MessageRequest::new(model="m", max_tokens=32, messages=[
+          @anthropic.Message::user("hi"),
+        ]),
+      )
+    })
+    assert_true(result is Ok(7))
+    assert_eq(seen.length(), 2)
+    assert_eq(seen[0].headers.get(name), Some(value))
+    assert_true(
+      seen[0].attributes
+      .get(@http.credential_headers)
+      .unwrap_or([])
+      .contains(name),
+    )
+    assert_false(
+      @client.request(seen[0])
+      .response(@client.as_bytes())
+      .to_curl()
+      .contains("fixture-key"),
+    )
+    assert_eq(seen[1].url, other)
+    assert_eq(seen[1].headers.get(name), None)
+  }
+}
+
+///|
+test "Anthropic rejects explicit header whitespace as validation before I/O" {
+  let backend = @testing.BackendStub::new()
+  let clock = @mock.FakeClock::new()
+  let key = @anthropic.Anthropic::new(api_key="fixture\t", backend, clock)
+  let bearer = @anthropic.Anthropic::new(
+    api_key=" fixture",
+    backend,
+    clock,
+    auth_header=Bearer,
+  )
+  let version = @anthropic.Anthropic::new(
+    api_key="fixture",
+    backend,
+    clock,
+    version=" 2026-10-21",
+  )
+  for sdk in [key, bearer, version] {
+    assert_true(
+      @driver.run_sync(() => sdk.list_models())
+      is Err(@anthropic.AnthropicFailure::Validation(_)),
+    )
+  }
+  assert_true(backend.sent().is_empty())
+}
+
+///|
+test "mttp credential marks retain the same-host default-port HTTPS upgrade exception" {
+  let start = "http://origin.example/probe"
+  let secure = "https://origin.example/probe"
+  assert_false(@http.Url::parse(start).same_origin(@http.Url::parse(secure)))
+  let seen = []
+  let backend = @client.from_fn((request, _) => {
+    seen.push(request.headers.get("x-api-key"))
+    if request.url == start {
+      @http.Response::new(
+        307,
+        headers=@http.Headers::of([("location", secure)]),
+      )
+    } else {
+      @http.Response::new(200)
+    }
+  })
+  let runtime = @client.Client::new(backend, @mock.FakeClock::new(), redirect={
+    ..@client.RedirectConfig::default(),
+    credential_headers: [],
+  })
+  let request = @http.Request::get(start).credential("x-api-key", "fixture-key")
+  assert_eq(
+    @driver.run_sync(() => {
+      runtime.send(@client.request(request).response(@client.as_bytes()))
+    }).status,
+    200,
+  )
+  assert_eq(seen, [Some("fixture-key"), Some("fixture-key")])
+}
+
+///|
+test "Anthropic propagates nested request validation from a streaming callback" {
+  let backend = @testing.BackendStub::new().expect(
+    _ => true,
+    @testing.Canned::bytes(
+      200,
+      body=b"data: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"text_delta\",\"text\":\"hello\"}}\n\n",
+    ),
+  )
+  let clock = @mock.FakeClock::new()
+  let sdk = @anthropic.Anthropic::new(api_key="fixture-key", backend, clock)
+  let nested_backend = @testing.BackendStub::new()
+  let nested = @client.Client::new(nested_backend, clock)
+  @driver.run_sync(() => {
+    let request = @http.Request::get("https://nested.example").header(
+      "x-test", " invalid",
+    )
+    let outer = sdk.stream_message(
+      @anthropic.MessageRequest::new(model="m", max_tokens=32, messages=[]),
+      _ => {
+        ignore(
+          nested.send(@client.request(request).response(@client.as_bytes())),
+        )
+      },
+    ) catch {
+      @http.TransportError(kind=Invalid, phase=Pool, ..) => return
+      error => raise error
+    }
+    fail(
+      "expected the nested request error to raise, got \{@debug.to_string(outer)}",
+    )
+  })
+  backend.verify()
+  assert_true(nested_backend.sent().is_empty())
+}

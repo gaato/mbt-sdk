@@ -19,6 +19,11 @@ are optional unless the field is required, and keep a wildcard arm.
 - The default `User-Agent` is now `gaato-moonbit-sdks/0.1.0` (was `gaato-mbt-sdk/0.1.0`), because the repository was renamed to `gaato/moonbit-sdks`. Pass `user_agent~` to keep your own.
 - Generated code now qualifies constructor references; no public API change.
 - **Regenerated from the upstream spec fetched 2026-11-17** (sha256 `1b1a8248bd69`). Changes are batched for the next weekly release; see the generated interface diff.
+- **Build with MoonBit 0.10.21 and mttp_core 0.3.0.** Invalid explicit header values, including surrounding whitespace, return validation failures before I/O.
+
+### Security
+
+- **Mark bearer credentials on each request.** The mark also enables redirect stripping and curl redaction with a caller-owned Client.
 
 ## [0.25.0] - 2026-11-16
 
@@ -43,7 +48,7 @@ are optional unless the field is required, and keep a wildcard arm.
 ### Changed
 
 - **Build on gaato/mttp 0.2 instead of gaato/http.** `::new` takes an `&@mttp.Backend`, and the request and response types are gaato/mttp's. Apps pass `@mttp_async.backend()`, `@mttp_async.clock()` and `timer=@mttp_async.timer()` from gaato/mttp_async 0.1. gaato/http and gaato/http-async are no longer dependencies. `GitHub::send`, `call` and `paginator` take `@mttp.Request`.
-- **Redirects are followed.** The Client follows up to 10 hops, dropping `authorization` and `cookie` on a hop to another origin, so a download such as a tarball returns its body instead of an HTTP failure with the 302's `location`. To get the 302 back, set the `redirect_limit` attribute to 0 on the request, or pass a Client built with `RedirectConfig::none()` to `GitHub::from_client`.
+- **Redirects are followed.** The Client follows up to 10 hops, dropping `authorization` and `cookie` on a hop to a different host, so a download such as a tarball returns its body instead of an HTTP failure with the 302's `location`. To get the 302 back, set the `redirect_limit` attribute to 0 on the request, or pass a Client built with `RedirectConfig::none()` to `GitHub::from_client`.
 
 ## [0.21.0] - 2026-11-11
 

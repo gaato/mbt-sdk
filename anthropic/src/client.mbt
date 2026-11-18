@@ -7,6 +7,8 @@
 pub struct Anthropic {
   priv client : @client.Client
   priv version : String
+  priv default_headers : @http.Headers
+  priv bearer_error : String?
 }
 
 ///|
@@ -43,10 +45,8 @@ pub impl @debug.Debug for Anthropic with fn to_repr(_self) {
 /// included, to that. A total deadline requires Timer and also covers admission
 /// and stream callbacks. Backend phase deadlines can finish attempts earlier.
 ///
-/// Redirects are followed as mttp's `Client` does by default, except that
-/// `x-api-key` is removed along with `authorization`, `proxy-authorization`
-/// and `cookie` when a redirect leaves the origin, so the API key is sent
-/// only to the origin it was given for.
+/// Redirects follow the runtime's default policies; see `from_client` for
+/// how the SDK marks its credentials.
 pub fn Anthropic::new(
   api_key~ : String,
   backend : &@http.Backend,
@@ -83,6 +83,17 @@ pub fn Anthropic::new(
       total_ms?=total_timeout_ms,
     ),
     version,
+    default_headers: headers,
+    bearer_error: if auth_header is Bearer {
+      try {
+        @http.Headers::of([("authorization", api_key)]).validate()
+        None
+      } catch {
+        @http.TransportError(detail~, ..) => Some(detail)
+      }
+    } else {
+      None
+    },
   }
 }
 
@@ -100,12 +111,18 @@ fn redirect_config() -> @client.RedirectConfig {
 ///|
 /// Wraps a preconfigured runtime client for compatible APIs and tests.
 ///
-/// The client's own redirect configuration applies: mttp's default forwards
-/// `x-api-key` across origins, so add it to `credential_headers` when the
-/// client carries one.
+/// From mttp_core 0.3.0, each request marks `x-api-key` and `authorization`.
+/// They are stripped when the host, port or scheme changes, except on a
+/// same-host HTTP port 80 to HTTPS port 443 upgrade. HTTPS to HTTP is refused
+/// by default.
 pub fn Anthropic::from_client(
   client : @client.Client,
   version~ : String = "2026-10-21",
 ) -> Anthropic {
-  { client, version, }
+  {
+    client,
+    version,
+    default_headers: @http.Headers::empty(),
+    bearer_error: None,
+  }
 }

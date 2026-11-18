@@ -53,8 +53,10 @@ pub fn Petstore3::new(
 
 ///|
 /// Wraps the caller's Client; its policies and retry budget apply.
-/// Add this SDK's apiKey header names to the Client's RedirectConfig.credential_headers:
-/// from_client cannot enforce their removal on cross-origin redirects.
+/// From mttp_core 0.3.0, SDK credential headers are marked on each request.
+/// They are stripped when the host, port or scheme changes, except on a
+/// same-host HTTP port 80 to HTTPS port 443 upgrade. HTTPS to HTTP is refused
+/// by default.
 /// Credentials are redacted from Debug output.
 pub fn Petstore3::from_client(
   client : @client.Client,
@@ -120,7 +122,7 @@ fn Petstore3::prepare(
   self : Petstore3,
   original : @http.Request,
   operation : String,
-) -> @http.Request {
+) -> Result[@http.Request, Failure] {
   let (use_auth, server) = self.operation_config(operation)
   let base = self.operation_base(server)
   let mut request = { ..original, url: @http.join_url(base, original.url), }
@@ -132,13 +134,34 @@ fn Petstore3::prepare(
   }
   let headers = request.headers.remove("api_key").remove("authorization")
   request = { ..request, headers, }
-  if use_auth && trusted {
-    request = self.authenticate(request)
+  try {
+    if use_auth && trusted {
+      request = self.authenticate(request)
+    }
+    request.headers.validate()
+  } catch {
+    @http.TransportError::TransportError(detail~, ..) =>
+      return Result::Err(
+        Failure::Validation(operation~, parameter="headers", message=detail),
+      )
+  }
+  // Client defaults merge after preparation, even with anonymous SDK auth.
+  let credential_headers = request.attributes
+    .get(@http.credential_headers)
+    .unwrap_or([])
+    .copy()
+  for name in ["authorization", "api_key"] {
+    if !credential_headers.iter().any(existing => existing.to_lower() == name) {
+      credential_headers.push(name)
+    }
   }
 
-  request
-  .attribute(@client.rate_limit_bucket, "petstore3" + ":" + operation)
-  .attribute(@client.operation_id, operation)
+  Result::Ok(
+    request
+    .attribute(@http.credential_headers, credential_headers)
+    .attribute(@client.rate_limit_bucket, "petstore3" + ":" + operation)
+    .attribute(@client.operation_id, operation),
+  )
 }
 
 ///|
@@ -165,11 +188,13 @@ pub async fn Petstore3::send(
   request : @http.Request,
   operation~ : String = self.infer_operation(request),
 ) -> Result[@client.Reply[Bytes], Failure] {
+  let request = match self.prepare(request, operation) {
+    Result::Ok(request) => request
+    Result::Err(error) => return Result::Err(error)
+  }
   try {
     let reply = self.client.send(
-      @client.request(self.prepare(request, operation)).response(
-        @client.as_bytes(),
-      ),
+      @client.request(request).response(@client.as_bytes()),
     )
     match reply.body {
       Result::Ok(body) =>
@@ -232,6 +257,11 @@ pub async fn Petstore3::stream(
 }
 
 ///|
+priv suberror CallbackTransport {
+  CallbackTransport(@http.TransportError)
+}
+
+///|
 async fn Petstore3::stream_with_head(
   self : Petstore3,
   request : @http.Request,
@@ -239,19 +269,30 @@ async fn Petstore3::stream_with_head(
   stop~ : (@http.ResponseHead, @sse.SseEvent) -> Bool,
   operation~ : String,
 ) -> Result[Unit, Failure] {
-  try {
-    let reply = self.client.send(
-      @client.request(self.prepare(request, operation)).response(
-        @client.from_head(head => {
-          @client.as_sse(receive, stop=event => stop(head, event))
-        }),
-      ),
+  let request = match self.prepare(request, operation) {
+    Result::Ok(request) => request
+    Result::Err(error) => return Result::Err(error)
+  }
+  let reader = @client.from_head(head => {
+    @client.as_sse(
+      event => {
+        receive(event) catch {
+          @http.TransportError::TransportError(..) as error =>
+            raise CallbackTransport(error)
+          error => raise error
+        }
+      },
+      stop=event => stop(head, event),
     )
+  })
+  try {
+    let reply = self.client.send(@client.request(request).response(reader))
     match reply.body {
       Result::Ok(value) => Result::Ok(value)
       Result::Err(error) => Result::Err(response_failure(operation, error))
     }
   } catch {
+    CallbackTransport(error) => raise error
     @http.TransportError::TransportError(..) as error =>
       Result::Err(Failure::Transport(error))
     error => raise error
@@ -278,11 +319,14 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
 fn Petstore3::authenticate(
   self : Petstore3,
   request : @http.Request,
-) -> @http.Request {
+) -> @http.Request raise @http.TransportError {
   match self.auth {
     Auth::Anonymous => request
-    Auth::Bearer(value) => request.bearer(value)
-    Auth::ApiKey(value) => request.set_header("api_key", value)
+    Auth::Bearer(value) => {
+      @http.Headers::of([("authorization", value)]).validate()
+      request.credential("authorization", "Bearer " + value)
+    }
+    Auth::ApiKey(value) => request.credential("api_key", value)
   }
 }
 

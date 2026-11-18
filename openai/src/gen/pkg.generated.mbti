@@ -52,7 +52,7 @@ pub(all) enum Annotation {
   Unknown(String, @json.Json)
 }
 pub fn Annotation::equal(Self, Self) -> Bool
-pub fn Annotation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Annotation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Annotation::not_equal(Self, Self) -> Bool
 pub fn Annotation::to_json(Self) -> @json.Json
 pub fn Annotation::to_repr(Self) -> @debug.Repr
@@ -67,7 +67,7 @@ pub(all) struct ApproximateLocation {
   timezone : @jsonkit.Presence[String]
 }
 pub fn ApproximateLocation::equal(Self, Self) -> Bool
-pub fn ApproximateLocation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ApproximateLocation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ApproximateLocation::new(country? : String, region? : String, city? : String, timezone? : String) -> Self
 pub fn ApproximateLocation::not_equal(Self, Self) -> Bool
 pub fn ApproximateLocation::to_json(Self) -> @json.Json
@@ -80,7 +80,7 @@ pub(all) struct ChatCompletionFunctionCallOption {
   name : String
 }
 pub fn ChatCompletionFunctionCallOption::equal(Self, Self) -> Bool
-pub fn ChatCompletionFunctionCallOption::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionFunctionCallOption::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionFunctionCallOption::new(name~ : String) -> Self
 pub fn ChatCompletionFunctionCallOption::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionFunctionCallOption::to_json(Self) -> @json.Json
@@ -95,7 +95,7 @@ pub(all) struct ChatCompletionFunctions {
   parameters : @json.Json?
 }
 pub fn ChatCompletionFunctions::equal(Self, Self) -> Bool
-pub fn ChatCompletionFunctions::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionFunctions::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionFunctions::new(name~ : String, description? : String, parameters? : @json.Json) -> Self
 pub fn ChatCompletionFunctions::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionFunctions::to_json(Self) -> @json.Json
@@ -109,7 +109,7 @@ pub(all) struct ChatCompletionMessageToolCall {
   function : ChatCompletionMessageToolCallFunction
 }
 pub fn ChatCompletionMessageToolCall::equal(Self, Self) -> Bool
-pub fn ChatCompletionMessageToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionMessageToolCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionMessageToolCall::new(id~ : String, function~ : ChatCompletionMessageToolCallFunction) -> Self
 pub fn ChatCompletionMessageToolCall::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionMessageToolCall::to_json(Self) -> @json.Json
@@ -124,7 +124,7 @@ pub(all) struct ChatCompletionMessageToolCallChunk {
   function : ChatCompletionMessageToolCallChunkFunction?
 }
 pub fn ChatCompletionMessageToolCallChunk::equal(Self, Self) -> Bool
-pub fn ChatCompletionMessageToolCallChunk::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionMessageToolCallChunk::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionMessageToolCallChunk::new(index~ : Int32, id? : String, function? : ChatCompletionMessageToolCallChunkFunction) -> Self
 pub fn ChatCompletionMessageToolCallChunk::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionMessageToolCallChunk::to_json(Self) -> @json.Json
@@ -138,7 +138,7 @@ pub(all) struct ChatCompletionMessageToolCallChunkFunction {
   arguments : String?
 }
 pub fn ChatCompletionMessageToolCallChunkFunction::equal(Self, Self) -> Bool
-pub fn ChatCompletionMessageToolCallChunkFunction::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionMessageToolCallChunkFunction::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionMessageToolCallChunkFunction::new(name? : String, arguments? : String) -> Self
 pub fn ChatCompletionMessageToolCallChunkFunction::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionMessageToolCallChunkFunction::to_json(Self) -> @json.Json
@@ -152,7 +152,7 @@ pub(all) struct ChatCompletionMessageToolCallFunction {
   arguments : String
 }
 pub fn ChatCompletionMessageToolCallFunction::equal(Self, Self) -> Bool
-pub fn ChatCompletionMessageToolCallFunction::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionMessageToolCallFunction::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionMessageToolCallFunction::new(name~ : String, arguments~ : String) -> Self
 pub fn ChatCompletionMessageToolCallFunction::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionMessageToolCallFunction::to_json(Self) -> @json.Json
@@ -165,7 +165,7 @@ pub(all) struct ChatCompletionNamedToolChoice {
   function : ChatCompletionNamedToolChoiceFunction
 }
 pub fn ChatCompletionNamedToolChoice::equal(Self, Self) -> Bool
-pub fn ChatCompletionNamedToolChoice::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionNamedToolChoice::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionNamedToolChoice::new(function~ : ChatCompletionNamedToolChoiceFunction) -> Self
 pub fn ChatCompletionNamedToolChoice::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionNamedToolChoice::to_json(Self) -> @json.Json
@@ -178,7 +178,7 @@ pub(all) struct ChatCompletionNamedToolChoiceFunction {
   name : String
 }
 pub fn ChatCompletionNamedToolChoiceFunction::equal(Self, Self) -> Bool
-pub fn ChatCompletionNamedToolChoiceFunction::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionNamedToolChoiceFunction::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionNamedToolChoiceFunction::new(name~ : String) -> Self
 pub fn ChatCompletionNamedToolChoiceFunction::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionNamedToolChoiceFunction::to_json(Self) -> @json.Json
@@ -197,7 +197,7 @@ pub(all) struct ChatCompletionRequestAssistantMessage {
   function_call : @jsonkit.Presence[ChatCompletionRequestAssistantMessageFunctionCall]
 }
 pub fn ChatCompletionRequestAssistantMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestAssistantMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestAssistantMessage::new(role~ : String, content? : ChatCompletionRequestAssistantMessageContent, refusal? : String, name? : String, audio? : ChatCompletionRequestAssistantMessageAudio, tool_calls? : Array[ChatCompletionMessageToolCall], function_call? : ChatCompletionRequestAssistantMessageFunctionCall) -> Self
 pub fn ChatCompletionRequestAssistantMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestAssistantMessage::to_json(Self) -> @json.Json
@@ -210,7 +210,7 @@ pub(all) struct ChatCompletionRequestAssistantMessageAudio {
   id : String
 }
 pub fn ChatCompletionRequestAssistantMessageAudio::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestAssistantMessageAudio::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageAudio::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestAssistantMessageAudio::new(id~ : String) -> Self
 pub fn ChatCompletionRequestAssistantMessageAudio::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestAssistantMessageAudio::to_json(Self) -> @json.Json
@@ -225,7 +225,7 @@ pub(all) enum ChatCompletionRequestAssistantMessageContent {
   ChatCompletionRequestAssistantMessageContentPartArray(Array[ChatCompletionRequestAssistantMessageContentPart])
 }
 pub fn ChatCompletionRequestAssistantMessageContent::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestAssistantMessageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestAssistantMessageContent::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestAssistantMessageContent::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestAssistantMessageContent::to_repr(Self) -> @debug.Repr
@@ -240,7 +240,7 @@ pub(all) enum ChatCompletionRequestAssistantMessageContentPart {
   Unknown(String, @json.Json)
 }
 pub fn ChatCompletionRequestAssistantMessageContentPart::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestAssistantMessageContentPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageContentPart::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestAssistantMessageContentPart::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestAssistantMessageContentPart::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestAssistantMessageContentPart::to_repr(Self) -> @debug.Repr
@@ -253,7 +253,7 @@ pub(all) struct ChatCompletionRequestAssistantMessageFunctionCall {
   name : String
 }
 pub fn ChatCompletionRequestAssistantMessageFunctionCall::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestAssistantMessageFunctionCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageFunctionCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestAssistantMessageFunctionCall::new(arguments~ : String, name~ : String) -> Self
 pub fn ChatCompletionRequestAssistantMessageFunctionCall::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestAssistantMessageFunctionCall::to_json(Self) -> @json.Json
@@ -268,7 +268,7 @@ pub(all) struct ChatCompletionRequestDeveloperMessage {
   name : String?
 }
 pub fn ChatCompletionRequestDeveloperMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestDeveloperMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestDeveloperMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestDeveloperMessage::new(content~ : ChatCompletionRequestDeveloperMessageContent, role~ : String, name? : String) -> Self
 pub fn ChatCompletionRequestDeveloperMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestDeveloperMessage::to_json(Self) -> @json.Json
@@ -283,7 +283,7 @@ pub(all) enum ChatCompletionRequestDeveloperMessageContent {
   ChatCompletionRequestMessageContentPartTextArray(Array[ChatCompletionRequestMessageContentPartText])
 }
 pub fn ChatCompletionRequestDeveloperMessageContent::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestDeveloperMessageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestDeveloperMessageContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestDeveloperMessageContent::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestDeveloperMessageContent::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestDeveloperMessageContent::to_repr(Self) -> @debug.Repr
@@ -297,7 +297,7 @@ pub(all) struct ChatCompletionRequestFunctionMessage {
   name : String
 }
 pub fn ChatCompletionRequestFunctionMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestFunctionMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestFunctionMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestFunctionMessage::new(role~ : String, name~ : String, content? : String) -> Self
 pub fn ChatCompletionRequestFunctionMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestFunctionMessage::to_json(Self) -> @json.Json
@@ -317,7 +317,7 @@ pub(all) enum ChatCompletionRequestMessage {
   Unknown(String, @json.Json)
 }
 pub fn ChatCompletionRequestMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessage::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestMessage::to_repr(Self) -> @debug.Repr
@@ -330,7 +330,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartAudio {
   input_audio : ChatCompletionRequestMessageContentPartAudioInputAudio
 }
 pub fn ChatCompletionRequestMessageContentPartAudio::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartAudio::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartAudio::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartAudio::new(type_~ : String, input_audio~ : ChatCompletionRequestMessageContentPartAudioInputAudio) -> Self
 pub fn ChatCompletionRequestMessageContentPartAudio::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartAudio::to_json(Self) -> @json.Json
@@ -344,7 +344,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartAudioInputAudio {
   format : ChatCompletionRequestMessageContentPartAudioInputAudioFormat
 }
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::new(data~ : String, format~ : ChatCompletionRequestMessageContentPartAudioInputAudioFormat) -> Self
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::to_json(Self) -> @json.Json
@@ -360,7 +360,7 @@ pub(all) enum ChatCompletionRequestMessageContentPartAudioInputAudioFormat {
   Custom(String)
 }
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::to_repr(Self) -> @debug.Repr
@@ -373,7 +373,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartFile {
   file : ChatCompletionRequestMessageContentPartFileFile
 }
 pub fn ChatCompletionRequestMessageContentPartFile::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartFile::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartFile::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartFile::new(type_~ : String, file~ : ChatCompletionRequestMessageContentPartFileFile) -> Self
 pub fn ChatCompletionRequestMessageContentPartFile::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartFile::to_json(Self) -> @json.Json
@@ -388,7 +388,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartFileFile {
   file_id : String?
 }
 pub fn ChatCompletionRequestMessageContentPartFileFile::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartFileFile::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartFileFile::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartFileFile::new(filename? : String, file_data? : String, file_id? : String) -> Self
 pub fn ChatCompletionRequestMessageContentPartFileFile::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartFileFile::to_json(Self) -> @json.Json
@@ -402,7 +402,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartImage {
   image_url : ChatCompletionRequestMessageContentPartImageImageUrl
 }
 pub fn ChatCompletionRequestMessageContentPartImage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartImage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartImage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartImage::new(type_~ : String, image_url~ : ChatCompletionRequestMessageContentPartImageImageUrl) -> Self
 pub fn ChatCompletionRequestMessageContentPartImage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartImage::to_json(Self) -> @json.Json
@@ -416,7 +416,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartImageImageUrl {
   detail : ChatCompletionRequestMessageContentPartImageImageUrlDetail?
 }
 pub fn ChatCompletionRequestMessageContentPartImageImageUrl::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartImageImageUrl::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartImageImageUrl::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartImageImageUrl::new(url~ : String, detail? : ChatCompletionRequestMessageContentPartImageImageUrlDetail) -> Self
 pub fn ChatCompletionRequestMessageContentPartImageImageUrl::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartImageImageUrl::to_json(Self) -> @json.Json
@@ -433,7 +433,7 @@ pub(all) enum ChatCompletionRequestMessageContentPartImageImageUrlDetail {
   Custom(String)
 }
 pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::to_repr(Self) -> @debug.Repr
@@ -446,7 +446,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartRefusal {
   refusal : String
 }
 pub fn ChatCompletionRequestMessageContentPartRefusal::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartRefusal::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartRefusal::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartRefusal::new(type_~ : String, refusal~ : String) -> Self
 pub fn ChatCompletionRequestMessageContentPartRefusal::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartRefusal::to_json(Self) -> @json.Json
@@ -460,7 +460,7 @@ pub(all) struct ChatCompletionRequestMessageContentPartText {
   text : String
 }
 pub fn ChatCompletionRequestMessageContentPartText::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestMessageContentPartText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartText::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestMessageContentPartText::new(type_~ : String, text~ : String) -> Self
 pub fn ChatCompletionRequestMessageContentPartText::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestMessageContentPartText::to_json(Self) -> @json.Json
@@ -475,7 +475,7 @@ pub(all) struct ChatCompletionRequestSystemMessage {
   name : String?
 }
 pub fn ChatCompletionRequestSystemMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestSystemMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestSystemMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestSystemMessage::new(content~ : ChatCompletionRequestSystemMessageContent, role~ : String, name? : String) -> Self
 pub fn ChatCompletionRequestSystemMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestSystemMessage::to_json(Self) -> @json.Json
@@ -490,7 +490,7 @@ pub(all) enum ChatCompletionRequestSystemMessageContent {
   ChatCompletionRequestSystemMessageContentPartArray(Array[ChatCompletionRequestSystemMessageContentPart])
 }
 pub fn ChatCompletionRequestSystemMessageContent::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestSystemMessageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestSystemMessageContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestSystemMessageContent::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestSystemMessageContent::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestSystemMessageContent::to_repr(Self) -> @debug.Repr
@@ -504,7 +504,7 @@ pub(all) enum ChatCompletionRequestSystemMessageContentPart {
   Unknown(String, @json.Json)
 }
 pub fn ChatCompletionRequestSystemMessageContentPart::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestSystemMessageContentPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestSystemMessageContentPart::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestSystemMessageContentPart::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestSystemMessageContentPart::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestSystemMessageContentPart::to_repr(Self) -> @debug.Repr
@@ -518,7 +518,7 @@ pub(all) struct ChatCompletionRequestToolMessage {
   tool_call_id : String
 }
 pub fn ChatCompletionRequestToolMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestToolMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestToolMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestToolMessage::new(role~ : String, content~ : ChatCompletionRequestToolMessageContent, tool_call_id~ : String) -> Self
 pub fn ChatCompletionRequestToolMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestToolMessage::to_json(Self) -> @json.Json
@@ -533,7 +533,7 @@ pub(all) enum ChatCompletionRequestToolMessageContent {
   ChatCompletionRequestToolMessageContentPartArray(Array[ChatCompletionRequestToolMessageContentPart])
 }
 pub fn ChatCompletionRequestToolMessageContent::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestToolMessageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestToolMessageContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestToolMessageContent::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestToolMessageContent::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestToolMessageContent::to_repr(Self) -> @debug.Repr
@@ -547,7 +547,7 @@ pub(all) enum ChatCompletionRequestToolMessageContentPart {
   Unknown(String, @json.Json)
 }
 pub fn ChatCompletionRequestToolMessageContentPart::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestToolMessageContentPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestToolMessageContentPart::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestToolMessageContentPart::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestToolMessageContentPart::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestToolMessageContentPart::to_repr(Self) -> @debug.Repr
@@ -561,7 +561,7 @@ pub(all) struct ChatCompletionRequestUserMessage {
   name : String?
 }
 pub fn ChatCompletionRequestUserMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestUserMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestUserMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestUserMessage::new(content~ : ChatCompletionRequestUserMessageContent, role~ : String, name? : String) -> Self
 pub fn ChatCompletionRequestUserMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestUserMessage::to_json(Self) -> @json.Json
@@ -576,7 +576,7 @@ pub(all) enum ChatCompletionRequestUserMessageContent {
   ChatCompletionRequestUserMessageContentPartArray(Array[ChatCompletionRequestUserMessageContentPart])
 }
 pub fn ChatCompletionRequestUserMessageContent::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestUserMessageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestUserMessageContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestUserMessageContent::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestUserMessageContent::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestUserMessageContent::to_repr(Self) -> @debug.Repr
@@ -593,7 +593,7 @@ pub(all) enum ChatCompletionRequestUserMessageContentPart {
   Unknown(String, @json.Json)
 }
 pub fn ChatCompletionRequestUserMessageContentPart::equal(Self, Self) -> Bool
-pub fn ChatCompletionRequestUserMessageContentPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestUserMessageContentPart::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionRequestUserMessageContentPart::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionRequestUserMessageContentPart::to_json(Self) -> @json.Json
 pub fn ChatCompletionRequestUserMessageContentPart::to_repr(Self) -> @debug.Repr
@@ -610,7 +610,7 @@ pub(all) struct ChatCompletionResponseMessage {
   audio : @jsonkit.Presence[ChatCompletionResponseMessageAudio]
 }
 pub fn ChatCompletionResponseMessage::equal(Self, Self) -> Bool
-pub fn ChatCompletionResponseMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionResponseMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionResponseMessage::new(content? : String, refusal? : String, tool_calls? : Array[ChatCompletionMessageToolCall], annotations? : Array[ChatCompletionResponseMessageAnnotationsItem], function_call? : ChatCompletionResponseMessageFunctionCall, audio? : ChatCompletionResponseMessageAudio) -> Self
 pub fn ChatCompletionResponseMessage::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionResponseMessage::to_json(Self) -> @json.Json
@@ -623,7 +623,7 @@ pub(all) struct ChatCompletionResponseMessageAnnotationsItem {
   url_citation : ChatCompletionResponseMessageAnnotationsItemUrlCitation
 }
 pub fn ChatCompletionResponseMessageAnnotationsItem::equal(Self, Self) -> Bool
-pub fn ChatCompletionResponseMessageAnnotationsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionResponseMessageAnnotationsItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionResponseMessageAnnotationsItem::new(url_citation~ : ChatCompletionResponseMessageAnnotationsItemUrlCitation) -> Self
 pub fn ChatCompletionResponseMessageAnnotationsItem::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionResponseMessageAnnotationsItem::to_json(Self) -> @json.Json
@@ -639,7 +639,7 @@ pub(all) struct ChatCompletionResponseMessageAnnotationsItemUrlCitation {
   title : String
 }
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::equal(Self, Self) -> Bool
-pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::new(end_index~ : Int32, start_index~ : Int32, url~ : String, title~ : String) -> Self
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::to_json(Self) -> @json.Json
@@ -655,7 +655,7 @@ pub(all) struct ChatCompletionResponseMessageAudio {
   transcript : String
 }
 pub fn ChatCompletionResponseMessageAudio::equal(Self, Self) -> Bool
-pub fn ChatCompletionResponseMessageAudio::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionResponseMessageAudio::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionResponseMessageAudio::new(id~ : String, expires_at~ : Int32, data~ : String, transcript~ : String) -> Self
 pub fn ChatCompletionResponseMessageAudio::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionResponseMessageAudio::to_json(Self) -> @json.Json
@@ -669,7 +669,7 @@ pub(all) struct ChatCompletionResponseMessageFunctionCall {
   name : String
 }
 pub fn ChatCompletionResponseMessageFunctionCall::equal(Self, Self) -> Bool
-pub fn ChatCompletionResponseMessageFunctionCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionResponseMessageFunctionCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionResponseMessageFunctionCall::new(arguments~ : String, name~ : String) -> Self
 pub fn ChatCompletionResponseMessageFunctionCall::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionResponseMessageFunctionCall::to_json(Self) -> @json.Json
@@ -682,7 +682,7 @@ pub(all) struct ChatCompletionStreamOptions {
   include_usage : Bool?
 }
 pub fn ChatCompletionStreamOptions::equal(Self, Self) -> Bool
-pub fn ChatCompletionStreamOptions::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionStreamOptions::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionStreamOptions::new(include_usage? : Bool) -> Self
 pub fn ChatCompletionStreamOptions::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionStreamOptions::to_json(Self) -> @json.Json
@@ -699,7 +699,7 @@ pub(all) struct ChatCompletionStreamResponseDelta {
   refusal : @jsonkit.Presence[String]
 }
 pub fn ChatCompletionStreamResponseDelta::equal(Self, Self) -> Bool
-pub fn ChatCompletionStreamResponseDelta::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionStreamResponseDelta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionStreamResponseDelta::new(content? : String, function_call? : ChatCompletionStreamResponseDeltaFunctionCall, tool_calls? : Array[ChatCompletionMessageToolCallChunk], role? : ChatCompletionStreamResponseDeltaRole, refusal? : String) -> Self
 pub fn ChatCompletionStreamResponseDelta::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionStreamResponseDelta::to_json(Self) -> @json.Json
@@ -713,7 +713,7 @@ pub(all) struct ChatCompletionStreamResponseDeltaFunctionCall {
   name : String?
 }
 pub fn ChatCompletionStreamResponseDeltaFunctionCall::equal(Self, Self) -> Bool
-pub fn ChatCompletionStreamResponseDeltaFunctionCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionStreamResponseDeltaFunctionCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionStreamResponseDeltaFunctionCall::new(arguments? : String, name? : String) -> Self
 pub fn ChatCompletionStreamResponseDeltaFunctionCall::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionStreamResponseDeltaFunctionCall::to_json(Self) -> @json.Json
@@ -732,7 +732,7 @@ pub(all) enum ChatCompletionStreamResponseDeltaRole {
   Unknown(String)
 }
 pub fn ChatCompletionStreamResponseDeltaRole::equal(Self, Self) -> Bool
-pub fn ChatCompletionStreamResponseDeltaRole::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionStreamResponseDeltaRole::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionStreamResponseDeltaRole::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionStreamResponseDeltaRole::to_json(Self) -> @json.Json
 pub fn ChatCompletionStreamResponseDeltaRole::to_repr(Self) -> @debug.Repr
@@ -747,7 +747,7 @@ pub(all) struct ChatCompletionTokenLogprob {
   top_logprobs : Array[ChatCompletionTokenLogprobTopLogprobsItem]
 }
 pub fn ChatCompletionTokenLogprob::equal(Self, Self) -> Bool
-pub fn ChatCompletionTokenLogprob::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionTokenLogprob::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionTokenLogprob::new(token~ : String, logprob~ : Double, top_logprobs~ : Array[ChatCompletionTokenLogprobTopLogprobsItem], bytes? : Array[Int32]) -> Self
 pub fn ChatCompletionTokenLogprob::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionTokenLogprob::to_json(Self) -> @json.Json
@@ -762,7 +762,7 @@ pub(all) struct ChatCompletionTokenLogprobTopLogprobsItem {
   bytes : Array[Int32]?
 }
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::equal(Self, Self) -> Bool
-pub fn ChatCompletionTokenLogprobTopLogprobsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionTokenLogprobTopLogprobsItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::new(token~ : String, logprob~ : Double, bytes? : Array[Int32]) -> Self
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::to_json(Self) -> @json.Json
@@ -775,7 +775,7 @@ pub(all) struct ChatCompletionTool {
   function : FunctionObject
 }
 pub fn ChatCompletionTool::equal(Self, Self) -> Bool
-pub fn ChatCompletionTool::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionTool::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionTool::new(function~ : FunctionObject) -> Self
 pub fn ChatCompletionTool::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionTool::to_json(Self) -> @json.Json
@@ -790,7 +790,7 @@ pub(all) enum ChatCompletionToolChoiceOption {
   ChatCompletionNamedToolChoice(ChatCompletionNamedToolChoice)
 }
 pub fn ChatCompletionToolChoiceOption::equal(Self, Self) -> Bool
-pub fn ChatCompletionToolChoiceOption::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionToolChoiceOption::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionToolChoiceOption::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionToolChoiceOption::to_json(Self) -> @json.Json
 pub fn ChatCompletionToolChoiceOption::to_repr(Self) -> @debug.Repr
@@ -806,7 +806,7 @@ pub(all) enum ChatCompletionToolChoiceOptionText {
   Custom(String)
 }
 pub fn ChatCompletionToolChoiceOptionText::equal(Self, Self) -> Bool
-pub fn ChatCompletionToolChoiceOptionText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionToolChoiceOptionText::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ChatCompletionToolChoiceOptionText::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionToolChoiceOptionText::to_json(Self) -> @json.Json
 pub fn ChatCompletionToolChoiceOptionText::to_repr(Self) -> @debug.Repr
@@ -821,7 +821,7 @@ pub(all) struct Click {
   y : Int32
 }
 pub fn Click::equal(Self, Self) -> Bool
-pub fn Click::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Click::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Click::new(type_~ : String, button~ : ClickButton, x~ : Int32, y~ : Int32) -> Self
 pub fn Click::not_equal(Self, Self) -> Bool
 pub fn Click::to_json(Self) -> @json.Json
@@ -840,7 +840,7 @@ pub(all) enum ClickButton {
   Unknown(String)
 }
 pub fn ClickButton::equal(Self, Self) -> Bool
-pub fn ClickButton::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClickButton::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ClickButton::not_equal(Self, Self) -> Bool
 pub fn ClickButton::to_json(Self) -> @json.Json
 pub fn ClickButton::to_repr(Self) -> @debug.Repr
@@ -853,7 +853,7 @@ pub(all) struct CodeInterpreterFileOutput {
   files : Array[CodeInterpreterFileOutputFilesItem]
 }
 pub fn CodeInterpreterFileOutput::equal(Self, Self) -> Bool
-pub fn CodeInterpreterFileOutput::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeInterpreterFileOutput::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CodeInterpreterFileOutput::new(type_~ : String, files~ : Array[CodeInterpreterFileOutputFilesItem]) -> Self
 pub fn CodeInterpreterFileOutput::not_equal(Self, Self) -> Bool
 pub fn CodeInterpreterFileOutput::to_json(Self) -> @json.Json
@@ -867,7 +867,7 @@ pub(all) struct CodeInterpreterFileOutputFilesItem {
   file_id : String
 }
 pub fn CodeInterpreterFileOutputFilesItem::equal(Self, Self) -> Bool
-pub fn CodeInterpreterFileOutputFilesItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeInterpreterFileOutputFilesItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CodeInterpreterFileOutputFilesItem::new(mime_type~ : String, file_id~ : String) -> Self
 pub fn CodeInterpreterFileOutputFilesItem::not_equal(Self, Self) -> Bool
 pub fn CodeInterpreterFileOutputFilesItem::to_json(Self) -> @json.Json
@@ -881,7 +881,7 @@ pub(all) struct CodeInterpreterTextOutput {
   logs : String
 }
 pub fn CodeInterpreterTextOutput::equal(Self, Self) -> Bool
-pub fn CodeInterpreterTextOutput::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeInterpreterTextOutput::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CodeInterpreterTextOutput::new(type_~ : String, logs~ : String) -> Self
 pub fn CodeInterpreterTextOutput::not_equal(Self, Self) -> Bool
 pub fn CodeInterpreterTextOutput::to_json(Self) -> @json.Json
@@ -897,7 +897,7 @@ pub(all) struct CodeInterpreterToolCall {
   results : Array[CodeInterpreterToolOutput]
 }
 pub fn CodeInterpreterToolCall::equal(Self, Self) -> Bool
-pub fn CodeInterpreterToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeInterpreterToolCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CodeInterpreterToolCall::new(id~ : String, code~ : String, status~ : CodeInterpreterToolCallStatus, results~ : Array[CodeInterpreterToolOutput]) -> Self
 pub fn CodeInterpreterToolCall::not_equal(Self, Self) -> Bool
 pub fn CodeInterpreterToolCall::to_json(Self) -> @json.Json
@@ -914,7 +914,7 @@ pub(all) enum CodeInterpreterToolCallStatus {
   Unknown(String)
 }
 pub fn CodeInterpreterToolCallStatus::equal(Self, Self) -> Bool
-pub fn CodeInterpreterToolCallStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeInterpreterToolCallStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CodeInterpreterToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn CodeInterpreterToolCallStatus::to_json(Self) -> @json.Json
 pub fn CodeInterpreterToolCallStatus::to_repr(Self) -> @debug.Repr
@@ -929,7 +929,7 @@ pub(all) enum CodeInterpreterToolOutput {
   Unknown(String, @json.Json)
 }
 pub fn CodeInterpreterToolOutput::equal(Self, Self) -> Bool
-pub fn CodeInterpreterToolOutput::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeInterpreterToolOutput::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CodeInterpreterToolOutput::not_equal(Self, Self) -> Bool
 pub fn CodeInterpreterToolOutput::to_json(Self) -> @json.Json
 pub fn CodeInterpreterToolOutput::to_repr(Self) -> @debug.Repr
@@ -945,7 +945,7 @@ pub(all) struct CompletionUsage {
   prompt_tokens_details : CompletionUsagePromptTokensDetails?
 }
 pub fn CompletionUsage::equal(Self, Self) -> Bool
-pub fn CompletionUsage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CompletionUsage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CompletionUsage::new(completion_tokens~ : Int32, prompt_tokens~ : Int32, total_tokens~ : Int32, completion_tokens_details? : CompletionUsageCompletionTokensDetails, prompt_tokens_details? : CompletionUsagePromptTokensDetails) -> Self
 pub fn CompletionUsage::not_equal(Self, Self) -> Bool
 pub fn CompletionUsage::to_json(Self) -> @json.Json
@@ -961,7 +961,7 @@ pub(all) struct CompletionUsageCompletionTokensDetails {
   rejected_prediction_tokens : Int32?
 }
 pub fn CompletionUsageCompletionTokensDetails::equal(Self, Self) -> Bool
-pub fn CompletionUsageCompletionTokensDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CompletionUsageCompletionTokensDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CompletionUsageCompletionTokensDetails::new(accepted_prediction_tokens? : Int32, audio_tokens? : Int32, reasoning_tokens? : Int32, rejected_prediction_tokens? : Int32) -> Self
 pub fn CompletionUsageCompletionTokensDetails::not_equal(Self, Self) -> Bool
 pub fn CompletionUsageCompletionTokensDetails::to_json(Self) -> @json.Json
@@ -975,7 +975,7 @@ pub(all) struct CompletionUsagePromptTokensDetails {
   cached_tokens : Int32?
 }
 pub fn CompletionUsagePromptTokensDetails::equal(Self, Self) -> Bool
-pub fn CompletionUsagePromptTokensDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CompletionUsagePromptTokensDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CompletionUsagePromptTokensDetails::new(audio_tokens? : Int32, cached_tokens? : Int32) -> Self
 pub fn CompletionUsagePromptTokensDetails::not_equal(Self, Self) -> Bool
 pub fn CompletionUsagePromptTokensDetails::to_json(Self) -> @json.Json
@@ -998,7 +998,7 @@ pub(all) enum ComputerAction {
   Unknown(String, @json.Json)
 }
 pub fn ComputerAction::equal(Self, Self) -> Bool
-pub fn ComputerAction::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerAction::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerAction::not_equal(Self, Self) -> Bool
 pub fn ComputerAction::to_json(Self) -> @json.Json
 pub fn ComputerAction::to_repr(Self) -> @debug.Repr
@@ -1015,7 +1015,7 @@ pub(all) struct ComputerCallOutputItemParam {
   status : @jsonkit.Presence[ComputerCallOutputItemParamStatus]
 }
 pub fn ComputerCallOutputItemParam::equal(Self, Self) -> Bool
-pub fn ComputerCallOutputItemParam::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerCallOutputItemParam::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerCallOutputItemParam::new(call_id~ : String, type_~ : String, output~ : ComputerScreenshotImage, id? : String, acknowledged_safety_checks? : Array[ComputerCallSafetyCheckParam], status? : ComputerCallOutputItemParamStatus) -> Self
 pub fn ComputerCallOutputItemParam::not_equal(Self, Self) -> Bool
 pub fn ComputerCallOutputItemParam::to_json(Self) -> @json.Json
@@ -1032,7 +1032,7 @@ pub(all) enum ComputerCallOutputItemParamStatus {
   Custom(String)
 }
 pub fn ComputerCallOutputItemParamStatus::equal(Self, Self) -> Bool
-pub fn ComputerCallOutputItemParamStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerCallOutputItemParamStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerCallOutputItemParamStatus::not_equal(Self, Self) -> Bool
 pub fn ComputerCallOutputItemParamStatus::to_json(Self) -> @json.Json
 pub fn ComputerCallOutputItemParamStatus::to_repr(Self) -> @debug.Repr
@@ -1046,7 +1046,7 @@ pub(all) struct ComputerCallSafetyCheckParam {
   message : @jsonkit.Presence[String]
 }
 pub fn ComputerCallSafetyCheckParam::equal(Self, Self) -> Bool
-pub fn ComputerCallSafetyCheckParam::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerCallSafetyCheckParam::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerCallSafetyCheckParam::new(id~ : String, code? : String, message? : String) -> Self
 pub fn ComputerCallSafetyCheckParam::not_equal(Self, Self) -> Bool
 pub fn ComputerCallSafetyCheckParam::to_json(Self) -> @json.Json
@@ -1060,7 +1060,7 @@ pub(all) struct ComputerScreenshotImage {
   file_id : String?
 }
 pub fn ComputerScreenshotImage::equal(Self, Self) -> Bool
-pub fn ComputerScreenshotImage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerScreenshotImage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerScreenshotImage::new(image_url? : String, file_id? : String) -> Self
 pub fn ComputerScreenshotImage::not_equal(Self, Self) -> Bool
 pub fn ComputerScreenshotImage::to_json(Self) -> @json.Json
@@ -1078,7 +1078,7 @@ pub(all) struct ComputerToolCall {
   status : ComputerToolCallStatus
 }
 pub fn ComputerToolCall::equal(Self, Self) -> Bool
-pub fn ComputerToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerToolCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerToolCall::new(type_~ : String, id~ : String, call_id~ : String, action~ : ComputerAction, pending_safety_checks~ : Array[ComputerToolCallSafetyCheck], status~ : ComputerToolCallStatus) -> Self
 pub fn ComputerToolCall::not_equal(Self, Self) -> Bool
 pub fn ComputerToolCall::to_json(Self) -> @json.Json
@@ -1093,7 +1093,7 @@ pub(all) struct ComputerToolCallSafetyCheck {
   message : String
 }
 pub fn ComputerToolCallSafetyCheck::equal(Self, Self) -> Bool
-pub fn ComputerToolCallSafetyCheck::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerToolCallSafetyCheck::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerToolCallSafetyCheck::new(id~ : String, code~ : String, message~ : String) -> Self
 pub fn ComputerToolCallSafetyCheck::not_equal(Self, Self) -> Bool
 pub fn ComputerToolCallSafetyCheck::to_json(Self) -> @json.Json
@@ -1110,7 +1110,7 @@ pub(all) enum ComputerToolCallStatus {
   Unknown(String)
 }
 pub fn ComputerToolCallStatus::equal(Self, Self) -> Bool
-pub fn ComputerToolCallStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerToolCallStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn ComputerToolCallStatus::to_json(Self) -> @json.Json
 pub fn ComputerToolCallStatus::to_repr(Self) -> @debug.Repr
@@ -1125,7 +1125,7 @@ pub(all) struct ComputerUsePreviewTool {
   display_height : Int32
 }
 pub fn ComputerUsePreviewTool::equal(Self, Self) -> Bool
-pub fn ComputerUsePreviewTool::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerUsePreviewTool::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerUsePreviewTool::new(type_~ : String, environment~ : ComputerUsePreviewToolEnvironment, display_width~ : Int32, display_height~ : Int32) -> Self
 pub fn ComputerUsePreviewTool::not_equal(Self, Self) -> Bool
 pub fn ComputerUsePreviewTool::to_json(Self) -> @json.Json
@@ -1144,7 +1144,7 @@ pub(all) enum ComputerUsePreviewToolEnvironment {
   Unknown(String)
 }
 pub fn ComputerUsePreviewToolEnvironment::equal(Self, Self) -> Bool
-pub fn ComputerUsePreviewToolEnvironment::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerUsePreviewToolEnvironment::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ComputerUsePreviewToolEnvironment::not_equal(Self, Self) -> Bool
 pub fn ComputerUsePreviewToolEnvironment::to_json(Self) -> @json.Json
 pub fn ComputerUsePreviewToolEnvironment::to_repr(Self) -> @debug.Repr
@@ -1157,7 +1157,7 @@ pub(all) struct Coordinate {
   y : Int32
 }
 pub fn Coordinate::equal(Self, Self) -> Bool
-pub fn Coordinate::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Coordinate::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Coordinate::new(x~ : Int32, y~ : Int32) -> Self
 pub fn Coordinate::not_equal(Self, Self) -> Bool
 pub fn Coordinate::to_json(Self) -> @json.Json
@@ -1200,7 +1200,7 @@ pub(all) struct CreateChatCompletionRequest {
   functions : Array[ChatCompletionFunctions]?
 }
 pub fn CreateChatCompletionRequest::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequest::new(messages~ : Array[ChatCompletionRequestMessage], model~ : String, metadata? : Map[String, String], temperature? : Double, top_p? : Double, user? : String, service_tier? : ServiceTier, modalities? : Array[ResponseModalitiesItem], reasoning_effort? : ReasoningEffort, max_completion_tokens? : Int32, frequency_penalty? : Double, presence_penalty? : Double, web_search_options? : CreateChatCompletionRequestWebSearchOptions, top_logprobs? : Int32, response_format? : CreateChatCompletionRequestResponseFormat, audio? : CreateChatCompletionRequestAudio, store? : Bool, stream? : Bool, stop? : StopConfiguration, logit_bias? : Map[String, Int32], logprobs? : Bool, max_tokens? : Int32, n? : Int32, prediction? : CreateChatCompletionRequestPrediction, seed? : Int32, stream_options? : ChatCompletionStreamOptions, tools? : Array[ChatCompletionTool], tool_choice? : ChatCompletionToolChoiceOption, parallel_tool_calls? : Bool, function_call? : CreateChatCompletionRequestFunctionCall, functions? : Array[ChatCompletionFunctions]) -> Self
 pub fn CreateChatCompletionRequest::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequest::to_json(Self) -> @json.Json
@@ -1214,7 +1214,7 @@ pub(all) struct CreateChatCompletionRequestAudio {
   format : CreateChatCompletionRequestAudioFormat
 }
 pub fn CreateChatCompletionRequestAudio::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestAudio::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestAudio::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestAudio::new(voice~ : String, format~ : CreateChatCompletionRequestAudioFormat) -> Self
 pub fn CreateChatCompletionRequestAudio::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestAudio::to_json(Self) -> @json.Json
@@ -1234,7 +1234,7 @@ pub(all) enum CreateChatCompletionRequestAudioFormat {
   Custom(String)
 }
 pub fn CreateChatCompletionRequestAudioFormat::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestAudioFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestAudioFormat::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestAudioFormat::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestAudioFormat::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionRequestAudioFormat::to_repr(Self) -> @debug.Repr
@@ -1248,7 +1248,7 @@ pub(all) enum CreateChatCompletionRequestFunctionCall {
   ChatCompletionFunctionCallOption(ChatCompletionFunctionCallOption)
 }
 pub fn CreateChatCompletionRequestFunctionCall::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestFunctionCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestFunctionCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestFunctionCall::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestFunctionCall::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionRequestFunctionCall::to_repr(Self) -> @debug.Repr
@@ -1263,7 +1263,7 @@ pub(all) enum CreateChatCompletionRequestFunctionCallText {
   Custom(String)
 }
 pub fn CreateChatCompletionRequestFunctionCallText::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestFunctionCallText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestFunctionCallText::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestFunctionCallText::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestFunctionCallText::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionRequestFunctionCallText::to_repr(Self) -> @debug.Repr
@@ -1277,7 +1277,7 @@ pub(all) enum CreateChatCompletionRequestPrediction {
   Unknown(String, @json.Json)
 }
 pub fn CreateChatCompletionRequestPrediction::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestPrediction::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestPrediction::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestPrediction::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestPrediction::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionRequestPrediction::to_repr(Self) -> @debug.Repr
@@ -1293,7 +1293,7 @@ pub(all) enum CreateChatCompletionRequestResponseFormat {
   Unknown(String, @json.Json)
 }
 pub fn CreateChatCompletionRequestResponseFormat::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestResponseFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestResponseFormat::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestResponseFormat::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestResponseFormat::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionRequestResponseFormat::to_repr(Self) -> @debug.Repr
@@ -1306,7 +1306,7 @@ pub(all) struct CreateChatCompletionRequestWebSearchOptions {
   search_context_size : WebSearchContextSize?
 }
 pub fn CreateChatCompletionRequestWebSearchOptions::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestWebSearchOptions::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestWebSearchOptions::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestWebSearchOptions::new(user_location? : CreateChatCompletionRequestWebSearchOptionsUserLocation, search_context_size? : WebSearchContextSize) -> Self
 pub fn CreateChatCompletionRequestWebSearchOptions::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestWebSearchOptions::to_json(Self) -> @json.Json
@@ -1319,7 +1319,7 @@ pub(all) struct CreateChatCompletionRequestWebSearchOptionsUserLocation {
   approximate : WebSearchLocation
 }
 pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::new(approximate~ : WebSearchLocation) -> Self
 pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::to_json(Self) -> @json.Json
@@ -1338,7 +1338,7 @@ pub(all) struct CreateChatCompletionResponse {
   usage : CompletionUsage?
 }
 pub fn CreateChatCompletionResponse::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionResponse::new(id~ : String, choices~ : Array[CreateChatCompletionResponseChoicesItem], created~ : Int32, model~ : String, service_tier? : ServiceTier, system_fingerprint? : String, usage? : CompletionUsage) -> Self
 pub fn CreateChatCompletionResponse::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionResponse::to_json(Self) -> @json.Json
@@ -1354,7 +1354,7 @@ pub(all) struct CreateChatCompletionResponseChoicesItem {
   logprobs : @jsonkit.Presence[CreateChatCompletionResponseChoicesItemLogprobs]
 }
 pub fn CreateChatCompletionResponseChoicesItem::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionResponseChoicesItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionResponseChoicesItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionResponseChoicesItem::new(finish_reason~ : CreateChatCompletionResponseChoicesItemFinishReason, index~ : Int32, message~ : ChatCompletionResponseMessage, logprobs? : CreateChatCompletionResponseChoicesItemLogprobs) -> Self
 pub fn CreateChatCompletionResponseChoicesItem::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionResponseChoicesItem::to_json(Self) -> @json.Json
@@ -1373,7 +1373,7 @@ pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
   Unknown(String)
 }
 pub fn CreateChatCompletionResponseChoicesItemFinishReason::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionResponseChoicesItemFinishReason::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionResponseChoicesItemFinishReason::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionResponseChoicesItemFinishReason::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionResponseChoicesItemFinishReason::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionResponseChoicesItemFinishReason::to_repr(Self) -> @debug.Repr
@@ -1386,7 +1386,7 @@ pub(all) struct CreateChatCompletionResponseChoicesItemLogprobs {
   refusal : Array[ChatCompletionTokenLogprob]?
 }
 pub fn CreateChatCompletionResponseChoicesItemLogprobs::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionResponseChoicesItemLogprobs::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionResponseChoicesItemLogprobs::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionResponseChoicesItemLogprobs::new(content? : Array[ChatCompletionTokenLogprob], refusal? : Array[ChatCompletionTokenLogprob]) -> Self
 pub fn CreateChatCompletionResponseChoicesItemLogprobs::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionResponseChoicesItemLogprobs::to_json(Self) -> @json.Json
@@ -1405,7 +1405,7 @@ pub(all) struct CreateChatCompletionStreamResponse {
   usage : @jsonkit.Presence[CompletionUsage]
 }
 pub fn CreateChatCompletionStreamResponse::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionStreamResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionStreamResponse::new(id~ : String, choices~ : Array[CreateChatCompletionStreamResponseChoicesItem], created~ : Int32, model~ : String, service_tier? : ServiceTier, system_fingerprint? : String, usage? : CompletionUsage) -> Self
 pub fn CreateChatCompletionStreamResponse::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionStreamResponse::to_json(Self) -> @json.Json
@@ -1421,7 +1421,7 @@ pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
   index : Int32
 }
 pub fn CreateChatCompletionStreamResponseChoicesItem::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionStreamResponseChoicesItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponseChoicesItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionStreamResponseChoicesItem::new(delta~ : ChatCompletionStreamResponseDelta, index~ : Int32, logprobs? : CreateChatCompletionStreamResponseChoicesItemLogprobs, finish_reason? : CreateChatCompletionStreamResponseChoicesItemFinishReason) -> Self
 pub fn CreateChatCompletionStreamResponseChoicesItem::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionStreamResponseChoicesItem::to_json(Self) -> @json.Json
@@ -1440,7 +1440,7 @@ pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
   Unknown(String)
 }
 pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::to_repr(Self) -> @debug.Repr
@@ -1453,7 +1453,7 @@ pub(all) struct CreateChatCompletionStreamResponseChoicesItemLogprobs {
   refusal : Array[ChatCompletionTokenLogprob]?
 }
 pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::equal(Self, Self) -> Bool
-pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::new(content? : Array[ChatCompletionTokenLogprob], refusal? : Array[ChatCompletionTokenLogprob]) -> Self
 pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::to_json(Self) -> @json.Json
@@ -1470,7 +1470,7 @@ pub(all) struct CreateEmbeddingRequest {
   user : String?
 }
 pub fn CreateEmbeddingRequest::equal(Self, Self) -> Bool
-pub fn CreateEmbeddingRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequest::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateEmbeddingRequest::new(input~ : CreateEmbeddingRequestInput, model~ : String, encoding_format? : CreateEmbeddingRequestEncodingFormat, dimensions? : Int32, user? : String) -> Self
 pub fn CreateEmbeddingRequest::not_equal(Self, Self) -> Bool
 pub fn CreateEmbeddingRequest::to_json(Self) -> @json.Json
@@ -1486,7 +1486,7 @@ pub(all) enum CreateEmbeddingRequestEncodingFormat {
   Custom(String)
 }
 pub fn CreateEmbeddingRequestEncodingFormat::equal(Self, Self) -> Bool
-pub fn CreateEmbeddingRequestEncodingFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequestEncodingFormat::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateEmbeddingRequestEncodingFormat::not_equal(Self, Self) -> Bool
 pub fn CreateEmbeddingRequestEncodingFormat::to_json(Self) -> @json.Json
 pub fn CreateEmbeddingRequestEncodingFormat::to_repr(Self) -> @debug.Repr
@@ -1502,7 +1502,7 @@ pub(all) enum CreateEmbeddingRequestInput {
   IntArrayArray(Array[Array[Int32]])
 }
 pub fn CreateEmbeddingRequestInput::equal(Self, Self) -> Bool
-pub fn CreateEmbeddingRequestInput::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequestInput::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateEmbeddingRequestInput::not_equal(Self, Self) -> Bool
 pub fn CreateEmbeddingRequestInput::to_json(Self) -> @json.Json
 pub fn CreateEmbeddingRequestInput::to_repr(Self) -> @debug.Repr
@@ -1516,7 +1516,7 @@ pub(all) struct CreateEmbeddingResponse {
   usage : CreateEmbeddingResponseUsage
 }
 pub fn CreateEmbeddingResponse::equal(Self, Self) -> Bool
-pub fn CreateEmbeddingResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateEmbeddingResponse::new(data~ : Array[Embedding], model~ : String, usage~ : CreateEmbeddingResponseUsage) -> Self
 pub fn CreateEmbeddingResponse::not_equal(Self, Self) -> Bool
 pub fn CreateEmbeddingResponse::to_json(Self) -> @json.Json
@@ -1530,7 +1530,7 @@ pub(all) struct CreateEmbeddingResponseUsage {
   total_tokens : Int32
 }
 pub fn CreateEmbeddingResponseUsage::equal(Self, Self) -> Bool
-pub fn CreateEmbeddingResponseUsage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingResponseUsage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateEmbeddingResponseUsage::new(total_tokens~ : Int32, prompt_tokens? : Int32) -> Self
 pub fn CreateEmbeddingResponseUsage::not_equal(Self, Self) -> Bool
 pub fn CreateEmbeddingResponseUsage::to_json(Self) -> @json.Json
@@ -1561,7 +1561,7 @@ pub(all) struct CreateResponse {
   stream : @jsonkit.Presence[Bool]
 }
 pub fn CreateResponse::equal(Self, Self) -> Bool
-pub fn CreateResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateResponse::new(model~ : String, input~ : CreateResponseInput, metadata? : Map[String, String], temperature? : Double, top_p? : Double, user? : String, service_tier? : ServiceTier, previous_response_id? : String, reasoning? : Reasoning, max_output_tokens? : Int32, instructions? : String, text? : CreateResponseText, tools? : Array[Tool], tool_choice? : @json.Json, truncation? : CreateResponseTruncation, include_? : Array[Includable], parallel_tool_calls? : Bool, store? : Bool, stream? : Bool) -> Self
 pub fn CreateResponse::not_equal(Self, Self) -> Bool
 pub fn CreateResponse::to_json(Self) -> @json.Json
@@ -1576,7 +1576,7 @@ pub(all) enum CreateResponseInput {
   InputItemArray(Array[InputItem])
 }
 pub fn CreateResponseInput::equal(Self, Self) -> Bool
-pub fn CreateResponseInput::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateResponseInput::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateResponseInput::not_equal(Self, Self) -> Bool
 pub fn CreateResponseInput::to_json(Self) -> @json.Json
 pub fn CreateResponseInput::to_repr(Self) -> @debug.Repr
@@ -1588,7 +1588,7 @@ pub(all) struct CreateResponseText {
   format : TextResponseFormatConfiguration?
 }
 pub fn CreateResponseText::equal(Self, Self) -> Bool
-pub fn CreateResponseText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateResponseText::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateResponseText::new(format? : TextResponseFormatConfiguration) -> Self
 pub fn CreateResponseText::not_equal(Self, Self) -> Bool
 pub fn CreateResponseText::to_json(Self) -> @json.Json
@@ -1604,7 +1604,7 @@ pub(all) enum CreateResponseTruncation {
   Custom(String)
 }
 pub fn CreateResponseTruncation::equal(Self, Self) -> Bool
-pub fn CreateResponseTruncation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateResponseTruncation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn CreateResponseTruncation::not_equal(Self, Self) -> Bool
 pub fn CreateResponseTruncation::to_json(Self) -> @json.Json
 pub fn CreateResponseTruncation::to_repr(Self) -> @debug.Repr
@@ -1618,7 +1618,7 @@ pub(all) struct DoubleClick {
   y : Int32
 }
 pub fn DoubleClick::equal(Self, Self) -> Bool
-pub fn DoubleClick::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn DoubleClick::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn DoubleClick::new(type_~ : String, x~ : Int32, y~ : Int32) -> Self
 pub fn DoubleClick::not_equal(Self, Self) -> Bool
 pub fn DoubleClick::to_json(Self) -> @json.Json
@@ -1632,7 +1632,7 @@ pub(all) struct Drag {
   path : Array[Coordinate]
 }
 pub fn Drag::equal(Self, Self) -> Bool
-pub fn Drag::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Drag::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Drag::new(type_~ : String, path~ : Array[Coordinate]) -> Self
 pub fn Drag::not_equal(Self, Self) -> Bool
 pub fn Drag::to_json(Self) -> @json.Json
@@ -1647,7 +1647,7 @@ pub(all) struct EasyInputMessage {
   type_ : String?
 }
 pub fn EasyInputMessage::equal(Self, Self) -> Bool
-pub fn EasyInputMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EasyInputMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn EasyInputMessage::new(role~ : EasyInputMessageRole, content~ : EasyInputMessageContent, type_? : String) -> Self
 pub fn EasyInputMessage::not_equal(Self, Self) -> Bool
 pub fn EasyInputMessage::to_json(Self) -> @json.Json
@@ -1662,7 +1662,7 @@ pub(all) enum EasyInputMessageContent {
   InputMessageContentList(Array[InputContent])
 }
 pub fn EasyInputMessageContent::equal(Self, Self) -> Bool
-pub fn EasyInputMessageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EasyInputMessageContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn EasyInputMessageContent::not_equal(Self, Self) -> Bool
 pub fn EasyInputMessageContent::to_json(Self) -> @json.Json
 pub fn EasyInputMessageContent::to_repr(Self) -> @debug.Repr
@@ -1679,7 +1679,7 @@ pub(all) enum EasyInputMessageRole {
   Custom(String)
 }
 pub fn EasyInputMessageRole::equal(Self, Self) -> Bool
-pub fn EasyInputMessageRole::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EasyInputMessageRole::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn EasyInputMessageRole::not_equal(Self, Self) -> Bool
 pub fn EasyInputMessageRole::to_json(Self) -> @json.Json
 pub fn EasyInputMessageRole::to_repr(Self) -> @debug.Repr
@@ -1692,7 +1692,7 @@ pub(all) struct Embedding {
   embedding : Array[Double]
 }
 pub fn Embedding::equal(Self, Self) -> Bool
-pub fn Embedding::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Embedding::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Embedding::new(index~ : Int32, embedding~ : Array[Double]) -> Self
 pub fn Embedding::not_equal(Self, Self) -> Bool
 pub fn Embedding::to_json(Self) -> @json.Json
@@ -1707,7 +1707,7 @@ pub(all) struct FileCitationBody {
   index : Int32
 }
 pub fn FileCitationBody::equal(Self, Self) -> Bool
-pub fn FileCitationBody::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileCitationBody::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FileCitationBody::new(type_~ : String, file_id~ : String, index~ : Int32) -> Self
 pub fn FileCitationBody::not_equal(Self, Self) -> Bool
 pub fn FileCitationBody::to_json(Self) -> @json.Json
@@ -1722,7 +1722,7 @@ pub(all) struct FilePath {
   index : Int32
 }
 pub fn FilePath::equal(Self, Self) -> Bool
-pub fn FilePath::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FilePath::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FilePath::new(type_~ : String, file_id~ : String, index~ : Int32) -> Self
 pub fn FilePath::not_equal(Self, Self) -> Bool
 pub fn FilePath::to_json(Self) -> @json.Json
@@ -1739,7 +1739,7 @@ pub(all) struct FileSearchTool {
   filters : @jsonkit.Presence[@json.Json]
 }
 pub fn FileSearchTool::equal(Self, Self) -> Bool
-pub fn FileSearchTool::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileSearchTool::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FileSearchTool::new(type_~ : String, vector_store_ids~ : Array[String], max_num_results? : Int32, ranking_options? : RankingOptions, filters? : @json.Json) -> Self
 pub fn FileSearchTool::not_equal(Self, Self) -> Bool
 pub fn FileSearchTool::to_json(Self) -> @json.Json
@@ -1756,7 +1756,7 @@ pub(all) struct FileSearchToolCall {
   results : @jsonkit.Presence[Array[FileSearchToolCallResultsItem]]
 }
 pub fn FileSearchToolCall::equal(Self, Self) -> Bool
-pub fn FileSearchToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileSearchToolCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FileSearchToolCall::new(id~ : String, type_~ : String, status~ : FileSearchToolCallStatus, queries~ : Array[String], results? : Array[FileSearchToolCallResultsItem]) -> Self
 pub fn FileSearchToolCall::not_equal(Self, Self) -> Bool
 pub fn FileSearchToolCall::to_json(Self) -> @json.Json
@@ -1773,7 +1773,7 @@ pub(all) struct FileSearchToolCallResultsItem {
   score : Double?
 }
 pub fn FileSearchToolCallResultsItem::equal(Self, Self) -> Bool
-pub fn FileSearchToolCallResultsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileSearchToolCallResultsItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FileSearchToolCallResultsItem::new(file_id? : String, text? : String, filename? : String, attributes? : Map[String, VectorStoreFileAttributesValue], score? : Double) -> Self
 pub fn FileSearchToolCallResultsItem::not_equal(Self, Self) -> Bool
 pub fn FileSearchToolCallResultsItem::to_json(Self) -> @json.Json
@@ -1792,7 +1792,7 @@ pub(all) enum FileSearchToolCallStatus {
   Unknown(String)
 }
 pub fn FileSearchToolCallStatus::equal(Self, Self) -> Bool
-pub fn FileSearchToolCallStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileSearchToolCallStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FileSearchToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn FileSearchToolCallStatus::to_json(Self) -> @json.Json
 pub fn FileSearchToolCallStatus::to_repr(Self) -> @debug.Repr
@@ -1808,7 +1808,7 @@ pub(all) struct FunctionCallOutputItemParam {
   status : @jsonkit.Presence[FunctionCallOutputItemParamStatus]
 }
 pub fn FunctionCallOutputItemParam::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputItemParam::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionCallOutputItemParam::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputItemParam::new(call_id~ : String, type_~ : String, output~ : String, id? : String, status? : FunctionCallOutputItemParamStatus) -> Self
 pub fn FunctionCallOutputItemParam::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputItemParam::to_json(Self) -> @json.Json
@@ -1825,7 +1825,7 @@ pub(all) enum FunctionCallOutputItemParamStatus {
   Custom(String)
 }
 pub fn FunctionCallOutputItemParamStatus::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputItemParamStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionCallOutputItemParamStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputItemParamStatus::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputItemParamStatus::to_json(Self) -> @json.Json
 pub fn FunctionCallOutputItemParamStatus::to_repr(Self) -> @debug.Repr
@@ -1840,7 +1840,7 @@ pub(all) struct FunctionObject {
   strict : @jsonkit.Presence[Bool]
 }
 pub fn FunctionObject::equal(Self, Self) -> Bool
-pub fn FunctionObject::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionObject::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FunctionObject::new(name~ : String, description? : String, parameters? : @json.Json, strict? : Bool) -> Self
 pub fn FunctionObject::not_equal(Self, Self) -> Bool
 pub fn FunctionObject::to_json(Self) -> @json.Json
@@ -1857,7 +1857,7 @@ pub(all) struct FunctionTool {
   strict : Bool?
 }
 pub fn FunctionTool::equal(Self, Self) -> Bool
-pub fn FunctionTool::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionTool::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FunctionTool::new(type_~ : String, name~ : String, description? : String, parameters? : @json.Json, strict? : Bool) -> Self
 pub fn FunctionTool::not_equal(Self, Self) -> Bool
 pub fn FunctionTool::to_json(Self) -> @json.Json
@@ -1875,7 +1875,7 @@ pub(all) struct FunctionToolCall {
   status : FunctionToolCallStatus?
 }
 pub fn FunctionToolCall::equal(Self, Self) -> Bool
-pub fn FunctionToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionToolCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FunctionToolCall::new(type_~ : String, call_id~ : String, name~ : String, arguments~ : String, id? : String, status? : FunctionToolCallStatus) -> Self
 pub fn FunctionToolCall::not_equal(Self, Self) -> Bool
 pub fn FunctionToolCall::to_json(Self) -> @json.Json
@@ -1892,7 +1892,7 @@ pub(all) enum FunctionToolCallStatus {
   Unknown(String)
 }
 pub fn FunctionToolCallStatus::equal(Self, Self) -> Bool
-pub fn FunctionToolCallStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionToolCallStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn FunctionToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn FunctionToolCallStatus::to_json(Self) -> @json.Json
 pub fn FunctionToolCallStatus::to_repr(Self) -> @debug.Repr
@@ -1908,7 +1908,7 @@ pub(all) enum Includable {
   Custom(String)
 }
 pub fn Includable::equal(Self, Self) -> Bool
-pub fn Includable::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Includable::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Includable::not_equal(Self, Self) -> Bool
 pub fn Includable::to_json(Self) -> @json.Json
 pub fn Includable::to_repr(Self) -> @debug.Repr
@@ -1924,7 +1924,7 @@ pub(all) enum InputContent {
   Unknown(String, @json.Json)
 }
 pub fn InputContent::equal(Self, Self) -> Bool
-pub fn InputContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputContent::not_equal(Self, Self) -> Bool
 pub fn InputContent::to_json(Self) -> @json.Json
 pub fn InputContent::to_repr(Self) -> @debug.Repr
@@ -1939,7 +1939,7 @@ pub(all) struct InputFileContent {
   file_data : String?
 }
 pub fn InputFileContent::equal(Self, Self) -> Bool
-pub fn InputFileContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputFileContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputFileContent::new(type_~ : String, file_id? : String, filename? : String, file_data? : String) -> Self
 pub fn InputFileContent::not_equal(Self, Self) -> Bool
 pub fn InputFileContent::to_json(Self) -> @json.Json
@@ -1955,7 +1955,7 @@ pub(all) struct InputImageContent {
   detail : InputImageContentDetail
 }
 pub fn InputImageContent::equal(Self, Self) -> Bool
-pub fn InputImageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputImageContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputImageContent::new(type_~ : String, detail~ : InputImageContentDetail, image_url? : String, file_id? : String) -> Self
 pub fn InputImageContent::not_equal(Self, Self) -> Bool
 pub fn InputImageContent::to_json(Self) -> @json.Json
@@ -1972,7 +1972,7 @@ pub(all) enum InputImageContentDetail {
   Custom(String)
 }
 pub fn InputImageContentDetail::equal(Self, Self) -> Bool
-pub fn InputImageContentDetail::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputImageContentDetail::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputImageContentDetail::not_equal(Self, Self) -> Bool
 pub fn InputImageContentDetail::to_json(Self) -> @json.Json
 pub fn InputImageContentDetail::to_repr(Self) -> @debug.Repr
@@ -1996,7 +1996,7 @@ pub(all) enum InputItem {
   Unknown(String, @json.Json)
 }
 pub fn InputItem::equal(Self, Self) -> Bool
-pub fn InputItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputItem::not_equal(Self, Self) -> Bool
 pub fn InputItem::to_json(Self) -> @json.Json
 pub fn InputItem::to_repr(Self) -> @debug.Repr
@@ -2011,7 +2011,7 @@ pub(all) struct InputMessage {
   content : Array[InputContent]
 }
 pub fn InputMessage::equal(Self, Self) -> Bool
-pub fn InputMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputMessage::new(role~ : InputMessageRole, content~ : Array[InputContent], type_? : String, status? : InputMessageStatus) -> Self
 pub fn InputMessage::not_equal(Self, Self) -> Bool
 pub fn InputMessage::to_json(Self) -> @json.Json
@@ -2028,7 +2028,7 @@ pub(all) enum InputMessageRole {
   Custom(String)
 }
 pub fn InputMessageRole::equal(Self, Self) -> Bool
-pub fn InputMessageRole::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputMessageRole::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputMessageRole::not_equal(Self, Self) -> Bool
 pub fn InputMessageRole::to_json(Self) -> @json.Json
 pub fn InputMessageRole::to_repr(Self) -> @debug.Repr
@@ -2044,7 +2044,7 @@ pub(all) enum InputMessageStatus {
   Custom(String)
 }
 pub fn InputMessageStatus::equal(Self, Self) -> Bool
-pub fn InputMessageStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputMessageStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputMessageStatus::not_equal(Self, Self) -> Bool
 pub fn InputMessageStatus::to_json(Self) -> @json.Json
 pub fn InputMessageStatus::to_repr(Self) -> @debug.Repr
@@ -2057,7 +2057,7 @@ pub(all) struct InputTextContent {
   text : String
 }
 pub fn InputTextContent::equal(Self, Self) -> Bool
-pub fn InputTextContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn InputTextContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn InputTextContent::new(type_~ : String, text~ : String) -> Self
 pub fn InputTextContent::not_equal(Self, Self) -> Bool
 pub fn InputTextContent::to_json(Self) -> @json.Json
@@ -2080,7 +2080,7 @@ pub(all) enum Item {
   Unknown(String, @json.Json)
 }
 pub fn Item::equal(Self, Self) -> Bool
-pub fn Item::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Item::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Item::not_equal(Self, Self) -> Bool
 pub fn Item::to_json(Self) -> @json.Json
 pub fn Item::to_repr(Self) -> @debug.Repr
@@ -2093,7 +2093,7 @@ pub(all) struct ItemReferenceParam {
   id : String
 }
 pub fn ItemReferenceParam::equal(Self, Self) -> Bool
-pub fn ItemReferenceParam::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ItemReferenceParam::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ItemReferenceParam::new(id~ : String, type_? : String) -> Self
 pub fn ItemReferenceParam::not_equal(Self, Self) -> Bool
 pub fn ItemReferenceParam::to_json(Self) -> @json.Json
@@ -2107,7 +2107,7 @@ pub(all) struct KeyPress {
   keys : Array[String]
 }
 pub fn KeyPress::equal(Self, Self) -> Bool
-pub fn KeyPress::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn KeyPress::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn KeyPress::new(type_~ : String, keys~ : Array[String]) -> Self
 pub fn KeyPress::not_equal(Self, Self) -> Bool
 pub fn KeyPress::to_json(Self) -> @json.Json
@@ -2120,7 +2120,7 @@ pub(all) struct ListModelsResponse {
   data : Array[Model]
 }
 pub fn ListModelsResponse::equal(Self, Self) -> Bool
-pub fn ListModelsResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ListModelsResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ListModelsResponse::new(data~ : Array[Model]) -> Self
 pub fn ListModelsResponse::not_equal(Self, Self) -> Bool
 pub fn ListModelsResponse::to_json(Self) -> @json.Json
@@ -2135,7 +2135,7 @@ pub(all) struct Model {
   owned_by : String?
 }
 pub fn Model::equal(Self, Self) -> Bool
-pub fn Model::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Model::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Model::new(id~ : String, created? : Int64, owned_by? : String) -> Self
 pub fn Model::not_equal(Self, Self) -> Bool
 pub fn Model::to_json(Self) -> @json.Json
@@ -2152,7 +2152,7 @@ pub(all) struct ModelResponseProperties {
   service_tier : @jsonkit.Presence[ServiceTier]
 }
 pub fn ModelResponseProperties::equal(Self, Self) -> Bool
-pub fn ModelResponseProperties::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelResponseProperties::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ModelResponseProperties::new(metadata? : Map[String, String], temperature? : Double, top_p? : Double, user? : String, service_tier? : ServiceTier) -> Self
 pub fn ModelResponseProperties::not_equal(Self, Self) -> Bool
 pub fn ModelResponseProperties::to_json(Self) -> @json.Json
@@ -2167,7 +2167,7 @@ pub(all) struct Move {
   y : Int32
 }
 pub fn Move::equal(Self, Self) -> Bool
-pub fn Move::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Move::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Move::new(type_~ : String, x~ : Int32, y~ : Int32) -> Self
 pub fn Move::not_equal(Self, Self) -> Bool
 pub fn Move::to_json(Self) -> @json.Json
@@ -2183,7 +2183,7 @@ pub(all) enum OutputContent {
   Unknown(String, @json.Json)
 }
 pub fn OutputContent::equal(Self, Self) -> Bool
-pub fn OutputContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OutputContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OutputContent::not_equal(Self, Self) -> Bool
 pub fn OutputContent::to_json(Self) -> @json.Json
 pub fn OutputContent::to_repr(Self) -> @debug.Repr
@@ -2202,7 +2202,7 @@ pub(all) enum OutputItem {
   Unknown(String, @json.Json)
 }
 pub fn OutputItem::equal(Self, Self) -> Bool
-pub fn OutputItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OutputItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OutputItem::not_equal(Self, Self) -> Bool
 pub fn OutputItem::to_json(Self) -> @json.Json
 pub fn OutputItem::to_repr(Self) -> @debug.Repr
@@ -2217,7 +2217,7 @@ pub(all) struct OutputMessage {
   status : OutputMessageStatus
 }
 pub fn OutputMessage::equal(Self, Self) -> Bool
-pub fn OutputMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OutputMessage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OutputMessage::new(id~ : String, type_~ : String, content~ : Array[OutputContent], status~ : OutputMessageStatus) -> Self
 pub fn OutputMessage::not_equal(Self, Self) -> Bool
 pub fn OutputMessage::to_json(Self) -> @json.Json
@@ -2234,7 +2234,7 @@ pub(all) enum OutputMessageStatus {
   Unknown(String)
 }
 pub fn OutputMessageStatus::equal(Self, Self) -> Bool
-pub fn OutputMessageStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OutputMessageStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OutputMessageStatus::not_equal(Self, Self) -> Bool
 pub fn OutputMessageStatus::to_json(Self) -> @json.Json
 pub fn OutputMessageStatus::to_repr(Self) -> @debug.Repr
@@ -2248,7 +2248,7 @@ pub(all) struct OutputTextContent {
   annotations : Array[Annotation]?
 }
 pub fn OutputTextContent::equal(Self, Self) -> Bool
-pub fn OutputTextContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OutputTextContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn OutputTextContent::new(type_~ : String, text~ : String, annotations? : Array[Annotation]) -> Self
 pub fn OutputTextContent::not_equal(Self, Self) -> Bool
 pub fn OutputTextContent::to_json(Self) -> @json.Json
@@ -2262,7 +2262,7 @@ pub(all) struct PredictionContent {
   content : PredictionContentContent
 }
 pub fn PredictionContent::equal(Self, Self) -> Bool
-pub fn PredictionContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PredictionContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn PredictionContent::new(type_~ : String, content~ : PredictionContentContent) -> Self
 pub fn PredictionContent::not_equal(Self, Self) -> Bool
 pub fn PredictionContent::to_json(Self) -> @json.Json
@@ -2277,7 +2277,7 @@ pub(all) enum PredictionContentContent {
   ChatCompletionRequestMessageContentPartTextArray(Array[ChatCompletionRequestMessageContentPartText])
 }
 pub fn PredictionContentContent::equal(Self, Self) -> Bool
-pub fn PredictionContentContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PredictionContentContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn PredictionContentContent::not_equal(Self, Self) -> Bool
 pub fn PredictionContentContent::to_json(Self) -> @json.Json
 pub fn PredictionContentContent::to_repr(Self) -> @debug.Repr
@@ -2290,7 +2290,7 @@ pub(all) struct RankingOptions {
   score_threshold : Double?
 }
 pub fn RankingOptions::equal(Self, Self) -> Bool
-pub fn RankingOptions::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RankingOptions::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn RankingOptions::new(ranker? : RankingOptionsRanker, score_threshold? : Double) -> Self
 pub fn RankingOptions::not_equal(Self, Self) -> Bool
 pub fn RankingOptions::to_json(Self) -> @json.Json
@@ -2306,7 +2306,7 @@ pub(all) enum RankingOptionsRanker {
   Unknown(String)
 }
 pub fn RankingOptionsRanker::equal(Self, Self) -> Bool
-pub fn RankingOptionsRanker::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RankingOptionsRanker::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn RankingOptionsRanker::not_equal(Self, Self) -> Bool
 pub fn RankingOptionsRanker::to_json(Self) -> @json.Json
 pub fn RankingOptionsRanker::to_repr(Self) -> @debug.Repr
@@ -2320,7 +2320,7 @@ pub(all) struct Reasoning {
   generate_summary : @jsonkit.Presence[ReasoningGenerateSummary]
 }
 pub fn Reasoning::equal(Self, Self) -> Bool
-pub fn Reasoning::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Reasoning::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Reasoning::new(effort? : ReasoningEffort, summary? : ReasoningSummary, generate_summary? : ReasoningGenerateSummary) -> Self
 pub fn Reasoning::not_equal(Self, Self) -> Bool
 pub fn Reasoning::to_json(Self) -> @json.Json
@@ -2337,7 +2337,7 @@ pub(all) enum ReasoningEffort {
   Unknown(String)
 }
 pub fn ReasoningEffort::equal(Self, Self) -> Bool
-pub fn ReasoningEffort::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReasoningEffort::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ReasoningEffort::not_equal(Self, Self) -> Bool
 pub fn ReasoningEffort::to_json(Self) -> @json.Json
 pub fn ReasoningEffort::to_repr(Self) -> @debug.Repr
@@ -2353,7 +2353,7 @@ pub(all) enum ReasoningGenerateSummary {
   Unknown(String)
 }
 pub fn ReasoningGenerateSummary::equal(Self, Self) -> Bool
-pub fn ReasoningGenerateSummary::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReasoningGenerateSummary::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ReasoningGenerateSummary::not_equal(Self, Self) -> Bool
 pub fn ReasoningGenerateSummary::to_json(Self) -> @json.Json
 pub fn ReasoningGenerateSummary::to_repr(Self) -> @debug.Repr
@@ -2369,7 +2369,7 @@ pub(all) struct ReasoningItem {
   content : Array[ReasoningItemContentItem]?
 }
 pub fn ReasoningItem::equal(Self, Self) -> Bool
-pub fn ReasoningItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReasoningItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ReasoningItem::new(type_~ : String, id~ : String, summary~ : Array[ReasoningItemSummaryItem], status? : ReasoningItemStatus, content? : Array[ReasoningItemContentItem]) -> Self
 pub fn ReasoningItem::not_equal(Self, Self) -> Bool
 pub fn ReasoningItem::to_json(Self) -> @json.Json
@@ -2382,7 +2382,7 @@ pub(all) struct ReasoningItemContentItem {
   text : String
 }
 pub fn ReasoningItemContentItem::equal(Self, Self) -> Bool
-pub fn ReasoningItemContentItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReasoningItemContentItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ReasoningItemContentItem::new(text~ : String) -> Self
 pub fn ReasoningItemContentItem::not_equal(Self, Self) -> Bool
 pub fn ReasoningItemContentItem::to_json(Self) -> @json.Json
@@ -2399,7 +2399,7 @@ pub(all) enum ReasoningItemStatus {
   Unknown(String)
 }
 pub fn ReasoningItemStatus::equal(Self, Self) -> Bool
-pub fn ReasoningItemStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReasoningItemStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ReasoningItemStatus::not_equal(Self, Self) -> Bool
 pub fn ReasoningItemStatus::to_json(Self) -> @json.Json
 pub fn ReasoningItemStatus::to_repr(Self) -> @debug.Repr
@@ -2411,7 +2411,7 @@ pub(all) struct ReasoningItemSummaryItem {
   text : String
 }
 pub fn ReasoningItemSummaryItem::equal(Self, Self) -> Bool
-pub fn ReasoningItemSummaryItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReasoningItemSummaryItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ReasoningItemSummaryItem::new(text~ : String) -> Self
 pub fn ReasoningItemSummaryItem::not_equal(Self, Self) -> Bool
 pub fn ReasoningItemSummaryItem::to_json(Self) -> @json.Json
@@ -2428,7 +2428,7 @@ pub(all) enum ReasoningSummary {
   Unknown(String)
 }
 pub fn ReasoningSummary::equal(Self, Self) -> Bool
-pub fn ReasoningSummary::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReasoningSummary::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ReasoningSummary::not_equal(Self, Self) -> Bool
 pub fn ReasoningSummary::to_json(Self) -> @json.Json
 pub fn ReasoningSummary::to_repr(Self) -> @debug.Repr
@@ -2441,7 +2441,7 @@ pub(all) struct RefusalContent {
   refusal : String
 }
 pub fn RefusalContent::equal(Self, Self) -> Bool
-pub fn RefusalContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RefusalContent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn RefusalContent::new(type_~ : String, refusal~ : String) -> Self
 pub fn RefusalContent::not_equal(Self, Self) -> Bool
 pub fn RefusalContent::to_json(Self) -> @json.Json
@@ -2476,7 +2476,7 @@ pub(all) struct Response {
   parallel_tool_calls : Bool?
 }
 pub fn Response::equal(Self, Self) -> Bool
-pub fn Response::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Response::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Response::new(model~ : String, id~ : String, created_at~ : Double, output~ : Array[OutputItem], metadata? : Map[String, String], temperature? : Double, top_p? : Double, user? : String, service_tier? : ServiceTier, previous_response_id? : String, reasoning? : Reasoning, max_output_tokens? : Int32, instructions? : String, text? : ResponseText, tools? : Array[Tool], tool_choice? : @json.Json, truncation? : ResponseTruncation, status? : ResponseStatus, error? : ResponseError, incomplete_details? : ResponseIncompleteDetails, output_text? : String, usage? : ResponseUsage, parallel_tool_calls? : Bool) -> Self
 pub fn Response::not_equal(Self, Self) -> Bool
 pub fn Response::to_json(Self) -> @json.Json
@@ -2490,7 +2490,7 @@ pub(all) struct ResponseAudioDeltaEvent {
   delta : String
 }
 pub fn ResponseAudioDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseAudioDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseAudioDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseAudioDeltaEvent::new(type_~ : String, delta~ : String) -> Self
 pub fn ResponseAudioDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseAudioDeltaEvent::to_json(Self) -> @json.Json
@@ -2503,7 +2503,7 @@ pub(all) struct ResponseAudioDoneEvent {
   type_ : String
 }
 pub fn ResponseAudioDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseAudioDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseAudioDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseAudioDoneEvent::new(type_~ : String) -> Self
 pub fn ResponseAudioDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseAudioDoneEvent::to_json(Self) -> @json.Json
@@ -2517,7 +2517,7 @@ pub(all) struct ResponseAudioTranscriptDeltaEvent {
   delta : String
 }
 pub fn ResponseAudioTranscriptDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseAudioTranscriptDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseAudioTranscriptDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseAudioTranscriptDeltaEvent::new(type_~ : String, delta~ : String) -> Self
 pub fn ResponseAudioTranscriptDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseAudioTranscriptDeltaEvent::to_json(Self) -> @json.Json
@@ -2530,7 +2530,7 @@ pub(all) struct ResponseAudioTranscriptDoneEvent {
   type_ : String
 }
 pub fn ResponseAudioTranscriptDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseAudioTranscriptDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseAudioTranscriptDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseAudioTranscriptDoneEvent::new(type_~ : String) -> Self
 pub fn ResponseAudioTranscriptDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseAudioTranscriptDoneEvent::to_json(Self) -> @json.Json
@@ -2545,7 +2545,7 @@ pub(all) struct ResponseCodeInterpreterCallCodeDeltaEvent {
   delta : String
 }
 pub fn ResponseCodeInterpreterCallCodeDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseCodeInterpreterCallCodeDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallCodeDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseCodeInterpreterCallCodeDeltaEvent::new(type_~ : String, output_index~ : Int32, delta~ : String) -> Self
 pub fn ResponseCodeInterpreterCallCodeDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseCodeInterpreterCallCodeDeltaEvent::to_json(Self) -> @json.Json
@@ -2560,7 +2560,7 @@ pub(all) struct ResponseCodeInterpreterCallCodeDoneEvent {
   code : String
 }
 pub fn ResponseCodeInterpreterCallCodeDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseCodeInterpreterCallCodeDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallCodeDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseCodeInterpreterCallCodeDoneEvent::new(type_~ : String, output_index~ : Int32, code~ : String) -> Self
 pub fn ResponseCodeInterpreterCallCodeDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseCodeInterpreterCallCodeDoneEvent::to_json(Self) -> @json.Json
@@ -2575,7 +2575,7 @@ pub(all) struct ResponseCodeInterpreterCallCompletedEvent {
   code_interpreter_call : CodeInterpreterToolCall
 }
 pub fn ResponseCodeInterpreterCallCompletedEvent::equal(Self, Self) -> Bool
-pub fn ResponseCodeInterpreterCallCompletedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallCompletedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseCodeInterpreterCallCompletedEvent::new(type_~ : String, output_index~ : Int32, code_interpreter_call~ : CodeInterpreterToolCall) -> Self
 pub fn ResponseCodeInterpreterCallCompletedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseCodeInterpreterCallCompletedEvent::to_json(Self) -> @json.Json
@@ -2590,7 +2590,7 @@ pub(all) struct ResponseCodeInterpreterCallInProgressEvent {
   code_interpreter_call : CodeInterpreterToolCall
 }
 pub fn ResponseCodeInterpreterCallInProgressEvent::equal(Self, Self) -> Bool
-pub fn ResponseCodeInterpreterCallInProgressEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallInProgressEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseCodeInterpreterCallInProgressEvent::new(type_~ : String, output_index~ : Int32, code_interpreter_call~ : CodeInterpreterToolCall) -> Self
 pub fn ResponseCodeInterpreterCallInProgressEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseCodeInterpreterCallInProgressEvent::to_json(Self) -> @json.Json
@@ -2605,7 +2605,7 @@ pub(all) struct ResponseCodeInterpreterCallInterpretingEvent {
   code_interpreter_call : CodeInterpreterToolCall
 }
 pub fn ResponseCodeInterpreterCallInterpretingEvent::equal(Self, Self) -> Bool
-pub fn ResponseCodeInterpreterCallInterpretingEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallInterpretingEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseCodeInterpreterCallInterpretingEvent::new(type_~ : String, output_index~ : Int32, code_interpreter_call~ : CodeInterpreterToolCall) -> Self
 pub fn ResponseCodeInterpreterCallInterpretingEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseCodeInterpreterCallInterpretingEvent::to_json(Self) -> @json.Json
@@ -2619,7 +2619,7 @@ pub(all) struct ResponseCompletedEvent {
   response : Response
 }
 pub fn ResponseCompletedEvent::equal(Self, Self) -> Bool
-pub fn ResponseCompletedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseCompletedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseCompletedEvent::new(type_~ : String, response~ : Response) -> Self
 pub fn ResponseCompletedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseCompletedEvent::to_json(Self) -> @json.Json
@@ -2636,7 +2636,7 @@ pub(all) struct ResponseContentPartAddedEvent {
   part : OutputContent
 }
 pub fn ResponseContentPartAddedEvent::equal(Self, Self) -> Bool
-pub fn ResponseContentPartAddedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseContentPartAddedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseContentPartAddedEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, content_index~ : Int32, part~ : OutputContent) -> Self
 pub fn ResponseContentPartAddedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseContentPartAddedEvent::to_json(Self) -> @json.Json
@@ -2653,7 +2653,7 @@ pub(all) struct ResponseContentPartDoneEvent {
   part : OutputContent
 }
 pub fn ResponseContentPartDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseContentPartDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseContentPartDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseContentPartDoneEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, content_index~ : Int32, part~ : OutputContent) -> Self
 pub fn ResponseContentPartDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseContentPartDoneEvent::to_json(Self) -> @json.Json
@@ -2667,7 +2667,7 @@ pub(all) struct ResponseCreatedEvent {
   response : Response
 }
 pub fn ResponseCreatedEvent::equal(Self, Self) -> Bool
-pub fn ResponseCreatedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseCreatedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseCreatedEvent::new(type_~ : String, response~ : Response) -> Self
 pub fn ResponseCreatedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseCreatedEvent::to_json(Self) -> @json.Json
@@ -2681,7 +2681,7 @@ pub(all) struct ResponseError {
   message : String
 }
 pub fn ResponseError::equal(Self, Self) -> Bool
-pub fn ResponseError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseError::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseError::new(code~ : ResponseErrorCode, message~ : String) -> Self
 pub fn ResponseError::not_equal(Self, Self) -> Bool
 pub fn ResponseError::to_json(Self) -> @json.Json
@@ -2713,7 +2713,7 @@ pub(all) enum ResponseErrorCode {
   Unknown(String)
 }
 pub fn ResponseErrorCode::equal(Self, Self) -> Bool
-pub fn ResponseErrorCode::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseErrorCode::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseErrorCode::not_equal(Self, Self) -> Bool
 pub fn ResponseErrorCode::to_json(Self) -> @json.Json
 pub fn ResponseErrorCode::to_repr(Self) -> @debug.Repr
@@ -2728,7 +2728,7 @@ pub(all) struct ResponseErrorEvent {
   param : String?
 }
 pub fn ResponseErrorEvent::equal(Self, Self) -> Bool
-pub fn ResponseErrorEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseErrorEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseErrorEvent::new(type_~ : String, message~ : String, code? : String, param? : String) -> Self
 pub fn ResponseErrorEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseErrorEvent::to_json(Self) -> @json.Json
@@ -2742,7 +2742,7 @@ pub(all) struct ResponseFailedEvent {
   response : Response
 }
 pub fn ResponseFailedEvent::equal(Self, Self) -> Bool
-pub fn ResponseFailedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFailedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFailedEvent::new(type_~ : String, response~ : Response) -> Self
 pub fn ResponseFailedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseFailedEvent::to_json(Self) -> @json.Json
@@ -2757,7 +2757,7 @@ pub(all) struct ResponseFileSearchCallCompletedEvent {
   item_id : String
 }
 pub fn ResponseFileSearchCallCompletedEvent::equal(Self, Self) -> Bool
-pub fn ResponseFileSearchCallCompletedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFileSearchCallCompletedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFileSearchCallCompletedEvent::new(type_~ : String, output_index~ : Int32, item_id~ : String) -> Self
 pub fn ResponseFileSearchCallCompletedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseFileSearchCallCompletedEvent::to_json(Self) -> @json.Json
@@ -2772,7 +2772,7 @@ pub(all) struct ResponseFileSearchCallInProgressEvent {
   item_id : String
 }
 pub fn ResponseFileSearchCallInProgressEvent::equal(Self, Self) -> Bool
-pub fn ResponseFileSearchCallInProgressEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFileSearchCallInProgressEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFileSearchCallInProgressEvent::new(type_~ : String, output_index~ : Int32, item_id~ : String) -> Self
 pub fn ResponseFileSearchCallInProgressEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseFileSearchCallInProgressEvent::to_json(Self) -> @json.Json
@@ -2787,7 +2787,7 @@ pub(all) struct ResponseFileSearchCallSearchingEvent {
   item_id : String
 }
 pub fn ResponseFileSearchCallSearchingEvent::equal(Self, Self) -> Bool
-pub fn ResponseFileSearchCallSearchingEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFileSearchCallSearchingEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFileSearchCallSearchingEvent::new(type_~ : String, output_index~ : Int32, item_id~ : String) -> Self
 pub fn ResponseFileSearchCallSearchingEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseFileSearchCallSearchingEvent::to_json(Self) -> @json.Json
@@ -2800,7 +2800,7 @@ pub(all) struct ResponseFormatJsonObject {
   type_ : String
 }
 pub fn ResponseFormatJsonObject::equal(Self, Self) -> Bool
-pub fn ResponseFormatJsonObject::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatJsonObject::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFormatJsonObject::new(type_~ : String) -> Self
 pub fn ResponseFormatJsonObject::not_equal(Self, Self) -> Bool
 pub fn ResponseFormatJsonObject::to_json(Self) -> @json.Json
@@ -2814,7 +2814,7 @@ pub(all) struct ResponseFormatJsonSchema {
   json_schema : ResponseFormatJsonSchemaJsonSchema
 }
 pub fn ResponseFormatJsonSchema::equal(Self, Self) -> Bool
-pub fn ResponseFormatJsonSchema::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatJsonSchema::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFormatJsonSchema::new(type_~ : String, json_schema~ : ResponseFormatJsonSchemaJsonSchema) -> Self
 pub fn ResponseFormatJsonSchema::not_equal(Self, Self) -> Bool
 pub fn ResponseFormatJsonSchema::to_json(Self) -> @json.Json
@@ -2830,7 +2830,7 @@ pub(all) struct ResponseFormatJsonSchemaJsonSchema {
   strict : @jsonkit.Presence[Bool]
 }
 pub fn ResponseFormatJsonSchemaJsonSchema::equal(Self, Self) -> Bool
-pub fn ResponseFormatJsonSchemaJsonSchema::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatJsonSchemaJsonSchema::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFormatJsonSchemaJsonSchema::new(name~ : String, description? : String, schema? : @json.Json, strict? : Bool) -> Self
 pub fn ResponseFormatJsonSchemaJsonSchema::not_equal(Self, Self) -> Bool
 pub fn ResponseFormatJsonSchemaJsonSchema::to_json(Self) -> @json.Json
@@ -2843,7 +2843,7 @@ pub(all) struct ResponseFormatText {
   type_ : String
 }
 pub fn ResponseFormatText::equal(Self, Self) -> Bool
-pub fn ResponseFormatText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatText::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFormatText::new(type_~ : String) -> Self
 pub fn ResponseFormatText::not_equal(Self, Self) -> Bool
 pub fn ResponseFormatText::to_json(Self) -> @json.Json
@@ -2859,7 +2859,7 @@ pub(all) struct ResponseFunctionCallArgumentsDeltaEvent {
   delta : String
 }
 pub fn ResponseFunctionCallArgumentsDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseFunctionCallArgumentsDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFunctionCallArgumentsDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFunctionCallArgumentsDeltaEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, delta~ : String) -> Self
 pub fn ResponseFunctionCallArgumentsDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseFunctionCallArgumentsDeltaEvent::to_json(Self) -> @json.Json
@@ -2875,7 +2875,7 @@ pub(all) struct ResponseFunctionCallArgumentsDoneEvent {
   arguments : String
 }
 pub fn ResponseFunctionCallArgumentsDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseFunctionCallArgumentsDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFunctionCallArgumentsDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseFunctionCallArgumentsDoneEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, arguments~ : String) -> Self
 pub fn ResponseFunctionCallArgumentsDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseFunctionCallArgumentsDoneEvent::to_json(Self) -> @json.Json
@@ -2889,7 +2889,7 @@ pub(all) struct ResponseInProgressEvent {
   response : Response
 }
 pub fn ResponseInProgressEvent::equal(Self, Self) -> Bool
-pub fn ResponseInProgressEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseInProgressEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseInProgressEvent::new(type_~ : String, response~ : Response) -> Self
 pub fn ResponseInProgressEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseInProgressEvent::to_json(Self) -> @json.Json
@@ -2902,7 +2902,7 @@ pub(all) struct ResponseIncompleteDetails {
   reason : ResponseIncompleteDetailsReason?
 }
 pub fn ResponseIncompleteDetails::equal(Self, Self) -> Bool
-pub fn ResponseIncompleteDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseIncompleteDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseIncompleteDetails::new(reason? : ResponseIncompleteDetailsReason) -> Self
 pub fn ResponseIncompleteDetails::not_equal(Self, Self) -> Bool
 pub fn ResponseIncompleteDetails::to_json(Self) -> @json.Json
@@ -2918,7 +2918,7 @@ pub(all) enum ResponseIncompleteDetailsReason {
   Unknown(String)
 }
 pub fn ResponseIncompleteDetailsReason::equal(Self, Self) -> Bool
-pub fn ResponseIncompleteDetailsReason::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseIncompleteDetailsReason::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseIncompleteDetailsReason::not_equal(Self, Self) -> Bool
 pub fn ResponseIncompleteDetailsReason::to_json(Self) -> @json.Json
 pub fn ResponseIncompleteDetailsReason::to_repr(Self) -> @debug.Repr
@@ -2931,7 +2931,7 @@ pub(all) struct ResponseIncompleteEvent {
   response : Response
 }
 pub fn ResponseIncompleteEvent::equal(Self, Self) -> Bool
-pub fn ResponseIncompleteEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseIncompleteEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseIncompleteEvent::new(type_~ : String, response~ : Response) -> Self
 pub fn ResponseIncompleteEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseIncompleteEvent::to_json(Self) -> @json.Json
@@ -2947,7 +2947,7 @@ pub(all) enum ResponseModalitiesItem {
   Custom(String)
 }
 pub fn ResponseModalitiesItem::equal(Self, Self) -> Bool
-pub fn ResponseModalitiesItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseModalitiesItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseModalitiesItem::not_equal(Self, Self) -> Bool
 pub fn ResponseModalitiesItem::to_json(Self) -> @json.Json
 pub fn ResponseModalitiesItem::to_repr(Self) -> @debug.Repr
@@ -2961,7 +2961,7 @@ pub(all) struct ResponseOutputItemAddedEvent {
   item : OutputItem
 }
 pub fn ResponseOutputItemAddedEvent::equal(Self, Self) -> Bool
-pub fn ResponseOutputItemAddedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseOutputItemAddedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseOutputItemAddedEvent::new(type_~ : String, output_index~ : Int32, item~ : OutputItem) -> Self
 pub fn ResponseOutputItemAddedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseOutputItemAddedEvent::to_json(Self) -> @json.Json
@@ -2976,7 +2976,7 @@ pub(all) struct ResponseOutputItemDoneEvent {
   item : OutputItem
 }
 pub fn ResponseOutputItemDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseOutputItemDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseOutputItemDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseOutputItemDoneEvent::new(type_~ : String, output_index~ : Int32, item~ : OutputItem) -> Self
 pub fn ResponseOutputItemDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseOutputItemDoneEvent::to_json(Self) -> @json.Json
@@ -2997,7 +2997,7 @@ pub(all) struct ResponseProperties {
   truncation : @jsonkit.Presence[ResponsePropertiesTruncation]
 }
 pub fn ResponseProperties::equal(Self, Self) -> Bool
-pub fn ResponseProperties::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseProperties::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseProperties::new(previous_response_id? : String, model? : String, reasoning? : Reasoning, max_output_tokens? : Int32, instructions? : String, text? : ResponsePropertiesText, tools? : Array[Tool], tool_choice? : @json.Json, truncation? : ResponsePropertiesTruncation) -> Self
 pub fn ResponseProperties::not_equal(Self, Self) -> Bool
 pub fn ResponseProperties::to_json(Self) -> @json.Json
@@ -3010,7 +3010,7 @@ pub(all) struct ResponsePropertiesText {
   format : TextResponseFormatConfiguration?
 }
 pub fn ResponsePropertiesText::equal(Self, Self) -> Bool
-pub fn ResponsePropertiesText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponsePropertiesText::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponsePropertiesText::new(format? : TextResponseFormatConfiguration) -> Self
 pub fn ResponsePropertiesText::not_equal(Self, Self) -> Bool
 pub fn ResponsePropertiesText::to_json(Self) -> @json.Json
@@ -3026,7 +3026,7 @@ pub(all) enum ResponsePropertiesTruncation {
   Unknown(String)
 }
 pub fn ResponsePropertiesTruncation::equal(Self, Self) -> Bool
-pub fn ResponsePropertiesTruncation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponsePropertiesTruncation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponsePropertiesTruncation::not_equal(Self, Self) -> Bool
 pub fn ResponsePropertiesTruncation::to_json(Self) -> @json.Json
 pub fn ResponsePropertiesTruncation::to_repr(Self) -> @debug.Repr
@@ -3042,7 +3042,7 @@ pub(all) struct ResponseReasoningSummaryPartAddedEvent {
   part : ResponseReasoningSummaryPartAddedEventPart
 }
 pub fn ResponseReasoningSummaryPartAddedEvent::equal(Self, Self) -> Bool
-pub fn ResponseReasoningSummaryPartAddedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartAddedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseReasoningSummaryPartAddedEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, summary_index~ : Int32, part~ : ResponseReasoningSummaryPartAddedEventPart) -> Self
 pub fn ResponseReasoningSummaryPartAddedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseReasoningSummaryPartAddedEvent::to_json(Self) -> @json.Json
@@ -3055,7 +3055,7 @@ pub(all) struct ResponseReasoningSummaryPartAddedEventPart {
   text : String
 }
 pub fn ResponseReasoningSummaryPartAddedEventPart::equal(Self, Self) -> Bool
-pub fn ResponseReasoningSummaryPartAddedEventPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartAddedEventPart::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseReasoningSummaryPartAddedEventPart::new(text~ : String) -> Self
 pub fn ResponseReasoningSummaryPartAddedEventPart::not_equal(Self, Self) -> Bool
 pub fn ResponseReasoningSummaryPartAddedEventPart::to_json(Self) -> @json.Json
@@ -3072,7 +3072,7 @@ pub(all) struct ResponseReasoningSummaryPartDoneEvent {
   part : ResponseReasoningSummaryPartDoneEventPart
 }
 pub fn ResponseReasoningSummaryPartDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseReasoningSummaryPartDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseReasoningSummaryPartDoneEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, summary_index~ : Int32, part~ : ResponseReasoningSummaryPartDoneEventPart) -> Self
 pub fn ResponseReasoningSummaryPartDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseReasoningSummaryPartDoneEvent::to_json(Self) -> @json.Json
@@ -3085,7 +3085,7 @@ pub(all) struct ResponseReasoningSummaryPartDoneEventPart {
   text : String
 }
 pub fn ResponseReasoningSummaryPartDoneEventPart::equal(Self, Self) -> Bool
-pub fn ResponseReasoningSummaryPartDoneEventPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartDoneEventPart::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseReasoningSummaryPartDoneEventPart::new(text~ : String) -> Self
 pub fn ResponseReasoningSummaryPartDoneEventPart::not_equal(Self, Self) -> Bool
 pub fn ResponseReasoningSummaryPartDoneEventPart::to_json(Self) -> @json.Json
@@ -3102,7 +3102,7 @@ pub(all) struct ResponseReasoningSummaryTextDeltaEvent {
   delta : String
 }
 pub fn ResponseReasoningSummaryTextDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseReasoningSummaryTextDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseReasoningSummaryTextDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseReasoningSummaryTextDeltaEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, summary_index~ : Int32, delta~ : String) -> Self
 pub fn ResponseReasoningSummaryTextDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseReasoningSummaryTextDeltaEvent::to_json(Self) -> @json.Json
@@ -3119,7 +3119,7 @@ pub(all) struct ResponseReasoningSummaryTextDoneEvent {
   text : String
 }
 pub fn ResponseReasoningSummaryTextDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseReasoningSummaryTextDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseReasoningSummaryTextDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseReasoningSummaryTextDoneEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, summary_index~ : Int32, text~ : String) -> Self
 pub fn ResponseReasoningSummaryTextDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseReasoningSummaryTextDoneEvent::to_json(Self) -> @json.Json
@@ -3136,7 +3136,7 @@ pub(all) struct ResponseRefusalDeltaEvent {
   delta : String
 }
 pub fn ResponseRefusalDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseRefusalDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseRefusalDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseRefusalDeltaEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, content_index~ : Int32, delta~ : String) -> Self
 pub fn ResponseRefusalDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseRefusalDeltaEvent::to_json(Self) -> @json.Json
@@ -3153,7 +3153,7 @@ pub(all) struct ResponseRefusalDoneEvent {
   refusal : String
 }
 pub fn ResponseRefusalDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseRefusalDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseRefusalDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseRefusalDoneEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, content_index~ : Int32, refusal~ : String) -> Self
 pub fn ResponseRefusalDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseRefusalDoneEvent::to_json(Self) -> @json.Json
@@ -3171,7 +3171,7 @@ pub(all) enum ResponseStatus {
   Unknown(String)
 }
 pub fn ResponseStatus::equal(Self, Self) -> Bool
-pub fn ResponseStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseStatus::not_equal(Self, Self) -> Bool
 pub fn ResponseStatus::to_json(Self) -> @json.Json
 pub fn ResponseStatus::to_repr(Self) -> @debug.Repr
@@ -3220,7 +3220,7 @@ pub(all) enum ResponseStreamEvent {
   Unknown(String, @json.Json)
 }
 pub fn ResponseStreamEvent::equal(Self, Self) -> Bool
-pub fn ResponseStreamEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseStreamEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseStreamEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseStreamEvent::to_json(Self) -> @json.Json
 pub fn ResponseStreamEvent::to_repr(Self) -> @debug.Repr
@@ -3232,7 +3232,7 @@ pub(all) struct ResponseText {
   format : TextResponseFormatConfiguration?
 }
 pub fn ResponseText::equal(Self, Self) -> Bool
-pub fn ResponseText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseText::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseText::new(format? : TextResponseFormatConfiguration) -> Self
 pub fn ResponseText::not_equal(Self, Self) -> Bool
 pub fn ResponseText::to_json(Self) -> @json.Json
@@ -3250,7 +3250,7 @@ pub(all) struct ResponseTextAnnotationDeltaEvent {
   annotation : Annotation
 }
 pub fn ResponseTextAnnotationDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseTextAnnotationDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseTextAnnotationDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseTextAnnotationDeltaEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, content_index~ : Int32, annotation_index~ : Int32, annotation~ : Annotation) -> Self
 pub fn ResponseTextAnnotationDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseTextAnnotationDeltaEvent::to_json(Self) -> @json.Json
@@ -3267,7 +3267,7 @@ pub(all) struct ResponseTextDeltaEvent {
   delta : String
 }
 pub fn ResponseTextDeltaEvent::equal(Self, Self) -> Bool
-pub fn ResponseTextDeltaEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseTextDeltaEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseTextDeltaEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, content_index~ : Int32, delta~ : String) -> Self
 pub fn ResponseTextDeltaEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseTextDeltaEvent::to_json(Self) -> @json.Json
@@ -3284,7 +3284,7 @@ pub(all) struct ResponseTextDoneEvent {
   text : String
 }
 pub fn ResponseTextDoneEvent::equal(Self, Self) -> Bool
-pub fn ResponseTextDoneEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseTextDoneEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseTextDoneEvent::new(type_~ : String, item_id~ : String, output_index~ : Int32, content_index~ : Int32, text~ : String) -> Self
 pub fn ResponseTextDoneEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseTextDoneEvent::to_json(Self) -> @json.Json
@@ -3300,7 +3300,7 @@ pub(all) enum ResponseTruncation {
   Unknown(String)
 }
 pub fn ResponseTruncation::equal(Self, Self) -> Bool
-pub fn ResponseTruncation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseTruncation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseTruncation::not_equal(Self, Self) -> Bool
 pub fn ResponseTruncation::to_json(Self) -> @json.Json
 pub fn ResponseTruncation::to_repr(Self) -> @debug.Repr
@@ -3316,7 +3316,7 @@ pub(all) struct ResponseUsage {
   total_tokens : Int32
 }
 pub fn ResponseUsage::equal(Self, Self) -> Bool
-pub fn ResponseUsage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseUsage::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseUsage::new(input_tokens~ : Int32, output_tokens~ : Int32, total_tokens~ : Int32, input_tokens_details? : ResponseUsageInputTokensDetails, output_tokens_details? : ResponseUsageOutputTokensDetails) -> Self
 pub fn ResponseUsage::not_equal(Self, Self) -> Bool
 pub fn ResponseUsage::to_json(Self) -> @json.Json
@@ -3329,7 +3329,7 @@ pub(all) struct ResponseUsageInputTokensDetails {
   cached_tokens : Int32
 }
 pub fn ResponseUsageInputTokensDetails::equal(Self, Self) -> Bool
-pub fn ResponseUsageInputTokensDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseUsageInputTokensDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseUsageInputTokensDetails::new(cached_tokens~ : Int32) -> Self
 pub fn ResponseUsageInputTokensDetails::not_equal(Self, Self) -> Bool
 pub fn ResponseUsageInputTokensDetails::to_json(Self) -> @json.Json
@@ -3342,7 +3342,7 @@ pub(all) struct ResponseUsageOutputTokensDetails {
   reasoning_tokens : Int32
 }
 pub fn ResponseUsageOutputTokensDetails::equal(Self, Self) -> Bool
-pub fn ResponseUsageOutputTokensDetails::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseUsageOutputTokensDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseUsageOutputTokensDetails::new(reasoning_tokens~ : Int32) -> Self
 pub fn ResponseUsageOutputTokensDetails::not_equal(Self, Self) -> Bool
 pub fn ResponseUsageOutputTokensDetails::to_json(Self) -> @json.Json
@@ -3357,7 +3357,7 @@ pub(all) struct ResponseWebSearchCallCompletedEvent {
   item_id : String
 }
 pub fn ResponseWebSearchCallCompletedEvent::equal(Self, Self) -> Bool
-pub fn ResponseWebSearchCallCompletedEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseWebSearchCallCompletedEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseWebSearchCallCompletedEvent::new(type_~ : String, output_index~ : Int32, item_id~ : String) -> Self
 pub fn ResponseWebSearchCallCompletedEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseWebSearchCallCompletedEvent::to_json(Self) -> @json.Json
@@ -3372,7 +3372,7 @@ pub(all) struct ResponseWebSearchCallInProgressEvent {
   item_id : String
 }
 pub fn ResponseWebSearchCallInProgressEvent::equal(Self, Self) -> Bool
-pub fn ResponseWebSearchCallInProgressEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseWebSearchCallInProgressEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseWebSearchCallInProgressEvent::new(type_~ : String, output_index~ : Int32, item_id~ : String) -> Self
 pub fn ResponseWebSearchCallInProgressEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseWebSearchCallInProgressEvent::to_json(Self) -> @json.Json
@@ -3387,7 +3387,7 @@ pub(all) struct ResponseWebSearchCallSearchingEvent {
   item_id : String
 }
 pub fn ResponseWebSearchCallSearchingEvent::equal(Self, Self) -> Bool
-pub fn ResponseWebSearchCallSearchingEvent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseWebSearchCallSearchingEvent::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ResponseWebSearchCallSearchingEvent::new(type_~ : String, output_index~ : Int32, item_id~ : String) -> Self
 pub fn ResponseWebSearchCallSearchingEvent::not_equal(Self, Self) -> Bool
 pub fn ResponseWebSearchCallSearchingEvent::to_json(Self) -> @json.Json
@@ -3400,7 +3400,7 @@ pub(all) struct Screenshot {
   type_ : String
 }
 pub fn Screenshot::equal(Self, Self) -> Bool
-pub fn Screenshot::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Screenshot::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Screenshot::new(type_~ : String) -> Self
 pub fn Screenshot::not_equal(Self, Self) -> Bool
 pub fn Screenshot::to_json(Self) -> @json.Json
@@ -3417,7 +3417,7 @@ pub(all) struct Scroll {
   scroll_y : Int32
 }
 pub fn Scroll::equal(Self, Self) -> Bool
-pub fn Scroll::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Scroll::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Scroll::new(type_~ : String, x~ : Int32, y~ : Int32, scroll_x~ : Int32, scroll_y~ : Int32) -> Self
 pub fn Scroll::not_equal(Self, Self) -> Bool
 pub fn Scroll::to_json(Self) -> @json.Json
@@ -3434,7 +3434,7 @@ pub(all) enum ServiceTier {
   Unknown(String)
 }
 pub fn ServiceTier::equal(Self, Self) -> Bool
-pub fn ServiceTier::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ServiceTier::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn ServiceTier::not_equal(Self, Self) -> Bool
 pub fn ServiceTier::to_json(Self) -> @json.Json
 pub fn ServiceTier::to_repr(Self) -> @debug.Repr
@@ -3448,7 +3448,7 @@ pub(all) enum StopConfiguration {
   TextArray(Array[String])
 }
 pub fn StopConfiguration::equal(Self, Self) -> Bool
-pub fn StopConfiguration::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn StopConfiguration::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn StopConfiguration::not_equal(Self, Self) -> Bool
 pub fn StopConfiguration::to_json(Self) -> @json.Json
 pub fn StopConfiguration::to_repr(Self) -> @debug.Repr
@@ -3464,7 +3464,7 @@ pub(all) enum TextResponseFormatConfiguration {
   Unknown(String, @json.Json)
 }
 pub fn TextResponseFormatConfiguration::equal(Self, Self) -> Bool
-pub fn TextResponseFormatConfiguration::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextResponseFormatConfiguration::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn TextResponseFormatConfiguration::not_equal(Self, Self) -> Bool
 pub fn TextResponseFormatConfiguration::to_json(Self) -> @json.Json
 pub fn TextResponseFormatConfiguration::to_repr(Self) -> @debug.Repr
@@ -3480,7 +3480,7 @@ pub(all) struct TextResponseFormatJsonSchema {
   strict : @jsonkit.Presence[Bool]
 }
 pub fn TextResponseFormatJsonSchema::equal(Self, Self) -> Bool
-pub fn TextResponseFormatJsonSchema::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextResponseFormatJsonSchema::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn TextResponseFormatJsonSchema::new(type_~ : String, name~ : String, schema~ : @json.Json, description? : String, strict? : Bool) -> Self
 pub fn TextResponseFormatJsonSchema::not_equal(Self, Self) -> Bool
 pub fn TextResponseFormatJsonSchema::to_json(Self) -> @json.Json
@@ -3498,7 +3498,7 @@ pub(all) enum Tool {
   Unknown(String, @json.Json)
 }
 pub fn Tool::equal(Self, Self) -> Bool
-pub fn Tool::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Tool::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Tool::not_equal(Self, Self) -> Bool
 pub fn Tool::to_json(Self) -> @json.Json
 pub fn Tool::to_repr(Self) -> @debug.Repr
@@ -3511,7 +3511,7 @@ pub(all) struct Type {
   text : String
 }
 pub fn Type::equal(Self, Self) -> Bool
-pub fn Type::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Type::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Type::new(type_~ : String, text~ : String) -> Self
 pub fn Type::not_equal(Self, Self) -> Bool
 pub fn Type::to_json(Self) -> @json.Json
@@ -3528,7 +3528,7 @@ pub(all) struct UrlCitationBody {
   title : String
 }
 pub fn UrlCitationBody::equal(Self, Self) -> Bool
-pub fn UrlCitationBody::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UrlCitationBody::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn UrlCitationBody::new(type_~ : String, url~ : String, start_index~ : Int32, end_index~ : Int32, title~ : String) -> Self
 pub fn UrlCitationBody::not_equal(Self, Self) -> Bool
 pub fn UrlCitationBody::to_json(Self) -> @json.Json
@@ -3544,7 +3544,7 @@ pub(all) enum VectorStoreFileAttributesValue {
   Bool(Bool)
 }
 pub fn VectorStoreFileAttributesValue::equal(Self, Self) -> Bool
-pub fn VectorStoreFileAttributesValue::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn VectorStoreFileAttributesValue::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn VectorStoreFileAttributesValue::not_equal(Self, Self) -> Bool
 pub fn VectorStoreFileAttributesValue::to_json(Self) -> @json.Json
 pub fn VectorStoreFileAttributesValue::to_repr(Self) -> @debug.Repr
@@ -3556,7 +3556,7 @@ pub(all) struct Wait {
   type_ : String
 }
 pub fn Wait::equal(Self, Self) -> Bool
-pub fn Wait::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Wait::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn Wait::new(type_~ : String) -> Self
 pub fn Wait::not_equal(Self, Self) -> Bool
 pub fn Wait::to_json(Self) -> @json.Json
@@ -3573,7 +3573,7 @@ pub(all) enum WebSearchContextSize {
   Custom(String)
 }
 pub fn WebSearchContextSize::equal(Self, Self) -> Bool
-pub fn WebSearchContextSize::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WebSearchContextSize::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn WebSearchContextSize::not_equal(Self, Self) -> Bool
 pub fn WebSearchContextSize::to_json(Self) -> @json.Json
 pub fn WebSearchContextSize::to_repr(Self) -> @debug.Repr
@@ -3588,7 +3588,7 @@ pub(all) struct WebSearchLocation {
   timezone : String?
 }
 pub fn WebSearchLocation::equal(Self, Self) -> Bool
-pub fn WebSearchLocation::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WebSearchLocation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn WebSearchLocation::new(country? : String, region? : String, city? : String, timezone? : String) -> Self
 pub fn WebSearchLocation::not_equal(Self, Self) -> Bool
 pub fn WebSearchLocation::to_json(Self) -> @json.Json
@@ -3603,7 +3603,7 @@ pub(all) struct WebSearchPreviewTool {
   search_context_size : WebSearchPreviewToolSearchContextSize?
 }
 pub fn WebSearchPreviewTool::equal(Self, Self) -> Bool
-pub fn WebSearchPreviewTool::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WebSearchPreviewTool::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn WebSearchPreviewTool::new(type_~ : String, user_location? : ApproximateLocation, search_context_size? : WebSearchPreviewToolSearchContextSize) -> Self
 pub fn WebSearchPreviewTool::not_equal(Self, Self) -> Bool
 pub fn WebSearchPreviewTool::to_json(Self) -> @json.Json
@@ -3620,7 +3620,7 @@ pub(all) enum WebSearchPreviewToolSearchContextSize {
   Unknown(String)
 }
 pub fn WebSearchPreviewToolSearchContextSize::equal(Self, Self) -> Bool
-pub fn WebSearchPreviewToolSearchContextSize::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WebSearchPreviewToolSearchContextSize::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn WebSearchPreviewToolSearchContextSize::not_equal(Self, Self) -> Bool
 pub fn WebSearchPreviewToolSearchContextSize::to_json(Self) -> @json.Json
 pub fn WebSearchPreviewToolSearchContextSize::to_repr(Self) -> @debug.Repr
@@ -3634,7 +3634,7 @@ pub(all) struct WebSearchToolCall {
   status : WebSearchToolCallStatus
 }
 pub fn WebSearchToolCall::equal(Self, Self) -> Bool
-pub fn WebSearchToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WebSearchToolCall::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn WebSearchToolCall::new(id~ : String, type_~ : String, status~ : WebSearchToolCallStatus) -> Self
 pub fn WebSearchToolCall::not_equal(Self, Self) -> Bool
 pub fn WebSearchToolCall::to_json(Self) -> @json.Json
@@ -3652,7 +3652,7 @@ pub(all) enum WebSearchToolCallStatus {
   Unknown(String)
 }
 pub fn WebSearchToolCallStatus::equal(Self, Self) -> Bool
-pub fn WebSearchToolCallStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WebSearchToolCallStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn WebSearchToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn WebSearchToolCallStatus::to_json(Self) -> @json.Json
 pub fn WebSearchToolCallStatus::to_repr(Self) -> @debug.Repr

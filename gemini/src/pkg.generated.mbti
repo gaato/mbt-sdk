@@ -80,7 +80,7 @@ pub(all) struct GoogleError {
   error : GoogleErrorStatus
 }
 pub fn GoogleError::equal(Self, Self) -> Bool
-pub fn GoogleError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleError::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn GoogleError::new(error~ : GoogleErrorStatus) -> Self
 pub fn GoogleError::not_equal(Self, Self) -> Bool
 pub fn GoogleError::to_json(Self) -> @json.Json
@@ -96,7 +96,7 @@ pub(all) struct GoogleErrorStatus {
   details : Array[@json.Json]?
 }
 pub fn GoogleErrorStatus::equal(Self, Self) -> Bool
-pub fn GoogleErrorStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleErrorStatus::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
 pub fn GoogleErrorStatus::new(code~ : Int32, message~ : String, status~ : String, details? : Array[@json.Json]) -> Self
 pub fn GoogleErrorStatus::not_equal(Self, Self) -> Bool
 pub fn GoogleErrorStatus::to_json(Self) -> @json.Json

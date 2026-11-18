@@ -247,7 +247,7 @@ async fn Connection::send(
   defer (if !complete { self.close() })
   self.writer.write(message.encode(envelope=self.envelope)) catch {
     error => {
-      // core/async after MoonBit 0.10.20 raises WriterError, which has no
+      // core/async raises WriterError, which has no
       // to_string of its own; Error's renders it as before.
       let error : Error = error
       let failure = RpcFailure::Transport(error.to_string())

@@ -25,6 +25,28 @@ async fn[T, M : @client.ResponseMode] OpenAI::send_with(
   reader : @client.ResponsePlan[Result[T, @client.ResponseFailure], M],
   bucket : String,
 ) -> Result[T, OpenAIFailure] {
+  if self.bearer_error is Some(message) {
+    return Err(Validation(message))
+  }
+  try {
+    request.headers.validate()
+    @http.Headers::of(
+      self.default_headers
+      .iter()
+      .filter(pair => !request.headers.contains(pair.0))
+      .collect(),
+    ).validate()
+  } catch {
+    @http.TransportError(detail~, ..) => return Err(Validation(detail))
+  }
+  // The runtime merges its Authorization default after the plan is built.
+  let request = request.attribute(
+    @http.credential_headers,
+    [
+      ..request.attributes.get(@http.credential_headers).unwrap_or([]),
+      "authorization",
+    ],
+  )
   try {
     match
       @client.RequestPlan::new(request, reader)

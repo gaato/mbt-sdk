@@ -9,7 +9,13 @@ repository consumes those interfaces; it does not implement HTTP engines.
 - Expected HTTP and deserialization failures are Result values containing
   mttp ResponseFailure, with the original response head and at most 1 MiB of
   diagnostic body. SDK validation failures are values too.
-- TransportError, cancellation and unknown callback exceptions remain effects.
+- Invalid header values on SDK requests and SDK-owned defaults are refused
+  before sending and surfaced as SDK validation failures. The runtime
+  validates defaults on a supplied Client. Generated facades return runtime
+  `TransportError` values as `Failure::Transport`, including invalid Client
+  defaults. Environment credential loading trims outer whitespace.
+- Hand-written facades raise runtime transport errors. Cancellation and
+  user callback errors remain effects.
   A streaming callback runs once, after attempt release/observation, and is
   never retried. SSE bodies close on EOF, sentinels, failure and cancellation.
 - Buffered replies default to mttp's 64 MiB limit. `max_body_bytes` overrides
@@ -20,6 +26,8 @@ repository consumes those interfaces; it does not implement HTTP engines.
   stops on Retry-After above 120 seconds; Anthropic has no server-wait cap.
   Both use 600-second attempt budgets. Backends enforce those budgets;
   a total call budget requires Timer and includes admission, waits and callbacks.
+  Statuses 600–999 are HTTP failures like 5xx. The default provider policies
+  retry them only when an explicit override such as `x-should-retry: true` applies.
 - GitHub defaults to three conservative retries and its documented primary,
   secondary and GraphQL conditions. Writes/GraphQL/search are paced, and
   caller-supplied gates add serialization. Header windows are shared using

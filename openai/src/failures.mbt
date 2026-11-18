@@ -143,7 +143,7 @@ fn non_transient_quota(body : Bytes) -> Bool {
       | "project_spend_limit_exceeded"
       | "organization_usage_limit_exceeded"
       | "Throttling.AllocationQuota"
-      | "AllocationQuota.FreeTierOnly"
+      | "AllocationQuota.FreeTierOnly",
     ) => true
     _ =>
       match error.get("type") {
@@ -151,8 +151,8 @@ fn non_transient_quota(body : Bytes) -> Bool {
           String(
             "insufficient_quota"
             | "insufficient_balance"
-            | "account_disabled"
-          )
+            | "account_disabled",
+          ),
         ) => true
         _ => false
       }

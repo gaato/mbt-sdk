@@ -21,6 +21,7 @@ pub(all) enum Failure {
   Http(HttpFailure)
   Transport(@http.TransportError)
   Decode(@client.ResponseFailure)
+  Validation(operation~ : String, parameter~ : String, message~ : String)
 }
 
 ///|

@@ -29,7 +29,10 @@ pub async fn[T] GitHub::call(
           }
       }
     }),
-  ).body
+  ).body catch {
+    ExpectedFailure(error) => Err(error)
+    error => raise error
+  }
 }
 
 ///|
@@ -38,7 +41,10 @@ pub async fn GitHub::send(
   self : GitHub,
   request : @http.Request,
 ) -> Result[@client.Reply[Bytes], GitHubFailure] {
-  let reply = self.send_with(request, http_reader())
+  let reply = self.send_with(request, http_reader()) catch {
+    ExpectedFailure(error) => return Err(error)
+    error => raise error
+  }
   match reply.body {
     Err(error) => Err(error)
     Ok(body) =>
@@ -84,11 +90,46 @@ async fn[T] GitHub::send_with(
   request : @http.Request,
   reader : @client.ResponseAs[Result[T, GitHubFailure]],
 ) -> @client.Reply[Result[T, GitHubFailure]] {
-  @client.RequestPlan::new(request, reader)
-  .attribute(
-    @client.rate_limit_bucket,
+  self.send_marked(
+    request,
+    reader,
     rate_limit_bucket(request.meth.to_string(), request.url),
   )
+}
+
+///|
+async fn[T] GitHub::send_marked(
+  self : GitHub,
+  request : @http.Request,
+  reader : @client.ResponseAs[Result[T, GitHubFailure]],
+  bucket : String,
+) -> @client.Reply[Result[T, GitHubFailure]] {
+  if !request.headers.contains("authorization") &&
+    self.bearer_error is Some(message) {
+    raise ExpectedFailure(Validation(message))
+  }
+  try {
+    request.headers.validate()
+    @http.Headers::of(
+      self.default_headers
+      .iter()
+      .filter(pair => !request.headers.contains(pair.0))
+      .collect(),
+    ).validate()
+  } catch {
+    @http.TransportError(detail~, ..) =>
+      raise ExpectedFailure(Validation(detail))
+  }
+  // Both SDK-owned and caller-owned runtime defaults are merged after this.
+  let request = request.attribute(
+    @http.credential_headers,
+    [
+      ..request.attributes.get(@http.credential_headers).unwrap_or([]),
+      "authorization",
+    ],
+  )
+  @client.RequestPlan::new(request, reader)
+  .attribute(@client.rate_limit_bucket, bucket)
   .send(self.client, decide_retry=(attempt, context) => {
     self.retry_decision(attempt, context)
   })

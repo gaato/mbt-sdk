@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **Adopt MoonBit 0.10.21 IO traits.** The new reader and writer implementations are now in the regular test tree.
+
 ## [0.2.0] - 2026-11-10
 
 ### Changed

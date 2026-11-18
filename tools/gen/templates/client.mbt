@@ -45,8 +45,10 @@ pub fn __CLIENT__::new(
 
 ///|
 /// Wraps the caller's Client; its policies and retry budget apply.
-/// Add this SDK's apiKey header names to the Client's RedirectConfig.credential_headers:
-/// from_client cannot enforce their removal on cross-origin redirects.
+/// From mttp_core 0.3.0, SDK credential headers are marked on each request.
+/// They are stripped when the host, port or scheme changes, except on a
+/// same-host HTTP port 80 to HTTPS port 443 upgrade. HTTPS to HTTP is refused
+/// by default.
 /// __QUERY_WARNING__
 pub fn __CLIENT__::from_client(
   client : @client.Client,
@@ -88,7 +90,7 @@ fn __CLIENT__::operation_base(self : __CLIENT__, server : String) -> String {
 }
 
 ///|
-fn __CLIENT__::prepare(self : __CLIENT__, original : @http.Request, operation : String) -> @http.Request {
+fn __CLIENT__::prepare(self : __CLIENT__, original : @http.Request, operation : String) -> Result[@http.Request, Failure] {
   let (use_auth, server) = self.operation_config(operation)
   let base = self.operation_base(server)
   let mut request = { ..original, url: @http.join_url(base, original.url) }
@@ -98,10 +100,24 @@ fn __CLIENT__::prepare(self : __CLIENT__, original : @http.Request, operation : 
   } catch { _ => false }
   let headers = request.headers__STRIP_HEADERS__
   request = { ..request, headers }
-  if use_auth && trusted { request = self.authenticate(request) }
+  try {
+    if use_auth && trusted { request = self.authenticate(request) }
+    request.headers.validate()
+  } catch {
+    @http.TransportError(detail~, ..) =>
+      return Err(Validation(operation~, parameter="headers", message=detail))
+  }
+  // Client defaults merge after preparation, even with anonymous SDK auth.
+  let credential_headers = request.attributes.get(@http.credential_headers).unwrap_or([]).copy()
+  for name in [__REQUEST_CREDENTIAL_HEADERS__] {
+    if !credential_headers.iter().any(existing => existing.to_lower() == name) {
+      credential_headers.push(name)
+    }
+  }
   __IDEMPOTENCY__
-  request.attribute(@client.rate_limit_bucket, __PROVIDER__ + ":" + operation)
-    .attribute(@client.operation_id, operation)
+  Ok(request.attribute(@http.credential_headers, credential_headers)
+    .attribute(@client.rate_limit_bucket, __PROVIDER__ + ":" + operation)
+    .attribute(@client.operation_id, operation))
 }
 
 ///|
@@ -115,8 +131,12 @@ fn response_failure(operation : String, error : @client.ResponseFailure) -> Fail
 ///|
 /// Buffers and consumes a response; HTTP failures retain status, headers and body.
 pub async fn __CLIENT__::send(self : __CLIENT__, request : @http.Request, operation~ : String = self.infer_operation(request)) -> Result[@client.Reply[Bytes], Failure] {
+  let request = match self.prepare(request, operation) {
+    Ok(request) => request
+    Err(error) => return Err(error)
+  }
   try {
-    let reply = self.client.send(@client.request(self.prepare(request, operation)).response(@client.as_bytes()))
+    let reply = self.client.send(@client.request(request).response(@client.as_bytes()))
     match reply.body {
       Ok(body) => Ok({ status: reply.status, headers: reply.headers, body, request: reply.request, attributes: reply.attributes })
       Err(error) => Err(response_failure(operation, error))
@@ -150,14 +170,30 @@ pub async fn __CLIENT__::stream(self : __CLIENT__, request : @http.Request, rece
 }
 
 ///|
+priv suberror CallbackTransport {
+  CallbackTransport(@http.TransportError)
+}
+
+///|
 async fn __CLIENT__::stream_with_head(self : __CLIENT__, request : @http.Request, receive : async (@sse.SseEvent) -> Unit, stop~ : (@http.ResponseHead, @sse.SseEvent) -> Bool, operation~ : String) -> Result[Unit, Failure] {
+  let request = match self.prepare(request, operation) {
+    Ok(request) => request
+    Err(error) => return Err(error)
+  }
+  let reader = @client.from_head(head => @client.as_sse(event => {
+    receive(event) catch {
+      @http.TransportError(..) as error => raise CallbackTransport(error)
+      error => raise error
+    }
+  }, stop=event => stop(head, event)))
   try {
-    let reply = self.client.send(@client.request(self.prepare(request, operation)).response(@client.from_head(head => @client.as_sse(receive, stop=event => stop(head, event)))))
+    let reply = self.client.send(@client.request(request).response(reader))
     match reply.body {
       Ok(value) => Ok(value)
       Err(error) => Err(response_failure(operation, error))
     }
   } catch {
+    CallbackTransport(error) => raise error
     @http.TransportError(..) as error => Err(Transport(error))
     error => raise error
   }

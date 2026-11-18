@@ -854,7 +854,7 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContentPart wit
 pub(all) enum ChatCompletionRequestAssistantMessageContent {
   Text(String)
   ChatCompletionRequestAssistantMessageContentPartArray(
-    Array[ChatCompletionRequestAssistantMessageContentPart]
+    Array[ChatCompletionRequestAssistantMessageContentPart],
   )
 }
 
@@ -882,7 +882,7 @@ pub impl ToJson for ChatCompletionRequestAssistantMessageContent with fn to_json
     ChatCompletionRequestAssistantMessageContent::Text(value) =>
       @json.Json::Json(value)
     ChatCompletionRequestAssistantMessageContent::ChatCompletionRequestAssistantMessageContentPartArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -1136,7 +1136,7 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessage with fn from_j
 pub(all) enum ChatCompletionRequestDeveloperMessageContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(
-    Array[ChatCompletionRequestMessageContentPartText]
+    Array[ChatCompletionRequestMessageContentPartText],
   )
 }
 
@@ -1164,7 +1164,7 @@ pub impl ToJson for ChatCompletionRequestDeveloperMessageContent with fn to_json
     ChatCompletionRequestDeveloperMessageContent::Text(value) =>
       @json.Json::Json(value)
     ChatCompletionRequestDeveloperMessageContent::ChatCompletionRequestMessageContentPartTextArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -1390,7 +1390,7 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessageContentPart with f
 pub(all) enum ChatCompletionRequestSystemMessageContent {
   Text(String)
   ChatCompletionRequestSystemMessageContentPartArray(
-    Array[ChatCompletionRequestSystemMessageContentPart]
+    Array[ChatCompletionRequestSystemMessageContentPart],
   )
 }
 
@@ -1415,7 +1415,7 @@ pub impl ToJson for ChatCompletionRequestSystemMessageContent with fn to_json(
     ChatCompletionRequestSystemMessageContent::Text(value) =>
       @json.Json::Json(value)
     ChatCompletionRequestSystemMessageContent::ChatCompletionRequestSystemMessageContentPartArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -2152,7 +2152,7 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessageContentPart with fn 
 pub(all) enum ChatCompletionRequestUserMessageContent {
   Text(String)
   ChatCompletionRequestUserMessageContentPartArray(
-    Array[ChatCompletionRequestUserMessageContentPart]
+    Array[ChatCompletionRequestUserMessageContentPart],
   )
 }
 
@@ -2175,7 +2175,7 @@ pub impl ToJson for ChatCompletionRequestUserMessageContent with fn to_json(
     ChatCompletionRequestUserMessageContent::Text(value) =>
       @json.Json::Json(value)
     ChatCompletionRequestUserMessageContent::ChatCompletionRequestUserMessageContentPartArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -2339,7 +2339,7 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessageContentPart with fn 
 pub(all) enum ChatCompletionRequestToolMessageContent {
   Text(String)
   ChatCompletionRequestToolMessageContentPartArray(
-    Array[ChatCompletionRequestToolMessageContentPart]
+    Array[ChatCompletionRequestToolMessageContentPart],
   )
 }
 
@@ -2362,7 +2362,7 @@ pub impl ToJson for ChatCompletionRequestToolMessageContent with fn to_json(
     ChatCompletionRequestToolMessageContent::Text(value) =>
       @json.Json::Json(value)
     ChatCompletionRequestToolMessageContent::ChatCompletionRequestToolMessageContentPartArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -5762,7 +5762,7 @@ pub impl @json.FromJson for StopConfiguration with fn from_json(value, path) {
 pub(all) enum PredictionContentContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(
-    Array[ChatCompletionRequestMessageContentPartText]
+    Array[ChatCompletionRequestMessageContentPartText],
   )
 }
 
@@ -5782,7 +5782,7 @@ pub impl ToJson for PredictionContentContent with fn to_json(self) {
   match self {
     PredictionContentContent::Text(value) => @json.Json::Json(value)
     PredictionContentContent::ChatCompletionRequestMessageContentPartTextArray(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -6016,7 +6016,7 @@ pub impl ToJson for CreateChatCompletionRequestFunctionCall with fn to_json(
     CreateChatCompletionRequestFunctionCall::Text(value) =>
       @json.Json::Json(value)
     CreateChatCompletionRequestFunctionCall::ChatCompletionFunctionCallOption(
-      value
+      value,
     ) => @json.Json::Json(value)
   }
 }
@@ -14491,17 +14491,17 @@ pub(all) enum ResponseStreamEvent {
   ResponseAudioTranscriptDelta(ResponseAudioTranscriptDeltaEvent)
   ResponseAudioTranscriptDone(ResponseAudioTranscriptDoneEvent)
   ResponseCodeInterpreterCallCodeDelta(
-    ResponseCodeInterpreterCallCodeDeltaEvent
+    ResponseCodeInterpreterCallCodeDeltaEvent,
   )
   ResponseCodeInterpreterCallCodeDone(ResponseCodeInterpreterCallCodeDoneEvent)
   ResponseCodeInterpreterCallCompleted(
-    ResponseCodeInterpreterCallCompletedEvent
+    ResponseCodeInterpreterCallCompletedEvent,
   )
   ResponseCodeInterpreterCallInProgress(
-    ResponseCodeInterpreterCallInProgressEvent
+    ResponseCodeInterpreterCallInProgressEvent,
   )
   ResponseCodeInterpreterCallInterpreting(
-    ResponseCodeInterpreterCallInterpretingEvent
+    ResponseCodeInterpreterCallInterpretingEvent,
   )
   ResponseCompleted(ResponseCompletedEvent)
   ResponseContentPartAdded(ResponseContentPartAddedEvent)

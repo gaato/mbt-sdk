@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **Build with mttp_core 0.3.0 and MoonBit 0.10.21.** The regenerated codec interfaces use the canonical JSON decode context name.
+
 ## [0.2.0] - 2026-11-10
 
 ### Changed

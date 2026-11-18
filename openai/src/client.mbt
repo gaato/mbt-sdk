@@ -2,6 +2,8 @@
 /// A thin OpenAI client backed by the runtime-free mttp Client.
 pub struct OpenAI {
   priv client : @client.Client
+  priv default_headers : @http.Headers
+  priv bearer_error : String?
 }
 
 ///|
@@ -72,11 +74,18 @@ pub fn OpenAI::new(
       timer?,
       total_ms?=total_timeout_ms,
     ),
+    default_headers: headers,
+    bearer_error: try {
+      @http.Headers::of([("authorization", api_key)]).validate()
+      None
+    } catch {
+      @http.TransportError(detail~, ..) => Some(detail)
+    },
   }
 }
 
 ///|
 /// Wraps a preconfigured runtime client for compatible APIs, Azure, and tests.
 pub fn OpenAI::from_client(client : @client.Client) -> OpenAI {
-  { client, }
+  { client, default_headers: @http.Headers::empty(), bearer_error: None, }
 }
