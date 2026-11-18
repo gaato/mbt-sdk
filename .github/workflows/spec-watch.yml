@@ -3,6 +3,8 @@ name: Spec watch
 # One daily job per vendored source; publication is batched weekly.
 on:
   schedule:
+    # 07:43 JST: results are ready by morning in Japan, and Sunday's run lands
+    # before the Monday 00:20 UTC release batch.
     - cron: "43 22 * * *"
   workflow_dispatch:
 
