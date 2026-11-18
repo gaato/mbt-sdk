@@ -113,7 +113,7 @@ test "OpenAI operations send exact requests and decode spec examples" {
         data: [{ index: 0, embedding: [0.0023064255, -0.009327292], }],
         model: "text-embedding-ada-002",
         prompt_tokens: Some(8),
-        total_tokens: 8,
+        total_tokens: Some(8),
       },
     )
     let response = expect(
@@ -413,7 +413,12 @@ test "tool calls decode from OpenAI and Ollama fixtures and stream in wire order
     assert_eq(documented_response.text, "")
     assert_eq(documented_response.finish_reason, Some(@openai_sdk.ToolCalls))
     assert_eq(documented_response.tool_calls, [
-      { id: "call_1", name: "get_weather", arguments: "{\"city\":\"Tokyo\"}", },
+      {
+        id: "call_1",
+        name: "get_weather",
+        arguments: "{\"city\":\"Tokyo\"}",
+        extra: {},
+      },
     ])
     assert_eq(documented_response.tool_calls[0].arguments_json(), {
       "city": "Tokyo",
@@ -437,8 +442,9 @@ test "tool calls decode from OpenAI and Ollama fixtures and stream in wire order
         ]),
         event => {
           events.push(event)
-          if event is @openai_sdk.ToolCallDelta(index~, id~, name~, arguments~) {
-            accumulator.feed(index~, id?, name?, arguments~)
+          if event
+            is @openai_sdk.ToolCallDelta(index~, id~, name~, arguments~, extra~) {
+            accumulator.feed(index~, id?, name?, arguments~, extra~)
           }
         },
       ),
@@ -449,9 +455,22 @@ test "tool calls decode from OpenAI and Ollama fixtures and stream in wire order
         id=Some("call_stream"),
         name=Some("get_weather"),
         arguments="{\"city\":",
+        extra={},
       ),
-      @openai_sdk.ToolCallDelta(index=0, id=None, name=None, arguments="\"Tok"),
-      @openai_sdk.ToolCallDelta(index=0, id=None, name=None, arguments="yo\"}"),
+      @openai_sdk.ToolCallDelta(
+        index=0,
+        id=None,
+        name=None,
+        arguments="\"Tok",
+        extra={},
+      ),
+      @openai_sdk.ToolCallDelta(
+        index=0,
+        id=None,
+        name=None,
+        arguments="yo\"}",
+        extra={},
+      ),
       @openai_sdk.Finished(@openai_sdk.ToolCalls),
     ])
     assert_eq(accumulator.finish(), [
@@ -459,6 +478,7 @@ test "tool calls decode from OpenAI and Ollama fixtures and stream in wire order
         id: "call_stream",
         name: "get_weather",
         arguments: "{\"city\":\"Tokyo\"}",
+        extra: {},
       },
     ])
     let sent = transport.sent()

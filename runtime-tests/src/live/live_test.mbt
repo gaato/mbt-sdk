@@ -58,23 +58,8 @@ fn runtime_client(api_key : String, base_url : String) -> @runtime.Client {
 }
 
 ///|
-fn openai_error(error : Error) -> String {
-  @debug.to_string(openai_value(error).bind(@openai_sdk.api_error))
-}
-
-///|
-fn anthropic_error(error : Error) -> String {
-  @debug.to_string(anthropic_value(error).bind(@anthropic_sdk.api_error))
-}
-
-///|
-fn sdk_failure(
-  provider : String,
-  model : String,
-  explain : (Error) -> String,
-  error : Error,
-) -> String {
-  "provider=\{provider} model=\{model} api_error=\{explain(error)} sdk_error=\{@debug.to_string(error)}"
+fn sdk_failure(provider : String, model : String, message : String) -> String {
+  @live_diagnostics.format(provider, "model=\{model}") + "\n" + message
 }
 
 ///|
@@ -82,17 +67,13 @@ async fn[X] with_model_fallback(
   provider : String,
   candidates : Array[String],
   call : async (String) -> X,
-  explain : (Error) -> String,
 ) -> (String, X) {
   let failures : Array[String] = []
   for model in candidates {
     try call(model) catch {
-      error =>
-        if is_sdk_error(error) {
-          failures.push(sdk_failure(provider, model, explain, error))
-        } else {
-          raise error
-        }
+      LiveFailure(message) =>
+        failures.push(sdk_failure(provider, model, message))
+      error => raise error
     } noraise {
       value => return (model, value)
     }
@@ -107,28 +88,8 @@ async fn[X] one_call(
   call : async () -> X,
 ) -> X {
   call() catch {
-    error =>
-      if is_sdk_error(error) {
-        fail(sdk_failure(provider, model, openai_error, error))
-      } else {
-        raise error
-      }
-  }
-}
-
-///|
-async fn[X] one_anthropic_call(
-  provider : String,
-  model : String,
-  call : async () -> X,
-) -> X {
-  call() catch {
-    error =>
-      if is_sdk_error(error) {
-        fail(sdk_failure(provider, model, anthropic_error, error))
-      } else {
-        raise error
-      }
+    LiveFailure(message) => fail(sdk_failure(provider, model, message))
+    error => raise error
   }
 }
 
@@ -138,7 +99,101 @@ fn validation_failure(
   model : String,
   message : String,
 ) -> Unit raise {
-  fail("provider=\{provider} model=\{model} api_error=None: " + message)
+  fail(@live_diagnostics.format(provider, "model=\{model}: " + message))
+}
+
+///|
+fn check_openrouter_stream(
+  model : String,
+  saw_text_delta : Bool,
+  last : @openai_sdk.ResponseEvent?,
+) -> Unit raise {
+  match last {
+    Some(@openai_sdk.Completed(response)) if response.status ==
+      @openai_sdk.Completed =>
+      if !saw_text_delta && response.output_text.is_empty() {
+        raise LiveFailure("completed stream had no visible output text")
+      }
+    Some(@openai_sdk.Incomplete(response)) if response.status ==
+      @openai_sdk.Incomplete =>
+      raise LiveFailure("provider ended with response.incomplete")
+    Some(@openai_sdk.Failed(response)) if response.status == @openai_sdk.Failed =>
+      raise LiveFailure("provider ended with response.failed")
+    Some(@openai_sdk.Error(error)) =>
+      raise LiveFailure(
+        @live_diagnostics.format("stream_response", error.message),
+      )
+    _ =>
+      validation_failure(
+        "OpenRouter/OpenAI streaming", model, "stream did not end with a consistent terminal response event",
+      )
+  }
+}
+
+///|
+async test "OpenRouter stream fallback requires decoded visible text and completion" {
+  let response : @openai_sdk.Response = {
+    id: "local-fixture",
+    status: @openai_sdk.Completed,
+    model: "fixture",
+    output_text: "",
+    usage: None,
+    tool_calls: [],
+    raw: Json::null(),
+  }
+  let attempts = []
+  let (selected, _) = with_model_fallback(
+    "fixture streaming",
+    ["error", "empty", "terminal"],
+    model => {
+      attempts.push(model)
+      if model == "error" {
+        check_openrouter_stream(
+          model,
+          false,
+          Some(
+            @openai_sdk.Error({
+              message: "provider rejected the request",
+              type_: None,
+              param: None,
+              code: None,
+            }),
+          ),
+        )
+        return
+      }
+      let completed = if model == "terminal" {
+        { ..response, output_text: "hello", }
+      } else {
+        response
+      }
+      check_openrouter_stream(
+        model,
+        false,
+        Some(@openai_sdk.Completed(completed)),
+      )
+    },
+  )
+  assert_eq(attempts, ["error", "empty", "terminal"])
+  assert_eq(selected, "terminal")
+  check_openrouter_stream("delta", true, Some(@openai_sdk.Completed(response)))
+
+  let reasoning : @openai_sdk.ResponseEvent = Other(
+    "response.reasoning.delta",
+    Json::null(),
+  )
+  try check_openrouter_stream("unfinished", false, Some(reasoning)) catch {
+    LiveFailure(_) =>
+      fail("a missing terminal event must fail without trying another model")
+    error =>
+      assert_true(
+        error
+        .to_string()
+        .contains("did not end with a consistent terminal response"),
+      )
+  } noraise {
+    _ => fail("expected an unfinished stream to fail")
+  }
 }
 
 ///|
@@ -150,12 +205,7 @@ async test "live OpenRouter OpenAI-compatible Responses API" {
     let client = @openai_sdk.OpenAI::from_client(
       runtime_client(key, "https://openrouter.ai/api/v1"),
     )
-    let models = expect(client.list_models()) catch {
-      error =>
-        fail(
-          "provider=OpenRouter/OpenAI model=<list> api_error=\{openai_error(error)} sdk_error=\{@debug.to_string(error)}",
-        )
-    }
+    let models = expect("list_models", () => client.list_models())
     if models.length() < 100 {
       validation_failure(
         "OpenRouter/OpenAI",
@@ -168,17 +218,16 @@ async test "live OpenRouter OpenAI-compatible Responses API" {
       "OpenRouter/OpenAI buffered",
       openrouter_models,
       model => {
-        expect(
+        expect("create_response", () => {
           client.create_response(
             @openai_sdk.ResponseRequest::new(
               model~,
               input="Reply with one short word.",
               max_output_tokens=1024,
             ),
-          ),
-        )
+          )
+        })
       },
-      openai_error,
     )
     if response.status != @openai_sdk.Completed {
       validation_failure(
@@ -193,14 +242,11 @@ async test "live OpenRouter OpenAI-compatible Responses API" {
       )
     }
 
-    let (stream_model, stream_result) = with_model_fallback(
-      "OpenRouter/OpenAI streaming",
-      openrouter_models,
-      model => {
-        let mut delta_count = 0
-        let mut completed = false
-        let mut completed_was_last = false
-        expect(
+    ignore(
+      with_model_fallback("OpenRouter/OpenAI streaming", openrouter_models, model => {
+        let mut saw_text_delta = false
+        let mut last = None
+        expect("stream_response", () => {
           client.stream_response(
             @openai_sdk.ResponseRequest::new(
               model~,
@@ -208,33 +254,16 @@ async test "live OpenRouter OpenAI-compatible Responses API" {
               max_output_tokens=1024,
             ),
             event => {
-              completed_was_last = false
-              match event {
-                @openai_sdk.OutputTextDelta(_) => delta_count += 1
-                @openai_sdk.Completed(_) => {
-                  completed = true
-                  completed_was_last = true
-                }
-                @openai_sdk.Other(_, _) => ()
-                _ => ()
+              if event is @openai_sdk.OutputTextDelta(text) && !text.is_empty() {
+                saw_text_delta = true
               }
+              last = Some(event)
             },
-          ),
-        )
-        (delta_count, completed, completed_was_last)
-      },
-      openai_error,
+          )
+        })
+        check_openrouter_stream(model, saw_text_delta, last)
+      }),
     )
-    if stream_result.0 < 1 {
-      validation_failure(
-        "OpenRouter/OpenAI streaming", stream_model, "expected at least one OutputTextDelta",
-      )
-    }
-    if !stream_result.1 || !stream_result.2 {
-      validation_failure(
-        "OpenRouter/OpenAI streaming", stream_model, "stream did not end with Completed",
-      )
-    }
   })
 }
 
@@ -255,15 +284,14 @@ async test "live OpenRouter Anthropic-compatible Messages API" {
       "OpenRouter/Anthropic buffered",
       openrouter_models,
       model => {
-        expect(
+        expect("create_message", () => {
           client.create_message(
             @anthropic_sdk.MessageRequest::new(model~, max_tokens=1024, messages=[
               @anthropic_sdk.Message::user("Reply with one short word."),
             ]),
-          ),
-        )
+          )
+        })
       },
-      anthropic_error,
     )
     if response.role != @anthropic_sdk.Assistant {
       validation_failure(
@@ -289,7 +317,7 @@ async test "live OpenRouter Anthropic-compatible Messages API" {
         let mut delta_order = -1
         let mut stop_order = -1
         let mut order = 0
-        expect(
+        expect("stream_message", () => {
           client.stream_message(
             @anthropic_sdk.MessageRequest::new(model~, max_tokens=1024, messages=[
               @anthropic_sdk.Message::user("Reply with one short word."),
@@ -314,11 +342,10 @@ async test "live OpenRouter Anthropic-compatible Messages API" {
               }
               order += 1
             },
-          ),
-        )
+          )
+        })
         (start_order, delta_order, stop_order)
       },
-      anthropic_error,
     )
     if !(stream_order.0 >= 0 &&
       stream_order.1 > stream_order.0 &&
@@ -359,7 +386,7 @@ async test "live local OpenAI-compatible Chat Completions API" {
       ),
     )
     let models = one_call("local OpenAI-compatible", "<list>", () => {
-      expect(client.list_models())
+      expect("list_models", () => client.list_models())
     })
     if models.is_empty() {
       validation_failure(
@@ -367,7 +394,7 @@ async test "live local OpenAI-compatible Chat Completions API" {
       )
     }
     let completion = one_call("local OpenAI-compatible", model, () => {
-      expect(
+      expect("chat_completion", () => {
         client.chat_completion(
           @openai_sdk.ChatRequest::new(
             model~,
@@ -376,8 +403,8 @@ async test "live local OpenAI-compatible Chat Completions API" {
             ],
             max_tokens=64,
           ),
-        ),
-      )
+        )
+      })
     })
     if completion.text.is_empty() {
       validation_failure(
@@ -386,7 +413,7 @@ async test "live local OpenAI-compatible Chat Completions API" {
     }
     ignore(
       one_call("local OpenAI-compatible tools", model, () => {
-        expect(
+        expect("chat_completion (tools)", () => {
           client.chat_completion(
             @openai_sdk.ChatRequest::new(
               model~,
@@ -406,15 +433,15 @@ async test "live local OpenAI-compatible Chat Completions API" {
                 ),
               ],
             ),
-          ),
-        )
+          )
+        })
       }),
     )
     let mut delta_count = 0
     let mut finished = false
     let mut finished_was_last_non_usage = false
     one_call("local OpenAI-compatible", model, () => {
-      expect(
+      expect("stream_chat_completion", () => {
         client.stream_chat_completion(
           @openai_sdk.ChatRequest::new(
             model~,
@@ -440,8 +467,8 @@ async test "live local OpenAI-compatible Chat Completions API" {
               @openai_sdk.ChatEvent::.. => finished_was_last_non_usage = false
             }
           },
-        ),
-      )
+        )
+      })
     })
     if delta_count < 1 || !finished || !finished_was_last_non_usage {
       validation_failure(
@@ -487,19 +514,15 @@ async test "live local Anthropic-compatible Messages API" {
           ),
         )
     }
-    let response = one_anthropic_call(
-      "local Anthropic-compatible buffered",
-      model,
-      () => {
-        expect(
-          client.create_message(
-            @anthropic_sdk.MessageRequest::new(model~, max_tokens=64, messages=[
-              @anthropic_sdk.Message::user("Reply with one short word."),
-            ]),
-          ),
+    let response = one_call("local Anthropic-compatible buffered", model, () => {
+      expect("create_message", () => {
+        client.create_message(
+          @anthropic_sdk.MessageRequest::new(model~, max_tokens=64, messages=[
+            @anthropic_sdk.Message::user("Reply with one short word."),
+          ]),
         )
-      },
-    )
+      })
+    })
     if response.role != @anthropic_sdk.Assistant {
       validation_failure(
         "local Anthropic-compatible buffered", model, "expected role Assistant",
@@ -515,8 +538,8 @@ async test "live local Anthropic-compatible Messages API" {
     let mut delta_order = -1
     let mut stop_order = -1
     let mut order = 0
-    one_anthropic_call("local Anthropic-compatible streaming", model, () => {
-      expect(
+    one_call("local Anthropic-compatible streaming", model, () => {
+      expect("stream_message", () => {
         client.stream_message(
           @anthropic_sdk.MessageRequest::new(model~, max_tokens=64, messages=[
             @anthropic_sdk.Message::user("Reply with one short word."),
@@ -541,8 +564,8 @@ async test "live local Anthropic-compatible Messages API" {
             }
             order += 1
           },
-        ),
-      )
+        )
+      })
     })
     if !(start_order >= 0 &&
       delta_order > start_order &&
@@ -563,7 +586,9 @@ async test "live OpenAI official minimal operations" {
       live_transport(),
       @adapter.AsyncClock::new(),
     )
-    let models = one_call("OpenAI", "<list>", () => expect(client.list_models()))
+    let models = one_call("OpenAI", "<list>", () => {
+      expect("list_models", () => client.list_models())
+    })
     if models.is_empty() {
       validation_failure("OpenAI", "<list>", "model list was empty")
     }
@@ -574,7 +599,7 @@ async test "live OpenAI official minimal operations" {
       models[0].id
     }
     let retrieved = one_call("OpenAI", retrieve_id, () => {
-      expect(client.retrieve_model(retrieve_id))
+      expect("retrieve_model", () => client.retrieve_model(retrieve_id))
     })
     if retrieved.id != retrieve_id {
       validation_failure(
@@ -584,15 +609,15 @@ async test "live OpenAI official minimal operations" {
       )
     }
     let embeddings = one_call("OpenAI", "text-embedding-3-small", () => {
-      expect(
+      expect("create_embeddings", () => {
         client.create_embeddings(
           @openai_sdk.EmbeddingRequest::new(
             model="text-embedding-3-small",
             input=["hello"],
             dimensions=64,
           ),
-        ),
-      )
+        )
+      })
     })
     if embeddings.data.length() != 1 ||
       embeddings.data[0].embedding.length() != 64 {
@@ -601,15 +626,15 @@ async test "live OpenAI official minimal operations" {
       )
     }
     let response = one_call("OpenAI", preferred, () => {
-      expect(
+      expect("create_response", () => {
         client.create_response(
           @openai_sdk.ResponseRequest::new(
             model=preferred,
             input="Reply with one word.",
             max_output_tokens=16,
           ),
-        ),
-      )
+        )
+      })
     })
     if response.status != @openai_sdk.Completed ||
       response.output_text.is_empty() {
@@ -620,7 +645,7 @@ async test "live OpenAI official minimal operations" {
     let mut delta_count = 0
     let mut completed = false
     one_call("OpenAI", preferred, () => {
-      expect(
+      expect("stream_response", () => {
         client.stream_response(
           @openai_sdk.ResponseRequest::new(
             model=preferred,
@@ -634,8 +659,8 @@ async test "live OpenAI official minimal operations" {
               _ => ()
             }
           },
-        ),
-      )
+        )
+      })
     })
     if delta_count < 1 || !completed {
       validation_failure(
@@ -682,16 +707,16 @@ async test "live Anthropic official tools and thinking" {
       tools~,
       tool_choice=@anthropic_sdk.tool_choice_tool("lookup_code"),
     )
-    let response = one_anthropic_call("Anthropic", model, () => {
-      expect(client.create_message(request))
+    let response = one_call("Anthropic", model, () => {
+      expect("create_message (tools)", () => client.create_message(request))
     })
     let calls = response.tool_uses()
     assert_eq(calls.length(), 1)
     let (id, name, input) = calls[0]
     assert_eq(name, "lookup_code")
     assert_eq(input, { "item": "test" })
-    let followup = one_anthropic_call("Anthropic", model, () => {
-      expect(
+    let followup = one_call("Anthropic", model, () => {
+      expect("create_message (tool result)", () => {
         client.create_message(
           @anthropic_sdk.MessageRequest::new(
             model~,
@@ -707,21 +732,21 @@ async test "live Anthropic official tools and thinking" {
             tools~,
             tool_choice=@anthropic_sdk.tool_choice_none(),
           ),
-        ),
-      )
+        )
+      })
     })
     assert_true(followup.text().contains("CHECK_731"))
     let accumulator = @anthropic_sdk.ToolUseAccumulator::new()
     let mut tool_stopped = false
-    one_anthropic_call("Anthropic", model, () => {
-      expect(
+    one_call("Anthropic", model, () => {
+      expect("stream_message (tools)", () => {
         client.stream_message(request, event => {
           accumulator.feed(event)
           if event is @anthropic_sdk.MessageStop {
             tool_stopped = true
           }
-        }),
-      )
+        })
+      })
     })
     let streamed = accumulator.finish()
     assert_true(tool_stopped)
@@ -743,8 +768,10 @@ async test "live Anthropic official tools and thinking" {
         ),
       ),
     )
-    let thought = one_anthropic_call("Anthropic", model, () => {
-      expect(client.create_message(thinking_request))
+    let thought = one_call("Anthropic", model, () => {
+      expect("create_message (thinking)", () => {
+        client.create_message(thinking_request)
+      })
     })
     assert_true(thought.text().contains("323"))
     assert_true(
@@ -760,8 +787,8 @@ async test "live Anthropic official tools and thinking" {
     let mut signature_delta = false
     let mut thinking_stopped = false
     let text = StringBuilder()
-    one_anthropic_call("Anthropic", model, () => {
-      expect(
+    one_call("Anthropic", model, () => {
+      expect("stream_message (thinking)", () => {
         client.stream_message(thinking_request, event => {
           match event {
             @anthropic_sdk.ThinkingDelta(thinking~, ..) =>
@@ -776,8 +803,8 @@ async test "live Anthropic official tools and thinking" {
             @anthropic_sdk.MessageStop => thinking_stopped = true
             _ => ()
           }
-        }),
-      )
+        })
+      })
     })
     assert_true(thinking_delta && signature_delta && thinking_stopped)
     assert_true(text.to_string().contains("323"))
@@ -798,15 +825,15 @@ async test "live Anthropic official minimal operations" {
       live_transport(),
       @adapter.AsyncClock::new(),
     )
-    let models = one_anthropic_call("Anthropic", "<list>", () => {
-      expect(client.list_models(limit=5))
+    let models = one_call("Anthropic", "<list>", () => {
+      expect("list_models", () => client.list_models(limit=5))
     })
     if models.data.is_empty() {
       validation_failure("Anthropic", "<list>", "model list was empty")
     }
     let model = "claude-haiku-4-5"
-    let retrieved = one_anthropic_call("Anthropic", model, () => {
-      expect(client.retrieve_model(model))
+    let retrieved = one_call("Anthropic", model, () => {
+      expect("retrieve_model", () => client.retrieve_model(model))
     })
     if retrieved.id.is_empty() {
       validation_failure(
@@ -816,14 +843,14 @@ async test "live Anthropic official minimal operations" {
     let request = @anthropic_sdk.MessageRequest::new(model~, max_tokens=16, messages=[
       @anthropic_sdk.Message::user("Reply with one word."),
     ])
-    let counted = one_anthropic_call("Anthropic", model, () => {
-      expect(client.count_tokens(request))
+    let counted = one_call("Anthropic", model, () => {
+      expect("count_tokens", () => client.count_tokens(request))
     })
     if counted <= 0 {
       validation_failure("Anthropic", model, "count_tokens returned \{counted}")
     }
-    let response = one_anthropic_call("Anthropic", model, () => {
-      expect(client.create_message(request))
+    let response = one_call("Anthropic", model, () => {
+      expect("create_message", () => client.create_message(request))
     })
     if response.text().is_empty() || response.usage.output_tokens <= 0 {
       validation_failure(
@@ -832,16 +859,16 @@ async test "live Anthropic official minimal operations" {
     }
     let mut delta_count = 0
     let mut stopped = false
-    one_anthropic_call("Anthropic", model, () => {
-      expect(
+    one_call("Anthropic", model, () => {
+      expect("stream_message", () => {
         client.stream_message(request, event => {
           match event {
             @anthropic_sdk.TextDelta(..) => delta_count += 1
             @anthropic_sdk.MessageStop => stopped = true
             _ => ()
           }
-        }),
-      )
+        })
+      })
     })
     if delta_count < 1 || !stopped {
       validation_failure(
@@ -859,32 +886,6 @@ async test "live Anthropic official minimal operations" {
 // -----------------------------------------------------------------------------
 
 ///|
-fn github_error(error : Error) -> String {
-  @debug.to_string(github_value(error).bind(@github_sdk.api_error))
-}
-
-///|
-fn github_failure(operation : String, hint : String, error : Error) -> String {
-  "provider=GitHub op=\{operation} \{hint}api_error=\{github_error(error)} sdk_error=\{@debug.to_string(error)}"
-}
-
-///|
-async fn[X] one_github_call(
-  operation : String,
-  call : async () -> X,
-  hint~ : String = "",
-) -> X {
-  call() catch {
-    error =>
-      if is_sdk_error(error) {
-        fail(github_failure(operation, hint, error))
-      } else {
-        raise error
-      }
-  }
-}
-
-///|
 async test "live GitHub REST read paths, Link pagination, and rate limits" {
   bounded(() => {
     // The token gates the whole section because it is the opt-in switch, not
@@ -895,17 +896,15 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
 
     // 1. A public repository over the unauthenticated route. That route is
     //    metered at 60 requests an hour, so it spends exactly one.
-    let public_repo = one_github_call("repos/get (unauthenticated)", () => {
-      expect(
-        @github_sdk.GitHub::new(
-          live_transport(),
-          @adapter.AsyncClock::new(),
-          retry=live_retry(),
-          timeout_ms=45000,
-        ).call(
-          @github_gen.repos_get_request("octocat", "Hello-World"),
-          @github_gen.repos_get_decode,
-        ),
+    let public_repo = expect("repos/get (unauthenticated)", () => {
+      @github_sdk.GitHub::new(
+        live_transport(),
+        @adapter.AsyncClock::new(),
+        retry=live_retry(),
+        timeout_ms=45000,
+      ).call(
+        @github_gen.repos_get_request("octocat", "Hello-World"),
+        @github_gen.repos_get_decode,
       )
     })
     if public_repo.full_name != "octocat/Hello-World" {
@@ -941,12 +940,8 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
       @github_gen.repos_list_for_org_request("github", per_page=2),
       @github_gen.repos_list_for_org_decode,
     )
-    let first = one_github_call("repos/list-for-org page 1", () => {
-      expect(pages.next_page())
-    })
-    let second = one_github_call("repos/list-for-org page 2", () => {
-      expect(pages.next_page())
-    })
+    let first = expect("repos/list-for-org page 1", () => pages.next_page())
+    let second = expect("repos/list-for-org page 2", () => pages.next_page())
     guard first is Some(first) && second is Some(second) else {
       fail(
         "provider=GitHub op=repos/list-for-org: expected at least two Link pages",
@@ -1000,14 +995,9 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
         "a multi-segment path parameter was not preserved: \{content_request.url}",
       )
     }
-    let content = one_github_call(
-      "repos/get-content",
-      () => {
-        expect(gh.call(content_request, @github_gen.repos_get_content_decode))
-      },
-      hint="path=\{content_path} url=\{content_request.url}: a multi-segment path " +
-        "parameter did not resolve. ",
-    )
+    let content = expect("repos/get-content (\{content_path})", () => {
+      gh.call(content_request, @github_gen.repos_get_content_decode)
+    })
     guard content is Object(File(file)) else {
       validation_failure(
         "GitHub",
@@ -1064,8 +1054,8 @@ async test "live GitHub GraphQL passthrough, error envelope, and point budget" {
 
     // 1. A query that succeeds. GraphQL requires authentication: the same call
     //    without a token is answered 403, not 401.
-    let viewer = one_github_call("graphql viewer", () => {
-      expect(gh.graphql(query="query { viewer { login } }"))
+    let viewer = expect("graphql viewer", () => {
+      gh.graphql(query="query { viewer { login } }")
     })
     guard viewer
       is Object({ "viewer": Object({ "login": String(login), .. }), .. }) else {
@@ -1085,47 +1075,32 @@ async test "live GitHub GraphQL passthrough, error envelope, and point budget" {
     //    return as a success.
     let missing =
       #|query { repository(owner: "gaato", name: "moonbit-sdks-does-not-exist-4f2a9") { id } }
-    try expect(gh.graphql(query=missing)) catch {
-      error => {
-        if status_of(error) is Some(status) {
-          validation_failure(
-            "GitHub",
-            "graphql NOT_FOUND",
-            "a field-level GraphQL error reported HTTP status \{status}",
+    let operation = "graphql NOT_FOUND"
+    let failure = expect(operation, () => {
+      match gh.graphql(query=missing) {
+        Err(@github_sdk.GraphqlFailure(_, ..) as failure) => Ok(failure)
+        Err(error) => Err(error)
+        Ok(_) =>
+          fail(
+            "graphql NOT_FOUND: a query naming a missing repository succeeded",
           )
-        }
-        guard github_value(error).bind(@github_sdk.graphql_errors)
-          is Some(errors) else {
-          validation_failure(
-            "GitHub",
-            "graphql NOT_FOUND",
-            "the raised error carried no GraphQL errors array: \{@debug.to_string(error)}",
-          )
-          return
-        }
-        if errors.is_empty() {
-          validation_failure(
-            "GitHub", "graphql NOT_FOUND", "the errors array was empty",
-          )
-        } else if errors[0].type_ != Some("NOT_FOUND") {
-          validation_failure(
-            "GitHub",
-            "graphql NOT_FOUND",
-            "expected type NOT_FOUND, got \{@debug.to_string(errors[0])}",
-          )
-        }
       }
-    } noraise {
-      _ =>
-        validation_failure(
-          "GitHub", "graphql NOT_FOUND", "a query naming a missing repository succeeded",
-        )
+    })
+    guard @github_sdk.graphql_errors(failure) is Some([first, ..]) &&
+      first.type_ == Some("NOT_FOUND") else {
+      fail(
+        ExpectedFailure::describe(
+          failure,
+          operation + " (expected a NOT_FOUND error)",
+          None,
+        ),
+      )
     }
 
     // 3. The same reply through graphql_response keeps its partial data, which
     //    is the whole reason that entry point exists.
-    let envelope = one_github_call("graphql_response NOT_FOUND", () => {
-      expect(gh.graphql_response(query=missing))
+    let envelope = expect("graphql_response NOT_FOUND", () => {
+      gh.graphql_response(query=missing)
     })
     guard envelope is Object(fields) else {
       validation_failure(

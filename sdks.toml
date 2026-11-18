@@ -245,7 +245,7 @@ auth_reason = "The OpenAPI email and key pair is one credential. The deprecated 
 auth_spec = { api_email = { in = "header", name = "X-Auth-Email", type = "apiKey" }, api_key = { in = "header", name = "X-Auth-Key", type = "apiKey" }, api_token = { scheme = "bearer", type = "http" }, user_service_key = { in = "header", name = "X-Auth-User-Service-Key", type = "apiKey" } }
 timeout_ms = 60000
 rate_limit_prefix = "cloudflare"
-publish = false
+publish = true
 spec_watch = true
 
 [sdk.selection]

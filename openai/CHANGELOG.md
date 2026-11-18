@@ -11,10 +11,65 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+### Added
+
+- **Provider options on embedding requests.** `EmbeddingRequest::new` accepts
+  `extra?` for JSON parameters such as Voyage's `input_type` and
+  `output_dimension`. Keys managed by the SDK produce a validation failure.
+  Add `extra: {}` to existing `EmbeddingRequest` record literals.
+
 ### Changed
 
+- **Chat decodes omitted stream finish reasons and default-valued fields.**
+  Content and usage can arrive together without a `Finished` event. Omitted
+  choice and streamed tool-call indices decode as zero. A present usage
+  object defaults omitted counts to zero. In `gaato/openai/gen`, buffered
+  choice `finish_reason` is optional, streamed `finish_reason` uses
+  `@sdkjson.Presence`, and both chat logprobs types' `content` and both token
+  logprob types' `bytes` use `Presence`. Use `to_option()` to read those
+  fields as options. Use `Absent` or `Null` to control their encoding.
+- **Chat tool calls preserve provider metadata.** The `ToolCall.extra` map
+  retains top-level extensions such as Gemini thought signatures and sends
+  them back in assistant tool history. Supply `extra: {}` in record literals
+  without metadata. `ChatEvent::ToolCallDelta` now carries `extra~`. Pass it
+  to `ToolCallAccumulator::feed(extra~)` for streamed follow-ups.
+- **Wrapped quota errors stop retries.** Singleton-array HTTP 429
+  envelopes use the same retry classification as object envelopes.
+- **Embeddings accept an omitted index or usage.** An omitted index decodes
+  as zero because Gemini's ProtoJSON response can omit default-valued fields.
+  `EmbeddingResponse.total_tokens` is now `Int32?`. Handle `None` as
+  unreported and `Some(0)` as a reported zero. In `gaato/openai/gen`,
+  `CreateEmbeddingResponse.usage` is now optional and its constructor accepts
+  `usage?`. Handle `None` when no usage object was returned.
+- **Chat accepts omitted assistant content and refusal log probabilities.**
+  Missing or null assistant content yields empty buffered text and contributes
+  no streamed text delta. In `gaato/openai/gen`, the buffered message's
+  `content` and both chat logprobs types' `refusal` fields now use
+  `@sdkjson.Presence`. Use `to_option()` to read them as before, and
+  `Absent`, `Null` or `Value` in record literals. A constructor call that
+  omits one of these arguments encodes no key. Use `Null` on the field to
+  encode an explicit JSON null.
+- **Recognized provider errors on any HTTP status** return
+  `OpenAIFailure::Api` with the original response head and bounded raw body.
+  Update status handling that matches only `Response(UnexpectedStatus(...))`
+  to also inspect `Api`. The type signatures and retry decisions are unchanged.
+- **Gemini compatibility.** The beta endpoint's single-element array of error
+  envelopes is decoded, including numeric codes.
+- **Voyage error messages.** On a rejected HTTP status, a top-level string
+  `detail` yields `OpenAIFailure::Api` with the original response head and
+  bounded raw body. The SDK leaves the provider code unset.
 - Generated code now qualifies constructor references; no public API change.
 - **Build with MoonBit 0.10.21 and mttp_core 0.3.0.** Invalid explicit header values, including surrounding whitespace, return validation failures before I/O.
+
+### Fixed
+
+- Missing token and alternate-token `logprob` values and citation offsets
+  remain absent. The corresponding generated fields are options and the
+  constructor arguments are optional. Explicit zero values are preserved.
+- Request constructors and streamed tool-call accumulation copy nested
+  JSON objects and arrays in `extra`, preserving metadata snapshots.
+- `create_embeddings` rejects `encoding_format: "base64"` in `extra` before
+  I/O. Embeddings returned as JSON number arrays remain supported.
 
 ### Security
 

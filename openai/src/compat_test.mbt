@@ -46,6 +46,7 @@ fn compat_stream(
   base_url : String,
   chunks : Array[Json],
   expected : Array[@openai.ChatEvent],
+  done~ : Bool = true,
 ) -> Unit raise {
   @driver.run_sync(() => {
     let stream = StringBuilder()
@@ -53,7 +54,9 @@ fn compat_stream(
     for chunk in chunks {
       stream.write_string("data: " + chunk.stringify() + "\n\n")
     }
-    stream.write_string("data: [DONE]\n\n")
+    if done {
+      stream.write_string("data: [DONE]\n\n")
+    }
     let backend = @testing.BackendStub::new().expect(
       _ => true,
       @testing.Canned::bytes(200, body=@utf8.encode(stream.to_string())),
@@ -120,7 +123,7 @@ fn compat_embeddings(
       )
       .unwrap()
     assert_eq(embeddings.prompt_tokens, prompt_tokens)
-    assert_eq(embeddings.total_tokens, 2)
+    assert_eq(embeddings.total_tokens, Some(2))
     assert_eq(embeddings.data[0].embedding, [0.25, -0.5])
     backend.verify()
   })

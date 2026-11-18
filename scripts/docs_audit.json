@@ -3,12 +3,14 @@
     "openai",
     "anthropic",
     "github",
-    "gemini"
+    "gemini",
+    "cloudflare_dns"
   ],
   "generated": [
     "openai/src/gen",
     "anthropic/src/gen",
     "github/src/gen",
-    "gemini/src/gen"
+    "gemini/src/gen",
+    "cloudflare_dns/src/gen"
   ]
 }

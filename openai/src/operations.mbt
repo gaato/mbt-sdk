@@ -13,8 +13,8 @@ fn embedding_response_from_generated(
       embedding: item.embedding,
     }),
     model: response.model,
-    prompt_tokens: response.usage.prompt_tokens,
-    total_tokens: response.usage.total_tokens,
+    prompt_tokens: response.usage.bind(usage => usage.prompt_tokens),
+    total_tokens: response.usage.map(usage => usage.total_tokens),
   }
 }
 
@@ -53,7 +53,13 @@ async fn[T, M : @client.ResponseMode] OpenAI::send_with(
       .attribute(@client.rate_limit_bucket, bucket)
       .send(self.client, decide_retry=compatible_retry).body {
       Ok(value) => Ok(value)
-      Err(error) => Err(Response(error))
+      Err(error) => {
+        // Classify the final status after the HTTP client has applied retries.
+        if error is @client.UnexpectedStatus(head, body~) {
+          check_api_error(head, body, unexpected_status=true)
+        }
+        Err(Response(error))
+      }
     }
   } catch {
     DecodeError(error) => Err(Response(error))
@@ -172,23 +178,15 @@ pub async fn OpenAI::create_embeddings(
   self : OpenAI,
   request : EmbeddingRequest,
 ) -> Result[EmbeddingResponse, OpenAIFailure] {
-  try {
-    let body = @gen.CreateEmbeddingRequest::new(
-      model=request.model,
-      input=@gen.TextArray(request.input.copy()),
-      dimensions?=request.dimensions,
-      user?=request.user,
-    )
-    self.send_with(
-      @gen.create_embedding_request(body),
-      decode_reader((bytes, head) => {
-        embedding_response_from_generated(
-          take_decode(@gen.create_embedding_decode(head, bytes)),
-        )
-      }),
-      "embeddings",
-    )
-  } catch {
+  self.send_with(
+    embedding_http_request(request),
+    decode_reader((bytes, head) => {
+      embedding_response_from_generated(
+        take_decode(@gen.create_embedding_decode(head, bytes)),
+      )
+    }),
+    "embeddings",
+  ) catch {
     ValidationError(message~) => Err(Validation(message))
     error => raise error
   }
@@ -230,6 +228,8 @@ fn decode_stream_data(
 
 ///|
 /// Dispatches Responses events in wire order, closing on EOF, [DONE] or failure.
+/// A typed error in an ordinary data frame reaches the callback as `Error`.
+/// The stream can still return `Ok(())` at EOF after delivering this event.
 /// User callback failures happen outside the retry attempt.
 pub async fn OpenAI::stream_response(
   self : OpenAI,

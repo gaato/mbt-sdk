@@ -42,6 +42,28 @@ test "non-transient 429 codes stop buffered and streaming requests without a wai
 }
 
 ///|
+test "wrapped quota errors stop HTTP 429 retries even without a message" {
+  @driver.run_sync(() => {
+    for
+      error in [
+        ({ "code": "insufficient_quota", "message": "quota exhausted" } : Json),
+        { "code": "insufficient_quota" },
+      ] {
+      let backend = @testing.BackendStub::new().expect(
+        _ => true,
+        compat_canned([{ "error": error }], status=429),
+      )
+      let clock = @mock.FakeClock::new()
+      let api = @openai.OpenAI::new(api_key="fixture", backend, clock)
+      assert_true(api.chat_completion(compat_request()) is Err(_))
+      assert_eq(clock.slept(), [])
+      assert_eq(backend.sent().length(), 1)
+      backend.verify()
+    }
+  })
+}
+
+///|
 test "quota classification handles sparse numeric bodies and overrides retry-true on custom clients" {
   @driver.run_sync(() => {
     for
@@ -353,6 +375,38 @@ test "mid-stream errors stop delivery and never turn into Finished Unknown error
 }
 
 ///|
+test "an ordinary Responses error frame reaches the callback and EOF returns Ok" {
+  @driver.run_sync(() => {
+    let backend = @testing.BackendStub::new().expect(
+      _ => true,
+      @testing.Canned::bytes(
+        200,
+        body=b"data: {\"type\":\"error\",\"code\":\"server_error\",\"message\":\"failed\",\"param\":null}\n\n",
+      ),
+    )
+    let api = @openai.OpenAI::new(
+      api_key="fixture",
+      backend,
+      @mock.FakeClock::new(),
+    )
+    let events : Array[@openai.ResponseEvent] = []
+    let request = @openai.ResponseRequest::new(model="m", input="hi")
+    assert_true(
+      api.stream_response(request, event => events.push(event)) is Ok(_),
+    )
+    assert_eq(events, [
+      @openai.Error({
+        message: "failed",
+        type_: None,
+        param: None,
+        code: Some("server_error"),
+      }),
+    ])
+    backend.verify()
+  })
+}
+
+///|
 test "numeric HTTP error codes normalize to strings without accepting unrelated shapes" {
   for
     (code, expected) in [
@@ -371,4 +425,80 @@ test "numeric HTTP error codes normalize to strings without accepting unrelated 
     )
     assert_eq(@openai.api_error(failure).unwrap().code, expected)
   }
+}
+
+///|
+// Live 2026-11-18, request IDs removed and messages shortened.
+test "DeepSeek and Gemini HTTP 402 errors retain the provider error and raw body" {
+  @driver.run_sync(() => {
+    for
+      (body, message, code, type_) in [
+        (
+          b"{\"error\":{\"message\":\"Insufficient Balance ...\",\"type\":\"insufficient_balance_error\",\"param\":null,\"code\":\"invalid_request_error\"}}",
+          "Insufficient Balance ...",
+          "invalid_request_error",
+          Some("insufficient_balance_error"),
+        ),
+        (
+          b"[{\"error\":{\"code\":402,\"message\":\"Your prepayment credits are depleted. ...\",\"status\":\"RESOURCE_EXHAUSTED\"}}]",
+          "Your prepayment credits are depleted. ...",
+          "402",
+          None,
+        ),
+      ] {
+      for streaming in [false, true] {
+        let headers = @http.Headers::of([("x-request-id", "fixture")])
+        let backend = @testing.BackendStub::new().expect(
+          _ => true,
+          @testing.Canned::bytes(402, headers~, body~),
+        )
+        let clock = @mock.FakeClock::new()
+        let api = @openai.OpenAI::new(api_key="fixture", backend, clock)
+        let failure = if streaming {
+          api
+          .stream_chat_completion(compat_request(), _ => {
+            fail("no callbacks on HTTP 402")
+          })
+          .unwrap_err()
+        } else {
+          api.chat_completion(compat_request()).unwrap_err()
+        }
+        guard failure is @openai.Api(head, error, body=actual) else {
+          fail("expected an API failure for HTTP 402")
+        }
+        assert_eq(head.status, 402)
+        assert_eq(head.headers, headers)
+        assert_eq(actual, body)
+        assert_eq(error, { message, code: Some(code), type_, param: None, })
+        assert_eq(@openai.api_error(failure), Some(error))
+        assert_eq(clock.slept(), [])
+        backend.verify()
+      }
+    }
+  })
+}
+
+///|
+test "an unrecognized HTTP error body remains an unexpected status" {
+  @driver.run_sync(() => {
+    let body = b"[{\"error\":{\"code\":402}}]"
+    let backend = @testing.BackendStub::new().expect(
+      _ => true,
+      @testing.Canned::bytes(402, body~),
+    )
+    let api = @openai.OpenAI::new(
+      api_key="fixture",
+      backend,
+      @mock.FakeClock::new(),
+    )
+    let failure = api.chat_completion(compat_request()).unwrap_err()
+    guard failure
+      is @openai.Response(@client.UnexpectedStatus(head, body=actual)) else {
+      fail("expected an unexpected status")
+    }
+    assert_eq(head.status, 402)
+    assert_eq(actual, body)
+    assert_eq(@openai.api_error(failure), None)
+    backend.verify()
+  })
 }

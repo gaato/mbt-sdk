@@ -1,71 +1,123 @@
 ///|
-// This adapter keeps opt-in live fallback diagnostics effectful. It only lifts
-// SDK values; it never catches transport failures or callback exceptions.
+// Raised live failures carry only the redacted diagnostic, including when
+// the test runner prints the error directly.
 suberror LiveFailure {
-  OpenAI(@openai_sdk.OpenAIFailure)
-  Anthropic(@anthropic_sdk.AnthropicFailure)
-  GitHub(@github_sdk.GitHubFailure)
+  LiveFailure(String)
+}
+
+///|
+impl Show for LiveFailure with fn output(self, logger) {
+  let LiveFailure(message) = self
+  logger.write_string(message)
 }
 
 ///|
 trait ExpectedFailure {
-  fn raised(Self) -> LiveFailure
+  fn describe(Self, String, Array[String]?) -> String
 }
 
 ///|
-impl ExpectedFailure for @openai_sdk.OpenAIFailure with fn raised(self) {
-  OpenAI(self)
+impl ExpectedFailure for @openai_sdk.OpenAIFailure with fn describe(
+  self,
+  operation,
+  credentials,
+) {
+  match self {
+    Response(error) =>
+      @live_diagnostics.response_failure(operation, error, credentials?)
+    Api(head, _, body~) =>
+      @live_diagnostics.format(
+        operation,
+        "API error",
+        status=head.status,
+        body~,
+        credentials?,
+      )
+    Validation(message) =>
+      @live_diagnostics.format(operation, message, credentials?)
+  }
 }
 
 ///|
-impl ExpectedFailure for @anthropic_sdk.AnthropicFailure with fn raised(self) {
-  Anthropic(self)
+impl ExpectedFailure for @anthropic_sdk.AnthropicFailure with fn describe(
+  self,
+  operation,
+  credentials,
+) {
+  match self {
+    Response(error) =>
+      @live_diagnostics.response_failure(operation, error, credentials?)
+    Validation(message) =>
+      @live_diagnostics.format(operation, message, credentials?)
+  }
 }
 
 ///|
-impl ExpectedFailure for @github_sdk.GitHubFailure with fn raised(self) {
-  GitHub(self)
+impl ExpectedFailure for @github_sdk.GitHubFailure with fn describe(
+  self,
+  operation,
+  credentials,
+) {
+  match self {
+    Http(error) =>
+      @live_diagnostics.response_failure(operation, error, credentials?)
+    GraphqlFailure(head, message~, body~) =>
+      @live_diagnostics.format(
+        operation,
+        message,
+        status=head.status,
+        body~,
+        credentials?,
+      )
+    Validation(message) =>
+      @live_diagnostics.format(operation, message, credentials?)
+  }
 }
 
 ///|
-fn[T, E : ExpectedFailure] expect(result : Result[T, E]) -> T raise LiveFailure {
-  match result {
+async fn[T, E : ExpectedFailure] expect(
+  operation : String,
+  call : async () -> Result[T, E],
+  credentials? : Array[String],
+) -> T {
+  try call() catch {
+    @http.TransportError::_ as error =>
+      raise LiveFailure(
+        @live_diagnostics.format(operation, error.message(), credentials?),
+      )
+    @runtime.InvalidRequest(message~) =>
+      raise LiveFailure(
+        @live_diagnostics.format(operation, message, credentials?),
+      )
+    error => raise error
+  } noraise {
     Ok(value) => value
-    Err(error) => raise error.raised()
+    Err(error) => raise LiveFailure(error.describe(operation, credentials))
   }
 }
 
 ///|
-fn openai_value(error : Error) -> @openai_sdk.OpenAIFailure? {
-  match error {
-    OpenAI(value) => Some(value)
-    _ => None
+async test "live expect reports operation, status, and redacted body" {
+  let head : @http.ResponseHead = {
+    status: 402,
+    headers: @http.Headers::of([("set-cookie", "hidden-cookie")]),
   }
-}
-
-///|
-fn anthropic_value(error : Error) -> @anthropic_sdk.AnthropicFailure? {
-  match error {
-    Anthropic(value) => Some(value)
-    _ => None
-  }
-}
-
-///|
-fn github_value(error : Error) -> @github_sdk.GitHubFailure? {
-  match error {
-    GitHub(value) => Some(value)
-    _ => None
-  }
-}
-
-///|
-fn status_of(error : Error) -> Int32? {
-  match error {
-    OpenAI(@openai_sdk.Response(value))
-    | Anthropic(@anthropic_sdk.Response(value))
-    | GitHub(@github_sdk.Http(value)) => @runtime.status_of(value)
-    // A GraphQL field error retains HTTP 200 rather than inventing a failure status.
-    _ => None
+  let failure : @openai_sdk.OpenAIFailure = Api(
+    head,
+    { message: "quota", type_: None, param: None, code: Some("402"), },
+    body=b"{\"error\":\"fixture-token and other-key\"}",
+  )
+  try
+    expect("chat_completion", () => (Err(failure) : Result[Unit, _]), credentials=[
+      "fixture-token", "other-key",
+    ])
+  catch {
+    error =>
+      assert_eq(
+        error.to_string(),
+        "chat_completion: HTTP 402 API error\n{\"error\":\"[redacted] and [redacted]\"}",
+      )
+  } noraise {
+    _ => fail("expected a live failure")
   }
 }

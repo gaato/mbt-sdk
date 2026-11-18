@@ -31,6 +31,28 @@ fn is_chat_key(key : String) -> Bool {
 }
 
 ///|
+fn is_embedding_key(key : String) -> Bool {
+  match key {
+    "model" | "input" | "dimensions" | "user" => true
+    _ => false
+  }
+}
+
+///|
+fn validate_extra(
+  extra : Map[String, Json],
+  is_known_key : (String) -> Bool,
+) -> Unit raise ValidationError {
+  for key, _ in extra {
+    if is_known_key(key) {
+      raise ValidationError(
+        message="extra parameter collides with known key: " + key,
+      )
+    }
+  }
+}
+
+///|
 fn chat_message_json(message : ChatMessage) -> Json raise ValidationError {
   if message.role != "assistant" && message.reasoning_content is Some(_) {
     raise ValidationError(
@@ -123,13 +145,7 @@ fn chat_parts(
   request : ChatRequest,
   stream : Bool,
 ) -> (@gen.CreateChatCompletionRequest, Json) raise ValidationError {
-  for key, _ in request.extra {
-    if is_chat_key(key) {
-      raise ValidationError(
-        message="extra parameter collides with known key: " + key,
-      )
-    }
-  }
+  validate_extra(request.extra, is_chat_key)
   let fields : Map[String, Json] = {
     "model": request.model,
     "messages": Json::array(request.messages.map(chat_message_json)),
@@ -165,27 +181,39 @@ fn chat_parts(
   guard body is Object(generated_fields) else {
     raise ValidationError(message="generated chat request must be an object")
   }
-  // The upstream generated tool-message type omits the optional `name` field.
-  // Restore it after generated validation and encoding until the schema gains it.
+  // Restore fields outside the upstream schema after generated validation.
   guard generated_fields.get("messages") is Some(Array(messages)) else {
     raise ValidationError(message="generated chat messages must be an array")
   }
   for index, message in request.messages {
+    guard messages.get(index) is Some(Object(fields)) else {
+      raise ValidationError(message="generated chat message must be an object")
+    }
     if message.reasoning_content is Some(reasoning) {
-      guard messages.get(index) is Some(Object(fields)) else {
-        raise ValidationError(
-          message="generated chat message must be an object",
-        )
-      }
       fields["reasoning_content"] = Json(reasoning)
     }
     if message.role == "tool" && message.name is Some(name) {
-      guard messages.get(index) is Some(Object(fields)) else {
+      fields["name"] = Json(name)
+    }
+    if message.tool_calls is Some(calls) &&
+      calls.any(call => !call.extra.is_empty()) {
+      guard fields.get("tool_calls") is Some(Array(encoded_calls)) else {
         raise ValidationError(
-          message="generated chat message must be an object",
+          message="generated chat tool calls must be an array",
         )
       }
-      fields["name"] = Json(name)
+      for position, call in calls {
+        guard encoded_calls.get(position) is Some(Object(encoded)) else {
+          raise ValidationError(
+            message="generated chat tool call must be an object",
+          )
+        }
+        for key, value in call.extra {
+          if is_tool_call_extension(key) {
+            encoded[key] = value
+          }
+        }
+      }
     }
   }
   for key, value in request.extra {
@@ -195,17 +223,40 @@ fn chat_parts(
 }
 
 ///|
+fn embedding_http_request(
+  request : EmbeddingRequest,
+) -> @http.Request raise ValidationError {
+  validate_extra(request.extra, is_embedding_key)
+  if request.extra.get("encoding_format") is Some(String("base64")) {
+    raise ValidationError(
+      message="embedding encoding_format base64 is unsupported because embeddings must be JSON number arrays",
+    )
+  }
+  let generated = @gen.CreateEmbeddingRequest::new(
+    model=request.model,
+    input=@gen.TextArray(request.input.copy()),
+    dimensions?=request.dimensions,
+    user?=request.user,
+  )
+  let body = generated.to_json()
+  guard body is Object(fields) else {
+    raise ValidationError(
+      message="generated embedding request must be an object",
+    )
+  }
+  for key, value in request.extra {
+    fields[key] = value
+  }
+  // The generated HTTP helper serializes immediately, before extras can be merged.
+  @http.Request::post("/embeddings").body_json(body)
+}
+
+///|
 fn response_parts(
   request : ResponseRequest,
   stream : Bool,
 ) -> (@gen.CreateResponse, Json) raise ValidationError {
-  for key, _ in request.extra {
-    if is_response_key(key) {
-      raise ValidationError(
-        message="extra parameter collides with known key: " + key,
-      )
-    }
-  }
+  validate_extra(request.extra, is_response_key)
   let input = if request.tool_outputs.is_empty() {
     @gen.CreateResponseInput::Text(request.input)
   } else {

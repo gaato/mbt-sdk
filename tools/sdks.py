@@ -294,8 +294,8 @@ def sync(sdks, check):
             continue
         row = next((r for r in old_rows if f'[{s["module"]}]' in r or f'| {s["module"]} |' in r), None)
         cells = row.split('|')[2:4] if row else [' Generated API vocabulary ', ' mttp_core ']
-        if not s['publish'] and not cells[0].rstrip().endswith(unpublished):
-            cells[0] = cells[0].rstrip() + unpublished + ' '
+        purpose = cells[0].rstrip().removesuffix(unpublished)
+        cells[0] = purpose + ('' if s['publish'] else unpublished) + ' '
         label = f'[{s["module"]}]({s["dir"]}/README.md)' if (ROOT / s['dir'] / 'README.md').is_file() else s['module']
         rows.append(f'| {label} |' + '|'.join(cells) + '|')
     extras = [r for r in old_rows if not any(s['module'] in r for s in sdks) and not r.startswith(('| Module |', '|---'))]

@@ -66,12 +66,20 @@ pub async fn ask(
 Buffered responses are limited to 64 MiB by default. To change the limit,
 construct an mttp `Client` with `max_body_bytes` and pass it
 to `from_client`. Streaming reads incrementally, with a 16 MiB per-event
-limit. Limit failures raise `TransportError(TooLarge, ...)`. HTTP and decode
-failures return `Err(Response(ResponseFailure))`, preserving the received head
-and bounded diagnostic body. Input checks return `Err(Validation(message))`.
-An error envelope inside HTTP 200 or a Chat Completions stream returns
-`Err(Api(head, error, body~))`; the stream stops and delivered events are not
-retried. Numeric error codes are exposed as strings.
+limit. Limit failures raise `TransportError(TooLarge, ...)`. Recognized
+provider error envelopes return `Err(Api(head, error, body~))` on any HTTP
+status and in Chat Completions streams. Other HTTP and decode failures
+return `Err(Response(ResponseFailure))`. Both preserve the response head and
+bounded diagnostic body. For a rejected HTTP status, the client keeps at most
+1 MiB of the body. If this cuts off the error envelope, the SDK returns
+`Response(UnexpectedStatus(...))` and `api_error` returns `None`.
+Input checks return `Err(Validation(message))`.
+Named SSE `event: error` frames and recognized streaming error envelopes,
+including Chat Completions errors, stop delivery and return a failure.
+An ordinary Responses `data:` frame with `type: "error"` reaches the
+callback as `ResponseEvent::Error`. Inspect the event for the provider
+failure. The call can still return `Ok(())` at EOF.
+Numeric error codes are exposed as strings.
 `api_error` extracts a provider error envelope from an `OpenAIFailure` value.
 Transport failures and unknown callback exceptions remain raised errors;
 cancellation remains a signal.
@@ -87,8 +95,13 @@ cancellation remains a signal.
 
 The client has `list_models`, `retrieve_model`, `create_embeddings`,
 `create_response`, `stream_response`, `chat_completion` and
-`stream_chat_completion`. A request's `extra` map adds JSON fields the typed
-request does not have.
+`stream_chat_completion`. On `ChatRequest`, `ResponseRequest` and
+`EmbeddingRequest`, `extra` adds JSON fields to the request body. A key
+already managed by the SDK yields a validation failure, even when the
+corresponding typed option is omitted.
+For embeddings, `encoding_format: "base64"` in `extra` yields a validation
+failure before sending the request. The SDK decodes JSON number arrays,
+including integer dtypes from Voyage.
 
 ## Streaming
 
@@ -110,9 +123,10 @@ pub async fn stream_text(
 }
 ```
 
-`ToolCallAccumulator` reassembles streamed tool-call arguments. It grows with
-what you feed it, so cap a stream by its events or bytes, and set a token
-limit on the request.
+`ToolCallAccumulator` reassembles streamed tool-call arguments and metadata.
+Pass each `ToolCallDelta` event's `extra` map to `feed(extra=...)` to retain
+provider extensions. The accumulator grows with what you feed it, so cap a
+stream by its events or bytes and set a token limit on the request.
 
 ## Compatible providers
 
@@ -123,6 +137,8 @@ implement only Chat Completions take `ChatRequest` with `chat_completion` or
 | Provider | `base_url` | Documented SDK endpoints and caveats |
 |---|---|---|
 | [DeepSeek](https://api-docs.deepseek.com/) | `https://api.deepseek.com` (no `/v1`) | Chat, streaming, Responses, models list. No embeddings or `retrieve_model`. Model timestamps may be absent. |
+| [Gemini](https://aistudio.google.com/docs/openai) | `https://generativelanguage.googleapis.com/v1beta/openai` | Beta. Chat, streaming, tools, embeddings, and model list/retrieval. Errors can be wrapped in a JSON array. No Responses API on the compatible endpoint. |
+| [Voyage AI](https://docs.voyageai.com/reference/embeddings-api) | `https://api.voyageai.com/v1` | Text embeddings only. Reranking, contextualized embeddings and multimodal embeddings are outside this SDK's coverage. |
 | [DashScope / Qwen](https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope) | `https://{WorkspaceId}.{region}.maas.aliyuncs.com/compatible-mode/v1` | Chat, streaming, Responses, embeddings. Model list/retrieval are not documented. Keys belong to a region; match the key, workspace and endpoint. |
 | [Zhipu](https://docs.bigmodel.cn/cn/guide/develop/openai/introduction) / [Z.AI](https://docs.z.ai/api-reference/introduction) | `https://open.bigmodel.cn/api/paas/v4` or `https://api.z.ai/api/paas/v4` | Chat, streaming, embeddings. Responses and model list/retrieval are not documented. The international service and Coding Plan use different account/endpoint configurations. |
 | [Moonshot / Kimi](https://platform.kimi.com/docs/guide/migrating-from-openai-to-kimi) | `https://api.moonshot.cn/v1` or `https://api.moonshot.ai/v1` | Chat, streaming, Responses, models list. No documented embeddings or model retrieval. Match the account's service domain. |
@@ -160,8 +176,13 @@ Endpoint availability and parameter support depend on the provider and model;
 the table describes provider documentation, not live certification.
 Use `ChatRequest.extra` for provider options such as `enable_thinking` or
 `thinking`. Providers may restrict temperature, tool choices or streaming tools;
-Ollama does not implement `tool_choice`. Embeddings accept float arrays only;
-`prompt_tokens=None` means the provider did not report that count.
+Ollama does not implement `tool_choice`. For Voyage text embeddings, pass
+`input_type` (`query` or `document`), `output_dimension`, `output_dtype` or
+`truncation` in `EmbeddingRequest.extra`. Leave `dimensions` unset with Voyage.
+On a rejected HTTP status, Voyage's string `detail` becomes the API error
+message, with no provider code.
+The index defaults to zero when omitted, as in Gemini's ProtoJSON response.
+`prompt_tokens` and `total_tokens` are `None` when the provider does not report them.
 
 Thinking providers can return `ChatCompletion.reasoning_content`; streaming
 delivers `ReasoningDelta` pieces that you can concatenate. Return that reasoning
@@ -178,6 +199,15 @@ pub fn assistant_turn(reply : @openai.ChatCompletion) -> @openai.ChatMessage {
   )
 }
 ```
+
+Gemini uses thought signatures on some tool calls. Pass the received
+`ToolCall` values to `ChatMessage::assistant_tool_calls` to send their
+provider extensions back, including `extra_content.google.thought_signature`.
+[Gemini thought-signature guide](https://aistudio.google.com/docs/thought-signatures?generate-content=true#openai)
+
+Chat streams can deliver text and usage in the same chunk. A missing or null
+`finish_reason` emits no `Finished` event, and EOF or `[DONE]` can end a stream
+without one. A present chat usage object uses zero for omitted token counts.
 
 Use `ChatMessage::assistant` for turns without tool calls. Missing reasoning
 remains `None`; no empty reasoning is fabricated. Additional headers, such as

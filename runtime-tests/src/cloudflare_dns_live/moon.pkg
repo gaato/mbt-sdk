@@ -6,6 +6,7 @@ import {
   "gaato/mttp/codings",
   "gaato/mttp/runtime" @adapter,
   "gaato/mttp_core" @http,
+  "gaato/moonbit-sdks-runtime-tests/internal/live_diagnostics",
   "moonbitlang/core/async",
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",

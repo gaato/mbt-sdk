@@ -4,7 +4,7 @@
 pub(all) enum OpenAIFailure {
   Response(@client.ResponseFailure)
   Validation(String)
-  /// An error envelope inside a successful HTTP response or SSE stream.
+  /// A recognized provider error envelope with its original head and bounded body.
   Api(@http.ResponseHead, ApiErrorBody, body~ : Bytes)
 }
 
@@ -17,8 +17,9 @@ priv suberror ApiError {
 fn check_api_error(
   head : @http.ResponseHead,
   body : Bytes,
+  unexpected_status~ : Bool = false,
 ) -> Unit raise ApiError {
-  let error = try decode_api_error_body(body) catch {
+  let error = try decode_api_error_body(body, unexpected_status~) catch {
     _ => None
   } noraise {
     error => Some(error)
@@ -123,7 +124,9 @@ fn[T] compatible_retry(
 ///|
 fn non_transient_quota(body : Bytes) -> Bool {
   let raw = parse_json_body(body) catch { _ => return false }
-  guard raw is { "error": Object(error), .. } else { return false }
+  guard unwrap_error_envelope(raw) is { "error": Object(error), .. } else {
+    return false
+  }
   // Classification needs the business code even when the error has no message.
   let code = match error.get("code") {
     Some(String(code)) => Some(code)

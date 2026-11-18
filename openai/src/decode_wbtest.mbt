@@ -262,6 +262,7 @@ test "tool request encoding is exact for chat and responses" {
     id: "call_1",
     name: "get_weather",
     arguments: "{\"city\":\"Tokyo\"}",
+    extra: { "id": "ignored", "index": 9, "type": "ignored", "function": null },
   }
   let choice : Json = {
     "type": "function",
@@ -360,7 +361,12 @@ test "responses decode function calls and function argument events" {
     #|
   let response = decode_response(success_head(), test_response(text))
   assert_eq(response.tool_calls, [
-    { id: "call_1", name: "get_weather", arguments: "{\"city\":\"Tokyo\"}", },
+    {
+      id: "call_1",
+      name: "get_weather",
+      arguments: "{\"city\":\"Tokyo\"}",
+      extra: {},
+    },
   ])
   assert_eq(
     decode_response_event(

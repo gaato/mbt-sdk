@@ -1,0 +1,19 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/moonbit-sdks-runtime-tests/internal/live_diagnostics"
+
+import {
+  "gaato/mttp_core/client",
+}
+
+// Values
+pub fn format(String, String, status? : Int32, body? : Bytes, credentials? : Array[String]) -> String
+
+pub fn response_failure(String, @client.ResponseFailure, credentials? : Array[String]) -> String
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

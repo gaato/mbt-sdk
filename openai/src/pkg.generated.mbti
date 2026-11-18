@@ -46,7 +46,7 @@ pub fn ChatCompletion::to_repr(Self) -> @debug.Repr
 pub(all) enum ChatEvent {
   Delta(String)
   ReasoningDelta(String)
-  ToolCallDelta(index~ : Int32, id~ : String?, name~ : String?, arguments~ : String)
+  ToolCallDelta(index~ : Int32, id~ : String?, name~ : String?, arguments~ : String, extra~ : Map[String, @json.Json])
   Finished(FinishReason)
   Usage(Usage)
   Other(String, @json.Json)
@@ -104,9 +104,10 @@ pub(all) struct EmbeddingRequest {
   input : Array[String]
   dimensions : Int32?
   user : String?
+  extra : Map[String, @json.Json]
 }
 pub fn EmbeddingRequest::equal(Self, Self) -> Bool
-pub fn EmbeddingRequest::new(model~ : String, input~ : Array[String], dimensions? : Int32, user? : String) -> Self
+pub fn EmbeddingRequest::new(model~ : String, input~ : Array[String], dimensions? : Int32, user? : String, extra? : Map[String, @json.Json]) -> Self
 pub fn EmbeddingRequest::not_equal(Self, Self) -> Bool
 pub fn EmbeddingRequest::to_repr(Self) -> @debug.Repr
 
@@ -115,7 +116,7 @@ pub(all) struct EmbeddingResponse {
   data : Array[Embedding]
   model : String
   prompt_tokens : Int32?
-  total_tokens : Int32
+  total_tokens : Int32?
 }
 pub fn EmbeddingResponse::equal(Self, Self) -> Bool
 pub fn EmbeddingResponse::not_equal(Self, Self) -> Bool
@@ -239,6 +240,7 @@ pub(all) struct ToolCall {
   id : String
   name : String
   arguments : String
+  extra : Map[String, @json.Json]
 }
 pub fn ToolCall::arguments_json(Self) -> @json.Json raise @json.ParseError
 pub fn ToolCall::equal(Self, Self) -> Bool
@@ -248,7 +250,7 @@ pub fn ToolCall::to_repr(Self) -> @debug.Repr
 pub struct ToolCallAccumulator {
   // private fields
 }
-pub fn ToolCallAccumulator::feed(Self, index~ : Int32, id? : String, name? : String, arguments~ : String) -> Unit
+pub fn ToolCallAccumulator::feed(Self, index~ : Int32, id? : String, name? : String, arguments~ : String, extra? : Map[String, @json.Json]) -> Unit
 pub fn ToolCallAccumulator::finish(Self) -> Array[ToolCall]
 pub fn ToolCallAccumulator::new() -> Self
 

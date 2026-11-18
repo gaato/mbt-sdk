@@ -3,6 +3,7 @@ import {
   "gaato/gemini/gen",
   "gaato/mttp/backend",
   "gaato/mttp/runtime" @adapter,
+  "gaato/moonbit-sdks-runtime-tests/internal/live_diagnostics",
   "moonbitlang/core/env",
   "moonbitlang/core/async",
 } for "test"

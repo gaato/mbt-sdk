@@ -25,6 +25,14 @@ actions:
   - target: "$['components']['schemas']['CreateEmbeddingResponse']['properties']['usage']['required'][?@ == 'prompt_tokens']"
     description: DashScope documents total_tokens alone; do not invent a prompt count when none was reported.
     remove: true
+  - target: "$['components']['schemas']['CreateEmbeddingResponse']['required'][?@ == 'usage']"
+    description: Gemini's OpenAI-compatible embeddings response omits usage (live 2026-11-18).
+    remove: true
+  - target: "$['components']['schemas']['Embedding']['properties']['index']"
+    description: Gemini omits index zero (live 2026-11-18). Proto3 JSON omits default values for fields with implicit presence, so restore zero independently of item order.
+    update:
+      default: 0
+      x-moonbit-default-on-missing: true
   - target: "$['paths']['/models']['get']"
     description: Include the listModels operation in the M4 MoonBit generator slice.
     update:
@@ -106,11 +114,59 @@ actions:
   - target: "$['components']['schemas']['Model']['required'][?@ == 'owned_by']"
     description: OpenAI-compatible servers (OpenRouter's /models) omit owned_by; the hand-written Model type treats it as optional, so the generated decoder must too.
     remove: true
+  - target: "$['components']['schemas']['ChatCompletionResponseMessage']['required'][?@ == 'content']"
+    description: Gemini's compatible endpoint omits nullable assistant content when its output budget produces no text (live 2026-11-18).
+    remove: true
   - target: "$['components']['schemas']['ChatCompletionResponseMessage']['required'][?@ == 'refusal']"
     description: "refusal is required-but-nullable upstream; OpenAI-compatible servers (Ollama 0.34) omit it instead of sending null. Same pattern as owned_by."
     remove: true
   - target: "$['components']['schemas']['CreateChatCompletionResponse']['properties']['choices']['items']['required'][?@ == 'logprobs']"
     description: "logprobs is required-but-nullable upstream; OpenAI-compatible servers (Ollama 0.34) omit it unless requested. Same pattern as owned_by."
+    remove: true
+  - target: "$['components']['schemas']['CreateChatCompletionResponse','CreateChatCompletionStreamResponse']['properties']['choices']['items']['required'][?@ == 'finish_reason']"
+    description: Gemini omits the finish reason on in-progress chunks (live 2026-11-18). Keep an absent reason unspecified in either response mode.
+    remove: true
+  - target: "$['components']['schemas']['CreateChatCompletionResponse','CreateChatCompletionStreamResponse']['properties']['choices']"
+    description: ProtoJSON omits empty repeated fields. An omitted choices list decodes like an empty list, including on usage-only stream chunks.
+    update:
+      default: []
+      x-moonbit-default-on-missing: true
+  - target: "$['components']['schemas']['CreateChatCompletionResponse','CreateChatCompletionStreamResponse']['properties']['choices']['items']['properties']['index']"
+    description: Restore a ProtoJSON-omitted zero choice index independently of array position.
+    update:
+      default: 0
+      x-moonbit-default-on-missing: true
+  - target: "$['components']['schemas']['ChatCompletionMessageToolCallChunk']['properties']['index']"
+    description: Restore a ProtoJSON-omitted zero tool-call index so deltas still assemble under the correct index.
+    update:
+      default: 0
+      x-moonbit-default-on-missing: true
+  - target: "$['components']['schemas']['CompletionUsage']['properties']['prompt_tokens','completion_tokens','total_tokens']"
+    description: Restore ProtoJSON-omitted zero counts within a present usage object. The optional usage object itself still represents whether usage was reported.
+    update:
+      x-moonbit-default-on-missing: true
+  - target: "$['components']['schemas']['CreateChatCompletionResponse','CreateChatCompletionStreamResponse']['properties']['choices']['items']['properties']['logprobs']['required'][?@ == 'content' || @ == 'refusal']"
+    description: ProtoJSON omits empty repeated log-probability lists. DeepSeek also documents content and reasoning token probabilities without refusal probabilities.
+    remove: true
+  - target: "$['components']['schemas']['ChatCompletionTokenLogprob']['properties']['top_logprobs']"
+    description: Decode an omitted repeated list of alternate tokens as empty.
+    update:
+      default: []
+      x-moonbit-default-on-missing: true
+  - target: "$['components']['schemas']['ChatCompletionTokenLogprob']['required'][?@ == 'bytes']"
+    description: An omitted byte list is possible when a token has no bytes to report.
+    remove: true
+  - target: "$['components']['schemas']['ChatCompletionTokenLogprob']['properties']['top_logprobs']['items']['required'][?@ == 'bytes']"
+    description: Apply the same optional-byte rule to alternate tokens.
+    remove: true
+  - target: "$['components']['schemas']['ChatCompletionTokenLogprob']['required'][?@ == 'logprob']"
+    description: Keep an unreported log probability absent because zero would mean certainty.
+    remove: true
+  - target: "$['components']['schemas']['ChatCompletionTokenLogprob']['properties']['top_logprobs']['items']['required'][?@ == 'logprob']"
+    description: Preserve unreported probabilities for alternate tokens as well.
+    remove: true
+  - target: "$['components']['schemas']['ChatCompletionResponseMessage']['properties']['annotations']['items']['properties']['url_citation']['required'][?@ == 'start_index' || @ == 'end_index']"
+    description: Keep an unreported citation bound absent because its location in the text is unknown.
     remove: true
   - target: "$['components']['schemas']['CreateAssistantRequest']['properties']['tool_resources']['properties']['file_search']"
     description: The API accepts two legacy file_search resource shapes with no discriminator; preserving raw JSON is the only lossless boundary.

@@ -9,6 +9,99 @@ fn success_head() -> @http.ResponseHead {
 }
 
 ///|
+test "generated chat defaults preserve presence and explicit indices" {
+  let buffered = @gen.create_chat_completion_decode_json({
+    "id": "fixture",
+    "created": 1,
+    "model": "m",
+    "choices": [
+      { "index": 1, "finish_reason": "stop", "message": {} },
+      {
+        "message": {
+          "annotations": [
+            {
+              "url_citation": {
+                "url": "https://example.invalid",
+                "title": "Example",
+              },
+            },
+            {
+              "url_citation": {
+                "url": "https://example.invalid",
+                "title": "Example with offsets",
+                "start_index": 0,
+                "end_index": 5,
+              },
+            },
+          ],
+        },
+      },
+    ],
+  })
+  assert_eq(buffered.choices.map(choice => choice.index), [1, 0])
+  assert_eq(buffered.choices[0].finish_reason, Some(@gen.Stop))
+  assert_eq(buffered.choices[1].finish_reason, None)
+  let annotations = buffered.choices[1].message.annotations.unwrap()
+  let citation = annotations[0].url_citation
+  assert_eq((citation.start_index, citation.end_index), (None, None))
+  assert_true(
+    citation.to_json() is { "start_index"? : None, "end_index"? : None, .. },
+  )
+  let located = annotations[1].url_citation
+  assert_eq((located.start_index, located.end_index), (Some(0), Some(5)))
+  let empty = @gen.create_chat_completion_decode_json({
+    "id": "fixture",
+    "created": 1,
+    "model": "m",
+  })
+  assert_eq(empty.choices, [])
+
+  let streamed : @gen.CreateChatCompletionStreamResponse = @json.from_json({
+    "id": "fixture",
+    "created": 1,
+    "model": "m",
+    "choices": [
+      { "delta": {}, "logprobs": {} },
+      {
+        "index": 1,
+        "delta": {},
+        "finish_reason": null,
+        "logprobs": {
+          "content": [
+            { "token": "a" },
+            {
+              "token": "b",
+              "logprob": -2,
+              "bytes": null,
+              "top_logprobs": [{ "token": "c" }],
+            },
+            { "token": "d", "logprob": 0 },
+          ],
+        },
+      },
+    ],
+  })
+  assert_eq(streamed.choices.map(choice => choice.index), [0, 1])
+  assert_true(streamed.choices[0].finish_reason is @sdkjson.Absent)
+  assert_true(streamed.choices[1].finish_reason is @sdkjson.Null)
+  let sparse = streamed.choices[0].logprobs.to_option().unwrap()
+  assert_true(sparse.content is @sdkjson.Absent)
+  let tokens = streamed.choices[1].logprobs.to_option().unwrap().content
+    .to_option()
+    .unwrap()
+  assert_eq(tokens[0].logprob, None)
+  assert_true(tokens[0].to_json() is { "logprob"? : None, .. })
+  assert_eq(tokens[0].top_logprobs, [])
+  assert_true(tokens[0].bytes is @sdkjson.Absent)
+  assert_eq(tokens[1].logprob, Some(-2.0))
+  assert_true(tokens[1].bytes is @sdkjson.Null)
+  assert_eq(tokens[1].top_logprobs[0].logprob, None)
+  assert_true(tokens[1].top_logprobs[0].to_json() is { "logprob"? : None, .. })
+  assert_true(tokens[1].top_logprobs[0].bytes is @sdkjson.Absent)
+  assert_eq(tokens[2].logprob, Some(0.0))
+}
+
+///|
 test "generated model decoders accept spec fixtures and Int64 above Int32" {
   let listed = @gen.list_models_decode(
     success_head(),
@@ -42,8 +135,9 @@ test "generated embedding response decoder accepts the M3 fixture" {
   assert_eq(decoded.data.length(), 1)
   assert_eq(decoded.data[0].index, 0)
   assert_eq(decoded.data[0].embedding, [0.0023064255, -0.009327292])
-  assert_eq(decoded.usage.prompt_tokens, Some(8))
-  assert_eq(decoded.usage.total_tokens, 8)
+  guard decoded.usage is Some(usage) else { fail("expected reported usage") }
+  assert_eq(usage.prompt_tokens, Some(8))
+  assert_eq(usage.total_tokens, 8)
 }
 
 ///|

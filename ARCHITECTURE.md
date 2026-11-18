@@ -9,7 +9,7 @@ HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp).
 | Layer | Modules | Responsibility |
 |---|---|---|
 | Applications | consumer code | Backend, clock, timer and credentials |
-| SDKs | openai, anthropic, github, jina (not published yet), replicate (not published yet), gemini, cloudflare_dns (not published yet) | Generated API vocabulary and vendor policy |
+| SDKs | openai, anthropic, github, jina (not published yet), replicate (not published yet), gemini, cloudflare_dns | Generated API vocabulary and vendor policy |
 | Codex | codex-protocol (not published yet), codex-app-server | Generated protocol and initialized sessions |
 | RPC | jsonrpc, jsonrpc-async | Portable messages/framing and runtime connections |
 | External HTTP | gaato/mttp_core, gaato/mttp | Vocabulary, engines and client policy; I/O |

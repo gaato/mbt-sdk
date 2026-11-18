@@ -105,6 +105,36 @@ pub(all) struct ToolCall {
   id : String
   name : String
   arguments : String
+  /// Provider-specific top-level fields retained for a Chat Completions follow-up.
+  extra : Map[String, Json]
+}
+
+///|
+fn is_tool_call_extension(key : String) -> Bool {
+  !(key is ("id" | "type" | "function" | "index"))
+}
+
+///|
+fn copy_tool_call(call : ToolCall) -> ToolCall {
+  { ..call, extra: copy_json_fields(call.extra), }
+}
+
+///|
+fn copy_json_fields(fields : Map[String, Json]) -> Map[String, Json] {
+  let snapshot : Map[String, Json] = Map([])
+  for key, value in fields {
+    snapshot[key] = copy_json_value(value)
+  }
+  snapshot
+}
+
+///|
+fn copy_json_value(value : Json) -> Json {
+  match value {
+    Object(fields) => Json::object(copy_json_fields(fields))
+    Array(items) => Json::array(items.map(copy_json_value))
+    _ => value
+  }
 }
 
 ///|
@@ -124,6 +154,7 @@ pub extend ToolCall with @debug.Debug::{to_repr}
 ///     id: "call_1",
 ///     name: "lookup",
 ///     arguments: "{\"id\":1}",
+///     extra: {},
 ///   }
 ///   assert_eq(call.arguments_json(), { "id": 1 })
 /// }
@@ -247,11 +278,12 @@ pub fn ChatMessage::tool(
 ///|
 /// Creates an assistant message containing function tool calls.
 /// When content is absent it is encoded without a content field.
+/// Provider extensions are copied, including nested objects and arrays.
 ///
 /// ```mbt check
 /// test {
 ///   let message = @openai.ChatMessage::assistant_tool_calls([
-///     { id: "call_1", name: "lookup", arguments: "{}", },
+///     { id: "call_1", name: "lookup", arguments: "{}", extra: {}, },
 ///   ])
 ///   assert_eq(message.tool_calls.unwrap().length(), 1)
 /// }
@@ -265,7 +297,7 @@ pub fn ChatMessage::assistant_tool_calls(
     role: "assistant",
     content: content.unwrap_or(""),
     name: None,
-    tool_calls: Some(tool_calls.copy()),
+    tool_calls: Some(tool_calls.map(copy_tool_call)),
     tool_call_id: None,
     reasoning_content,
   }
@@ -296,7 +328,9 @@ pub extend ChatRequest with Eq::{equal, not_equal}
 pub extend ChatRequest with @debug.Debug::{to_repr}
 
 ///|
-/// Creates a chat request and snapshots mutable inputs.
+/// Creates a chat request and snapshots its message history, tool array, and
+/// extra fields. The extra fields on the request and its tool calls are copied
+/// recursively.
 ///
 /// ```mbt check
 /// test {
@@ -324,13 +358,16 @@ pub fn ChatRequest::new(
     reasoning_effort,
     tools: tools.map(Array::copy),
     tool_choice,
-    extra: extra.map(Map::copy).unwrap_or({}),
+    extra: extra.map(copy_json_fields).unwrap_or({}),
   }
 }
 
 ///|
 fn copy_chat_message(message : ChatMessage) -> ChatMessage {
-  { ..message, tool_calls: message.tool_calls.map(Array::copy), }
+  {
+    ..message,
+    tool_calls: message.tool_calls.map(calls => calls.map(copy_tool_call)),
+  }
 }
 
 ///|
@@ -388,6 +425,7 @@ pub(all) enum ChatEvent {
     id~ : String?,
     name~ : String?,
     arguments~ : String,
+    extra~ : Map[String, Json],
   )
   Finished(FinishReason)
   Usage(Usage)
@@ -424,17 +462,20 @@ pub fn ToolCallAccumulator::new() -> ToolCallAccumulator {
 
 ///|
 /// Adds one tool-call delta. The first supplied id and name for an index win.
+/// Pass the event's `extra` fields to preserve an independent copy of provider metadata.
 pub fn ToolCallAccumulator::feed(
   self : ToolCallAccumulator,
   index~ : Int32,
   id? : String,
   name? : String,
   arguments~ : String,
+  extra? : Map[String, Json],
 ) -> Unit {
-  match self.calls.search_by(call => call.index == index) {
+  let call = match self.calls.search_by(call => call.index == index) {
     None => {
-      self.calls.push({ index, id, name, arguments: StringBuilder(), })
-      self.calls.last().unwrap().arguments.write_string(arguments)
+      let call = { index, id, name, arguments: StringBuilder(), extra: {}, }
+      self.calls.push(call)
+      call
     }
     Some(call_index) => {
       let call = self.calls[call_index]
@@ -444,7 +485,28 @@ pub fn ToolCallAccumulator::feed(
       if call.name is None && name is Some(value) {
         call.name = Some(value)
       }
-      call.arguments.write_string(arguments)
+      call
+    }
+  }
+  call.arguments.write_string(arguments)
+  if extra is Some(extra) {
+    merge_tool_call_extra(call.extra, extra)
+  }
+}
+
+///|
+// Metadata can arrive across several chunks. Merge object keys and keep the
+// first non-null value when a provider repeats a leaf.
+fn merge_tool_call_extra(
+  target : Map[String, Json],
+  source : Map[String, Json],
+) -> Unit {
+  for key, value in source {
+    match (target.get(key), value) {
+      (None | Some(Null), _) => target[key] = copy_json_value(value)
+      (Some(Object(current)), Object(incoming)) =>
+        merge_tool_call_extra(current, incoming)
+      _ => ()
     }
   }
 }
@@ -452,6 +514,7 @@ pub fn ToolCallAccumulator::feed(
 ///|
 /// Returns reconstructed calls ordered by their stream index.
 /// Missing ids or names are returned as empty strings.
+/// Each result owns a copy of its provider metadata.
 pub fn ToolCallAccumulator::finish(
   self : ToolCallAccumulator,
 ) -> Array[ToolCall] {
@@ -461,6 +524,7 @@ pub fn ToolCallAccumulator::finish(
     id: call.id.unwrap_or(""),
     name: call.name.unwrap_or(""),
     arguments: call.arguments.to_string(),
+    extra: copy_json_fields(call.extra),
   })
 }
 
@@ -470,6 +534,7 @@ priv struct PendingToolCall {
   mut id : String?
   mut name : String?
   arguments : StringBuilder
+  extra : Map[String, Json]
 }
 
 ///|
@@ -480,6 +545,9 @@ pub(all) struct EmbeddingRequest {
   input : Array[String]
   dimensions : Int32?
   user : String?
+  /// Additional JSON fields. Using `model`, `input`, `dimensions`, or `user`
+  /// here returns a validation failure, even if the typed field is omitted.
+  extra : Map[String, Json]
 }
 
 ///|
@@ -491,14 +559,17 @@ pub extend EmbeddingRequest with Eq::{equal, not_equal}
 pub extend EmbeddingRequest with @debug.Debug::{to_repr}
 
 ///|
-/// Creates an embedding request and snapshots its input array.
+/// Creates an embedding request and snapshots its input array and extra fields,
+/// including nested JSON objects and arrays.
 ///
 /// ```mbt check
 /// test {
-///   let request = @openai.EmbeddingRequest::new(model="text-embedding-3-small", input=[
-///     "hello",
-///   ])
-///   assert_eq(request.input, ["hello"])
+///   let request = @openai.EmbeddingRequest::new(
+///     model="embedding-model",
+///     input=["hello"],
+///     extra={ "input_type": "query", "output_dimension": 256 },
+///   )
+///   assert_eq(request.extra.get("input_type"), Some(Json("query")))
 /// }
 /// ```
 pub fn EmbeddingRequest::new(
@@ -506,12 +577,19 @@ pub fn EmbeddingRequest::new(
   input~ : Array[String],
   dimensions? : Int32,
   user? : String,
+  extra? : Map[String, Json],
 ) -> EmbeddingRequest {
-  { model, input: input.copy(), dimensions, user, }
+  {
+    model,
+    input: input.copy(),
+    dimensions,
+    user,
+    extra: extra.map(copy_json_fields).unwrap_or({}),
+  }
 }
 
 ///|
-/// One embedding vector and its position in the result list.
+/// One embedding vector and its provider-supplied index, which defaults to zero when omitted.
 #derive(Eq, Debug)
 pub(all) struct Embedding {
   index : Int32
@@ -527,13 +605,13 @@ pub extend Embedding with Eq::{equal, not_equal}
 pub extend Embedding with @debug.Debug::{to_repr}
 
 ///|
-/// The flattened result of an embeddings operation.
+/// The flattened result of an embeddings operation. Unreported token counts are `None`.
 #derive(Eq, Debug)
 pub(all) struct EmbeddingResponse {
   data : Array[Embedding]
   model : String
   prompt_tokens : Int32?
-  total_tokens : Int32
+  total_tokens : Int32?
 }
 
 ///|
@@ -591,7 +669,8 @@ pub extend ResponseRequest with Eq::{equal, not_equal}
 pub extend ResponseRequest with @debug.Debug::{to_repr}
 
 ///|
-/// Creates a response request and snapshots the extra parameter map.
+/// Creates a response request and snapshots its extra fields, including nested
+/// JSON objects and arrays.
 ///
 /// ```mbt check
 /// test {
@@ -619,7 +698,7 @@ pub fn ResponseRequest::new(
     previous_response_id,
     tools: tools.map(Array::copy),
     tool_choice,
-    extra: extra.map(Map::copy).unwrap_or({}),
+    extra: extra.map(copy_json_fields).unwrap_or({}),
     tool_outputs: [],
   }
 }

@@ -7,6 +7,8 @@
 ///|
 test "DeepSeek chat, reasoning, keepalive stream, models and Responses fixtures" {
   let base = "https://api.deepseek.com"
+  // DeepSeek documents content and reasoning token logprobs and omits refusal.
+  let logprobs : Json = { "content": [], "reasoning_content": [] }
   let chat : Json = {
     "id": "c",
     "object": "chat.completion",
@@ -21,6 +23,7 @@ test "DeepSeek chat, reasoning, keepalive stream, models and Responses fixtures"
           "reasoning_content": "think",
         },
         "finish_reason": "insufficient_system_resource",
+        "logprobs": logprobs,
       },
     ],
   }
@@ -30,11 +33,16 @@ test "DeepSeek chat, reasoning, keepalive stream, models and Responses fixtures"
     Some("think"),
     @openai.Unknown("insufficient_system_resource"),
   )
+  let last_chunk = compat_chunk({ "content": "hello" }, finish="stop")
+  guard last_chunk is { "choices": [Object(choice)], .. } else {
+    fail("expected one choice in the fixture")
+  }
+  choice["logprobs"] = logprobs
   compat_stream(
     base,
     [
       compat_chunk({ "reasoning_content": "think" }),
-      compat_chunk({ "content": "hello" }, finish="stop"),
+      last_chunk,
       compat_usage_chunk(),
     ],
     [

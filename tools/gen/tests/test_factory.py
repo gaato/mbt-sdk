@@ -95,6 +95,25 @@ offline_packages = []
         for label in ('A —', 'B —', 'C —'):
             self.assertIn(label, (self.root / 'docs/behavior/sample.md').read_text())
 
+    def test_sync_updates_the_readme_suffix_when_publication_changes(self):
+        self.write('README.md', '<!-- BEGIN sdks: modules -->\n'
+                   '| gaato/seed | Custom purpose | Custom dependency |\n'
+                   '<!-- END sdks: modules -->\n')
+        readme = self.root / 'README.md'
+        ledger = self.root / 'sdks.toml'
+        unpublished = ledger.read_text()
+        for publish in (False, True, False):
+            self.write('sdks.toml', unpublished.replace(
+                'publish = false', f'publish = {str(publish).lower()}'))
+            before = readme.read_bytes()
+            self.assertTrue(sdks.sync(sdks.load(), True))
+            self.assertEqual(readme.read_bytes(), before)
+            self.assertFalse(sdks.sync(sdks.load(), False))
+            suffix = '' if publish else ' (not published yet)'
+            self.assertIn(f'| gaato/seed | Custom purpose{suffix} | Custom dependency |',
+                          readme.read_text())
+            self.assertFalse(sdks.sync(sdks.load(), True))
+
     def test_yaml_scaffold_retains_root_auth_with_public_operation(self):
         self.doc['paths']['/public'] = {'get': {
             'operationId': 'public_get', 'security': [], 'responses': {'200': {}},

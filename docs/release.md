@@ -13,9 +13,9 @@ Mooncakes index. Daily spec-watch merges never bump versions or dispatch release
 Run `uv run --with pyyaml --with jsonpath-rfc9535 python tools/sdks.py sync` after registration changes; gates check the derived files.
 
 <!-- BEGIN sdks: publish -->
-Published modules (ledger order): `openai`, `anthropic`, `github`, `gemini`.
+Published modules (ledger order): `openai`, `anthropic`, `github`, `gemini`, `cloudflare_dns`.
 
-Generated modules kept unpublished: `fixtures/gen/badhttp`, `fixtures/gen/petstore3`, `codex-protocol`, `jina`, `replicate`, `cloudflare_dns`.
+Generated modules kept unpublished: `fixtures/gen/badhttp`, `fixtures/gen/petstore3`, `codex-protocol`, `jina`, `replicate`.
 <!-- END sdks: publish -->
 
 `jsonrpc`, `jsonrpc-async` and `codex-app-server` also remain unpublished until

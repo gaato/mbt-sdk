@@ -602,7 +602,7 @@ pub impl @json.ToJson for ChatCompletionRequestUserMessageContentPart
 
 #derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionResponseMessage {
-  content : String?
+  content : @jsonkit.Presence[String]
   refusal : @jsonkit.Presence[String]
   tool_calls : Array[ChatCompletionMessageToolCall]?
   annotations : Array[ChatCompletionResponseMessageAnnotationsItem]?
@@ -633,14 +633,14 @@ pub impl @json.ToJson for ChatCompletionResponseMessageAnnotationsItem
 
 #derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionResponseMessageAnnotationsItemUrlCitation {
-  end_index : Int32
-  start_index : Int32
+  end_index : Int32?
+  start_index : Int32?
   url : String
   title : String
 }
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::equal(Self, Self) -> Bool
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::new(end_index~ : Int32, start_index~ : Int32, url~ : String, title~ : String) -> Self
+pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::new(url~ : String, title~ : String, end_index? : Int32, start_index? : Int32) -> Self
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::to_json(Self) -> @json.Json
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::to_repr(Self) -> @debug.Repr
@@ -742,13 +742,13 @@ pub impl @json.ToJson for ChatCompletionStreamResponseDeltaRole
 #derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionTokenLogprob {
   token : String
-  logprob : Double
-  bytes : Array[Int32]?
+  logprob : Double?
+  bytes : @jsonkit.Presence[Array[Int32]]
   top_logprobs : Array[ChatCompletionTokenLogprobTopLogprobsItem]
 }
 pub fn ChatCompletionTokenLogprob::equal(Self, Self) -> Bool
 pub fn ChatCompletionTokenLogprob::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn ChatCompletionTokenLogprob::new(token~ : String, logprob~ : Double, top_logprobs~ : Array[ChatCompletionTokenLogprobTopLogprobsItem], bytes? : Array[Int32]) -> Self
+pub fn ChatCompletionTokenLogprob::new(token~ : String, top_logprobs~ : Array[ChatCompletionTokenLogprobTopLogprobsItem], logprob? : Double, bytes? : Array[Int32]) -> Self
 pub fn ChatCompletionTokenLogprob::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionTokenLogprob::to_json(Self) -> @json.Json
 pub fn ChatCompletionTokenLogprob::to_repr(Self) -> @debug.Repr
@@ -758,12 +758,12 @@ pub impl @json.ToJson for ChatCompletionTokenLogprob
 #derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionTokenLogprobTopLogprobsItem {
   token : String
-  logprob : Double
-  bytes : Array[Int32]?
+  logprob : Double?
+  bytes : @jsonkit.Presence[Array[Int32]]
 }
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::equal(Self, Self) -> Bool
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn ChatCompletionTokenLogprobTopLogprobsItem::new(token~ : String, logprob~ : Double, bytes? : Array[Int32]) -> Self
+pub fn ChatCompletionTokenLogprobTopLogprobsItem::new(token~ : String, logprob? : Double, bytes? : Array[Int32]) -> Self
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::not_equal(Self, Self) -> Bool
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::to_json(Self) -> @json.Json
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::to_repr(Self) -> @debug.Repr
@@ -1348,14 +1348,14 @@ pub impl @json.ToJson for CreateChatCompletionResponse
 
 #derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionResponseChoicesItem {
-  finish_reason : CreateChatCompletionResponseChoicesItemFinishReason
+  finish_reason : CreateChatCompletionResponseChoicesItemFinishReason?
   index : Int32
   message : ChatCompletionResponseMessage
   logprobs : @jsonkit.Presence[CreateChatCompletionResponseChoicesItemLogprobs]
 }
 pub fn CreateChatCompletionResponseChoicesItem::equal(Self, Self) -> Bool
 pub fn CreateChatCompletionResponseChoicesItem::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn CreateChatCompletionResponseChoicesItem::new(finish_reason~ : CreateChatCompletionResponseChoicesItemFinishReason, index~ : Int32, message~ : ChatCompletionResponseMessage, logprobs? : CreateChatCompletionResponseChoicesItemLogprobs) -> Self
+pub fn CreateChatCompletionResponseChoicesItem::new(index~ : Int32, message~ : ChatCompletionResponseMessage, finish_reason? : CreateChatCompletionResponseChoicesItemFinishReason, logprobs? : CreateChatCompletionResponseChoicesItemLogprobs) -> Self
 pub fn CreateChatCompletionResponseChoicesItem::not_equal(Self, Self) -> Bool
 pub fn CreateChatCompletionResponseChoicesItem::to_json(Self) -> @json.Json
 pub fn CreateChatCompletionResponseChoicesItem::to_repr(Self) -> @debug.Repr
@@ -1382,8 +1382,8 @@ pub impl @json.ToJson for CreateChatCompletionResponseChoicesItemFinishReason
 
 #derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionResponseChoicesItemLogprobs {
-  content : Array[ChatCompletionTokenLogprob]?
-  refusal : Array[ChatCompletionTokenLogprob]?
+  content : @jsonkit.Presence[Array[ChatCompletionTokenLogprob]]
+  refusal : @jsonkit.Presence[Array[ChatCompletionTokenLogprob]]
 }
 pub fn CreateChatCompletionResponseChoicesItemLogprobs::equal(Self, Self) -> Bool
 pub fn CreateChatCompletionResponseChoicesItemLogprobs::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
@@ -1417,7 +1417,7 @@ pub impl @json.ToJson for CreateChatCompletionStreamResponse
 pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
   delta : ChatCompletionStreamResponseDelta
   logprobs : @jsonkit.Presence[CreateChatCompletionStreamResponseChoicesItemLogprobs]
-  finish_reason : CreateChatCompletionStreamResponseChoicesItemFinishReason?
+  finish_reason : @jsonkit.Presence[CreateChatCompletionStreamResponseChoicesItemFinishReason]
   index : Int32
 }
 pub fn CreateChatCompletionStreamResponseChoicesItem::equal(Self, Self) -> Bool
@@ -1449,8 +1449,8 @@ pub impl @json.ToJson for CreateChatCompletionStreamResponseChoicesItemFinishRea
 
 #derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionStreamResponseChoicesItemLogprobs {
-  content : Array[ChatCompletionTokenLogprob]?
-  refusal : Array[ChatCompletionTokenLogprob]?
+  content : @jsonkit.Presence[Array[ChatCompletionTokenLogprob]]
+  refusal : @jsonkit.Presence[Array[ChatCompletionTokenLogprob]]
 }
 pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::equal(Self, Self) -> Bool
 pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
@@ -1513,11 +1513,11 @@ pub impl @json.ToJson for CreateEmbeddingRequestInput
 pub(all) struct CreateEmbeddingResponse {
   data : Array[Embedding]
   model : String
-  usage : CreateEmbeddingResponseUsage
+  usage : CreateEmbeddingResponseUsage?
 }
 pub fn CreateEmbeddingResponse::equal(Self, Self) -> Bool
 pub fn CreateEmbeddingResponse::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn CreateEmbeddingResponse::new(data~ : Array[Embedding], model~ : String, usage~ : CreateEmbeddingResponseUsage) -> Self
+pub fn CreateEmbeddingResponse::new(data~ : Array[Embedding], model~ : String, usage? : CreateEmbeddingResponseUsage) -> Self
 pub fn CreateEmbeddingResponse::not_equal(Self, Self) -> Bool
 pub fn CreateEmbeddingResponse::to_json(Self) -> @json.Json
 pub fn CreateEmbeddingResponse::to_repr(Self) -> @debug.Repr

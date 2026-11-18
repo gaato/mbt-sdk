@@ -5,7 +5,7 @@ settings. It supports MoonBit's wasm-gc, JavaScript and native targets.
 For code that runs in Cloudflare Workers and needs runtime bindings, see
 [mizchi/cloudflare](https://mooncakes.io/docs/mizchi/cloudflare).
 
-## Install and authenticate
+## Install
 
 ```sh
 moon add gaato/cloudflare_dns
@@ -136,3 +136,7 @@ wait when using a cancellation-aware clock such as mttp's async clock. Supply a
 timer and `total_timeout_ms` for a whole-call deadline that includes waits.
 Cloudflare also applies per-token and per-IP limits across operations.
 [Cloudflare API limits](https://developers.cloudflare.com/fundamentals/api/reference/limits/)
+
+## License
+
+Apache-2.0

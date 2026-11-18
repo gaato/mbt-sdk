@@ -19,8 +19,27 @@ async test "Gemini live countTokens" {
       Text(@gen.PartText::new(text="Hello")),
     ]),
   ])
-  guard sdk.count_tokens(model~, request) is Ok(result) else {
-    fail("Gemini countTokens failed")
+  let operation = "count_tokens"
+  let result = match sdk.count_tokens(model~, request) {
+    Ok(result) => result
+    Err(Decode(error)) =>
+      fail(@live_diagnostics.response_failure(operation, error))
+    Err(Http({ head, body, .. })) =>
+      fail(
+        @live_diagnostics.format(
+          operation,
+          "API error",
+          status=head.status,
+          body~,
+        ),
+      )
+    Err(Transport(error)) =>
+      fail(@live_diagnostics.format(operation, error.message()))
+    Err(Validation(parameter~, message~, ..)) =>
+      fail(
+        @live_diagnostics.format(operation, "invalid \{parameter}: \{message}"),
+      )
+    Err(@gemini.Failure::..) => fail(operation + ": request failed")
   }
   assert_true(result.total_tokens.unwrap_or(0) > 0)
 }

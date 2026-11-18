@@ -39,8 +39,27 @@ fn chat_usage_from_generated(usage : @gen.CompletionUsage) -> Usage {
 ///|
 fn tool_call_from_generated(
   call : @gen.ChatCompletionMessageToolCall,
+  raw : Json?,
 ) -> ToolCall {
-  { id: call.id, name: call.function.name, arguments: call.function.arguments, }
+  {
+    id: call.id,
+    name: call.function.name,
+    arguments: call.function.arguments,
+    extra: tool_call_extra(raw),
+  }
+}
+
+///|
+fn tool_call_extra(raw : Json?) -> Map[String, Json] {
+  let extra : Map[String, Json] = Map([])
+  if raw is Some(Object(fields)) {
+    for key, value in fields {
+      if is_tool_call_extension(key) {
+        extra[key] = value
+      }
+    }
+  }
+  extra
 }
 
 ///|
@@ -99,35 +118,54 @@ fn decode_chat_completion(
   guard generated.choices.get(0) is Some(choice) else {
     raise decode_error(head, message="chat completion has no choices", body~)
   }
+  let message = chat_payload(raw, 0, "message")
+  let raw_calls = chat_tool_calls(message)
   {
     id: generated.id,
     model: generated.model,
-    text: choice.message.content.unwrap_or(""),
-    reasoning_content: chat_reasoning_at(raw, 0, "message"),
-    finish_reason: Some(chat_finish_reason(choice.finish_reason)),
+    text: choice.message.content.to_option().unwrap_or(""),
+    reasoning_content: chat_reasoning(message),
+    finish_reason: choice.finish_reason.map(chat_finish_reason),
     usage: generated.usage.map(chat_usage_from_generated),
     tool_calls: choice.message.tool_calls
-    .map(calls => calls.map(tool_call_from_generated))
+    .map(calls => {
+      calls.mapi((index, call) => {
+        tool_call_from_generated(call, raw_calls.get(index))
+      })
+    })
     .unwrap_or([]),
     raw,
   }
 }
 
 ///|
-fn reasoning_delta_at(value : Json, index : Int32) -> String? {
-  chat_reasoning_at(value, index, "delta")
+fn chat_payload(
+  value : Json,
+  index : Int32,
+  field : String,
+) -> Map[String, Json] {
+  guard value is { "choices": Array(choices), .. } &&
+    choices.get(index) is Some(Object(choice)) &&
+    choice.get(field) is Some(Object(payload)) else {
+    return Map([])
+  }
+  payload
 }
 
 ///|
-fn chat_reasoning_at(value : Json, index : Int32, field : String) -> String? {
-  guard value is Object(root) else { return None }
-  guard root.get("choices") is Some(Array(choices)) else { return None }
-  guard choices.get(index) is Some(Object(choice)) else { return None }
-  guard choice.get(field) is Some(Object(delta)) else { return None }
-  match delta.get("reasoning_content") {
+fn chat_tool_calls(payload : Map[String, Json]) -> Array[Json] {
+  match payload.get("tool_calls") {
+    Some(Array(calls)) => calls
+    _ => []
+  }
+}
+
+///|
+fn chat_reasoning(payload : Map[String, Json]) -> String? {
+  match payload.get("reasoning_content") {
     Some(String(text)) => Some(text)
     _ =>
-      match delta.get("reasoning") {
+      match payload.get("reasoning") {
         Some(String(text)) => Some(text)
         _ => None
       }
@@ -150,15 +188,17 @@ fn decode_chat_chunk(
   let chunk : @gen.CreateChatCompletionStreamResponse = @json.from_json(value)
   let events : Array[ChatEvent] = []
   for index, choice in chunk.choices {
+    let delta = chat_payload(value, index, "delta")
     match choice.delta.content {
       @sdkjson.Value(text) => events.push(Delta(text))
       _ => ()
     }
-    if reasoning_delta_at(value, index) is Some(text) {
+    if chat_reasoning(delta) is Some(text) {
       events.push(ReasoningDelta(text))
     }
     if index == 0 && choice.delta.tool_calls is Some(calls) {
-      for call in calls {
+      let raw_calls = chat_tool_calls(delta)
+      for position, call in calls {
         let name = match call.function {
           Some(function) => function.name
           None => None
@@ -168,11 +208,17 @@ fn decode_chat_chunk(
           None => ""
         }
         events.push(
-          ToolCallDelta(index=call.index, id=call.id, name~, arguments~),
+          ToolCallDelta(
+            index=call.index,
+            id=call.id,
+            name~,
+            arguments~,
+            extra=tool_call_extra(raw_calls.get(position)),
+          ),
         )
       }
     }
-    if choice.finish_reason is Some(reason) {
+    if choice.finish_reason is @sdkjson.Value(reason) {
       events.push(Finished(chat_stream_finish_reason(reason)))
     }
   }
@@ -213,6 +259,7 @@ fn response_tool_calls(output : Array[@gen.OutputItem]) -> Array[ToolCall] {
         id: call.call_id,
         name: call.name,
         arguments: call.arguments,
+        extra: {},
       })
     }
   }
@@ -365,9 +412,29 @@ fn parse_json_body(body : Bytes) -> Json raise {
 }
 
 ///|
-fn decode_api_error_body(body : Bytes) -> ApiErrorBody raise {
-  let envelope : ApiErrorEnvelopeJson = @json.from_json(parse_json_body(body))
+fn decode_api_error_body(
+  body : Bytes,
+  unexpected_status~ : Bool = false,
+) -> ApiErrorBody raise {
+  let raw = parse_json_body(body)
+  // A string detail is documented on Voyage HTTP errors. Success and stream
+  // frames can carry their own detail fields, so keep their existing decoder.
+  if unexpected_status &&
+    raw is { "detail": String(message), "error"? : None, .. } {
+    return { message, type_: None, param: None, code: None, }
+  }
+  let envelope : ApiErrorEnvelopeJson = @json.from_json(
+    unwrap_error_envelope(raw),
+  )
   envelope.0
+}
+
+///|
+fn unwrap_error_envelope(value : Json) -> Json {
+  match value {
+    Array([envelope]) => envelope
+    _ => value
+  }
 }
 
 ///|
@@ -379,7 +446,7 @@ pub fn api_error(error : OpenAIFailure) -> ApiErrorBody? {
     Response(@client.UnexpectedStatus(_, body~)) => body
     _ => return None
   }
-  try decode_api_error_body(body) catch {
+  try decode_api_error_body(body, unexpected_status=true) catch {
     _ => None
   } noraise {
     value => Some(value)

@@ -12,6 +12,7 @@ import {
   "gaato/anthropic/gen" @anthropic_gen,
   "gaato/github" @github_sdk,
   "gaato/github/gen" @github_gen,
+  "gaato/moonbit-sdks-runtime-tests/internal/live_diagnostics",
   "moonbitlang/core/async",
   "moonbitlang/core/debug",
   "moonbitlang/core/env",
