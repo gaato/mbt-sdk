@@ -894,12 +894,225 @@ pub fn dns_records_for_a_zone_batch_dns_records_decode(
 /// Export DNS Records The caller handles the response as @http.Response.
 pub fn dns_records_for_a_zone_export_dns_records_request(
   zone_id : String,
+  include_generated_records? : Bool,
+  name? : String,
+  name_exact? : String,
+  name_contains? : String,
+  name_startswith? : String,
+  name_endswith? : String,
+  type_? : DnsRecordType,
+  content? : String,
+  content_exact? : String,
+  content_contains? : String,
+  content_startswith? : String,
+  content_endswith? : String,
+  proxied? : Bool,
+  match_? : DnsRecordMatch,
+  comment? : String,
+  comment_present? : String,
+  comment_absent? : String,
+  comment_exact? : String,
+  comment_contains? : String,
+  comment_startswith? : String,
+  comment_endswith? : String,
+  tag? : String,
+  tag_present? : String,
+  tag_absent? : String,
+  tag_exact? : String,
+  tag_contains? : String,
+  tag_startswith? : String,
+  tag_endswith? : String,
+  search? : String,
+  tag_match? : DnsRecordTagMatch,
+  include_shadow_metadata? : Bool,
+  shadowed_by_name? : String,
+  shadowing_name? : String,
 ) -> @http.Request {
-  @http.Request::get(
-    "/zones/" +
+  let mut url = "/zones/" +
     @http.percent_encode(parameter_value(zone_id)) +
-    "/dns_records/export",
-  )
+    "/dns_records/export"
+  match include_generated_records {
+    Option::Some(value) =>
+      url = @http.append_query(
+        url,
+        "include_generated_records",
+        parameter_value(value),
+      )
+    Option::None => ()
+  }
+  match name {
+    Option::Some(value) =>
+      url = @http.append_query(url, "name", parameter_value(value))
+    Option::None => ()
+  }
+  match name_exact {
+    Option::Some(value) =>
+      url = @http.append_query(url, "name.exact", parameter_value(value))
+    Option::None => ()
+  }
+  match name_contains {
+    Option::Some(value) =>
+      url = @http.append_query(url, "name.contains", parameter_value(value))
+    Option::None => ()
+  }
+  match name_startswith {
+    Option::Some(value) =>
+      url = @http.append_query(url, "name.startswith", parameter_value(value))
+    Option::None => ()
+  }
+  match name_endswith {
+    Option::Some(value) =>
+      url = @http.append_query(url, "name.endswith", parameter_value(value))
+    Option::None => ()
+  }
+  match type_ {
+    Option::Some(value) =>
+      url = @http.append_query(url, "type", parameter_value(value))
+    Option::None => ()
+  }
+  match content {
+    Option::Some(value) =>
+      url = @http.append_query(url, "content", parameter_value(value))
+    Option::None => ()
+  }
+  match content_exact {
+    Option::Some(value) =>
+      url = @http.append_query(url, "content.exact", parameter_value(value))
+    Option::None => ()
+  }
+  match content_contains {
+    Option::Some(value) =>
+      url = @http.append_query(url, "content.contains", parameter_value(value))
+    Option::None => ()
+  }
+  match content_startswith {
+    Option::Some(value) =>
+      url = @http.append_query(
+        url,
+        "content.startswith",
+        parameter_value(value),
+      )
+    Option::None => ()
+  }
+  match content_endswith {
+    Option::Some(value) =>
+      url = @http.append_query(url, "content.endswith", parameter_value(value))
+    Option::None => ()
+  }
+  match proxied {
+    Option::Some(value) =>
+      url = @http.append_query(url, "proxied", parameter_value(value))
+    Option::None => ()
+  }
+  match match_ {
+    Option::Some(value) =>
+      url = @http.append_query(url, "match", parameter_value(value))
+    Option::None => ()
+  }
+  match comment {
+    Option::Some(value) =>
+      url = @http.append_query(url, "comment", parameter_value(value))
+    Option::None => ()
+  }
+  match comment_present {
+    Option::Some(value) =>
+      url = @http.append_query(url, "comment.present", parameter_value(value))
+    Option::None => ()
+  }
+  match comment_absent {
+    Option::Some(value) =>
+      url = @http.append_query(url, "comment.absent", parameter_value(value))
+    Option::None => ()
+  }
+  match comment_exact {
+    Option::Some(value) =>
+      url = @http.append_query(url, "comment.exact", parameter_value(value))
+    Option::None => ()
+  }
+  match comment_contains {
+    Option::Some(value) =>
+      url = @http.append_query(url, "comment.contains", parameter_value(value))
+    Option::None => ()
+  }
+  match comment_startswith {
+    Option::Some(value) =>
+      url = @http.append_query(
+        url,
+        "comment.startswith",
+        parameter_value(value),
+      )
+    Option::None => ()
+  }
+  match comment_endswith {
+    Option::Some(value) =>
+      url = @http.append_query(url, "comment.endswith", parameter_value(value))
+    Option::None => ()
+  }
+  match tag {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag", parameter_value(value))
+    Option::None => ()
+  }
+  match tag_present {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag.present", parameter_value(value))
+    Option::None => ()
+  }
+  match tag_absent {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag.absent", parameter_value(value))
+    Option::None => ()
+  }
+  match tag_exact {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag.exact", parameter_value(value))
+    Option::None => ()
+  }
+  match tag_contains {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag.contains", parameter_value(value))
+    Option::None => ()
+  }
+  match tag_startswith {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag.startswith", parameter_value(value))
+    Option::None => ()
+  }
+  match tag_endswith {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag.endswith", parameter_value(value))
+    Option::None => ()
+  }
+  match search {
+    Option::Some(value) =>
+      url = @http.append_query(url, "search", parameter_value(value))
+    Option::None => ()
+  }
+  match tag_match {
+    Option::Some(value) =>
+      url = @http.append_query(url, "tag_match", parameter_value(value))
+    Option::None => ()
+  }
+  match include_shadow_metadata {
+    Option::Some(value) =>
+      url = @http.append_query(
+        url,
+        "include_shadow_metadata",
+        parameter_value(value),
+      )
+    Option::None => ()
+  }
+  match shadowed_by_name {
+    Option::Some(value) =>
+      url = @http.append_query(url, "shadowed_by_name", parameter_value(value))
+    Option::None => ()
+  }
+  match shadowing_name {
+    Option::Some(value) =>
+      url = @http.append_query(url, "shadowing_name", parameter_value(value))
+    Option::None => ()
+  }
+  @http.Request::get(url)
 }
 
 ///|
