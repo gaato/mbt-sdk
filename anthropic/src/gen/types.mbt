@@ -22997,6 +22997,7 @@ pub impl @json.FromJson for RefusalCategory with fn from_json(value, path) {
 pub(all) struct RefusalStopDetails {
   category : RefusalCategory?
   explanation : String?
+  type_ : String
 }
 
 ///|
@@ -23009,10 +23010,11 @@ pub extend RefusalStopDetails with @debug.Debug::{to_repr}
 ///
 /// Creates a RefusalStopDetails with omitted optional fields absent.
 pub fn RefusalStopDetails::new(
+  type_~ : String,
   category? : RefusalCategory,
   explanation? : String,
 ) -> RefusalStopDetails {
-  { category, explanation, }
+  { category, explanation, type_, }
 }
 
 ///|
@@ -23028,7 +23030,7 @@ pub impl ToJson for RefusalStopDetails with fn to_json(self) {
     "explanation",
     nullable_presence(self.explanation.map(value => value)),
   )
-  .field("type", "refusal")
+  .field("type", self.type_)
   .build()
 }
 
@@ -23043,6 +23045,51 @@ pub impl @json.FromJson for RefusalStopDetails with fn from_json(value, path) {
   {
     category: decode_nullable_field(obj, "category", path),
     explanation: decode_nullable_field(obj, "explanation", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union StopDetails.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum StopDetails {
+  Refusal(RefusalStopDetails)
+  Unknown(String, Json)
+}
+
+///|
+pub extend StopDetails with Eq::{equal, not_equal}
+
+///|
+pub extend StopDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend StopDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for StopDetails with fn to_json(self) {
+  match self {
+    StopDetails::Refusal(value) => @json.Json::Json(value)
+    StopDetails::Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend StopDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for StopDetails with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "refusal" => StopDetails::Refusal(@json.from_json(value, path~))
+    other => StopDetails::Unknown(other, value)
   }
 }
 
@@ -23315,7 +23362,7 @@ pub(all) struct Message {
   model : String
   stop_reason : StopReason?
   stop_sequence : @sdkjson.Presence[String]
-  stop_details : @sdkjson.Presence[RefusalStopDetails]
+  stop_details : @sdkjson.Presence[StopDetails]
   usage : Usage
   diagnostics : @sdkjson.Presence[Diagnostics]
   container : @sdkjson.Presence[Container]
@@ -23337,7 +23384,7 @@ pub fn Message::new(
   usage~ : Usage,
   stop_reason? : StopReason,
   stop_sequence? : String,
-  stop_details? : RefusalStopDetails,
+  stop_details? : StopDetails,
   diagnostics? : Diagnostics,
   container? : Container,
 ) -> Message {
@@ -23406,7 +23453,7 @@ pub impl @json.FromJson for Message with fn from_json(value, path) {
 #derive(Eq, @debug.Debug)
 pub(all) struct MessageDelta {
   container : @sdkjson.Presence[Container]
-  stop_details : @sdkjson.Presence[RefusalStopDetails]
+  stop_details : @sdkjson.Presence[StopDetails]
   stop_reason : StopReason?
   stop_sequence : @sdkjson.Presence[String]
 }
@@ -23422,7 +23469,7 @@ pub extend MessageDelta with @debug.Debug::{to_repr}
 /// Creates a MessageDelta with omitted optional fields absent.
 pub fn MessageDelta::new(
   container? : Container,
-  stop_details? : RefusalStopDetails,
+  stop_details? : StopDetails,
   stop_reason? : StopReason,
   stop_sequence? : String,
 ) -> MessageDelta {

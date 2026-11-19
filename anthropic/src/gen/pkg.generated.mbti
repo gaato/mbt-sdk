@@ -2379,14 +2379,14 @@ pub(all) struct Message {
   model : String
   stop_reason : StopReason?
   stop_sequence : @jsonkit.Presence[String]
-  stop_details : @jsonkit.Presence[RefusalStopDetails]
+  stop_details : @jsonkit.Presence[StopDetails]
   usage : Usage
   diagnostics : @jsonkit.Presence[Diagnostics]
   container : @jsonkit.Presence[Container]
 }
 pub fn Message::equal(Self, Self) -> Bool
 pub fn Message::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn Message::new(id~ : String, content~ : Array[ContentBlock], model~ : String, usage~ : Usage, stop_reason? : StopReason, stop_sequence? : String, stop_details? : RefusalStopDetails, diagnostics? : Diagnostics, container? : Container) -> Self
+pub fn Message::new(id~ : String, content~ : Array[ContentBlock], model~ : String, usage~ : Usage, stop_reason? : StopReason, stop_sequence? : String, stop_details? : StopDetails, diagnostics? : Diagnostics, container? : Container) -> Self
 pub fn Message::not_equal(Self, Self) -> Bool
 pub fn Message::to_json(Self) -> @json.Json
 pub fn Message::to_repr(Self) -> @debug.Repr
@@ -2396,13 +2396,13 @@ pub impl @json.ToJson for Message
 #derive(Eq, @debug.Debug)
 pub(all) struct MessageDelta {
   container : @jsonkit.Presence[Container]
-  stop_details : @jsonkit.Presence[RefusalStopDetails]
+  stop_details : @jsonkit.Presence[StopDetails]
   stop_reason : StopReason?
   stop_sequence : @jsonkit.Presence[String]
 }
 pub fn MessageDelta::equal(Self, Self) -> Bool
 pub fn MessageDelta::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn MessageDelta::new(container? : Container, stop_details? : RefusalStopDetails, stop_reason? : StopReason, stop_sequence? : String) -> Self
+pub fn MessageDelta::new(container? : Container, stop_details? : StopDetails, stop_reason? : StopReason, stop_sequence? : String) -> Self
 pub fn MessageDelta::not_equal(Self, Self) -> Bool
 pub fn MessageDelta::to_json(Self) -> @json.Json
 pub fn MessageDelta::to_repr(Self) -> @debug.Repr
@@ -2738,10 +2738,11 @@ pub impl @json.ToJson for RefusalCategory
 pub(all) struct RefusalStopDetails {
   category : RefusalCategory?
   explanation : String?
+  type_ : String
 }
 pub fn RefusalStopDetails::equal(Self, Self) -> Bool
 pub fn RefusalStopDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
-pub fn RefusalStopDetails::new(category? : RefusalCategory, explanation? : String) -> Self
+pub fn RefusalStopDetails::new(type_~ : String, category? : RefusalCategory, explanation? : String) -> Self
 pub fn RefusalStopDetails::not_equal(Self, Self) -> Bool
 pub fn RefusalStopDetails::to_json(Self) -> @json.Json
 pub fn RefusalStopDetails::to_repr(Self) -> @debug.Repr
@@ -4912,6 +4913,20 @@ pub fn Speed::to_json(Self) -> @json.Json
 pub fn Speed::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for Speed
 pub impl @json.ToJson for Speed
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum StopDetails {
+  Refusal(RefusalStopDetails)
+  Unknown(String, @json.Json)
+}
+pub fn StopDetails::equal(Self, Self) -> Bool
+pub fn StopDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn StopDetails::not_equal(Self, Self) -> Bool
+pub fn StopDetails::to_json(Self) -> @json.Json
+pub fn StopDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for StopDetails
+pub impl @json.ToJson for StopDetails
 
 #non_exhaustive
 #derive(Eq, @debug.Debug)
