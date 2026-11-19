@@ -20,6 +20,7 @@ are optional unless the field is required, and keep a wildcard arm.
 - Generated code now qualifies constructor references; no public API change.
 - **Regenerated from the upstream spec fetched 2026-11-17** (sha256 `7696dbb0d6d6`). Changes are batched for the next weekly release; see the generated interface diff.
 - **Build with MoonBit 0.10.21 and mttp_core 0.3.0.** Invalid explicit header values, including surrounding whitespace, return validation failures before I/O.
+- **Regenerated from the upstream spec fetched 2026-11-19** (sha256 `c444545fad0e`). Changes are batched for the next weekly release; see the generated interface diff.
 
 ### Security
 
