@@ -26,7 +26,7 @@ pub impl @debug.Debug for Auth
 pub struct CloudflareDns {
   // private fields
 }
-pub async fn CloudflareDns::batch_dns_records(Self, zone_id~ : String, @gen.DnsBatch, include_shadow_metadata? : Bool) -> Result[@gen.DnsBatchResult, Failure]
+pub async fn CloudflareDns::bulk_apply_dns_records(Self, zone_id~ : String, @gen.DnsBatch, include_shadow_metadata? : Bool) -> Result[@gen.DnsBatchResult, Failure]
 pub async fn[T] CloudflareDns::call(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure], operation? : String) -> Result[T, Failure]
 pub async fn CloudflareDns::create_dns_record(Self, zone_id~ : String, @gen.DnsRecord, include_shadow_metadata? : Bool) -> Result[@gen.DnsRecordResponse, Failure]
 pub async fn CloudflareDns::create_zone(Self, @gen.ZoneCreate) -> Result[@gen.Zone, Failure]
@@ -37,7 +37,7 @@ pub async fn CloudflareDns::edit_dns_record(Self, dns_record_id~ : String, zone_
 pub async fn CloudflareDns::edit_dns_settings(Self, zone_id~ : String, @gen.ZoneDnsSettingsPatch) -> Result[@gen.ZoneDnsSettings, Failure]
 pub async fn CloudflareDns::edit_dnssec(Self, zone_id~ : String, @gen.DnssecPatch) -> Result[@gen.Dnssec, Failure]
 pub async fn CloudflareDns::edit_zone(Self, zone_id~ : String, @gen.ZonePatch) -> Result[@gen.Zone, Failure]
-pub async fn CloudflareDns::export_dns_records(Self, zone_id~ : String) -> Result[String, Failure]
+pub async fn CloudflareDns::export_dns_records(Self, zone_id~ : String, include_generated_records? : Bool, name? : String, name_exact? : String, name_contains? : String, name_startswith? : String, name_endswith? : String, type_? : @gen.DnsRecordType, content? : String, content_exact? : String, content_contains? : String, content_startswith? : String, content_endswith? : String, proxied? : Bool, match_? : @gen.DnsRecordMatch, comment? : String, comment_present? : String, comment_absent? : String, comment_exact? : String, comment_contains? : String, comment_startswith? : String, comment_endswith? : String, tag? : String, tag_present? : String, tag_absent? : String, tag_exact? : String, tag_contains? : String, tag_startswith? : String, tag_endswith? : String, search? : String, tag_match? : @gen.DnsRecordTagMatch, include_shadow_metadata? : Bool, shadowed_by_name? : String, shadowing_name? : String) -> Result[String, Failure]
 pub fn CloudflareDns::from_client(@client.Client, auth~ : Auth, base_url? : String, server_urls? : Map[String, String]) -> Self
 pub async fn CloudflareDns::get_dns_record(Self, dns_record_id~ : String, zone_id~ : String, include_shadow_metadata? : Bool) -> Result[@gen.DnsRecordResponse, Failure]
 pub async fn CloudflareDns::get_dns_settings(Self, zone_id~ : String) -> Result[@gen.ZoneDnsSettings, Failure]
