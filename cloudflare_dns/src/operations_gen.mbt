@@ -135,6 +135,8 @@ pub async fn CloudflareDns::list_dns_records(
   tag_endswith? : String,
   search? : String,
   tag_match? : @gen.DnsRecordTagMatch,
+  cursor? : String,
+  prev_cursor? : String,
   page? : Int32,
   per_page? : Int32,
   order? : @gen.DnsRecordOrder,
@@ -174,6 +176,8 @@ pub async fn CloudflareDns::list_dns_records(
     tag_endswith?,
     search?,
     tag_match?,
+    cursor?,
+    prev_cursor?,
     page?,
     per_page?,
     order?,
@@ -211,7 +215,7 @@ pub async fn CloudflareDns::create_dns_record(
 
 ///|
 /// Calls dns-records-for-a-zone-batch-dns-records.
-pub async fn CloudflareDns::batch_dns_records(
+pub async fn CloudflareDns::bulk_apply_dns_records(
   self : CloudflareDns,
   zone_id~ : String,
   body : @gen.DnsBatch,
@@ -234,10 +238,76 @@ pub async fn CloudflareDns::batch_dns_records(
 pub async fn CloudflareDns::export_dns_records(
   self : CloudflareDns,
   zone_id~ : String,
+  include_generated_records? : Bool,
+  name? : String,
+  name_exact? : String,
+  name_contains? : String,
+  name_startswith? : String,
+  name_endswith? : String,
+  type_? : @gen.DnsRecordType,
+  content? : String,
+  content_exact? : String,
+  content_contains? : String,
+  content_startswith? : String,
+  content_endswith? : String,
+  proxied? : Bool,
+  match_? : @gen.DnsRecordMatch,
+  comment? : String,
+  comment_present? : String,
+  comment_absent? : String,
+  comment_exact? : String,
+  comment_contains? : String,
+  comment_startswith? : String,
+  comment_endswith? : String,
+  tag? : String,
+  tag_present? : String,
+  tag_absent? : String,
+  tag_exact? : String,
+  tag_contains? : String,
+  tag_startswith? : String,
+  tag_endswith? : String,
+  search? : String,
+  tag_match? : @gen.DnsRecordTagMatch,
+  include_shadow_metadata? : Bool,
+  shadowed_by_name? : String,
+  shadowing_name? : String,
 ) -> Result[String, Failure] {
-  let request = @gen.dns_records_for_a_zone_export_dns_records_request(zone_id).header(
-    "accept", "text/plain",
-  )
+  let request = @gen.dns_records_for_a_zone_export_dns_records_request(
+    zone_id,
+    include_generated_records?,
+    name?,
+    name_exact?,
+    name_contains?,
+    name_startswith?,
+    name_endswith?,
+    type_?,
+    content?,
+    content_exact?,
+    content_contains?,
+    content_startswith?,
+    content_endswith?,
+    proxied?,
+    match_?,
+    comment?,
+    comment_present?,
+    comment_absent?,
+    comment_exact?,
+    comment_contains?,
+    comment_startswith?,
+    comment_endswith?,
+    tag?,
+    tag_present?,
+    tag_absent?,
+    tag_exact?,
+    tag_contains?,
+    tag_startswith?,
+    tag_endswith?,
+    search?,
+    tag_match?,
+    include_shadow_metadata?,
+    shadowed_by_name?,
+    shadowing_name?,
+  ).header("accept", "text/plain")
   match
     self.send(request, operation="dns-records-for-a-zone-export-dns-records") {
     Result::Err(error) => Result::Err(error)
@@ -410,7 +480,7 @@ pub async fn CloudflareDns::update_dns_record(
 
 ///|
 /// Calls dns-settings-for-a-zone-list-dns-settings.
-pub async fn CloudflareDns::get_dns_settings(
+pub async fn CloudflareDns::dns_settings_for_a_zone_list_dns_settings(
   self : CloudflareDns,
   zone_id~ : String,
 ) -> Result[@gen.ZoneDnsSettings, Failure] {
@@ -424,7 +494,7 @@ pub async fn CloudflareDns::get_dns_settings(
 
 ///|
 /// Calls dns-settings-for-a-zone-update-dns-settings.
-pub async fn CloudflareDns::edit_dns_settings(
+pub async fn CloudflareDns::dns_settings_for_a_zone_update_dns_settings(
   self : CloudflareDns,
   zone_id~ : String,
   body : @gen.ZoneDnsSettingsPatch,
