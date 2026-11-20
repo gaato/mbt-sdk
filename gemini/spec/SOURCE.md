@@ -1,6 +1,6 @@
 # discovery.json
 
 - Source: https://generativelanguage.googleapis.com/$discovery/rest?version=v1beta
-- Fetched: 2026-11-18
-- sha256: f9fc221fdb7235c60305b546d1da106d82a1bd5ea5a607825c4a84ec7bf6eb51
-- Discovery revision: 20261118
+- Fetched: 2026-11-20
+- sha256: 474ab75875fbf9613379e2298210f6953714c5c14b2cf0327acd355eeddf5da5
+- Discovery revision: 20261120

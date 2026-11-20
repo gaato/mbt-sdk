@@ -492,174 +492,7 @@ test "generated from_client auth OAuthToken and redirect boundaries" {
 }
 
 ///|
-test "generated route and server files_get" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(
-        @http.Request::new(@http.Method::parse("GET"), "/v1beta/example"),
-      )
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/example",
-  )
-}
-
-///|
-test "generated route and server files_delete" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(
-        @http.Request::new(@http.Method::parse("DELETE"), "/v1beta/example"),
-      )
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/example",
-  )
-}
-
-///|
-test "generated route and server files_list" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(@http.Request::new(@http.Method::parse("GET"), "/v1beta/files"))
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/files",
-  )
-}
-
-///|
-test "generated route and server media_upload" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(@http.Request::new(@http.Method::parse("POST"), "/v1beta/files"))
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/files",
-  )
-}
-
-///|
-test "generated route and server cached_contents_delete" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(
-        @http.Request::new(@http.Method::parse("DELETE"), "/v1beta/example"),
-      )
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/example",
-  )
-}
-
-///|
-test "generated route and server cached_contents_patch" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(
-        @http.Request::new(@http.Method::parse("PATCH"), "/v1beta/example"),
-      )
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/example",
-  )
-}
-
-///|
-test "generated route and server cached_contents_list" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(
-        @http.Request::new(@http.Method::parse("GET"), "/v1beta/cachedContents"),
-      )
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/cachedContents",
-  )
-}
-
-///|
-test "generated route and server cached_contents_create" {
-  let seen = Ref::Ref("")
-  let backend = @client.from_fn((request, _) => {
-    seen.val = request.url
-    @http.Response::new(200)
-  })
-  let sdk = Gemini::new(backend, @sim.FakeClock::new())
-  ignore(
-    @driver.run_sync(() => {
-      sdk.send(
-        @http.Request::new(
-          @http.Method::parse("POST"),
-          "/v1beta/cachedContents",
-        ),
-      )
-    }),
-  )
-  try! assert_eq(
-    seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/cachedContents",
-  )
-}
-
-///|
-test "generated route and server cached_contents_get" {
+test "generated route and server models_get" {
   let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
@@ -728,6 +561,49 @@ test "generated route and server models_batch_embed_contents" {
 }
 
 ///|
+test "generated route and server models_count_tokens" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(
+        @http.Request::new(
+          @http.Method::parse("POST"),
+          "/v1beta/example:countTokens",
+        ),
+      )
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/example:countTokens",
+  )
+}
+
+///|
+test "generated route and server models_list" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(@http.Request::new(@http.Method::parse("GET"), "/v1beta/models"))
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/models",
+  )
+}
+
+///|
 test "generated route and server models_generate_content" {
   let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
@@ -776,7 +652,7 @@ test "generated route and server models_stream_generate_content" {
 }
 
 ///|
-test "generated route and server models_list" {
+test "generated route and server files_list" {
   let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
@@ -785,17 +661,57 @@ test "generated route and server models_list" {
   let sdk = Gemini::new(backend, @sim.FakeClock::new())
   ignore(
     @driver.run_sync(() => {
-      sdk.send(@http.Request::new(@http.Method::parse("GET"), "/v1beta/models"))
+      sdk.send(@http.Request::new(@http.Method::parse("GET"), "/v1beta/files"))
     }),
   )
   try! assert_eq(
     seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/models",
+    "https://generativelanguage.googleapis.com/v1beta/files",
   )
 }
 
 ///|
-test "generated route and server models_get" {
+test "generated route and server media_upload" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(@http.Request::new(@http.Method::parse("POST"), "/v1beta/files"))
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/files",
+  )
+}
+
+///|
+test "generated route and server files_delete" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(
+        @http.Request::new(@http.Method::parse("DELETE"), "/v1beta/example"),
+      )
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/example",
+  )
+}
+
+///|
+test "generated route and server files_get" {
   let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
@@ -816,7 +732,7 @@ test "generated route and server models_get" {
 }
 
 ///|
-test "generated route and server models_count_tokens" {
+test "generated route and server cached_contents_create" {
   let seen = Ref::Ref("")
   let backend = @client.from_fn((request, _) => {
     seen.val = request.url
@@ -828,14 +744,98 @@ test "generated route and server models_count_tokens" {
       sdk.send(
         @http.Request::new(
           @http.Method::parse("POST"),
-          "/v1beta/example:countTokens",
+          "/v1beta/cachedContents",
         ),
       )
     }),
   )
   try! assert_eq(
     seen.val,
-    "https://generativelanguage.googleapis.com/v1beta/example:countTokens",
+    "https://generativelanguage.googleapis.com/v1beta/cachedContents",
+  )
+}
+
+///|
+test "generated route and server cached_contents_list" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(
+        @http.Request::new(@http.Method::parse("GET"), "/v1beta/cachedContents"),
+      )
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/cachedContents",
+  )
+}
+
+///|
+test "generated route and server cached_contents_patch" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(
+        @http.Request::new(@http.Method::parse("PATCH"), "/v1beta/example"),
+      )
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/example",
+  )
+}
+
+///|
+test "generated route and server cached_contents_delete" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(
+        @http.Request::new(@http.Method::parse("DELETE"), "/v1beta/example"),
+      )
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/example",
+  )
+}
+
+///|
+test "generated route and server cached_contents_get" {
+  let seen = Ref::Ref("")
+  let backend = @client.from_fn((request, _) => {
+    seen.val = request.url
+    @http.Response::new(200)
+  })
+  let sdk = Gemini::new(backend, @sim.FakeClock::new())
+  ignore(
+    @driver.run_sync(() => {
+      sdk.send(
+        @http.Request::new(@http.Method::parse("GET"), "/v1beta/example"),
+      )
+    }),
+  )
+  try! assert_eq(
+    seen.val,
+    "https://generativelanguage.googleapis.com/v1beta/example",
   )
 }
 
@@ -854,7 +854,7 @@ test "generated typed HTTP error body" {
   )
   match
     @driver.run_sync(() => {
-      sdk.send(@http.Request::get("/contract-test"), operation="files_get")
+      sdk.send(@http.Request::get("/contract-test"), operation="models_get")
     }) {
     Result::Err(Failure::Http(failure)) => {
       try! assert_true(failure.typed is Option::Some(_))
