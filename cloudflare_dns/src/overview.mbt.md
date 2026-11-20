@@ -9,7 +9,14 @@ For code that runs in Cloudflare Workers and needs runtime bindings, see
 
 ```sh
 moon add gaato/cloudflare_dns
+moon add gaato/mttp_core
+moon add gaato/mttp
 ```
+
+An app adds all three: `gaato/mttp` for its backend and clock, `gaato/mttp_core`
+for the `client.Client` the examples take. A library that wraps this SDK adds
+`gaato/cloudflare_dns` and `gaato/mttp_core`, and takes the backend from its
+caller.
 
 Import `gaato/cloudflare_dns`, `gaato/cloudflare_dns/gen` for the data types
 and low-level builders, and `gaato/mttp_core/client` if you pass a runtime
