@@ -145,414 +145,54 @@ fn[T : @json.FromJson] decode_optional_json_map(
 
 ///|
 ///
-/// Optional. Specifies the mode in which function calling should execute. If unspecified, the default value will be set to AUTO. Enum values: MODE_UNSPECIFIED: Unspecified function calling mode. This value should not be used.; AUTO: Default model behavior, model decides to predict either a function call or a natural language response.; ANY: Model is constrained to always predicting a function call only. If "allowed_function_names" are set, the predicted function call will be limited to any one of "allowed_function_names", else the predicted function call will be any one of the provided "function_declarations".; NONE: Model will not predict any function call. Model behavior is same as when not passing any function declarations.; VALIDATED: Model decides to predict either a function call or a natural language response, but will validate function calls with constrained decoding. If "allowed_function_names" are set, the predicted function call will be limited to any one of "allowed_function_names", else the predicted function call will be any one of the provided "function_declarations".
+/// Metadata related to retrieval in the grounding flow.
 #derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum FunctionCallingConfigMode {
-  MODEUNSPECIFIED
-  AUTO
-  ANY
-  NONE
-  VALIDATED
-  Unknown(String)
+pub(all) struct RetrievalMetadata {
+  google_search_dynamic_retrieval_score : Double?
 }
 
 ///|
-pub extend FunctionCallingConfigMode with Eq::{equal, not_equal}
+pub extend RetrievalMetadata with Eq::{equal, not_equal}
 
 ///|
-pub extend FunctionCallingConfigMode with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend FunctionCallingConfigMode with ToJson::{to_json}
-
-///|
-pub impl ToJson for FunctionCallingConfigMode with fn to_json(self) {
-  let raw = match self {
-    FunctionCallingConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
-    FunctionCallingConfigMode::AUTO => "AUTO"
-    FunctionCallingConfigMode::ANY => "ANY"
-    FunctionCallingConfigMode::NONE => "NONE"
-    FunctionCallingConfigMode::VALIDATED => "VALIDATED"
-    FunctionCallingConfigMode::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
+pub extend RetrievalMetadata with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Decodes this string enum from JSON.
-pub extend FunctionCallingConfigMode with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FunctionCallingConfigMode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MODE_UNSPECIFIED" =>
-          Option::Some(FunctionCallingConfigMode::MODEUNSPECIFIED)
-        "AUTO" => Option::Some(FunctionCallingConfigMode::AUTO)
-        "ANY" => Option::Some(FunctionCallingConfigMode::ANY)
-        "NONE" => Option::Some(FunctionCallingConfigMode::NONE)
-        "VALIDATED" => Option::Some(FunctionCallingConfigMode::VALIDATED)
-        _ => Option::None
-      }
-    },
-    raw => FunctionCallingConfigMode::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Configuration for specifying function calling behavior.
-#derive(Eq, @debug.Debug)
-pub(all) struct FunctionCallingConfig {
-  allowed_function_names : Array[String]?
-  mode : FunctionCallingConfigMode?
-}
-
-///|
-pub extend FunctionCallingConfig with Eq::{equal, not_equal}
-
-///|
-pub extend FunctionCallingConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a FunctionCallingConfig with omitted optional fields absent.
-pub fn FunctionCallingConfig::new(
-  allowed_function_names? : Array[String],
-  mode? : FunctionCallingConfigMode,
-) -> FunctionCallingConfig {
-  { allowed_function_names, mode, }
+/// Creates a RetrievalMetadata with omitted optional fields absent.
+pub fn RetrievalMetadata::new(
+  google_search_dynamic_retrieval_score? : Double,
+) -> RetrievalMetadata {
+  { google_search_dynamic_retrieval_score, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend FunctionCallingConfig with ToJson::{to_json}
+pub extend RetrievalMetadata with ToJson::{to_json}
 
 ///|
-pub impl ToJson for FunctionCallingConfig with fn to_json(self) {
+pub impl ToJson for RetrievalMetadata with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("allowedFunctionNames", self.allowed_function_names)
-  .opt("mode", self.mode)
+  .opt(
+    "googleSearchDynamicRetrievalScore",
+    self.google_search_dynamic_retrieval_score,
+  )
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend FunctionCallingConfig with @json.FromJson::{from_json}
+pub extend RetrievalMetadata with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for FunctionCallingConfig with fn from_json(value, path) {
+pub impl @json.FromJson for RetrievalMetadata with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    allowed_function_names: @sdkjson.opt_field(
-      obj, "allowedFunctionNames", path,
+    google_search_dynamic_retrieval_score: @sdkjson.opt_field(
+      obj, "googleSearchDynamicRetrievalScore", path,
     ),
-    mode: @sdkjson.opt_field(obj, "mode", path),
-  }
-}
-
-///|
-///
-/// The modality associated with this token count. Enum values: MODALITY_UNSPECIFIED: Unspecified modality.; TEXT: Plain text.; IMAGE: Image.; VIDEO: Video.; AUDIO: Audio.; DOCUMENT: Document, e.g. PDF.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum ModalityTokenCountModality {
-  MODALITYUNSPECIFIED
-  TEXT
-  IMAGE
-  VIDEO
-  AUDIO
-  DOCUMENT
-  Unknown(String)
-}
-
-///|
-pub extend ModalityTokenCountModality with Eq::{equal, not_equal}
-
-///|
-pub extend ModalityTokenCountModality with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ModalityTokenCountModality with ToJson::{to_json}
-
-///|
-pub impl ToJson for ModalityTokenCountModality with fn to_json(self) {
-  let raw = match self {
-    ModalityTokenCountModality::MODALITYUNSPECIFIED => "MODALITY_UNSPECIFIED"
-    ModalityTokenCountModality::TEXT => "TEXT"
-    ModalityTokenCountModality::IMAGE => "IMAGE"
-    ModalityTokenCountModality::VIDEO => "VIDEO"
-    ModalityTokenCountModality::AUDIO => "AUDIO"
-    ModalityTokenCountModality::DOCUMENT => "DOCUMENT"
-    ModalityTokenCountModality::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ModalityTokenCountModality with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ModalityTokenCountModality with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MODALITY_UNSPECIFIED" =>
-          Option::Some(ModalityTokenCountModality::MODALITYUNSPECIFIED)
-        "TEXT" => Option::Some(ModalityTokenCountModality::TEXT)
-        "IMAGE" => Option::Some(ModalityTokenCountModality::IMAGE)
-        "VIDEO" => Option::Some(ModalityTokenCountModality::VIDEO)
-        "AUDIO" => Option::Some(ModalityTokenCountModality::AUDIO)
-        "DOCUMENT" => Option::Some(ModalityTokenCountModality::DOCUMENT)
-        _ => Option::None
-      }
-    },
-    raw => ModalityTokenCountModality::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Represents token counting info for a single modality.
-#derive(Eq, @debug.Debug)
-pub(all) struct ModalityTokenCount {
-  token_count : Int32?
-  modality : ModalityTokenCountModality?
-}
-
-///|
-pub extend ModalityTokenCount with Eq::{equal, not_equal}
-
-///|
-pub extend ModalityTokenCount with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ModalityTokenCount with omitted optional fields absent.
-pub fn ModalityTokenCount::new(
-  token_count? : Int32,
-  modality? : ModalityTokenCountModality,
-) -> ModalityTokenCount {
-  { token_count, modality, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ModalityTokenCount with ToJson::{to_json}
-
-///|
-pub impl ToJson for ModalityTokenCount with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("tokenCount", self.token_count)
-  .opt("modality", self.modality)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ModalityTokenCount with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ModalityTokenCount with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    token_count: @sdkjson.opt_field(obj, "tokenCount", path),
-    modality: @sdkjson.opt_field(obj, "modality", path),
-  }
-}
-
-///|
-///
-/// Output only. Service tier of the request. Enum values: unspecified: Default service tier, which is standard.; standard: Standard service tier.; flex: Flex service tier.; priority: Priority service tier.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum UsageMetadataServiceTier {
-  Unspecified
-  Standard
-  Flex
-  Priority
-  Unknown(String)
-}
-
-///|
-pub extend UsageMetadataServiceTier with Eq::{equal, not_equal}
-
-///|
-pub extend UsageMetadataServiceTier with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend UsageMetadataServiceTier with ToJson::{to_json}
-
-///|
-pub impl ToJson for UsageMetadataServiceTier with fn to_json(self) {
-  let raw = match self {
-    UsageMetadataServiceTier::Unspecified => "unspecified"
-    UsageMetadataServiceTier::Standard => "standard"
-    UsageMetadataServiceTier::Flex => "flex"
-    UsageMetadataServiceTier::Priority => "priority"
-    UsageMetadataServiceTier::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend UsageMetadataServiceTier with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for UsageMetadataServiceTier with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "unspecified" => Option::Some(UsageMetadataServiceTier::Unspecified)
-        "standard" => Option::Some(UsageMetadataServiceTier::Standard)
-        "flex" => Option::Some(UsageMetadataServiceTier::Flex)
-        "priority" => Option::Some(UsageMetadataServiceTier::Priority)
-        _ => Option::None
-      }
-    },
-    raw => UsageMetadataServiceTier::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Metadata on the generation request's token usage.
-#derive(Eq, @debug.Debug)
-pub(all) struct UsageMetadata {
-  prompt_tokens_details : Array[ModalityTokenCount]?
-  cached_content_token_count : Int32?
-  thoughts_token_count : Int32?
-  tool_use_prompt_tokens_details : Array[ModalityTokenCount]?
-  prompt_token_count : Int32?
-  tool_use_prompt_token_count : Int32?
-  service_tier : UsageMetadataServiceTier?
-  candidates_token_count : Int32?
-  total_token_count : Int32?
-  candidates_tokens_details : Array[ModalityTokenCount]?
-  cache_tokens_details : Array[ModalityTokenCount]?
-}
-
-///|
-pub extend UsageMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend UsageMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a UsageMetadata with omitted optional fields absent.
-pub fn UsageMetadata::new(
-  prompt_tokens_details? : Array[ModalityTokenCount],
-  cached_content_token_count? : Int32,
-  thoughts_token_count? : Int32,
-  tool_use_prompt_tokens_details? : Array[ModalityTokenCount],
-  prompt_token_count? : Int32,
-  tool_use_prompt_token_count? : Int32,
-  service_tier? : UsageMetadataServiceTier,
-  candidates_token_count? : Int32,
-  total_token_count? : Int32,
-  candidates_tokens_details? : Array[ModalityTokenCount],
-  cache_tokens_details? : Array[ModalityTokenCount],
-) -> UsageMetadata {
-  {
-    prompt_tokens_details,
-    cached_content_token_count,
-    thoughts_token_count,
-    tool_use_prompt_tokens_details,
-    prompt_token_count,
-    tool_use_prompt_token_count,
-    service_tier,
-    candidates_token_count,
-    total_token_count,
-    candidates_tokens_details,
-    cache_tokens_details,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend UsageMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for UsageMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("promptTokensDetails", self.prompt_tokens_details)
-  .opt("cachedContentTokenCount", self.cached_content_token_count)
-  .opt("thoughtsTokenCount", self.thoughts_token_count)
-  .opt("toolUsePromptTokensDetails", self.tool_use_prompt_tokens_details)
-  .opt("promptTokenCount", self.prompt_token_count)
-  .opt("toolUsePromptTokenCount", self.tool_use_prompt_token_count)
-  .opt("serviceTier", self.service_tier)
-  .opt("candidatesTokenCount", self.candidates_token_count)
-  .opt("totalTokenCount", self.total_token_count)
-  .opt("candidatesTokensDetails", self.candidates_tokens_details)
-  .opt("cacheTokensDetails", self.cache_tokens_details)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend UsageMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for UsageMetadata with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    prompt_tokens_details: @sdkjson.opt_field(obj, "promptTokensDetails", path),
-    cached_content_token_count: @sdkjson.opt_field(
-      obj, "cachedContentTokenCount", path,
-    ),
-    thoughts_token_count: @sdkjson.opt_field(obj, "thoughtsTokenCount", path),
-    tool_use_prompt_tokens_details: @sdkjson.opt_field(
-      obj, "toolUsePromptTokensDetails", path,
-    ),
-    prompt_token_count: @sdkjson.opt_field(obj, "promptTokenCount", path),
-    tool_use_prompt_token_count: @sdkjson.opt_field(
-      obj, "toolUsePromptTokenCount", path,
-    ),
-    service_tier: @sdkjson.opt_field(obj, "serviceTier", path),
-    candidates_token_count: @sdkjson.opt_field(
-      obj, "candidatesTokenCount", path,
-    ),
-    total_token_count: @sdkjson.opt_field(obj, "totalTokenCount", path),
-    candidates_tokens_details: @sdkjson.opt_field(
-      obj, "candidatesTokensDetails", path,
-    ),
-    cache_tokens_details: @sdkjson.opt_field(obj, "cacheTokensDetails", path),
   }
 }
 
@@ -663,9 +303,9 @@ pub impl @json.FromJson for PlaceAnswerSources with fn from_json(value, path) {
 pub(all) struct Maps {
   uri : String?
   place_id : String?
+  text : String?
   title : String?
   place_answer_sources : PlaceAnswerSources?
-  text : String?
 }
 
 ///|
@@ -680,11 +320,11 @@ pub extend Maps with @debug.Debug::{to_repr}
 pub fn Maps::new(
   uri? : String,
   place_id? : String,
+  text? : String,
   title? : String,
   place_answer_sources? : PlaceAnswerSources,
-  text? : String,
 ) -> Maps {
-  { uri, place_id, title, place_answer_sources, text, }
+  { uri, place_id, text, title, place_answer_sources, }
 }
 
 ///|
@@ -697,9 +337,9 @@ pub impl ToJson for Maps with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .opt("uri", self.uri)
   .opt("placeId", self.place_id)
+  .opt("text", self.text)
   .opt("title", self.title)
   .opt("placeAnswerSources", self.place_answer_sources)
-  .opt("text", self.text)
   .build()
 }
 
@@ -714,122 +354,1698 @@ pub impl @json.FromJson for Maps with fn from_json(value, path) {
   {
     uri: @sdkjson.opt_field(obj, "uri", path),
     place_id: @sdkjson.opt_field(obj, "placeId", path),
+    text: @sdkjson.opt_field(obj, "text", path),
     title: @sdkjson.opt_field(obj, "title", path),
     place_answer_sources: @sdkjson.opt_field(obj, "placeAnswerSources", path),
-    text: @sdkjson.opt_field(obj, "text", path),
   }
 }
 
 ///|
 ///
-/// Information about a Generative Language Model.
+/// URI based data for function response.
 #derive(Eq, @debug.Debug)
-pub(all) struct Model {
-  output_token_limit : Int32?
-  base_model_id : String?
-  thinking : Bool?
-  temperature : Double?
-  top_k : Int32?
-  supported_generation_methods : Array[String]?
-  version : String?
-  name : String?
-  description : String?
-  input_token_limit : Int32?
-  max_temperature : Double?
+pub(all) struct FunctionResponseFileData {
+  file_uri : String?
+  mime_type : String?
   display_name : String?
-  top_p : Double?
 }
 
 ///|
-pub extend Model with Eq::{equal, not_equal}
+pub extend FunctionResponseFileData with Eq::{equal, not_equal}
 
 ///|
-pub extend Model with @debug.Debug::{to_repr}
+pub extend FunctionResponseFileData with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a Model with omitted optional fields absent.
-pub fn Model::new(
-  output_token_limit? : Int32,
-  base_model_id? : String,
-  thinking? : Bool,
-  temperature? : Double,
-  top_k? : Int32,
-  supported_generation_methods? : Array[String],
-  version? : String,
-  name? : String,
-  description? : String,
-  input_token_limit? : Int32,
-  max_temperature? : Double,
+/// Creates a FunctionResponseFileData with omitted optional fields absent.
+pub fn FunctionResponseFileData::new(
+  file_uri? : String,
+  mime_type? : String,
   display_name? : String,
-  top_p? : Double,
-) -> Model {
-  {
-    output_token_limit,
-    base_model_id,
-    thinking,
-    temperature,
-    top_k,
-    supported_generation_methods,
-    version,
-    name,
-    description,
-    input_token_limit,
-    max_temperature,
-    display_name,
-    top_p,
-  }
+) -> FunctionResponseFileData {
+  { file_uri, mime_type, display_name, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend Model with ToJson::{to_json}
+pub extend FunctionResponseFileData with ToJson::{to_json}
 
 ///|
-pub impl ToJson for Model with fn to_json(self) {
+pub impl ToJson for FunctionResponseFileData with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("outputTokenLimit", self.output_token_limit)
-  .opt("baseModelId", self.base_model_id)
-  .opt("thinking", self.thinking)
-  .opt("temperature", self.temperature)
-  .opt("topK", self.top_k)
-  .opt("supportedGenerationMethods", self.supported_generation_methods)
-  .opt("version", self.version)
-  .opt("name", self.name)
-  .opt("description", self.description)
-  .opt("inputTokenLimit", self.input_token_limit)
-  .opt("maxTemperature", self.max_temperature)
+  .opt("fileUri", self.file_uri)
+  .opt("mimeType", self.mime_type)
   .opt("displayName", self.display_name)
-  .opt("topP", self.top_p)
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend Model with @json.FromJson::{from_json}
+pub extend FunctionResponseFileData with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for Model with fn from_json(value, path) {
+pub impl @json.FromJson for FunctionResponseFileData with fn from_json(
+  value,
+  path,
+) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    output_token_limit: @sdkjson.opt_field(obj, "outputTokenLimit", path),
-    base_model_id: @sdkjson.opt_field(obj, "baseModelId", path),
-    thinking: @sdkjson.opt_field(obj, "thinking", path),
-    temperature: @sdkjson.opt_field(obj, "temperature", path),
-    top_k: @sdkjson.opt_field(obj, "topK", path),
-    supported_generation_methods: @sdkjson.opt_field(
-      obj, "supportedGenerationMethods", path,
-    ),
-    version: @sdkjson.opt_field(obj, "version", path),
-    name: @sdkjson.opt_field(obj, "name", path),
-    description: @sdkjson.opt_field(obj, "description", path),
-    input_token_limit: @sdkjson.opt_field(obj, "inputTokenLimit", path),
-    max_temperature: @sdkjson.opt_field(obj, "maxTemperature", path),
+    file_uri: @sdkjson.opt_field(obj, "fileUri", path),
+    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
     display_name: @sdkjson.opt_field(obj, "displayName", path),
-    top_p: @sdkjson.opt_field(obj, "topP", path),
   }
+}
+
+///|
+///
+/// Config for translation features.
+#derive(Eq, @debug.Debug)
+pub(all) struct TranslationConfig {
+  target_language_code : String?
+  echo_target_language : Bool?
+}
+
+///|
+pub extend TranslationConfig with Eq::{equal, not_equal}
+
+///|
+pub extend TranslationConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a TranslationConfig with omitted optional fields absent.
+pub fn TranslationConfig::new(
+  target_language_code? : String,
+  echo_target_language? : Bool,
+) -> TranslationConfig {
+  { target_language_code, echo_target_language, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend TranslationConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for TranslationConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("targetLanguageCode", self.target_language_code)
+  .opt("echoTargetLanguage", self.echo_target_language)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend TranslationConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for TranslationConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    target_language_code: @sdkjson.opt_field(obj, "targetLanguageCode", path),
+    echo_target_language: @sdkjson.opt_field(obj, "echoTargetLanguage", path),
+  }
+}
+
+///|
+///
+/// Optional. Controls the maximum depth of the model's internal reasoning process before it produces a response. The default value is model-dependent. Refer to the [Thinking levels guide](https://aistudio.google.com/docs/thinking#thinking-levels) for more details. Recommended for Gemini 3 or later models. Use with earlier models results in an error. Enum values: THINKING_LEVEL_UNSPECIFIED: Default value.; MINIMAL: Little to no thinking.; LOW: Low thinking level.; MEDIUM: Medium thinking level.; HIGH: High thinking level.; XHIGH: XHigh thinking level.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ThinkingConfigThinkingLevel {
+  THINKINGLEVELUNSPECIFIED
+  MINIMAL
+  LOW
+  MEDIUM
+  HIGH
+  XHIGH
+  Custom(String)
+}
+
+///|
+pub extend ThinkingConfigThinkingLevel with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingConfigThinkingLevel with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ThinkingConfigThinkingLevel with ToJson::{to_json}
+
+///|
+pub impl ToJson for ThinkingConfigThinkingLevel with fn to_json(self) {
+  let raw = match self {
+    ThinkingConfigThinkingLevel::THINKINGLEVELUNSPECIFIED =>
+      "THINKING_LEVEL_UNSPECIFIED"
+    ThinkingConfigThinkingLevel::MINIMAL => "MINIMAL"
+    ThinkingConfigThinkingLevel::LOW => "LOW"
+    ThinkingConfigThinkingLevel::MEDIUM => "MEDIUM"
+    ThinkingConfigThinkingLevel::HIGH => "HIGH"
+    ThinkingConfigThinkingLevel::XHIGH => "XHIGH"
+    ThinkingConfigThinkingLevel::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ThinkingConfigThinkingLevel with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ThinkingConfigThinkingLevel with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "THINKING_LEVEL_UNSPECIFIED" =>
+          Option::Some(ThinkingConfigThinkingLevel::THINKINGLEVELUNSPECIFIED)
+        "MINIMAL" => Option::Some(ThinkingConfigThinkingLevel::MINIMAL)
+        "LOW" => Option::Some(ThinkingConfigThinkingLevel::LOW)
+        "MEDIUM" => Option::Some(ThinkingConfigThinkingLevel::MEDIUM)
+        "HIGH" => Option::Some(ThinkingConfigThinkingLevel::HIGH)
+        "XHIGH" => Option::Some(ThinkingConfigThinkingLevel::XHIGH)
+        _ => Option::None
+      }
+    },
+    raw => ThinkingConfigThinkingLevel::Custom(raw),
+  )
+}
+
+///|
+///
+/// Config for thinking features.
+#derive(Eq, @debug.Debug)
+pub(all) struct ThinkingConfig {
+  include_thoughts : Bool?
+  thinking_budget : Int32?
+  thinking_level : ThinkingConfigThinkingLevel?
+}
+
+///|
+pub extend ThinkingConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ThinkingConfig with omitted optional fields absent.
+pub fn ThinkingConfig::new(
+  include_thoughts? : Bool,
+  thinking_budget? : Int32,
+  thinking_level? : ThinkingConfigThinkingLevel,
+) -> ThinkingConfig {
+  { include_thoughts, thinking_budget, thinking_level, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ThinkingConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for ThinkingConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("includeThoughts", self.include_thoughts)
+  .opt("thinkingBudget", self.thinking_budget)
+  .opt("thinkingLevel", self.thinking_level)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ThinkingConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ThinkingConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    include_thoughts: @sdkjson.opt_field(obj, "includeThoughts", path),
+    thinking_budget: @sdkjson.opt_field(obj, "thinkingBudget", path),
+    thinking_level: @sdkjson.opt_field(obj, "thinkingLevel", path),
+  }
+}
+
+///|
+///
+/// Required. Data type. Enum values: TYPE_UNSPECIFIED: Not specified, should not be used.; STRING: String type.; NUMBER: Number type.; INTEGER: Integer type.; BOOLEAN: Boolean type.; ARRAY: Array type.; OBJECT: Object type.; NULL: Null type.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum SchemaType {
+  TYPEUNSPECIFIED
+  STRING
+  NUMBER
+  INTEGER
+  BOOLEAN
+  ARRAY
+  OBJECT
+  NULL
+  Unknown(String)
+}
+
+///|
+pub extend SchemaType with Eq::{equal, not_equal}
+
+///|
+pub extend SchemaType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend SchemaType with ToJson::{to_json}
+
+///|
+pub impl ToJson for SchemaType with fn to_json(self) {
+  let raw = match self {
+    SchemaType::TYPEUNSPECIFIED => "TYPE_UNSPECIFIED"
+    SchemaType::STRING => "STRING"
+    SchemaType::NUMBER => "NUMBER"
+    SchemaType::INTEGER => "INTEGER"
+    SchemaType::BOOLEAN => "BOOLEAN"
+    SchemaType::ARRAY => "ARRAY"
+    SchemaType::OBJECT => "OBJECT"
+    SchemaType::NULL => "NULL"
+    SchemaType::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend SchemaType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SchemaType with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "TYPE_UNSPECIFIED" => Option::Some(SchemaType::TYPEUNSPECIFIED)
+        "STRING" => Option::Some(SchemaType::STRING)
+        "NUMBER" => Option::Some(SchemaType::NUMBER)
+        "INTEGER" => Option::Some(SchemaType::INTEGER)
+        "BOOLEAN" => Option::Some(SchemaType::BOOLEAN)
+        "ARRAY" => Option::Some(SchemaType::ARRAY)
+        "OBJECT" => Option::Some(SchemaType::OBJECT)
+        "NULL" => Option::Some(SchemaType::NULL)
+        _ => Option::None
+      }
+    },
+    raw => SchemaType::Unknown(raw),
+  )
+}
+
+///|
+///
+/// The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).
+#derive(Eq, @debug.Debug)
+pub(all) struct Schema {
+  properties : Map[String, Schema]?
+  max_length : Int64?
+  example : Json?
+  max_properties : Int64?
+  format : String?
+  nullable : Bool?
+  maximum : Double?
+  minimum : Double?
+  property_ordering : Array[String]?
+  enum_ : Array[String]?
+  description : String?
+  items : Schema?
+  min_length : Int64?
+  any_of : Array[Schema]?
+  default : Json?
+  title : String?
+  min_properties : Int64?
+  max_items : Int64?
+  required : Array[String]?
+  type_ : SchemaType?
+  min_items : Int64?
+  pattern : String?
+}
+
+///|
+pub extend Schema with Eq::{equal, not_equal}
+
+///|
+pub extend Schema with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Schema with omitted optional fields absent.
+pub fn Schema::new(
+  properties? : Map[String, Schema],
+  max_length? : Int64,
+  example? : Json,
+  max_properties? : Int64,
+  format? : String,
+  nullable? : Bool,
+  maximum? : Double,
+  minimum? : Double,
+  property_ordering? : Array[String],
+  enum_? : Array[String],
+  description? : String,
+  items? : Schema,
+  min_length? : Int64,
+  any_of? : Array[Schema],
+  default? : Json,
+  title? : String,
+  min_properties? : Int64,
+  max_items? : Int64,
+  required? : Array[String],
+  type_? : SchemaType,
+  min_items? : Int64,
+  pattern? : String,
+) -> Schema {
+  {
+    properties,
+    max_length,
+    example,
+    max_properties,
+    format,
+    nullable,
+    maximum,
+    minimum,
+    property_ordering,
+    enum_,
+    description,
+    items,
+    min_length,
+    any_of,
+    default,
+    title,
+    min_properties,
+    max_items,
+    required,
+    type_,
+    min_items,
+    pattern,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Schema with ToJson::{to_json}
+
+///|
+pub impl ToJson for Schema with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("properties", self.properties.map(value => json_map_to_json(value)))
+  .opt(
+    "maxLength",
+    self.max_length.map(value => json_string_int64_to_json(value)),
+  )
+  .opt("example", self.example)
+  .opt(
+    "maxProperties",
+    self.max_properties.map(value => json_string_int64_to_json(value)),
+  )
+  .opt("format", self.format)
+  .opt("nullable", self.nullable)
+  .opt("maximum", self.maximum)
+  .opt("minimum", self.minimum)
+  .opt("propertyOrdering", self.property_ordering)
+  .opt("enum", self.enum_)
+  .opt("description", self.description)
+  .opt("items", self.items)
+  .opt(
+    "minLength",
+    self.min_length.map(value => json_string_int64_to_json(value)),
+  )
+  .opt("anyOf", self.any_of)
+  .opt("default", self.default)
+  .opt("title", self.title)
+  .opt(
+    "minProperties",
+    self.min_properties.map(value => json_string_int64_to_json(value)),
+  )
+  .opt(
+    "maxItems",
+    self.max_items.map(value => json_string_int64_to_json(value)),
+  )
+  .opt("required", self.required)
+  .opt("type", self.type_)
+  .opt(
+    "minItems",
+    self.min_items.map(value => json_string_int64_to_json(value)),
+  )
+  .opt("pattern", self.pattern)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Schema with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Schema with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    properties: decode_optional_json_map(obj, "properties", path),
+    max_length: decode_optional_custom(obj, "maxLength", path, (
+      value,
+      value_path,
+    ) => json_string_int64(value, value_path)),
+    example: @sdkjson.opt_field(obj, "example", path),
+    max_properties: decode_optional_custom(obj, "maxProperties", path, (
+      value,
+      value_path,
+    ) => json_string_int64(value, value_path)),
+    format: @sdkjson.opt_field(obj, "format", path),
+    nullable: @sdkjson.opt_field(obj, "nullable", path),
+    maximum: @sdkjson.opt_field(obj, "maximum", path),
+    minimum: @sdkjson.opt_field(obj, "minimum", path),
+    property_ordering: @sdkjson.opt_field(obj, "propertyOrdering", path),
+    enum_: @sdkjson.opt_field(obj, "enum", path),
+    description: @sdkjson.opt_field(obj, "description", path),
+    items: @sdkjson.opt_field(obj, "items", path),
+    min_length: decode_optional_custom(obj, "minLength", path, (
+      value,
+      value_path,
+    ) => json_string_int64(value, value_path)),
+    any_of: @sdkjson.opt_field(obj, "anyOf", path),
+    default: @sdkjson.opt_field(obj, "default", path),
+    title: @sdkjson.opt_field(obj, "title", path),
+    min_properties: decode_optional_custom(obj, "minProperties", path, (
+      value,
+      value_path,
+    ) => json_string_int64(value, value_path)),
+    max_items: decode_optional_custom(obj, "maxItems", path, (value, value_path) => {
+      json_string_int64(value, value_path)
+    }),
+    required: @sdkjson.opt_field(obj, "required", path),
+    type_: @sdkjson.opt_field(obj, "type", path),
+    min_items: decode_optional_custom(obj, "minItems", path, (value, value_path) => {
+      json_string_int64(value, value_path)
+    }),
+    pattern: @sdkjson.opt_field(obj, "pattern", path),
+  }
+}
+
+///|
+///
+/// Optional. The MIME type of the audio output. Enum values: MIME_TYPE_UNSPECIFIED: Default value. This value is unused.; AUDIO_MP3: MP3 audio format.; AUDIO_OGG_OPUS: OGG Opus audio format.; AUDIO_L16: Raw PCM (L16) audio format.; AUDIO_WAV: WAV audio format.; AUDIO_ALAW: A-law audio format.; AUDIO_MULAW: Mu-law audio format.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum AudioResponseFormatMimeType {
+  MIMETYPEUNSPECIFIED
+  AUDIOMP3
+  AUDIOOGGOPUS
+  AUDIOL16
+  AUDIOWAV
+  AUDIOALAW
+  AUDIOMULAW
+  Custom(String)
+}
+
+///|
+pub extend AudioResponseFormatMimeType with Eq::{equal, not_equal}
+
+///|
+pub extend AudioResponseFormatMimeType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AudioResponseFormatMimeType with ToJson::{to_json}
+
+///|
+pub impl ToJson for AudioResponseFormatMimeType with fn to_json(self) {
+  let raw = match self {
+    AudioResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
+    AudioResponseFormatMimeType::AUDIOMP3 => "AUDIO_MP3"
+    AudioResponseFormatMimeType::AUDIOOGGOPUS => "AUDIO_OGG_OPUS"
+    AudioResponseFormatMimeType::AUDIOL16 => "AUDIO_L16"
+    AudioResponseFormatMimeType::AUDIOWAV => "AUDIO_WAV"
+    AudioResponseFormatMimeType::AUDIOALAW => "AUDIO_ALAW"
+    AudioResponseFormatMimeType::AUDIOMULAW => "AUDIO_MULAW"
+    AudioResponseFormatMimeType::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AudioResponseFormatMimeType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AudioResponseFormatMimeType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MIME_TYPE_UNSPECIFIED" =>
+          Option::Some(AudioResponseFormatMimeType::MIMETYPEUNSPECIFIED)
+        "AUDIO_MP3" => Option::Some(AudioResponseFormatMimeType::AUDIOMP3)
+        "AUDIO_OGG_OPUS" =>
+          Option::Some(AudioResponseFormatMimeType::AUDIOOGGOPUS)
+        "AUDIO_L16" => Option::Some(AudioResponseFormatMimeType::AUDIOL16)
+        "AUDIO_WAV" => Option::Some(AudioResponseFormatMimeType::AUDIOWAV)
+        "AUDIO_ALAW" => Option::Some(AudioResponseFormatMimeType::AUDIOALAW)
+        "AUDIO_MULAW" => Option::Some(AudioResponseFormatMimeType::AUDIOMULAW)
+        _ => Option::None
+      }
+    },
+    raw => AudioResponseFormatMimeType::Custom(raw),
+  )
+}
+
+///|
+///
+/// Optional. The delivery mode for the audio output. Enum values: DELIVERY_UNSPECIFIED: Default value. This value is unused.; INLINE: Audio data is returned inline in the response.; URI: Audio data is returned as a URI.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum AudioResponseFormatDelivery {
+  DELIVERYUNSPECIFIED
+  INLINE
+  URI
+  Custom(String)
+}
+
+///|
+pub extend AudioResponseFormatDelivery with Eq::{equal, not_equal}
+
+///|
+pub extend AudioResponseFormatDelivery with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AudioResponseFormatDelivery with ToJson::{to_json}
+
+///|
+pub impl ToJson for AudioResponseFormatDelivery with fn to_json(self) {
+  let raw = match self {
+    AudioResponseFormatDelivery::DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
+    AudioResponseFormatDelivery::INLINE => "INLINE"
+    AudioResponseFormatDelivery::URI => "URI"
+    AudioResponseFormatDelivery::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AudioResponseFormatDelivery with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AudioResponseFormatDelivery with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "DELIVERY_UNSPECIFIED" =>
+          Option::Some(AudioResponseFormatDelivery::DELIVERYUNSPECIFIED)
+        "INLINE" => Option::Some(AudioResponseFormatDelivery::INLINE)
+        "URI" => Option::Some(AudioResponseFormatDelivery::URI)
+        _ => Option::None
+      }
+    },
+    raw => AudioResponseFormatDelivery::Custom(raw),
+  )
+}
+
+///|
+///
+/// Configuration for audio output format.
+#derive(Eq, @debug.Debug)
+pub(all) struct AudioResponseFormat {
+  mime_type : AudioResponseFormatMimeType?
+  delivery : AudioResponseFormatDelivery?
+  sample_rate : Int32?
+  bit_rate : Int32?
+}
+
+///|
+pub extend AudioResponseFormat with Eq::{equal, not_equal}
+
+///|
+pub extend AudioResponseFormat with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a AudioResponseFormat with omitted optional fields absent.
+pub fn AudioResponseFormat::new(
+  mime_type? : AudioResponseFormatMimeType,
+  delivery? : AudioResponseFormatDelivery,
+  sample_rate? : Int32,
+  bit_rate? : Int32,
+) -> AudioResponseFormat {
+  { mime_type, delivery, sample_rate, bit_rate, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AudioResponseFormat with ToJson::{to_json}
+
+///|
+pub impl ToJson for AudioResponseFormat with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("mimeType", self.mime_type)
+  .opt("delivery", self.delivery)
+  .opt("sampleRate", self.sample_rate)
+  .opt("bitRate", self.bit_rate)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AudioResponseFormat with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AudioResponseFormat with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
+    delivery: @sdkjson.opt_field(obj, "delivery", path),
+    sample_rate: @sdkjson.opt_field(obj, "sampleRate", path),
+    bit_rate: @sdkjson.opt_field(obj, "bitRate", path),
+  }
+}
+
+///|
+///
+/// Optional. The MIME type of the text output. Enum values: MIME_TYPE_UNSPECIFIED: Default value. This value is unused.; APPLICATION_JSON: JSON output format.; TEXT_PLAIN: Plain text output format.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum TextResponseFormatMimeType {
+  MIMETYPEUNSPECIFIED
+  APPLICATIONJSON
+  TEXTPLAIN
+  Custom(String)
+}
+
+///|
+pub extend TextResponseFormatMimeType with Eq::{equal, not_equal}
+
+///|
+pub extend TextResponseFormatMimeType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend TextResponseFormatMimeType with ToJson::{to_json}
+
+///|
+pub impl ToJson for TextResponseFormatMimeType with fn to_json(self) {
+  let raw = match self {
+    TextResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
+    TextResponseFormatMimeType::APPLICATIONJSON => "APPLICATION_JSON"
+    TextResponseFormatMimeType::TEXTPLAIN => "TEXT_PLAIN"
+    TextResponseFormatMimeType::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend TextResponseFormatMimeType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for TextResponseFormatMimeType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MIME_TYPE_UNSPECIFIED" =>
+          Option::Some(TextResponseFormatMimeType::MIMETYPEUNSPECIFIED)
+        "APPLICATION_JSON" =>
+          Option::Some(TextResponseFormatMimeType::APPLICATIONJSON)
+        "TEXT_PLAIN" => Option::Some(TextResponseFormatMimeType::TEXTPLAIN)
+        _ => Option::None
+      }
+    },
+    raw => TextResponseFormatMimeType::Custom(raw),
+  )
+}
+
+///|
+///
+/// Configuration for text output format.
+#derive(Eq, @debug.Debug)
+pub(all) struct TextResponseFormat {
+  mime_type : TextResponseFormatMimeType?
+  schema : Json?
+}
+
+///|
+pub extend TextResponseFormat with Eq::{equal, not_equal}
+
+///|
+pub extend TextResponseFormat with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a TextResponseFormat with omitted optional fields absent.
+pub fn TextResponseFormat::new(
+  mime_type? : TextResponseFormatMimeType,
+  schema? : Json,
+) -> TextResponseFormat {
+  { mime_type, schema, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend TextResponseFormat with ToJson::{to_json}
+
+///|
+pub impl ToJson for TextResponseFormat with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("mimeType", self.mime_type)
+  .opt("schema", self.schema)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend TextResponseFormat with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for TextResponseFormat with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
+    schema: @sdkjson.opt_field(obj, "schema", path),
+  }
+}
+
+///|
+///
+/// Optional. The size of the image output. Enum values: IMAGE_SIZE_UNSPECIFIED: Default value. This value is unused.; IMAGE_SIZE_FIVE_TWELVE: 512px image size.; IMAGE_SIZE_ONE_K: 1K image size.; IMAGE_SIZE_TWO_K: 2K image size.; IMAGE_SIZE_FOUR_K: 4K image size.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ImageResponseFormatImageSize {
+  IMAGESIZEUNSPECIFIED
+  IMAGESIZEFIVETWELVE
+  IMAGESIZEONEK
+  IMAGESIZETWOK
+  IMAGESIZEFOURK
+  Custom(String)
+}
+
+///|
+pub extend ImageResponseFormatImageSize with Eq::{equal, not_equal}
+
+///|
+pub extend ImageResponseFormatImageSize with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ImageResponseFormatImageSize with ToJson::{to_json}
+
+///|
+pub impl ToJson for ImageResponseFormatImageSize with fn to_json(self) {
+  let raw = match self {
+    ImageResponseFormatImageSize::IMAGESIZEUNSPECIFIED =>
+      "IMAGE_SIZE_UNSPECIFIED"
+    ImageResponseFormatImageSize::IMAGESIZEFIVETWELVE =>
+      "IMAGE_SIZE_FIVE_TWELVE"
+    ImageResponseFormatImageSize::IMAGESIZEONEK => "IMAGE_SIZE_ONE_K"
+    ImageResponseFormatImageSize::IMAGESIZETWOK => "IMAGE_SIZE_TWO_K"
+    ImageResponseFormatImageSize::IMAGESIZEFOURK => "IMAGE_SIZE_FOUR_K"
+    ImageResponseFormatImageSize::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ImageResponseFormatImageSize with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ImageResponseFormatImageSize with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "IMAGE_SIZE_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEUNSPECIFIED)
+        "IMAGE_SIZE_FIVE_TWELVE" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEFIVETWELVE)
+        "IMAGE_SIZE_ONE_K" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEONEK)
+        "IMAGE_SIZE_TWO_K" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZETWOK)
+        "IMAGE_SIZE_FOUR_K" =>
+          Option::Some(ImageResponseFormatImageSize::IMAGESIZEFOURK)
+        _ => Option::None
+      }
+    },
+    raw => ImageResponseFormatImageSize::Custom(raw),
+  )
+}
+
+///|
+///
+/// Optional. The MIME type of the image output. Enum values: MIME_TYPE_UNSPECIFIED: Default value. This value is unused.; IMAGE_JPEG: JPEG image format.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ImageResponseFormatMimeType {
+  MIMETYPEUNSPECIFIED
+  IMAGEJPEG
+  Custom(String)
+}
+
+///|
+pub extend ImageResponseFormatMimeType with Eq::{equal, not_equal}
+
+///|
+pub extend ImageResponseFormatMimeType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ImageResponseFormatMimeType with ToJson::{to_json}
+
+///|
+pub impl ToJson for ImageResponseFormatMimeType with fn to_json(self) {
+  let raw = match self {
+    ImageResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
+    ImageResponseFormatMimeType::IMAGEJPEG => "IMAGE_JPEG"
+    ImageResponseFormatMimeType::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ImageResponseFormatMimeType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ImageResponseFormatMimeType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MIME_TYPE_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatMimeType::MIMETYPEUNSPECIFIED)
+        "IMAGE_JPEG" => Option::Some(ImageResponseFormatMimeType::IMAGEJPEG)
+        _ => Option::None
+      }
+    },
+    raw => ImageResponseFormatMimeType::Custom(raw),
+  )
+}
+
+///|
+///
+/// Optional. The delivery mode for the image output. Enum values: DELIVERY_UNSPECIFIED: Default value. This value is unused.; INLINE: Image data is returned inline in the response.; URI: Image data is returned as a URI.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ImageResponseFormatDelivery {
+  DELIVERYUNSPECIFIED
+  INLINE
+  URI
+  Custom(String)
+}
+
+///|
+pub extend ImageResponseFormatDelivery with Eq::{equal, not_equal}
+
+///|
+pub extend ImageResponseFormatDelivery with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ImageResponseFormatDelivery with ToJson::{to_json}
+
+///|
+pub impl ToJson for ImageResponseFormatDelivery with fn to_json(self) {
+  let raw = match self {
+    ImageResponseFormatDelivery::DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
+    ImageResponseFormatDelivery::INLINE => "INLINE"
+    ImageResponseFormatDelivery::URI => "URI"
+    ImageResponseFormatDelivery::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ImageResponseFormatDelivery with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ImageResponseFormatDelivery with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "DELIVERY_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatDelivery::DELIVERYUNSPECIFIED)
+        "INLINE" => Option::Some(ImageResponseFormatDelivery::INLINE)
+        "URI" => Option::Some(ImageResponseFormatDelivery::URI)
+        _ => Option::None
+      }
+    },
+    raw => ImageResponseFormatDelivery::Custom(raw),
+  )
+}
+
+///|
+///
+/// Optional. The aspect ratio for the image output. Enum values: ASPECT_RATIO_UNSPECIFIED: Default value. This value is unused.; ASPECT_RATIO_ONE_BY_ONE: 1:1 aspect ratio.; ASPECT_RATIO_TWO_BY_THREE: 2:3 aspect ratio.; ASPECT_RATIO_THREE_BY_TWO: 3:2 aspect ratio.; ASPECT_RATIO_THREE_BY_FOUR: 3:4 aspect ratio.; ASPECT_RATIO_FOUR_BY_THREE: 4:3 aspect ratio.; ASPECT_RATIO_FOUR_BY_FIVE: 4:5 aspect ratio.; ASPECT_RATIO_FIVE_BY_FOUR: 5:4 aspect ratio.; ASPECT_RATIO_NINE_BY_SIXTEEN: 9:16 aspect ratio.; ASPECT_RATIO_SIXTEEN_BY_NINE: 16:9 aspect ratio.; ASPECT_RATIO_TWENTY_ONE_BY_NINE: 21:9 aspect ratio.; ASPECT_RATIO_ONE_BY_EIGHT: 1:8 aspect ratio.; ASPECT_RATIO_EIGHT_BY_ONE: 8:1 aspect ratio.; ASPECT_RATIO_ONE_BY_FOUR: 1:4 aspect ratio.; ASPECT_RATIO_FOUR_BY_ONE: 4:1 aspect ratio.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ImageResponseFormatAspectRatio {
+  ASPECTRATIOUNSPECIFIED
+  ASPECTRATIOONEBYONE
+  ASPECTRATIOTWOBYTHREE
+  ASPECTRATIOTHREEBYTWO
+  ASPECTRATIOTHREEBYFOUR
+  ASPECTRATIOFOURBYTHREE
+  ASPECTRATIOFOURBYFIVE
+  ASPECTRATIOFIVEBYFOUR
+  ASPECTRATIONINEBYSIXTEEN
+  ASPECTRATIOSIXTEENBYNINE
+  ASPECTRATIOTWENTYONEBYNINE
+  ASPECTRATIOONEBYEIGHT
+  ASPECTRATIOEIGHTBYONE
+  ASPECTRATIOONEBYFOUR
+  ASPECTRATIOFOURBYONE
+  Custom(String)
+}
+
+///|
+pub extend ImageResponseFormatAspectRatio with Eq::{equal, not_equal}
+
+///|
+pub extend ImageResponseFormatAspectRatio with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ImageResponseFormatAspectRatio with ToJson::{to_json}
+
+///|
+pub impl ToJson for ImageResponseFormatAspectRatio with fn to_json(self) {
+  let raw = match self {
+    ImageResponseFormatAspectRatio::ASPECTRATIOUNSPECIFIED =>
+      "ASPECT_RATIO_UNSPECIFIED"
+    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYONE =>
+      "ASPECT_RATIO_ONE_BY_ONE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTWOBYTHREE =>
+      "ASPECT_RATIO_TWO_BY_THREE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYTWO =>
+      "ASPECT_RATIO_THREE_BY_TWO"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYFOUR =>
+      "ASPECT_RATIO_THREE_BY_FOUR"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYTHREE =>
+      "ASPECT_RATIO_FOUR_BY_THREE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYFIVE =>
+      "ASPECT_RATIO_FOUR_BY_FIVE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFIVEBYFOUR =>
+      "ASPECT_RATIO_FIVE_BY_FOUR"
+    ImageResponseFormatAspectRatio::ASPECTRATIONINEBYSIXTEEN =>
+      "ASPECT_RATIO_NINE_BY_SIXTEEN"
+    ImageResponseFormatAspectRatio::ASPECTRATIOSIXTEENBYNINE =>
+      "ASPECT_RATIO_SIXTEEN_BY_NINE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOTWENTYONEBYNINE =>
+      "ASPECT_RATIO_TWENTY_ONE_BY_NINE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYEIGHT =>
+      "ASPECT_RATIO_ONE_BY_EIGHT"
+    ImageResponseFormatAspectRatio::ASPECTRATIOEIGHTBYONE =>
+      "ASPECT_RATIO_EIGHT_BY_ONE"
+    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYFOUR =>
+      "ASPECT_RATIO_ONE_BY_FOUR"
+    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYONE =>
+      "ASPECT_RATIO_FOUR_BY_ONE"
+    ImageResponseFormatAspectRatio::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ImageResponseFormatAspectRatio with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ImageResponseFormatAspectRatio with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "ASPECT_RATIO_UNSPECIFIED" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOUNSPECIFIED)
+        "ASPECT_RATIO_ONE_BY_ONE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYONE)
+        "ASPECT_RATIO_TWO_BY_THREE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTWOBYTHREE)
+        "ASPECT_RATIO_THREE_BY_TWO" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYTWO)
+        "ASPECT_RATIO_THREE_BY_FOUR" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYFOUR)
+        "ASPECT_RATIO_FOUR_BY_THREE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYTHREE)
+        "ASPECT_RATIO_FOUR_BY_FIVE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYFIVE)
+        "ASPECT_RATIO_FIVE_BY_FOUR" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFIVEBYFOUR)
+        "ASPECT_RATIO_NINE_BY_SIXTEEN" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIONINEBYSIXTEEN)
+        "ASPECT_RATIO_SIXTEEN_BY_NINE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOSIXTEENBYNINE)
+        "ASPECT_RATIO_TWENTY_ONE_BY_NINE" =>
+          Option::Some(
+            ImageResponseFormatAspectRatio::ASPECTRATIOTWENTYONEBYNINE,
+          )
+        "ASPECT_RATIO_ONE_BY_EIGHT" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYEIGHT)
+        "ASPECT_RATIO_EIGHT_BY_ONE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOEIGHTBYONE)
+        "ASPECT_RATIO_ONE_BY_FOUR" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYFOUR)
+        "ASPECT_RATIO_FOUR_BY_ONE" =>
+          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYONE)
+        _ => Option::None
+      }
+    },
+    raw => ImageResponseFormatAspectRatio::Custom(raw),
+  )
+}
+
+///|
+///
+/// Configuration for image output format.
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageResponseFormat {
+  image_size : ImageResponseFormatImageSize?
+  mime_type : ImageResponseFormatMimeType?
+  delivery : ImageResponseFormatDelivery?
+  aspect_ratio : ImageResponseFormatAspectRatio?
+}
+
+///|
+pub extend ImageResponseFormat with Eq::{equal, not_equal}
+
+///|
+pub extend ImageResponseFormat with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ImageResponseFormat with omitted optional fields absent.
+pub fn ImageResponseFormat::new(
+  image_size? : ImageResponseFormatImageSize,
+  mime_type? : ImageResponseFormatMimeType,
+  delivery? : ImageResponseFormatDelivery,
+  aspect_ratio? : ImageResponseFormatAspectRatio,
+) -> ImageResponseFormat {
+  { image_size, mime_type, delivery, aspect_ratio, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ImageResponseFormat with ToJson::{to_json}
+
+///|
+pub impl ToJson for ImageResponseFormat with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("imageSize", self.image_size)
+  .opt("mimeType", self.mime_type)
+  .opt("delivery", self.delivery)
+  .opt("aspectRatio", self.aspect_ratio)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ImageResponseFormat with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ImageResponseFormat with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    image_size: @sdkjson.opt_field(obj, "imageSize", path),
+    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
+    delivery: @sdkjson.opt_field(obj, "delivery", path),
+    aspect_ratio: @sdkjson.opt_field(obj, "aspectRatio", path),
+  }
+}
+
+///|
+///
+/// Configuration for the response output format. This is a flat object where each optional sub-field configures a specific output modality.
+#derive(Eq, @debug.Debug)
+pub(all) struct ResponseFormatConfig {
+  audio : AudioResponseFormat?
+  text : TextResponseFormat?
+  image : ImageResponseFormat?
+}
+
+///|
+pub extend ResponseFormatConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFormatConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ResponseFormatConfig with omitted optional fields absent.
+pub fn ResponseFormatConfig::new(
+  audio? : AudioResponseFormat,
+  text? : TextResponseFormat,
+  image? : ImageResponseFormat,
+) -> ResponseFormatConfig {
+  { audio, text, image, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFormatConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFormatConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("audio", self.audio)
+  .opt("text", self.text)
+  .opt("image", self.image)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFormatConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFormatConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    audio: @sdkjson.opt_field(obj, "audio", path),
+    text: @sdkjson.opt_field(obj, "text", path),
+    image: @sdkjson.opt_field(obj, "image", path),
+  }
+}
+
+///|
+///
+/// Enum values: MODALITY_UNSPECIFIED: Default value.; TEXT: Indicates the model should return text.; IMAGE: Indicates the model should return images.; AUDIO: Indicates the model should return audio.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum GenerationConfigResponseModalitiesItem {
+  MODALITYUNSPECIFIED
+  TEXT
+  IMAGE
+  AUDIO
+  Custom(String)
+}
+
+///|
+pub extend GenerationConfigResponseModalitiesItem with Eq::{equal, not_equal}
+
+///|
+pub extend GenerationConfigResponseModalitiesItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend GenerationConfigResponseModalitiesItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for GenerationConfigResponseModalitiesItem with fn to_json(self) {
+  let raw = match self {
+    GenerationConfigResponseModalitiesItem::MODALITYUNSPECIFIED =>
+      "MODALITY_UNSPECIFIED"
+    GenerationConfigResponseModalitiesItem::TEXT => "TEXT"
+    GenerationConfigResponseModalitiesItem::IMAGE => "IMAGE"
+    GenerationConfigResponseModalitiesItem::AUDIO => "AUDIO"
+    GenerationConfigResponseModalitiesItem::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend GenerationConfigResponseModalitiesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for GenerationConfigResponseModalitiesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MODALITY_UNSPECIFIED" =>
+          Option::Some(
+            GenerationConfigResponseModalitiesItem::MODALITYUNSPECIFIED,
+          )
+        "TEXT" => Option::Some(GenerationConfigResponseModalitiesItem::TEXT)
+        "IMAGE" => Option::Some(GenerationConfigResponseModalitiesItem::IMAGE)
+        "AUDIO" => Option::Some(GenerationConfigResponseModalitiesItem::AUDIO)
+        _ => Option::None
+      }
+    },
+    raw => GenerationConfigResponseModalitiesItem::Custom(raw),
+  )
+}
+
+///|
+///
+/// Optional. Configures transcription mode. Supported values: `VERBATIM`, `SMART`. If unspecified, defaults to `VERBATIM` transcription. In `SMART` mode, the model performs disfluency removal (eliminating filler words, repetitions, and false starts), light grammatical cleanup, automatic formatting (paragraphs, bullet points, numbered lists), and minor user edits (inline self-corrections). Timestamps and diarization are incompatible with mode `SMART`. Enum values: MODE_UNSPECIFIED: Unspecified transcription mode.; VERBATIM: Verbatim transcription mode.; SMART: Smart transcription mode.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum AudioTranscriptionConfigMode {
+  MODEUNSPECIFIED
+  VERBATIM
+  SMART
+  Custom(String)
+}
+
+///|
+pub extend AudioTranscriptionConfigMode with Eq::{equal, not_equal}
+
+///|
+pub extend AudioTranscriptionConfigMode with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AudioTranscriptionConfigMode with ToJson::{to_json}
+
+///|
+pub impl ToJson for AudioTranscriptionConfigMode with fn to_json(self) {
+  let raw = match self {
+    AudioTranscriptionConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
+    AudioTranscriptionConfigMode::VERBATIM => "VERBATIM"
+    AudioTranscriptionConfigMode::SMART => "SMART"
+    AudioTranscriptionConfigMode::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AudioTranscriptionConfigMode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AudioTranscriptionConfigMode with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MODE_UNSPECIFIED" =>
+          Option::Some(AudioTranscriptionConfigMode::MODEUNSPECIFIED)
+        "VERBATIM" => Option::Some(AudioTranscriptionConfigMode::VERBATIM)
+        "SMART" => Option::Some(AudioTranscriptionConfigMode::SMART)
+        _ => Option::None
+      }
+    },
+    raw => AudioTranscriptionConfigMode::Custom(raw),
+  )
+}
+
+///|
+///
+/// Provides hints to the model about possible languages present in the audio.
+#derive(Eq, @debug.Debug)
+pub(all) struct LanguageHints {
+  language_codes : Array[String]?
+}
+
+///|
+pub extend LanguageHints with Eq::{equal, not_equal}
+
+///|
+pub extend LanguageHints with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a LanguageHints with omitted optional fields absent.
+pub fn LanguageHints::new(language_codes? : Array[String]) -> LanguageHints {
+  { language_codes, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend LanguageHints with ToJson::{to_json}
+
+///|
+pub impl ToJson for LanguageHints with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("languageCodes", self.language_codes).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend LanguageHints with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for LanguageHints with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { language_codes: @sdkjson.opt_field(obj, "languageCodes", path), }
+}
+
+///|
+///
+/// The audio transcription configuration.
+#derive(Eq, @debug.Debug)
+pub(all) struct AudioTranscriptionConfig {
+  adaptation_phrases : Array[String]?
+  language_auto : Json?
+  language_codes : Array[String]?
+  mode : AudioTranscriptionConfigMode?
+  word_timestamp : Bool?
+  source_text : String?
+  language_hints : LanguageHints?
+  custom_vocabulary : Array[String]?
+  diarization : Bool?
+}
+
+///|
+pub extend AudioTranscriptionConfig with Eq::{equal, not_equal}
+
+///|
+pub extend AudioTranscriptionConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a AudioTranscriptionConfig with omitted optional fields absent.
+pub fn AudioTranscriptionConfig::new(
+  adaptation_phrases? : Array[String],
+  language_auto? : Json,
+  language_codes? : Array[String],
+  mode? : AudioTranscriptionConfigMode,
+  word_timestamp? : Bool,
+  source_text? : String,
+  language_hints? : LanguageHints,
+  custom_vocabulary? : Array[String],
+  diarization? : Bool,
+) -> AudioTranscriptionConfig {
+  {
+    adaptation_phrases,
+    language_auto,
+    language_codes,
+    mode,
+    word_timestamp,
+    source_text,
+    language_hints,
+    custom_vocabulary,
+    diarization,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AudioTranscriptionConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for AudioTranscriptionConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("adaptationPhrases", self.adaptation_phrases)
+  .opt("languageAuto", self.language_auto)
+  .opt("languageCodes", self.language_codes)
+  .opt("mode", self.mode)
+  .opt("wordTimestamp", self.word_timestamp)
+  .opt("sourceText", self.source_text)
+  .opt("languageHints", self.language_hints)
+  .opt("customVocabulary", self.custom_vocabulary)
+  .opt("diarization", self.diarization)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AudioTranscriptionConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AudioTranscriptionConfig with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    adaptation_phrases: @sdkjson.opt_field(obj, "adaptationPhrases", path),
+    language_auto: @sdkjson.opt_field(obj, "languageAuto", path),
+    language_codes: @sdkjson.opt_field(obj, "languageCodes", path),
+    mode: @sdkjson.opt_field(obj, "mode", path),
+    word_timestamp: @sdkjson.opt_field(obj, "wordTimestamp", path),
+    source_text: @sdkjson.opt_field(obj, "sourceText", path),
+    language_hints: @sdkjson.opt_field(obj, "languageHints", path),
+    custom_vocabulary: @sdkjson.opt_field(obj, "customVocabulary", path),
+    diarization: @sdkjson.opt_field(obj, "diarization", path),
+  }
+}
+
+///|
+///
+/// Config for image generation features.
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageConfig {
+  image_size : String?
+  aspect_ratio : String?
+}
+
+///|
+pub extend ImageConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ImageConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ImageConfig with omitted optional fields absent.
+pub fn ImageConfig::new(
+  image_size? : String,
+  aspect_ratio? : String,
+) -> ImageConfig {
+  { image_size, aspect_ratio, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ImageConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for ImageConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("imageSize", self.image_size)
+  .opt("aspectRatio", self.aspect_ratio)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ImageConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ImageConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    image_size: @sdkjson.opt_field(obj, "imageSize", path),
+    aspect_ratio: @sdkjson.opt_field(obj, "aspectRatio", path),
+  }
+}
+
+///|
+///
+/// Optional. If specified, the media resolution specified will be used. Enum values: MEDIA_RESOLUTION_UNSPECIFIED: Media resolution has not been set.; MEDIA_RESOLUTION_LOW: Media resolution set to low (64 tokens).; MEDIA_RESOLUTION_MEDIUM: Media resolution set to medium (256 tokens).; MEDIA_RESOLUTION_HIGH: Media resolution set to high (zoomed reframing with 256 tokens).
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum GenerationConfigMediaResolution {
+  MEDIARESOLUTIONUNSPECIFIED
+  MEDIARESOLUTIONLOW
+  MEDIARESOLUTIONMEDIUM
+  MEDIARESOLUTIONHIGH
+  Custom(String)
+}
+
+///|
+pub extend GenerationConfigMediaResolution with Eq::{equal, not_equal}
+
+///|
+pub extend GenerationConfigMediaResolution with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend GenerationConfigMediaResolution with ToJson::{to_json}
+
+///|
+pub impl ToJson for GenerationConfigMediaResolution with fn to_json(self) {
+  let raw = match self {
+    GenerationConfigMediaResolution::MEDIARESOLUTIONUNSPECIFIED =>
+      "MEDIA_RESOLUTION_UNSPECIFIED"
+    GenerationConfigMediaResolution::MEDIARESOLUTIONLOW =>
+      "MEDIA_RESOLUTION_LOW"
+    GenerationConfigMediaResolution::MEDIARESOLUTIONMEDIUM =>
+      "MEDIA_RESOLUTION_MEDIUM"
+    GenerationConfigMediaResolution::MEDIARESOLUTIONHIGH =>
+      "MEDIA_RESOLUTION_HIGH"
+    GenerationConfigMediaResolution::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend GenerationConfigMediaResolution with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GenerationConfigMediaResolution with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MEDIA_RESOLUTION_UNSPECIFIED" =>
+          Option::Some(
+            GenerationConfigMediaResolution::MEDIARESOLUTIONUNSPECIFIED,
+          )
+        "MEDIA_RESOLUTION_LOW" =>
+          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONLOW)
+        "MEDIA_RESOLUTION_MEDIUM" =>
+          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONMEDIUM)
+        "MEDIA_RESOLUTION_HIGH" =>
+          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONHIGH)
+        _ => Option::None
+      }
+    },
+    raw => GenerationConfigMediaResolution::Custom(raw),
+  )
+}
+
+///|
+///
+/// Optional. Controls text normalization before speech synthesis. Enum values: TEXT_NORMALIZATION_UNSPECIFIED: Unspecified text normalization mode. Defaults to `AUTO`.; AUTO: Automatically determines whether to apply text normalization based on the model and speech mode.; ENABLED: Enables text normalization for numbers, currencies, dates, and units.; DISABLED: Disables text normalization for pre-normalized or phonetic inputs.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum SpeechConfigTextNormalization {
+  TEXTNORMALIZATIONUNSPECIFIED
+  AUTO
+  ENABLED
+  DISABLED
+  Custom(String)
+}
+
+///|
+pub extend SpeechConfigTextNormalization with Eq::{equal, not_equal}
+
+///|
+pub extend SpeechConfigTextNormalization with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend SpeechConfigTextNormalization with ToJson::{to_json}
+
+///|
+pub impl ToJson for SpeechConfigTextNormalization with fn to_json(self) {
+  let raw = match self {
+    SpeechConfigTextNormalization::TEXTNORMALIZATIONUNSPECIFIED =>
+      "TEXT_NORMALIZATION_UNSPECIFIED"
+    SpeechConfigTextNormalization::AUTO => "AUTO"
+    SpeechConfigTextNormalization::ENABLED => "ENABLED"
+    SpeechConfigTextNormalization::DISABLED => "DISABLED"
+    SpeechConfigTextNormalization::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend SpeechConfigTextNormalization with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SpeechConfigTextNormalization with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "TEXT_NORMALIZATION_UNSPECIFIED" =>
+          Option::Some(
+            SpeechConfigTextNormalization::TEXTNORMALIZATIONUNSPECIFIED,
+          )
+        "AUTO" => Option::Some(SpeechConfigTextNormalization::AUTO)
+        "ENABLED" => Option::Some(SpeechConfigTextNormalization::ENABLED)
+        "DISABLED" => Option::Some(SpeechConfigTextNormalization::DISABLED)
+        _ => Option::None
+      }
+    },
+    raw => SpeechConfigTextNormalization::Custom(raw),
+  )
 }
 
 ///|
@@ -1034,9 +2250,10 @@ pub impl @json.FromJson for MultiSpeakerVoiceConfig with fn from_json(
 /// Config for speech generation and transcription.
 #derive(Eq, @debug.Debug)
 pub(all) struct SpeechConfig {
-  multi_speaker_voice_config : MultiSpeakerVoiceConfig?
+  text_normalization : SpeechConfigTextNormalization?
   language_code : String?
   voice_config : VoiceConfig?
+  multi_speaker_voice_config : MultiSpeakerVoiceConfig?
 }
 
 ///|
@@ -1049,11 +2266,17 @@ pub extend SpeechConfig with @debug.Debug::{to_repr}
 ///
 /// Creates a SpeechConfig with omitted optional fields absent.
 pub fn SpeechConfig::new(
-  multi_speaker_voice_config? : MultiSpeakerVoiceConfig,
+  text_normalization? : SpeechConfigTextNormalization,
   language_code? : String,
   voice_config? : VoiceConfig,
+  multi_speaker_voice_config? : MultiSpeakerVoiceConfig,
 ) -> SpeechConfig {
-  { multi_speaker_voice_config, language_code, voice_config, }
+  {
+    text_normalization,
+    language_code,
+    voice_config,
+    multi_speaker_voice_config,
+  }
 }
 
 ///|
@@ -1064,9 +2287,10 @@ pub extend SpeechConfig with ToJson::{to_json}
 ///|
 pub impl ToJson for SpeechConfig with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("multiSpeakerVoiceConfig", self.multi_speaker_voice_config)
+  .opt("textNormalization", self.text_normalization)
   .opt("languageCode", self.language_code)
   .opt("voiceConfig", self.voice_config)
+  .opt("multiSpeakerVoiceConfig", self.multi_speaker_voice_config)
   .build()
 }
 
@@ -1079,12 +2303,303 @@ pub extend SpeechConfig with @json.FromJson::{from_json}
 pub impl @json.FromJson for SpeechConfig with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
+    text_normalization: @sdkjson.opt_field(obj, "textNormalization", path),
+    language_code: @sdkjson.opt_field(obj, "languageCode", path),
+    voice_config: @sdkjson.opt_field(obj, "voiceConfig", path),
     multi_speaker_voice_config: @sdkjson.opt_field(
       obj, "multiSpeakerVoiceConfig", path,
     ),
-    language_code: @sdkjson.opt_field(obj, "languageCode", path),
-    voice_config: @sdkjson.opt_field(obj, "voiceConfig", path),
   }
+}
+
+///|
+///
+/// Configuration options for model generation and outputs. Not all parameters are configurable for every model.
+#derive(Eq, @debug.Debug)
+pub(all) struct GenerationConfig {
+  logprobs : Int32?
+  translation_config : TranslationConfig?
+  frequency_penalty : Double?
+  thinking_config : ThinkingConfig?
+  presence_penalty : Double?
+  top_k : Int32?
+  temperature : Double?
+  response_schema : Schema?
+  response_json_schema : Json?
+  enable_affective_dialog : Bool?
+  response_mime_type : String?
+  response_format : ResponseFormatConfig?
+  response_modalities : Array[GenerationConfigResponseModalitiesItem]?
+  audio_transcription_config : AudioTranscriptionConfig?
+  response_logprobs : Bool?
+  response_json_schema_2 : Json?
+  image_config : ImageConfig?
+  top_p : Double?
+  media_resolution : GenerationConfigMediaResolution?
+  max_output_tokens : Int32?
+  speech_config : SpeechConfig?
+  stop_sequences : Array[String]?
+  seed : Int32?
+  candidate_count : Int32?
+  enable_enhanced_civic_answers : Bool?
+}
+
+///|
+pub extend GenerationConfig with Eq::{equal, not_equal}
+
+///|
+pub extend GenerationConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GenerationConfig with omitted optional fields absent.
+pub fn GenerationConfig::new(
+  logprobs? : Int32,
+  translation_config? : TranslationConfig,
+  frequency_penalty? : Double,
+  thinking_config? : ThinkingConfig,
+  presence_penalty? : Double,
+  top_k? : Int32,
+  temperature? : Double,
+  response_schema? : Schema,
+  response_json_schema? : Json,
+  enable_affective_dialog? : Bool,
+  response_mime_type? : String,
+  response_format? : ResponseFormatConfig,
+  response_modalities? : Array[GenerationConfigResponseModalitiesItem],
+  audio_transcription_config? : AudioTranscriptionConfig,
+  response_logprobs? : Bool,
+  response_json_schema_2? : Json,
+  image_config? : ImageConfig,
+  top_p? : Double,
+  media_resolution? : GenerationConfigMediaResolution,
+  max_output_tokens? : Int32,
+  speech_config? : SpeechConfig,
+  stop_sequences? : Array[String],
+  seed? : Int32,
+  candidate_count? : Int32,
+  enable_enhanced_civic_answers? : Bool,
+) -> GenerationConfig {
+  {
+    logprobs,
+    translation_config,
+    frequency_penalty,
+    thinking_config,
+    presence_penalty,
+    top_k,
+    temperature,
+    response_schema,
+    response_json_schema,
+    enable_affective_dialog,
+    response_mime_type,
+    response_format,
+    response_modalities,
+    audio_transcription_config,
+    response_logprobs,
+    response_json_schema_2,
+    image_config,
+    top_p,
+    media_resolution,
+    max_output_tokens,
+    speech_config,
+    stop_sequences,
+    seed,
+    candidate_count,
+    enable_enhanced_civic_answers,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GenerationConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for GenerationConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("logprobs", self.logprobs)
+  .opt("translationConfig", self.translation_config)
+  .opt("frequencyPenalty", self.frequency_penalty)
+  .opt("thinkingConfig", self.thinking_config)
+  .opt("presencePenalty", self.presence_penalty)
+  .opt("topK", self.top_k)
+  .opt("temperature", self.temperature)
+  .opt("responseSchema", self.response_schema)
+  .opt("_responseJsonSchema", self.response_json_schema)
+  .opt("enableAffectiveDialog", self.enable_affective_dialog)
+  .opt("responseMimeType", self.response_mime_type)
+  .opt("responseFormat", self.response_format)
+  .opt("responseModalities", self.response_modalities)
+  .opt("audioTranscriptionConfig", self.audio_transcription_config)
+  .opt("responseLogprobs", self.response_logprobs)
+  .opt("responseJsonSchema", self.response_json_schema_2)
+  .opt("imageConfig", self.image_config)
+  .opt("topP", self.top_p)
+  .opt("mediaResolution", self.media_resolution)
+  .opt("maxOutputTokens", self.max_output_tokens)
+  .opt("speechConfig", self.speech_config)
+  .opt("stopSequences", self.stop_sequences)
+  .opt("seed", self.seed)
+  .opt("candidateCount", self.candidate_count)
+  .opt("enableEnhancedCivicAnswers", self.enable_enhanced_civic_answers)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GenerationConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GenerationConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    logprobs: @sdkjson.opt_field(obj, "logprobs", path),
+    translation_config: @sdkjson.opt_field(obj, "translationConfig", path),
+    frequency_penalty: @sdkjson.opt_field(obj, "frequencyPenalty", path),
+    thinking_config: @sdkjson.opt_field(obj, "thinkingConfig", path),
+    presence_penalty: @sdkjson.opt_field(obj, "presencePenalty", path),
+    top_k: @sdkjson.opt_field(obj, "topK", path),
+    temperature: @sdkjson.opt_field(obj, "temperature", path),
+    response_schema: @sdkjson.opt_field(obj, "responseSchema", path),
+    response_json_schema: @sdkjson.opt_field(obj, "_responseJsonSchema", path),
+    enable_affective_dialog: @sdkjson.opt_field(
+      obj, "enableAffectiveDialog", path,
+    ),
+    response_mime_type: @sdkjson.opt_field(obj, "responseMimeType", path),
+    response_format: @sdkjson.opt_field(obj, "responseFormat", path),
+    response_modalities: @sdkjson.opt_field(obj, "responseModalities", path),
+    audio_transcription_config: @sdkjson.opt_field(
+      obj, "audioTranscriptionConfig", path,
+    ),
+    response_logprobs: @sdkjson.opt_field(obj, "responseLogprobs", path),
+    response_json_schema_2: @sdkjson.opt_field(obj, "responseJsonSchema", path),
+    image_config: @sdkjson.opt_field(obj, "imageConfig", path),
+    top_p: @sdkjson.opt_field(obj, "topP", path),
+    media_resolution: @sdkjson.opt_field(obj, "mediaResolution", path),
+    max_output_tokens: @sdkjson.opt_field(obj, "maxOutputTokens", path),
+    speech_config: @sdkjson.opt_field(obj, "speechConfig", path),
+    stop_sequences: @sdkjson.opt_field(obj, "stopSequences", path),
+    seed: @sdkjson.opt_field(obj, "seed", path),
+    candidate_count: @sdkjson.opt_field(obj, "candidateCount", path),
+    enable_enhanced_civic_answers: @sdkjson.opt_field(
+      obj, "enableEnhancedCivicAnswers", path,
+    ),
+  }
+}
+
+///|
+///
+/// Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.
+#derive(Eq, @debug.Debug)
+pub(all) struct SemanticRetrieverChunk {
+  source : String?
+  chunk : String?
+}
+
+///|
+pub extend SemanticRetrieverChunk with Eq::{equal, not_equal}
+
+///|
+pub extend SemanticRetrieverChunk with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a SemanticRetrieverChunk with omitted optional fields absent.
+pub fn SemanticRetrieverChunk::new(
+  source? : String,
+  chunk? : String,
+) -> SemanticRetrieverChunk {
+  { source, chunk, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend SemanticRetrieverChunk with ToJson::{to_json}
+
+///|
+pub impl ToJson for SemanticRetrieverChunk with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("source", self.source)
+  .opt("chunk", self.chunk)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend SemanticRetrieverChunk with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SemanticRetrieverChunk with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    source: @sdkjson.opt_field(obj, "source", path),
+    chunk: @sdkjson.opt_field(obj, "chunk", path),
+  }
+}
+
+///|
+///
+/// Source of the File. Enum values: SOURCE_UNSPECIFIED: Used if source is not specified.; UPLOADED: Indicates the file is uploaded by the user.; GENERATED: Indicates the file is generated by Google.; REGISTERED: Indicates the file is a registered, i.e. a Google Cloud Storage file.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum FileSource {
+  SOURCEUNSPECIFIED
+  UPLOADED
+  GENERATED
+  REGISTERED
+  Unknown(String)
+}
+
+///|
+pub extend FileSource with Eq::{equal, not_equal}
+
+///|
+pub extend FileSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend FileSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileSource with fn to_json(self) {
+  let raw = match self {
+    FileSource::SOURCEUNSPECIFIED => "SOURCE_UNSPECIFIED"
+    FileSource::UPLOADED => "UPLOADED"
+    FileSource::GENERATED => "GENERATED"
+    FileSource::REGISTERED => "REGISTERED"
+    FileSource::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend FileSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileSource with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "SOURCE_UNSPECIFIED" => Option::Some(FileSource::SOURCEUNSPECIFIED)
+        "UPLOADED" => Option::Some(FileSource::UPLOADED)
+        "GENERATED" => Option::Some(FileSource::GENERATED)
+        "REGISTERED" => Option::Some(FileSource::REGISTERED)
+        _ => Option::None
+      }
+    },
+    raw => FileSource::Unknown(raw),
+  )
 }
 
 ///|
@@ -1135,8 +2650,8 @@ pub impl @json.FromJson for VideoFileMetadata with fn from_json(value, path) {
 #derive(Eq, @debug.Debug)
 pub(all) struct Status {
   code : Int32?
-  message : String?
   details : Array[Map[String, Json]]?
+  message : String?
 }
 
 ///|
@@ -1150,10 +2665,10 @@ pub extend Status with @debug.Debug::{to_repr}
 /// Creates a Status with omitted optional fields absent.
 pub fn Status::new(
   code? : Int32,
-  message? : String,
   details? : Array[Map[String, Json]],
+  message? : String,
 ) -> Status {
-  { code, message, details, }
+  { code, details, message, }
 }
 
 ///|
@@ -1165,8 +2680,8 @@ pub extend Status with ToJson::{to_json}
 pub impl ToJson for Status with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .opt("code", self.code)
-  .opt("message", self.message)
   .opt("details", self.details)
+  .opt("message", self.message)
   .build()
 }
 
@@ -1180,8 +2695,8 @@ pub impl @json.FromJson for Status with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     code: @sdkjson.opt_field(obj, "code", path),
-    message: @sdkjson.opt_field(obj, "message", path),
     details: @sdkjson.opt_field(obj, "details", path),
+    message: @sdkjson.opt_field(obj, "message", path),
   }
 }
 
@@ -1246,82 +2761,23 @@ pub impl @json.FromJson for FileState with fn from_json(value, path) {
 
 ///|
 ///
-/// Source of the File. Enum values: SOURCE_UNSPECIFIED: Used if source is not specified.; UPLOADED: Indicates the file is uploaded by the user.; GENERATED: Indicates the file is generated by Google.; REGISTERED: Indicates the file is a registered, i.e. a Google Cloud Storage file.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum FileSource {
-  SOURCEUNSPECIFIED
-  UPLOADED
-  GENERATED
-  REGISTERED
-  Unknown(String)
-}
-
-///|
-pub extend FileSource with Eq::{equal, not_equal}
-
-///|
-pub extend FileSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend FileSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for FileSource with fn to_json(self) {
-  let raw = match self {
-    FileSource::SOURCEUNSPECIFIED => "SOURCE_UNSPECIFIED"
-    FileSource::UPLOADED => "UPLOADED"
-    FileSource::GENERATED => "GENERATED"
-    FileSource::REGISTERED => "REGISTERED"
-    FileSource::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend FileSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FileSource with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "SOURCE_UNSPECIFIED" => Option::Some(FileSource::SOURCEUNSPECIFIED)
-        "UPLOADED" => Option::Some(FileSource::UPLOADED)
-        "GENERATED" => Option::Some(FileSource::GENERATED)
-        "REGISTERED" => Option::Some(FileSource::REGISTERED)
-        _ => Option::None
-      }
-    },
-    raw => FileSource::Unknown(raw),
-  )
-}
-
-///|
-///
 /// A file uploaded to the API.
 #derive(Eq, @debug.Debug)
 pub(all) struct File {
-  update_time : String?
-  video_metadata : VideoFileMetadata?
-  expiration_time : String?
-  name : String?
-  sha256_hash : String?
-  display_name : String?
-  mime_type : String?
-  uri : String?
-  error : Status?
-  create_time : String?
-  size_bytes : Int64?
-  state : FileState?
-  download_uri : String?
   source : FileSource?
+  display_name : String?
+  size_bytes : Int64?
+  video_metadata : VideoFileMetadata?
+  name : String?
+  error : Status?
+  uri : String?
+  update_time : String?
+  sha256_hash : String?
+  create_time : String?
+  expiration_time : String?
+  download_uri : String?
+  mime_type : String?
+  state : FileState?
 }
 
 ///|
@@ -1334,36 +2790,36 @@ pub extend File with @debug.Debug::{to_repr}
 ///
 /// Creates a File with omitted optional fields absent.
 pub fn File::new(
-  update_time? : String,
-  video_metadata? : VideoFileMetadata,
-  expiration_time? : String,
-  name? : String,
-  sha256_hash? : String,
-  display_name? : String,
-  mime_type? : String,
-  uri? : String,
-  error? : Status,
-  create_time? : String,
-  size_bytes? : Int64,
-  state? : FileState,
-  download_uri? : String,
   source? : FileSource,
+  display_name? : String,
+  size_bytes? : Int64,
+  video_metadata? : VideoFileMetadata,
+  name? : String,
+  error? : Status,
+  uri? : String,
+  update_time? : String,
+  sha256_hash? : String,
+  create_time? : String,
+  expiration_time? : String,
+  download_uri? : String,
+  mime_type? : String,
+  state? : FileState,
 ) -> File {
   {
-    update_time,
-    video_metadata,
-    expiration_time,
-    name,
-    sha256_hash,
-    display_name,
-    mime_type,
-    uri,
-    error,
-    create_time,
-    size_bytes,
-    state,
-    download_uri,
     source,
+    display_name,
+    size_bytes,
+    video_metadata,
+    name,
+    error,
+    uri,
+    update_time,
+    sha256_hash,
+    create_time,
+    expiration_time,
+    download_uri,
+    mime_type,
+    state,
   }
 }
 
@@ -1375,23 +2831,23 @@ pub extend File with ToJson::{to_json}
 ///|
 pub impl ToJson for File with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("updateTime", self.update_time)
-  .opt("videoMetadata", self.video_metadata)
-  .opt("expirationTime", self.expiration_time)
-  .opt("name", self.name)
-  .opt("sha256Hash", self.sha256_hash)
+  .opt("source", self.source)
   .opt("displayName", self.display_name)
-  .opt("mimeType", self.mime_type)
-  .opt("uri", self.uri)
-  .opt("error", self.error)
-  .opt("createTime", self.create_time)
   .opt(
     "sizeBytes",
     self.size_bytes.map(value => json_string_int64_to_json(value)),
   )
-  .opt("state", self.state)
+  .opt("videoMetadata", self.video_metadata)
+  .opt("name", self.name)
+  .opt("error", self.error)
+  .opt("uri", self.uri)
+  .opt("updateTime", self.update_time)
+  .opt("sha256Hash", self.sha256_hash)
+  .opt("createTime", self.create_time)
+  .opt("expirationTime", self.expiration_time)
   .opt("downloadUri", self.download_uri)
-  .opt("source", self.source)
+  .opt("mimeType", self.mime_type)
+  .opt("state", self.state)
   .build()
 }
 
@@ -1404,66 +2860,381 @@ pub extend File with @json.FromJson::{from_json}
 pub impl @json.FromJson for File with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    update_time: @sdkjson.opt_field(obj, "updateTime", path),
-    video_metadata: @sdkjson.opt_field(obj, "videoMetadata", path),
-    expiration_time: @sdkjson.opt_field(obj, "expirationTime", path),
-    name: @sdkjson.opt_field(obj, "name", path),
-    sha256_hash: @sdkjson.opt_field(obj, "sha256Hash", path),
+    source: @sdkjson.opt_field(obj, "source", path),
     display_name: @sdkjson.opt_field(obj, "displayName", path),
-    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
-    uri: @sdkjson.opt_field(obj, "uri", path),
-    error: @sdkjson.opt_field(obj, "error", path),
-    create_time: @sdkjson.opt_field(obj, "createTime", path),
     size_bytes: decode_optional_custom(obj, "sizeBytes", path, (
       value,
       value_path,
     ) => json_string_int64(value, value_path)),
-    state: @sdkjson.opt_field(obj, "state", path),
+    video_metadata: @sdkjson.opt_field(obj, "videoMetadata", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+    error: @sdkjson.opt_field(obj, "error", path),
+    uri: @sdkjson.opt_field(obj, "uri", path),
+    update_time: @sdkjson.opt_field(obj, "updateTime", path),
+    sha256_hash: @sdkjson.opt_field(obj, "sha256Hash", path),
+    create_time: @sdkjson.opt_field(obj, "createTime", path),
+    expiration_time: @sdkjson.opt_field(obj, "expirationTime", path),
     download_uri: @sdkjson.opt_field(obj, "downloadUri", path),
-    source: @sdkjson.opt_field(obj, "source", path),
+    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
+    state: @sdkjson.opt_field(obj, "state", path),
   }
 }
 
 ///|
 ///
-/// Request for `CreateFile`.
+/// Response for `ListFiles`.
 #derive(Eq, @debug.Debug)
-pub(all) struct CreateFileRequest {
-  file : File?
+pub(all) struct ListFilesResponse {
+  next_page_token : String?
+  files : Array[File]?
 }
 
 ///|
-pub extend CreateFileRequest with Eq::{equal, not_equal}
+pub extend ListFilesResponse with Eq::{equal, not_equal}
 
 ///|
-pub extend CreateFileRequest with @debug.Debug::{to_repr}
+pub extend ListFilesResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a CreateFileRequest with omitted optional fields absent.
-pub fn CreateFileRequest::new(file? : File) -> CreateFileRequest {
-  { file, }
+/// Creates a ListFilesResponse with omitted optional fields absent.
+pub fn ListFilesResponse::new(
+  next_page_token? : String,
+  files? : Array[File],
+) -> ListFilesResponse {
+  { next_page_token, files, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend CreateFileRequest with ToJson::{to_json}
+pub extend ListFilesResponse with ToJson::{to_json}
 
 ///|
-pub impl ToJson for CreateFileRequest with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("file", self.file).build()
+pub impl ToJson for ListFilesResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("nextPageToken", self.next_page_token)
+  .opt("files", self.files)
+  .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend CreateFileRequest with @json.FromJson::{from_json}
+pub extend ListFilesResponse with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for CreateFileRequest with fn from_json(value, path) {
+pub impl @json.FromJson for ListFilesResponse with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { file: @sdkjson.opt_field(obj, "file", path), }
+  {
+    next_page_token: @sdkjson.opt_field(obj, "nextPageToken", path),
+    files: @sdkjson.opt_field(obj, "files", path),
+  }
+}
+
+///|
+///
+/// Identifier for a part within a `GroundingPassage`.
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingPassageId {
+  part_index : Int32?
+  passage_id : String?
+}
+
+///|
+pub extend GroundingPassageId with Eq::{equal, not_equal}
+
+///|
+pub extend GroundingPassageId with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GroundingPassageId with omitted optional fields absent.
+pub fn GroundingPassageId::new(
+  part_index? : Int32,
+  passage_id? : String,
+) -> GroundingPassageId {
+  { part_index, passage_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GroundingPassageId with ToJson::{to_json}
+
+///|
+pub impl ToJson for GroundingPassageId with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("partIndex", self.part_index)
+  .opt("passageId", self.passage_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GroundingPassageId with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GroundingPassageId with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    part_index: @sdkjson.opt_field(obj, "partIndex", path),
+    passage_id: @sdkjson.opt_field(obj, "passageId", path),
+  }
+}
+
+///|
+///
+/// Identifier for the source contributing to this attribution.
+#derive(Eq, @debug.Debug)
+pub(all) struct AttributionSourceId {
+  semantic_retriever_chunk : SemanticRetrieverChunk?
+  grounding_passage : GroundingPassageId?
+}
+
+///|
+pub extend AttributionSourceId with Eq::{equal, not_equal}
+
+///|
+pub extend AttributionSourceId with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a AttributionSourceId with omitted optional fields absent.
+pub fn AttributionSourceId::new(
+  semantic_retriever_chunk? : SemanticRetrieverChunk,
+  grounding_passage? : GroundingPassageId,
+) -> AttributionSourceId {
+  { semantic_retriever_chunk, grounding_passage, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AttributionSourceId with ToJson::{to_json}
+
+///|
+pub impl ToJson for AttributionSourceId with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("semanticRetrieverChunk", self.semantic_retriever_chunk)
+  .opt("groundingPassage", self.grounding_passage)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AttributionSourceId with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AttributionSourceId with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    semantic_retriever_chunk: @sdkjson.opt_field(
+      obj, "semanticRetrieverChunk", path,
+    ),
+    grounding_passage: @sdkjson.opt_field(obj, "groundingPassage", path),
+  }
+}
+
+///|
+///
+/// A predicted `FunctionCall` returned from the model that contains a string representing the `FunctionDeclaration.name` with the arguments and their values.
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionCall {
+  name : String?
+  args : Map[String, Json]?
+  id : String?
+}
+
+///|
+pub extend FunctionCall with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCall with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a FunctionCall with omitted optional fields absent.
+pub fn FunctionCall::new(
+  name? : String,
+  args? : Map[String, Json],
+  id? : String,
+) -> FunctionCall {
+  { name, args, id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("name", self.name)
+  .opt("args", self.args.map(value => json_map_to_json(value)))
+  .opt("id", self.id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionCall with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: @sdkjson.opt_field(obj, "name", path),
+    args: decode_optional_json_map(obj, "args", path),
+    id: @sdkjson.opt_field(obj, "id", path),
+  }
+}
+
+///|
+///
+/// Segment of the content.
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleAiGenerativelanguageV1betaSegment {
+  part_index : Int32?
+  text : String?
+  start_index : Int32?
+  end_index : Int32?
+}
+
+///|
+pub extend GoogleAiGenerativelanguageV1betaSegment with Eq::{equal, not_equal}
+
+///|
+pub extend GoogleAiGenerativelanguageV1betaSegment with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GoogleAiGenerativelanguageV1betaSegment with omitted optional fields absent.
+pub fn GoogleAiGenerativelanguageV1betaSegment::new(
+  part_index? : Int32,
+  text? : String,
+  start_index? : Int32,
+  end_index? : Int32,
+) -> GoogleAiGenerativelanguageV1betaSegment {
+  { part_index, text, start_index, end_index, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GoogleAiGenerativelanguageV1betaSegment with ToJson::{to_json}
+
+///|
+pub impl ToJson for GoogleAiGenerativelanguageV1betaSegment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("partIndex", self.part_index)
+  .opt("text", self.text)
+  .opt("startIndex", self.start_index)
+  .opt("endIndex", self.end_index)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GoogleAiGenerativelanguageV1betaSegment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for GoogleAiGenerativelanguageV1betaSegment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    part_index: @sdkjson.opt_field(obj, "partIndex", path),
+    text: @sdkjson.opt_field(obj, "text", path),
+    start_index: @sdkjson.opt_field(obj, "startIndex", path),
+    end_index: @sdkjson.opt_field(obj, "endIndex", path),
+  }
+}
+
+///|
+///
+/// Grounding support.
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleAiGenerativelanguageV1betaGroundingSupport {
+  segment : GoogleAiGenerativelanguageV1betaSegment?
+  grounding_chunk_indices : Array[Int32]?
+  rendered_parts : Array[Int32]?
+  confidence_scores : Array[Double]?
+}
+
+///|
+pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a GoogleAiGenerativelanguageV1betaGroundingSupport with omitted optional fields absent.
+pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::new(
+  segment? : GoogleAiGenerativelanguageV1betaSegment,
+  grounding_chunk_indices? : Array[Int32],
+  rendered_parts? : Array[Int32],
+  confidence_scores? : Array[Double],
+) -> GoogleAiGenerativelanguageV1betaGroundingSupport {
+  { segment, grounding_chunk_indices, rendered_parts, confidence_scores, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for GoogleAiGenerativelanguageV1betaGroundingSupport with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("segment", self.segment)
+  .opt("groundingChunkIndices", self.grounding_chunk_indices)
+  .opt("renderedParts", self.rendered_parts)
+  .opt("confidenceScores", self.confidence_scores)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for GoogleAiGenerativelanguageV1betaGroundingSupport with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    segment: @sdkjson.opt_field(obj, "segment", path),
+    grounding_chunk_indices: @sdkjson.opt_field(
+      obj, "groundingChunkIndices", path,
+    ),
+    rendered_parts: @sdkjson.opt_field(obj, "renderedParts", path),
+    confidence_scores: @sdkjson.opt_field(obj, "confidenceScores", path),
+  }
 }
 
 ///|
@@ -1648,10 +3419,10 @@ pub impl @json.FromJson for VideoMetadataContentLayersItem with fn from_json(
 /// Metadata describes the input video content. Set this in `Part.video_metadata` or `FunctionResponsePart.video_metadata` when `inline_data` or `file_data` contains video to configure static video preprocessing (such as time clipping, frame rate, maximum frame count, or extracted content layers).
 #derive(Eq, @debug.Debug)
 pub(all) struct VideoMetadata {
-  fps : Double?
-  start_offset : String?
   end_offset : String?
   content_layers : Array[VideoMetadataContentLayersItem]?
+  start_offset : String?
+  fps : Double?
 }
 
 ///|
@@ -1664,12 +3435,12 @@ pub extend VideoMetadata with @debug.Debug::{to_repr}
 ///
 /// Creates a VideoMetadata with omitted optional fields absent.
 pub fn VideoMetadata::new(
-  fps? : Double,
-  start_offset? : String,
   end_offset? : String,
   content_layers? : Array[VideoMetadataContentLayersItem],
+  start_offset? : String,
+  fps? : Double,
 ) -> VideoMetadata {
-  { fps, start_offset, end_offset, content_layers, }
+  { end_offset, content_layers, start_offset, fps, }
 }
 
 ///|
@@ -1680,10 +3451,10 @@ pub extend VideoMetadata with ToJson::{to_json}
 ///|
 pub impl ToJson for VideoMetadata with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("fps", self.fps)
-  .opt("startOffset", self.start_offset)
   .opt("endOffset", self.end_offset)
   .opt("contentLayers", self.content_layers)
+  .opt("startOffset", self.start_offset)
+  .opt("fps", self.fps)
   .build()
 }
 
@@ -1696,10 +3467,10 @@ pub extend VideoMetadata with @json.FromJson::{from_json}
 pub impl @json.FromJson for VideoMetadata with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    fps: @sdkjson.opt_field(obj, "fps", path),
-    start_offset: @sdkjson.opt_field(obj, "startOffset", path),
     end_offset: @sdkjson.opt_field(obj, "endOffset", path),
     content_layers: @sdkjson.opt_field(obj, "contentLayers", path),
+    start_offset: @sdkjson.opt_field(obj, "startOffset", path),
+    fps: @sdkjson.opt_field(obj, "fps", path),
   }
 }
 
@@ -1708,9 +3479,9 @@ pub impl @json.FromJson for VideoMetadata with fn from_json(value, path) {
 /// Information about a single recognized word.
 #derive(Eq, @debug.Debug)
 pub(all) struct WordInfo {
-  start_offset : String?
-  word : String?
   end_offset : String?
+  word : String?
+  start_offset : String?
 }
 
 ///|
@@ -1723,11 +3494,11 @@ pub extend WordInfo with @debug.Debug::{to_repr}
 ///
 /// Creates a WordInfo with omitted optional fields absent.
 pub fn WordInfo::new(
-  start_offset? : String,
-  word? : String,
   end_offset? : String,
+  word? : String,
+  start_offset? : String,
 ) -> WordInfo {
-  { start_offset, word, end_offset, }
+  { end_offset, word, start_offset, }
 }
 
 ///|
@@ -1738,9 +3509,9 @@ pub extend WordInfo with ToJson::{to_json}
 ///|
 pub impl ToJson for WordInfo with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("startOffset", self.start_offset)
-  .opt("word", self.word)
   .opt("endOffset", self.end_offset)
+  .opt("word", self.word)
+  .opt("startOffset", self.start_offset)
   .build()
 }
 
@@ -1753,9 +3524,9 @@ pub extend WordInfo with @json.FromJson::{from_json}
 pub impl @json.FromJson for WordInfo with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    start_offset: @sdkjson.opt_field(obj, "startOffset", path),
-    word: @sdkjson.opt_field(obj, "word", path),
     end_offset: @sdkjson.opt_field(obj, "endOffset", path),
+    word: @sdkjson.opt_field(obj, "word", path),
+    start_offset: @sdkjson.opt_field(obj, "startOffset", path),
   }
 }
 
@@ -2236,9 +4007,9 @@ pub impl @json.FromJson for PartInlineData with fn from_json(value, path) {
 /// URI based data.
 #derive(Eq, @debug.Debug)
 pub(all) struct FileData {
-  mime_type : String?
   display_name : String?
   file_uri : String?
+  mime_type : String?
 }
 
 ///|
@@ -2251,11 +4022,11 @@ pub extend FileData with @debug.Debug::{to_repr}
 ///
 /// Creates a FileData with omitted optional fields absent.
 pub fn FileData::new(
-  mime_type? : String,
   display_name? : String,
   file_uri? : String,
+  mime_type? : String,
 ) -> FileData {
-  { mime_type, display_name, file_uri, }
+  { display_name, file_uri, mime_type, }
 }
 
 ///|
@@ -2266,9 +4037,9 @@ pub extend FileData with ToJson::{to_json}
 ///|
 pub impl ToJson for FileData with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("mimeType", self.mime_type)
   .opt("displayName", self.display_name)
   .opt("fileUri", self.file_uri)
+  .opt("mimeType", self.mime_type)
   .build()
 }
 
@@ -2281,9 +4052,9 @@ pub extend FileData with @json.FromJson::{from_json}
 pub impl @json.FromJson for FileData with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
     display_name: @sdkjson.opt_field(obj, "displayName", path),
     file_uri: @sdkjson.opt_field(obj, "fileUri", path),
+    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
   }
 }
 
@@ -2503,62 +4274,6 @@ pub impl @json.FromJson for PartFunctionCallMediaProcessing with fn from_json(
 
 ///|
 ///
-/// A predicted `FunctionCall` returned from the model that contains a string representing the `FunctionDeclaration.name` with the arguments and their values.
-#derive(Eq, @debug.Debug)
-pub(all) struct FunctionCall {
-  name : String?
-  args : Map[String, Json]?
-  id : String?
-}
-
-///|
-pub extend FunctionCall with Eq::{equal, not_equal}
-
-///|
-pub extend FunctionCall with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a FunctionCall with omitted optional fields absent.
-pub fn FunctionCall::new(
-  name? : String,
-  args? : Map[String, Json],
-  id? : String,
-) -> FunctionCall {
-  { name, args, id, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend FunctionCall with ToJson::{to_json}
-
-///|
-pub impl ToJson for FunctionCall with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("name", self.name)
-  .opt("args", self.args.map(value => json_map_to_json(value)))
-  .opt("id", self.id)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend FunctionCall with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FunctionCall with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    name: @sdkjson.opt_field(obj, "name", path),
-    args: decode_optional_json_map(obj, "args", path),
-    id: @sdkjson.opt_field(obj, "id", path),
-  }
-}
-
-///|
-///
 /// Generated representation of PartFunctionCall.
 #derive(Eq, @debug.Debug)
 pub(all) struct PartFunctionCall {
@@ -2649,246 +4364,11 @@ pub impl @json.FromJson for PartFunctionCall with fn from_json(value, path) {
 
 ///|
 ///
-/// Raw media bytes for function response. Text should not be sent as raw bytes, use the 'FunctionResponse.response' field.
-#derive(Eq, @debug.Debug)
-pub(all) struct FunctionResponseBlob {
-  data : String?
-  mime_type : String?
-  display_name : String?
-}
-
-///|
-pub extend FunctionResponseBlob with Eq::{equal, not_equal}
-
-///|
-pub extend FunctionResponseBlob with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a FunctionResponseBlob with omitted optional fields absent.
-pub fn FunctionResponseBlob::new(
-  data? : String,
-  mime_type? : String,
-  display_name? : String,
-) -> FunctionResponseBlob {
-  { data, mime_type, display_name, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend FunctionResponseBlob with ToJson::{to_json}
-
-///|
-pub impl ToJson for FunctionResponseBlob with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("data", self.data)
-  .opt("mimeType", self.mime_type)
-  .opt("displayName", self.display_name)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend FunctionResponseBlob with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FunctionResponseBlob with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    data: @sdkjson.opt_field(obj, "data", path),
-    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
-    display_name: @sdkjson.opt_field(obj, "displayName", path),
-  }
-}
-
-///|
-///
-/// Enum values: CONTENT_LAYER_UNSPECIFIED: Default value.; PAGE_IMAGE: Rendered page images.; PAGE_TEXT: Extracted page text.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum DocumentMetadataContentLayersItem {
-  CONTENTLAYERUNSPECIFIED
-  PAGEIMAGE
-  PAGETEXT
-  Unknown(String)
-}
-
-///|
-pub extend DocumentMetadataContentLayersItem with Eq::{equal, not_equal}
-
-///|
-pub extend DocumentMetadataContentLayersItem with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend DocumentMetadataContentLayersItem with ToJson::{to_json}
-
-///|
-pub impl ToJson for DocumentMetadataContentLayersItem with fn to_json(self) {
-  let raw = match self {
-    DocumentMetadataContentLayersItem::CONTENTLAYERUNSPECIFIED =>
-      "CONTENT_LAYER_UNSPECIFIED"
-    DocumentMetadataContentLayersItem::PAGEIMAGE => "PAGE_IMAGE"
-    DocumentMetadataContentLayersItem::PAGETEXT => "PAGE_TEXT"
-    DocumentMetadataContentLayersItem::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend DocumentMetadataContentLayersItem with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for DocumentMetadataContentLayersItem with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "CONTENT_LAYER_UNSPECIFIED" =>
-          Option::Some(
-            DocumentMetadataContentLayersItem::CONTENTLAYERUNSPECIFIED,
-          )
-        "PAGE_IMAGE" =>
-          Option::Some(DocumentMetadataContentLayersItem::PAGEIMAGE)
-        "PAGE_TEXT" => Option::Some(DocumentMetadataContentLayersItem::PAGETEXT)
-        _ => Option::None
-      }
-    },
-    raw => DocumentMetadataContentLayersItem::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Metadata describes the input document content. Set this in `Part.document_metadata` or `FunctionResponsePart.document_metadata` when `inline_data` or `file_data` contains a document to configure static document preprocessing.
-#derive(Eq, @debug.Debug)
-pub(all) struct DocumentMetadata {
-  start_page : Int32?
-  end_page : Int32?
-  content_layers : Array[DocumentMetadataContentLayersItem]?
-}
-
-///|
-pub extend DocumentMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend DocumentMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a DocumentMetadata with omitted optional fields absent.
-pub fn DocumentMetadata::new(
-  start_page? : Int32,
-  end_page? : Int32,
-  content_layers? : Array[DocumentMetadataContentLayersItem],
-) -> DocumentMetadata {
-  { start_page, end_page, content_layers, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend DocumentMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for DocumentMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("startPage", self.start_page)
-  .opt("endPage", self.end_page)
-  .opt("contentLayers", self.content_layers)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend DocumentMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for DocumentMetadata with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    start_page: @sdkjson.opt_field(obj, "startPage", path),
-    end_page: @sdkjson.opt_field(obj, "endPage", path),
-    content_layers: @sdkjson.opt_field(obj, "contentLayers", path),
-  }
-}
-
-///|
-///
-/// URI based data for function response.
-#derive(Eq, @debug.Debug)
-pub(all) struct FunctionResponseFileData {
-  mime_type : String?
-  display_name : String?
-  file_uri : String?
-}
-
-///|
-pub extend FunctionResponseFileData with Eq::{equal, not_equal}
-
-///|
-pub extend FunctionResponseFileData with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a FunctionResponseFileData with omitted optional fields absent.
-pub fn FunctionResponseFileData::new(
-  mime_type? : String,
-  display_name? : String,
-  file_uri? : String,
-) -> FunctionResponseFileData {
-  { mime_type, display_name, file_uri, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend FunctionResponseFileData with ToJson::{to_json}
-
-///|
-pub impl ToJson for FunctionResponseFileData with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("mimeType", self.mime_type)
-  .opt("displayName", self.display_name)
-  .opt("fileUri", self.file_uri)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend FunctionResponseFileData with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FunctionResponseFileData with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
-    display_name: @sdkjson.opt_field(obj, "displayName", path),
-    file_uri: @sdkjson.opt_field(obj, "fileUri", path),
-  }
-}
-
-///|
-///
 /// Metadata describes the input audio content. Set this in `Part.audio_metadata` or `FunctionResponsePart.audio_metadata` when `inline_data` or `file_data` contains audio to configure static audio preprocessing.
 #derive(Eq, @debug.Debug)
 pub(all) struct AudioMetadata {
-  start_offset : String?
   end_offset : String?
+  start_offset : String?
 }
 
 ///|
@@ -2901,10 +4381,10 @@ pub extend AudioMetadata with @debug.Debug::{to_repr}
 ///
 /// Creates a AudioMetadata with omitted optional fields absent.
 pub fn AudioMetadata::new(
-  start_offset? : String,
   end_offset? : String,
+  start_offset? : String,
 ) -> AudioMetadata {
-  { start_offset, end_offset, }
+  { end_offset, start_offset, }
 }
 
 ///|
@@ -2915,8 +4395,8 @@ pub extend AudioMetadata with ToJson::{to_json}
 ///|
 pub impl ToJson for AudioMetadata with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("startOffset", self.start_offset)
   .opt("endOffset", self.end_offset)
+  .opt("startOffset", self.start_offset)
   .build()
 }
 
@@ -2929,8 +4409,8 @@ pub extend AudioMetadata with @json.FromJson::{from_json}
 pub impl @json.FromJson for AudioMetadata with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    start_offset: @sdkjson.opt_field(obj, "startOffset", path),
     end_offset: @sdkjson.opt_field(obj, "endOffset", path),
+    start_offset: @sdkjson.opt_field(obj, "startOffset", path),
   }
 }
 
@@ -3006,8 +4486,8 @@ pub impl @json.FromJson for SpreadsheetMetadataContentLayersItem with fn from_js
 /// Metadata describes the input spreadsheet content. Set this in `Part.spreadsheet_metadata` or `FunctionResponsePart.spreadsheet_metadata` when `inline_data` or `file_data` contains a spreadsheet to configure static spreadsheet preprocessing.
 #derive(Eq, @debug.Debug)
 pub(all) struct SpreadsheetMetadata {
-  visible_cells : String?
   content_layers : Array[SpreadsheetMetadataContentLayersItem]?
+  visible_cells : String?
   sheet_index : Int32?
 }
 
@@ -3021,11 +4501,11 @@ pub extend SpreadsheetMetadata with @debug.Debug::{to_repr}
 ///
 /// Creates a SpreadsheetMetadata with omitted optional fields absent.
 pub fn SpreadsheetMetadata::new(
-  visible_cells? : String,
   content_layers? : Array[SpreadsheetMetadataContentLayersItem],
+  visible_cells? : String,
   sheet_index? : Int32,
 ) -> SpreadsheetMetadata {
-  { visible_cells, content_layers, sheet_index, }
+  { content_layers, visible_cells, sheet_index, }
 }
 
 ///|
@@ -3036,8 +4516,8 @@ pub extend SpreadsheetMetadata with ToJson::{to_json}
 ///|
 pub impl ToJson for SpreadsheetMetadata with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("visibleCells", self.visible_cells)
   .opt("contentLayers", self.content_layers)
+  .opt("visibleCells", self.visible_cells)
   .opt("sheetIndex", self.sheet_index)
   .build()
 }
@@ -3051,9 +4531,129 @@ pub extend SpreadsheetMetadata with @json.FromJson::{from_json}
 pub impl @json.FromJson for SpreadsheetMetadata with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    visible_cells: @sdkjson.opt_field(obj, "visibleCells", path),
     content_layers: @sdkjson.opt_field(obj, "contentLayers", path),
+    visible_cells: @sdkjson.opt_field(obj, "visibleCells", path),
     sheet_index: @sdkjson.opt_field(obj, "sheetIndex", path),
+  }
+}
+
+///|
+///
+/// Enum values: CONTENT_LAYER_UNSPECIFIED: Default value.; PAGE_IMAGE: Rendered page images.; PAGE_TEXT: Extracted page text.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum DocumentMetadataContentLayersItem {
+  CONTENTLAYERUNSPECIFIED
+  PAGEIMAGE
+  PAGETEXT
+  Unknown(String)
+}
+
+///|
+pub extend DocumentMetadataContentLayersItem with Eq::{equal, not_equal}
+
+///|
+pub extend DocumentMetadataContentLayersItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend DocumentMetadataContentLayersItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for DocumentMetadataContentLayersItem with fn to_json(self) {
+  let raw = match self {
+    DocumentMetadataContentLayersItem::CONTENTLAYERUNSPECIFIED =>
+      "CONTENT_LAYER_UNSPECIFIED"
+    DocumentMetadataContentLayersItem::PAGEIMAGE => "PAGE_IMAGE"
+    DocumentMetadataContentLayersItem::PAGETEXT => "PAGE_TEXT"
+    DocumentMetadataContentLayersItem::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend DocumentMetadataContentLayersItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for DocumentMetadataContentLayersItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "CONTENT_LAYER_UNSPECIFIED" =>
+          Option::Some(
+            DocumentMetadataContentLayersItem::CONTENTLAYERUNSPECIFIED,
+          )
+        "PAGE_IMAGE" =>
+          Option::Some(DocumentMetadataContentLayersItem::PAGEIMAGE)
+        "PAGE_TEXT" => Option::Some(DocumentMetadataContentLayersItem::PAGETEXT)
+        _ => Option::None
+      }
+    },
+    raw => DocumentMetadataContentLayersItem::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Metadata describes the input document content. Set this in `Part.document_metadata` or `FunctionResponsePart.document_metadata` when `inline_data` or `file_data` contains a document to configure static document preprocessing.
+#derive(Eq, @debug.Debug)
+pub(all) struct DocumentMetadata {
+  content_layers : Array[DocumentMetadataContentLayersItem]?
+  start_page : Int32?
+  end_page : Int32?
+}
+
+///|
+pub extend DocumentMetadata with Eq::{equal, not_equal}
+
+///|
+pub extend DocumentMetadata with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a DocumentMetadata with omitted optional fields absent.
+pub fn DocumentMetadata::new(
+  content_layers? : Array[DocumentMetadataContentLayersItem],
+  start_page? : Int32,
+  end_page? : Int32,
+) -> DocumentMetadata {
+  { content_layers, start_page, end_page, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend DocumentMetadata with ToJson::{to_json}
+
+///|
+pub impl ToJson for DocumentMetadata with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("contentLayers", self.content_layers)
+  .opt("startPage", self.start_page)
+  .opt("endPage", self.end_page)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend DocumentMetadata with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for DocumentMetadata with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content_layers: @sdkjson.opt_field(obj, "contentLayers", path),
+    start_page: @sdkjson.opt_field(obj, "startPage", path),
+    end_page: @sdkjson.opt_field(obj, "endPage", path),
   }
 }
 
@@ -3122,17 +4722,73 @@ pub impl @json.FromJson for FunctionResponsePartMediaProcessing with fn from_jso
 
 ///|
 ///
+/// Raw media bytes for function response. Text should not be sent as raw bytes, use the 'FunctionResponse.response' field.
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionResponseBlob {
+  mime_type : String?
+  display_name : String?
+  data : String?
+}
+
+///|
+pub extend FunctionResponseBlob with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionResponseBlob with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a FunctionResponseBlob with omitted optional fields absent.
+pub fn FunctionResponseBlob::new(
+  mime_type? : String,
+  display_name? : String,
+  data? : String,
+) -> FunctionResponseBlob {
+  { mime_type, display_name, data, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionResponseBlob with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionResponseBlob with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("mimeType", self.mime_type)
+  .opt("displayName", self.display_name)
+  .opt("data", self.data)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionResponseBlob with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionResponseBlob with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
+    display_name: @sdkjson.opt_field(obj, "displayName", path),
+    data: @sdkjson.opt_field(obj, "data", path),
+  }
+}
+
+///|
+///
 /// A datatype containing media that is part of a `FunctionResponse` message. A `FunctionResponsePart` consists of data which has an associated datatype. A `FunctionResponsePart` can only contain one of the accepted types in `FunctionResponsePart.data`. Media can be passed as raw bytes (`inline_data`) or by URI (`file_data`) with an IANA MIME type identifying the type and subtype of the media.
 #derive(Eq, @debug.Debug)
 pub(all) struct FunctionResponsePart {
-  video_metadata : VideoMetadata?
-  media_resolution : V1mainMediaResolution?
-  inline_data : FunctionResponseBlob?
-  document_metadata : DocumentMetadata?
-  file_data : FunctionResponseFileData?
   audio_metadata : AudioMetadata?
   spreadsheet_metadata : SpreadsheetMetadata?
+  media_resolution : V1mainMediaResolution?
+  video_metadata : VideoMetadata?
+  file_data : FunctionResponseFileData?
+  document_metadata : DocumentMetadata?
   media_processing : FunctionResponsePartMediaProcessing?
+  inline_data : FunctionResponseBlob?
 }
 
 ///|
@@ -3145,24 +4801,24 @@ pub extend FunctionResponsePart with @debug.Debug::{to_repr}
 ///
 /// Creates a FunctionResponsePart with omitted optional fields absent.
 pub fn FunctionResponsePart::new(
-  video_metadata? : VideoMetadata,
-  media_resolution? : V1mainMediaResolution,
-  inline_data? : FunctionResponseBlob,
-  document_metadata? : DocumentMetadata,
-  file_data? : FunctionResponseFileData,
   audio_metadata? : AudioMetadata,
   spreadsheet_metadata? : SpreadsheetMetadata,
+  media_resolution? : V1mainMediaResolution,
+  video_metadata? : VideoMetadata,
+  file_data? : FunctionResponseFileData,
+  document_metadata? : DocumentMetadata,
   media_processing? : FunctionResponsePartMediaProcessing,
+  inline_data? : FunctionResponseBlob,
 ) -> FunctionResponsePart {
   {
-    video_metadata,
-    media_resolution,
-    inline_data,
-    document_metadata,
-    file_data,
     audio_metadata,
     spreadsheet_metadata,
+    media_resolution,
+    video_metadata,
+    file_data,
+    document_metadata,
     media_processing,
+    inline_data,
   }
 }
 
@@ -3174,14 +4830,14 @@ pub extend FunctionResponsePart with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionResponsePart with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("videoMetadata", self.video_metadata)
-  .opt("mediaResolution", self.media_resolution)
-  .opt("inlineData", self.inline_data)
-  .opt("documentMetadata", self.document_metadata)
-  .opt("fileData", self.file_data)
   .opt("audioMetadata", self.audio_metadata)
   .opt("spreadsheetMetadata", self.spreadsheet_metadata)
+  .opt("mediaResolution", self.media_resolution)
+  .opt("videoMetadata", self.video_metadata)
+  .opt("fileData", self.file_data)
+  .opt("documentMetadata", self.document_metadata)
   .opt("mediaProcessing", self.media_processing)
+  .opt("inlineData", self.inline_data)
   .build()
 }
 
@@ -3194,14 +4850,14 @@ pub extend FunctionResponsePart with @json.FromJson::{from_json}
 pub impl @json.FromJson for FunctionResponsePart with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    video_metadata: @sdkjson.opt_field(obj, "videoMetadata", path),
-    media_resolution: @sdkjson.opt_field(obj, "mediaResolution", path),
-    inline_data: @sdkjson.opt_field(obj, "inlineData", path),
-    document_metadata: @sdkjson.opt_field(obj, "documentMetadata", path),
-    file_data: @sdkjson.opt_field(obj, "fileData", path),
     audio_metadata: @sdkjson.opt_field(obj, "audioMetadata", path),
     spreadsheet_metadata: @sdkjson.opt_field(obj, "spreadsheetMetadata", path),
+    media_resolution: @sdkjson.opt_field(obj, "mediaResolution", path),
+    video_metadata: @sdkjson.opt_field(obj, "videoMetadata", path),
+    file_data: @sdkjson.opt_field(obj, "fileData", path),
+    document_metadata: @sdkjson.opt_field(obj, "documentMetadata", path),
     media_processing: @sdkjson.opt_field(obj, "mediaProcessing", path),
+    inline_data: @sdkjson.opt_field(obj, "inlineData", path),
   }
 }
 
@@ -3274,12 +4930,12 @@ pub impl @json.FromJson for FunctionResponseScheduling with fn from_json(
 /// The result output from a `FunctionCall` that contains a string representing the `FunctionDeclaration.name` and a structured JSON object containing any output from the function is used as context to the model. This should contain the result of a`FunctionCall` made based on model prediction.
 #derive(Eq, @debug.Debug)
 pub(all) struct FunctionResponse {
-  name : String?
   parts : Array[FunctionResponsePart]?
-  id : String?
   response : Map[String, Json]?
   scheduling : FunctionResponseScheduling?
+  id : String?
   will_continue : Bool?
+  name : String?
 }
 
 ///|
@@ -3292,14 +4948,14 @@ pub extend FunctionResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a FunctionResponse with omitted optional fields absent.
 pub fn FunctionResponse::new(
-  name? : String,
   parts? : Array[FunctionResponsePart],
-  id? : String,
   response? : Map[String, Json],
   scheduling? : FunctionResponseScheduling,
+  id? : String,
   will_continue? : Bool,
+  name? : String,
 ) -> FunctionResponse {
-  { name, parts, id, response, scheduling, will_continue, }
+  { parts, response, scheduling, id, will_continue, name, }
 }
 
 ///|
@@ -3310,12 +4966,12 @@ pub extend FunctionResponse with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionResponse with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("name", self.name)
   .opt("parts", self.parts)
-  .opt("id", self.id)
   .opt("response", self.response.map(value => json_map_to_json(value)))
   .opt("scheduling", self.scheduling)
+  .opt("id", self.id)
   .opt("willContinue", self.will_continue)
+  .opt("name", self.name)
   .build()
 }
 
@@ -3328,12 +4984,12 @@ pub extend FunctionResponse with @json.FromJson::{from_json}
 pub impl @json.FromJson for FunctionResponse with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    name: @sdkjson.opt_field(obj, "name", path),
     parts: @sdkjson.opt_field(obj, "parts", path),
-    id: @sdkjson.opt_field(obj, "id", path),
     response: decode_optional_json_map(obj, "response", path),
     scheduling: @sdkjson.opt_field(obj, "scheduling", path),
+    id: @sdkjson.opt_field(obj, "id", path),
     will_continue: @sdkjson.opt_field(obj, "willContinue", path),
+    name: @sdkjson.opt_field(obj, "name", path),
   }
 }
 
@@ -3552,9 +5208,9 @@ pub impl @json.FromJson for ExecutableCodeLanguage with fn from_json(
 /// Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.
 #derive(Eq, @debug.Debug)
 pub(all) struct ExecutableCode {
-  id : String?
-  language : ExecutableCodeLanguage?
   code : String?
+  language : ExecutableCodeLanguage?
+  id : String?
 }
 
 ///|
@@ -3567,11 +5223,11 @@ pub extend ExecutableCode with @debug.Debug::{to_repr}
 ///
 /// Creates a ExecutableCode with omitted optional fields absent.
 pub fn ExecutableCode::new(
-  id? : String,
-  language? : ExecutableCodeLanguage,
   code? : String,
+  language? : ExecutableCodeLanguage,
+  id? : String,
 ) -> ExecutableCode {
-  { id, language, code, }
+  { code, language, id, }
 }
 
 ///|
@@ -3582,9 +5238,9 @@ pub extend ExecutableCode with ToJson::{to_json}
 ///|
 pub impl ToJson for ExecutableCode with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("id", self.id)
-  .opt("language", self.language)
   .opt("code", self.code)
+  .opt("language", self.language)
+  .opt("id", self.id)
   .build()
 }
 
@@ -3597,9 +5253,9 @@ pub extend ExecutableCode with @json.FromJson::{from_json}
 pub impl @json.FromJson for ExecutableCode with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    id: @sdkjson.opt_field(obj, "id", path),
-    language: @sdkjson.opt_field(obj, "language", path),
     code: @sdkjson.opt_field(obj, "code", path),
+    language: @sdkjson.opt_field(obj, "language", path),
+    id: @sdkjson.opt_field(obj, "id", path),
   }
 }
 
@@ -4112,10 +5768,10 @@ pub impl @json.FromJson for ToolCallToolType with fn from_json(value, path) {
 /// A predicted server-side `ToolCall` returned from the model. This message contains information about a tool that the model wants to invoke. The client is NOT expected to execute this `ToolCall`. Instead, the client should pass this `ToolCall` back to the API in a subsequent turn within a `Content` message, along with the corresponding `ToolResponse`.
 #derive(Eq, @debug.Debug)
 pub(all) struct ToolCall {
+  tool_name : String?
   tool_type : ToolCallToolType?
   id : String?
   args : Map[String, Json]?
-  tool_name : String?
 }
 
 ///|
@@ -4128,12 +5784,12 @@ pub extend ToolCall with @debug.Debug::{to_repr}
 ///
 /// Creates a ToolCall with omitted optional fields absent.
 pub fn ToolCall::new(
+  tool_name? : String,
   tool_type? : ToolCallToolType,
   id? : String,
   args? : Map[String, Json],
-  tool_name? : String,
 ) -> ToolCall {
-  { tool_type, id, args, tool_name, }
+  { tool_name, tool_type, id, args, }
 }
 
 ///|
@@ -4144,10 +5800,10 @@ pub extend ToolCall with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolCall with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
+  .opt("toolName", self.tool_name)
   .opt("toolType", self.tool_type)
   .opt("id", self.id)
   .opt("args", self.args.map(value => json_map_to_json(value)))
-  .opt("toolName", self.tool_name)
   .build()
 }
 
@@ -4160,10 +5816,10 @@ pub extend ToolCall with @json.FromJson::{from_json}
 pub impl @json.FromJson for ToolCall with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
+    tool_name: @sdkjson.opt_field(obj, "toolName", path),
     tool_type: @sdkjson.opt_field(obj, "toolType", path),
     id: @sdkjson.opt_field(obj, "id", path),
     args: decode_optional_json_map(obj, "args", path),
-    tool_name: @sdkjson.opt_field(obj, "toolName", path),
   }
 }
 
@@ -4759,328 +6415,6 @@ pub impl @json.FromJson for Content with fn from_json(value, path) {
 
 ///|
 ///
-/// Optional. The task type of the embedding. Enum values: TASK_TYPE_UNSPECIFIED: Unset value, which will default to one of the other enum values.; RETRIEVAL_QUERY: Specifies the given text is a query in a search/retrieval setting.; RETRIEVAL_DOCUMENT: Specifies the given text is a document from the corpus being searched.; SEMANTIC_SIMILARITY: Specifies the given text will be used for STS.; CLASSIFICATION: Specifies that the given text will be classified.; CLUSTERING: Specifies that the embeddings will be used for clustering.; QUESTION_ANSWERING: Specifies that the given text will be used for question answering.; FACT_VERIFICATION: Specifies that the given text will be used for fact verification.; CODE_RETRIEVAL_QUERY: Specifies that the given text will be used for code retrieval.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum EmbedContentConfigTaskType {
-  TASKTYPEUNSPECIFIED
-  RETRIEVALQUERY
-  RETRIEVALDOCUMENT
-  SEMANTICSIMILARITY
-  CLASSIFICATION
-  CLUSTERING
-  QUESTIONANSWERING
-  FACTVERIFICATION
-  CODERETRIEVALQUERY
-  Custom(String)
-}
-
-///|
-pub extend EmbedContentConfigTaskType with Eq::{equal, not_equal}
-
-///|
-pub extend EmbedContentConfigTaskType with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend EmbedContentConfigTaskType with ToJson::{to_json}
-
-///|
-pub impl ToJson for EmbedContentConfigTaskType with fn to_json(self) {
-  let raw = match self {
-    EmbedContentConfigTaskType::TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
-    EmbedContentConfigTaskType::RETRIEVALQUERY => "RETRIEVAL_QUERY"
-    EmbedContentConfigTaskType::RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
-    EmbedContentConfigTaskType::SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
-    EmbedContentConfigTaskType::CLASSIFICATION => "CLASSIFICATION"
-    EmbedContentConfigTaskType::CLUSTERING => "CLUSTERING"
-    EmbedContentConfigTaskType::QUESTIONANSWERING => "QUESTION_ANSWERING"
-    EmbedContentConfigTaskType::FACTVERIFICATION => "FACT_VERIFICATION"
-    EmbedContentConfigTaskType::CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
-    EmbedContentConfigTaskType::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend EmbedContentConfigTaskType with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for EmbedContentConfigTaskType with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "TASK_TYPE_UNSPECIFIED" =>
-          Option::Some(EmbedContentConfigTaskType::TASKTYPEUNSPECIFIED)
-        "RETRIEVAL_QUERY" =>
-          Option::Some(EmbedContentConfigTaskType::RETRIEVALQUERY)
-        "RETRIEVAL_DOCUMENT" =>
-          Option::Some(EmbedContentConfigTaskType::RETRIEVALDOCUMENT)
-        "SEMANTIC_SIMILARITY" =>
-          Option::Some(EmbedContentConfigTaskType::SEMANTICSIMILARITY)
-        "CLASSIFICATION" =>
-          Option::Some(EmbedContentConfigTaskType::CLASSIFICATION)
-        "CLUSTERING" => Option::Some(EmbedContentConfigTaskType::CLUSTERING)
-        "QUESTION_ANSWERING" =>
-          Option::Some(EmbedContentConfigTaskType::QUESTIONANSWERING)
-        "FACT_VERIFICATION" =>
-          Option::Some(EmbedContentConfigTaskType::FACTVERIFICATION)
-        "CODE_RETRIEVAL_QUERY" =>
-          Option::Some(EmbedContentConfigTaskType::CODERETRIEVALQUERY)
-        _ => Option::None
-      }
-    },
-    raw => EmbedContentConfigTaskType::Custom(raw),
-  )
-}
-
-///|
-///
-/// Configurations for the EmbedContent request.
-#derive(Eq, @debug.Debug)
-pub(all) struct EmbedContentConfig {
-  document_ocr : Bool?
-  auto_truncate : Bool?
-  output_dimensionality : Int32?
-  task_type : EmbedContentConfigTaskType?
-  title : String?
-  audio_track_extraction : Bool?
-}
-
-///|
-pub extend EmbedContentConfig with Eq::{equal, not_equal}
-
-///|
-pub extend EmbedContentConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a EmbedContentConfig with omitted optional fields absent.
-pub fn EmbedContentConfig::new(
-  document_ocr? : Bool,
-  auto_truncate? : Bool,
-  output_dimensionality? : Int32,
-  task_type? : EmbedContentConfigTaskType,
-  title? : String,
-  audio_track_extraction? : Bool,
-) -> EmbedContentConfig {
-  {
-    document_ocr,
-    auto_truncate,
-    output_dimensionality,
-    task_type,
-    title,
-    audio_track_extraction,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend EmbedContentConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for EmbedContentConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("documentOcr", self.document_ocr)
-  .opt("autoTruncate", self.auto_truncate)
-  .opt("outputDimensionality", self.output_dimensionality)
-  .opt("taskType", self.task_type)
-  .opt("title", self.title)
-  .opt("audioTrackExtraction", self.audio_track_extraction)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend EmbedContentConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for EmbedContentConfig with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    document_ocr: @sdkjson.opt_field(obj, "documentOcr", path),
-    auto_truncate: @sdkjson.opt_field(obj, "autoTruncate", path),
-    output_dimensionality: @sdkjson.opt_field(obj, "outputDimensionality", path),
-    task_type: @sdkjson.opt_field(obj, "taskType", path),
-    title: @sdkjson.opt_field(obj, "title", path),
-    audio_track_extraction: @sdkjson.opt_field(
-      obj, "audioTrackExtraction", path,
-    ),
-  }
-}
-
-///|
-///
-/// Optional. Deprecated: Please use EmbedContentConfig.task_type instead. Optional task type for which the embeddings will be used. Not supported on earlier models (`models/embedding-001`). Enum values: TASK_TYPE_UNSPECIFIED: Unset value, which will default to one of the other enum values.; RETRIEVAL_QUERY: Specifies the given text is a query in a search/retrieval setting.; RETRIEVAL_DOCUMENT: Specifies the given text is a document from the corpus being searched.; SEMANTIC_SIMILARITY: Specifies the given text will be used for STS.; CLASSIFICATION: Specifies that the given text will be classified.; CLUSTERING: Specifies that the embeddings will be used for clustering.; QUESTION_ANSWERING: Specifies that the given text will be used for question answering.; FACT_VERIFICATION: Specifies that the given text will be used for fact verification.; CODE_RETRIEVAL_QUERY: Specifies that the given text will be used for code retrieval.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum EmbedContentRequestTaskType {
-  TASKTYPEUNSPECIFIED
-  RETRIEVALQUERY
-  RETRIEVALDOCUMENT
-  SEMANTICSIMILARITY
-  CLASSIFICATION
-  CLUSTERING
-  QUESTIONANSWERING
-  FACTVERIFICATION
-  CODERETRIEVALQUERY
-  Custom(String)
-}
-
-///|
-pub extend EmbedContentRequestTaskType with Eq::{equal, not_equal}
-
-///|
-pub extend EmbedContentRequestTaskType with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend EmbedContentRequestTaskType with ToJson::{to_json}
-
-///|
-pub impl ToJson for EmbedContentRequestTaskType with fn to_json(self) {
-  let raw = match self {
-    EmbedContentRequestTaskType::TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
-    EmbedContentRequestTaskType::RETRIEVALQUERY => "RETRIEVAL_QUERY"
-    EmbedContentRequestTaskType::RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
-    EmbedContentRequestTaskType::SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
-    EmbedContentRequestTaskType::CLASSIFICATION => "CLASSIFICATION"
-    EmbedContentRequestTaskType::CLUSTERING => "CLUSTERING"
-    EmbedContentRequestTaskType::QUESTIONANSWERING => "QUESTION_ANSWERING"
-    EmbedContentRequestTaskType::FACTVERIFICATION => "FACT_VERIFICATION"
-    EmbedContentRequestTaskType::CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
-    EmbedContentRequestTaskType::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend EmbedContentRequestTaskType with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for EmbedContentRequestTaskType with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "TASK_TYPE_UNSPECIFIED" =>
-          Option::Some(EmbedContentRequestTaskType::TASKTYPEUNSPECIFIED)
-        "RETRIEVAL_QUERY" =>
-          Option::Some(EmbedContentRequestTaskType::RETRIEVALQUERY)
-        "RETRIEVAL_DOCUMENT" =>
-          Option::Some(EmbedContentRequestTaskType::RETRIEVALDOCUMENT)
-        "SEMANTIC_SIMILARITY" =>
-          Option::Some(EmbedContentRequestTaskType::SEMANTICSIMILARITY)
-        "CLASSIFICATION" =>
-          Option::Some(EmbedContentRequestTaskType::CLASSIFICATION)
-        "CLUSTERING" => Option::Some(EmbedContentRequestTaskType::CLUSTERING)
-        "QUESTION_ANSWERING" =>
-          Option::Some(EmbedContentRequestTaskType::QUESTIONANSWERING)
-        "FACT_VERIFICATION" =>
-          Option::Some(EmbedContentRequestTaskType::FACTVERIFICATION)
-        "CODE_RETRIEVAL_QUERY" =>
-          Option::Some(EmbedContentRequestTaskType::CODERETRIEVALQUERY)
-        _ => Option::None
-      }
-    },
-    raw => EmbedContentRequestTaskType::Custom(raw),
-  )
-}
-
-///|
-///
-/// Request containing the `Content` for the model to embed.
-#derive(Eq, @debug.Debug)
-pub(all) struct EmbedContentRequest {
-  content : Content?
-  title : String?
-  output_dimensionality : Int32?
-  embed_content_config : EmbedContentConfig?
-  model : String?
-  task_type : EmbedContentRequestTaskType?
-}
-
-///|
-pub extend EmbedContentRequest with Eq::{equal, not_equal}
-
-///|
-pub extend EmbedContentRequest with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a EmbedContentRequest with omitted optional fields absent.
-pub fn EmbedContentRequest::new(
-  content? : Content,
-  title? : String,
-  output_dimensionality? : Int32,
-  embed_content_config? : EmbedContentConfig,
-  model? : String,
-  task_type? : EmbedContentRequestTaskType,
-) -> EmbedContentRequest {
-  {
-    content,
-    title,
-    output_dimensionality,
-    embed_content_config,
-    model,
-    task_type,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend EmbedContentRequest with ToJson::{to_json}
-
-///|
-pub impl ToJson for EmbedContentRequest with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("content", self.content)
-  .opt("title", self.title)
-  .opt("outputDimensionality", self.output_dimensionality)
-  .opt("embedContentConfig", self.embed_content_config)
-  .opt("model", self.model)
-  .opt("taskType", self.task_type)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend EmbedContentRequest with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for EmbedContentRequest with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    content: @sdkjson.opt_field(obj, "content", path),
-    title: @sdkjson.opt_field(obj, "title", path),
-    output_dimensionality: @sdkjson.opt_field(obj, "outputDimensionality", path),
-    embed_content_config: @sdkjson.opt_field(obj, "embedContentConfig", path),
-    model: @sdkjson.opt_field(obj, "model", path),
-    task_type: @sdkjson.opt_field(obj, "taskType", path),
-  }
-}
-
-///|
-///
 /// An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.
 #derive(Eq, @debug.Debug)
 pub(all) struct LatLng {
@@ -5182,36 +6516,38 @@ pub impl @json.FromJson for RetrievalConfig with fn from_json(value, path) {
 
 ///|
 ///
-/// Required. The environment being operated. Enum values: ENVIRONMENT_UNSPECIFIED: Defaults to browser.; ENVIRONMENT_BROWSER: Operates in a web browser.; ENVIRONMENT_MOBILE: Operates in a mobile environment.; ENVIRONMENT_DESKTOP: Operates in a desktop environment.
+/// Optional. Specifies the mode in which function calling should execute. If unspecified, the default value will be set to AUTO. Enum values: MODE_UNSPECIFIED: Unspecified function calling mode. This value should not be used.; AUTO: Default model behavior, model decides to predict either a function call or a natural language response.; ANY: Model is constrained to always predicting a function call only. If "allowed_function_names" are set, the predicted function call will be limited to any one of "allowed_function_names", else the predicted function call will be any one of the provided "function_declarations".; NONE: Model will not predict any function call. Model behavior is same as when not passing any function declarations.; VALIDATED: Model decides to predict either a function call or a natural language response, but will validate function calls with constrained decoding. If "allowed_function_names" are set, the predicted function call will be limited to any one of "allowed_function_names", else the predicted function call will be any one of the provided "function_declarations".
 #derive(Eq, @debug.Debug)
 #non_exhaustive
-pub(all) enum ComputerUseEnvironment {
-  ENVIRONMENTUNSPECIFIED
-  ENVIRONMENTBROWSER
-  ENVIRONMENTMOBILE
-  ENVIRONMENTDESKTOP
+pub(all) enum FunctionCallingConfigMode {
+  MODEUNSPECIFIED
+  AUTO
+  ANY
+  NONE
+  VALIDATED
   Unknown(String)
 }
 
 ///|
-pub extend ComputerUseEnvironment with Eq::{equal, not_equal}
+pub extend FunctionCallingConfigMode with Eq::{equal, not_equal}
 
 ///|
-pub extend ComputerUseEnvironment with @debug.Debug::{to_repr}
+pub extend FunctionCallingConfigMode with @debug.Debug::{to_repr}
 
 ///|
 ///
 /// Encodes this string enum as JSON.
-pub extend ComputerUseEnvironment with ToJson::{to_json}
+pub extend FunctionCallingConfigMode with ToJson::{to_json}
 
 ///|
-pub impl ToJson for ComputerUseEnvironment with fn to_json(self) {
+pub impl ToJson for FunctionCallingConfigMode with fn to_json(self) {
   let raw = match self {
-    ComputerUseEnvironment::ENVIRONMENTUNSPECIFIED => "ENVIRONMENT_UNSPECIFIED"
-    ComputerUseEnvironment::ENVIRONMENTBROWSER => "ENVIRONMENT_BROWSER"
-    ComputerUseEnvironment::ENVIRONMENTMOBILE => "ENVIRONMENT_MOBILE"
-    ComputerUseEnvironment::ENVIRONMENTDESKTOP => "ENVIRONMENT_DESKTOP"
-    ComputerUseEnvironment::Unknown(raw) => raw
+    FunctionCallingConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
+    FunctionCallingConfigMode::AUTO => "AUTO"
+    FunctionCallingConfigMode::ANY => "ANY"
+    FunctionCallingConfigMode::NONE => "NONE"
+    FunctionCallingConfigMode::VALIDATED => "VALIDATED"
+    FunctionCallingConfigMode::Unknown(raw) => raw
   }
   @json.Json::Json(raw)
 }
@@ -5219,10 +6555,10 @@ pub impl ToJson for ComputerUseEnvironment with fn to_json(self) {
 ///|
 ///
 /// Decodes this string enum from JSON.
-pub extend ComputerUseEnvironment with @json.FromJson::{from_json}
+pub extend FunctionCallingConfigMode with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for ComputerUseEnvironment with fn from_json(
+pub impl @json.FromJson for FunctionCallingConfigMode with fn from_json(
   value,
   path,
 ) {
@@ -5231,19 +6567,259 @@ pub impl @json.FromJson for ComputerUseEnvironment with fn from_json(
     path,
     raw => {
       match raw {
-        "ENVIRONMENT_UNSPECIFIED" =>
-          Option::Some(ComputerUseEnvironment::ENVIRONMENTUNSPECIFIED)
-        "ENVIRONMENT_BROWSER" =>
-          Option::Some(ComputerUseEnvironment::ENVIRONMENTBROWSER)
-        "ENVIRONMENT_MOBILE" =>
-          Option::Some(ComputerUseEnvironment::ENVIRONMENTMOBILE)
-        "ENVIRONMENT_DESKTOP" =>
-          Option::Some(ComputerUseEnvironment::ENVIRONMENTDESKTOP)
+        "MODE_UNSPECIFIED" =>
+          Option::Some(FunctionCallingConfigMode::MODEUNSPECIFIED)
+        "AUTO" => Option::Some(FunctionCallingConfigMode::AUTO)
+        "ANY" => Option::Some(FunctionCallingConfigMode::ANY)
+        "NONE" => Option::Some(FunctionCallingConfigMode::NONE)
+        "VALIDATED" => Option::Some(FunctionCallingConfigMode::VALIDATED)
         _ => Option::None
       }
     },
-    raw => ComputerUseEnvironment::Unknown(raw),
+    raw => FunctionCallingConfigMode::Unknown(raw),
   )
+}
+
+///|
+///
+/// Configuration for specifying function calling behavior.
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionCallingConfig {
+  allowed_function_names : Array[String]?
+  mode : FunctionCallingConfigMode?
+}
+
+///|
+pub extend FunctionCallingConfig with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallingConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a FunctionCallingConfig with omitted optional fields absent.
+pub fn FunctionCallingConfig::new(
+  allowed_function_names? : Array[String],
+  mode? : FunctionCallingConfigMode,
+) -> FunctionCallingConfig {
+  { allowed_function_names, mode, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionCallingConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionCallingConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("allowedFunctionNames", self.allowed_function_names)
+  .opt("mode", self.mode)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionCallingConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionCallingConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    allowed_function_names: @sdkjson.opt_field(
+      obj, "allowedFunctionNames", path,
+    ),
+    mode: @sdkjson.opt_field(obj, "mode", path),
+  }
+}
+
+///|
+///
+/// The Tool configuration containing parameters for specifying `Tool` use in the request.
+#derive(Eq, @debug.Debug)
+pub(all) struct ToolConfig {
+  include_server_side_tool_invocations : Bool?
+  retrieval_config : RetrievalConfig?
+  function_calling_config : FunctionCallingConfig?
+}
+
+///|
+pub extend ToolConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ToolConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ToolConfig with omitted optional fields absent.
+pub fn ToolConfig::new(
+  include_server_side_tool_invocations? : Bool,
+  retrieval_config? : RetrievalConfig,
+  function_calling_config? : FunctionCallingConfig,
+) -> ToolConfig {
+  {
+    include_server_side_tool_invocations,
+    retrieval_config,
+    function_calling_config,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ToolConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for ToolConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt(
+    "includeServerSideToolInvocations",
+    self.include_server_side_tool_invocations,
+  )
+  .opt("retrievalConfig", self.retrieval_config)
+  .opt("functionCallingConfig", self.function_calling_config)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ToolConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ToolConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    include_server_side_tool_invocations: @sdkjson.opt_field(
+      obj, "includeServerSideToolInvocations", path,
+    ),
+    retrieval_config: @sdkjson.opt_field(obj, "retrievalConfig", path),
+    function_calling_config: @sdkjson.opt_field(
+      obj, "functionCallingConfig", path,
+    ),
+  }
+}
+
+///|
+///
+/// A transport that can stream HTTP requests and responses.
+#derive(Eq, @debug.Debug)
+pub(all) struct StreamableHttpTransport {
+  url : String?
+  sse_read_timeout : String?
+  headers : Map[String, String]?
+  timeout : String?
+  terminate_on_close : Bool?
+}
+
+///|
+pub extend StreamableHttpTransport with Eq::{equal, not_equal}
+
+///|
+pub extend StreamableHttpTransport with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a StreamableHttpTransport with omitted optional fields absent.
+pub fn StreamableHttpTransport::new(
+  url? : String,
+  sse_read_timeout? : String,
+  headers? : Map[String, String],
+  timeout? : String,
+  terminate_on_close? : Bool,
+) -> StreamableHttpTransport {
+  { url, sse_read_timeout, headers, timeout, terminate_on_close, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend StreamableHttpTransport with ToJson::{to_json}
+
+///|
+pub impl ToJson for StreamableHttpTransport with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("url", self.url)
+  .opt("sseReadTimeout", self.sse_read_timeout)
+  .opt("headers", self.headers.map(value => json_map_to_json(value)))
+  .opt("timeout", self.timeout)
+  .opt("terminateOnClose", self.terminate_on_close)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend StreamableHttpTransport with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for StreamableHttpTransport with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    url: @sdkjson.opt_field(obj, "url", path),
+    sse_read_timeout: @sdkjson.opt_field(obj, "sseReadTimeout", path),
+    headers: decode_optional_json_map(obj, "headers", path),
+    timeout: @sdkjson.opt_field(obj, "timeout", path),
+    terminate_on_close: @sdkjson.opt_field(obj, "terminateOnClose", path),
+  }
+}
+
+///|
+///
+/// A MCPServer is a server that can be called by the model to perform actions. It is a server that implements the MCP protocol.
+#derive(Eq, @debug.Debug)
+pub(all) struct McpServer {
+  streamable_http_transport : StreamableHttpTransport?
+  name : String?
+}
+
+///|
+pub extend McpServer with Eq::{equal, not_equal}
+
+///|
+pub extend McpServer with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a McpServer with omitted optional fields absent.
+pub fn McpServer::new(
+  streamable_http_transport? : StreamableHttpTransport,
+  name? : String,
+) -> McpServer {
+  { streamable_http_transport, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend McpServer with ToJson::{to_json}
+
+///|
+pub impl ToJson for McpServer with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("streamableHttpTransport", self.streamable_http_transport)
+  .opt("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend McpServer with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for McpServer with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    streamable_http_transport: @sdkjson.opt_field(
+      obj, "streamableHttpTransport", path,
+    ),
+    name: @sdkjson.opt_field(obj, "name", path),
+  }
 }
 
 ///|
@@ -5349,12 +6925,78 @@ pub impl @json.FromJson for ComputerUseDisabledSafetyPoliciesItem with fn from_j
 
 ///|
 ///
+/// Required. The environment being operated. Enum values: ENVIRONMENT_UNSPECIFIED: Defaults to browser.; ENVIRONMENT_BROWSER: Operates in a web browser.; ENVIRONMENT_MOBILE: Operates in a mobile environment.; ENVIRONMENT_DESKTOP: Operates in a desktop environment.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ComputerUseEnvironment {
+  ENVIRONMENTUNSPECIFIED
+  ENVIRONMENTBROWSER
+  ENVIRONMENTMOBILE
+  ENVIRONMENTDESKTOP
+  Unknown(String)
+}
+
+///|
+pub extend ComputerUseEnvironment with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerUseEnvironment with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ComputerUseEnvironment with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerUseEnvironment with fn to_json(self) {
+  let raw = match self {
+    ComputerUseEnvironment::ENVIRONMENTUNSPECIFIED => "ENVIRONMENT_UNSPECIFIED"
+    ComputerUseEnvironment::ENVIRONMENTBROWSER => "ENVIRONMENT_BROWSER"
+    ComputerUseEnvironment::ENVIRONMENTMOBILE => "ENVIRONMENT_MOBILE"
+    ComputerUseEnvironment::ENVIRONMENTDESKTOP => "ENVIRONMENT_DESKTOP"
+    ComputerUseEnvironment::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ComputerUseEnvironment with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerUseEnvironment with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "ENVIRONMENT_UNSPECIFIED" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTUNSPECIFIED)
+        "ENVIRONMENT_BROWSER" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTBROWSER)
+        "ENVIRONMENT_MOBILE" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTMOBILE)
+        "ENVIRONMENT_DESKTOP" =>
+          Option::Some(ComputerUseEnvironment::ENVIRONMENTDESKTOP)
+        _ => Option::None
+      }
+    },
+    raw => ComputerUseEnvironment::Unknown(raw),
+  )
+}
+
+///|
+///
 /// Computer Use tool type.
 #derive(Eq, @debug.Debug)
 pub(all) struct ComputerUse {
   excluded_predefined_functions : Array[String]?
-  environment : ComputerUseEnvironment?
   disabled_safety_policies : Array[ComputerUseDisabledSafetyPoliciesItem]?
+  environment : ComputerUseEnvironment?
   enable_prompt_injection_detection : Bool?
 }
 
@@ -5369,14 +7011,14 @@ pub extend ComputerUse with @debug.Debug::{to_repr}
 /// Creates a ComputerUse with omitted optional fields absent.
 pub fn ComputerUse::new(
   excluded_predefined_functions? : Array[String],
-  environment? : ComputerUseEnvironment,
   disabled_safety_policies? : Array[ComputerUseDisabledSafetyPoliciesItem],
+  environment? : ComputerUseEnvironment,
   enable_prompt_injection_detection? : Bool,
 ) -> ComputerUse {
   {
     excluded_predefined_functions,
-    environment,
     disabled_safety_policies,
+    environment,
     enable_prompt_injection_detection,
   }
 }
@@ -5390,8 +7032,8 @@ pub extend ComputerUse with ToJson::{to_json}
 pub impl ToJson for ComputerUse with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .opt("excludedPredefinedFunctions", self.excluded_predefined_functions)
-  .opt("environment", self.environment)
   .opt("disabledSafetyPolicies", self.disabled_safety_policies)
+  .opt("environment", self.environment)
   .opt("enablePromptInjectionDetection", self.enable_prompt_injection_detection)
   .build()
 }
@@ -5408,790 +7050,13 @@ pub impl @json.FromJson for ComputerUse with fn from_json(value, path) {
     excluded_predefined_functions: @sdkjson.opt_field(
       obj, "excludedPredefinedFunctions", path,
     ),
-    environment: @sdkjson.opt_field(obj, "environment", path),
     disabled_safety_policies: @sdkjson.opt_field(
       obj, "disabledSafetyPolicies", path,
     ),
+    environment: @sdkjson.opt_field(obj, "environment", path),
     enable_prompt_injection_detection: @sdkjson.opt_field(
       obj, "enablePromptInjectionDetection", path,
     ),
-  }
-}
-
-///|
-///
-/// Response for `CreateFile`.
-#derive(Eq, @debug.Debug)
-pub(all) struct CreateFileResponse {
-  file : File?
-}
-
-///|
-pub extend CreateFileResponse with Eq::{equal, not_equal}
-
-///|
-pub extend CreateFileResponse with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a CreateFileResponse with omitted optional fields absent.
-pub fn CreateFileResponse::new(file? : File) -> CreateFileResponse {
-  { file, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend CreateFileResponse with ToJson::{to_json}
-
-///|
-pub impl ToJson for CreateFileResponse with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("file", self.file).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend CreateFileResponse with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CreateFileResponse with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { file: @sdkjson.opt_field(obj, "file", path), }
-}
-
-///|
-///
-/// Identifier for a part within a `GroundingPassage`.
-#derive(Eq, @debug.Debug)
-pub(all) struct GroundingPassageId {
-  passage_id : String?
-  part_index : Int32?
-}
-
-///|
-pub extend GroundingPassageId with Eq::{equal, not_equal}
-
-///|
-pub extend GroundingPassageId with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GroundingPassageId with omitted optional fields absent.
-pub fn GroundingPassageId::new(
-  passage_id? : String,
-  part_index? : Int32,
-) -> GroundingPassageId {
-  { passage_id, part_index, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GroundingPassageId with ToJson::{to_json}
-
-///|
-pub impl ToJson for GroundingPassageId with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("passageId", self.passage_id)
-  .opt("partIndex", self.part_index)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GroundingPassageId with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GroundingPassageId with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    passage_id: @sdkjson.opt_field(obj, "passageId", path),
-    part_index: @sdkjson.opt_field(obj, "partIndex", path),
-  }
-}
-
-///|
-///
-/// Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.
-#derive(Eq, @debug.Debug)
-pub(all) struct SemanticRetrieverChunk {
-  chunk : String?
-  source : String?
-}
-
-///|
-pub extend SemanticRetrieverChunk with Eq::{equal, not_equal}
-
-///|
-pub extend SemanticRetrieverChunk with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a SemanticRetrieverChunk with omitted optional fields absent.
-pub fn SemanticRetrieverChunk::new(
-  chunk? : String,
-  source? : String,
-) -> SemanticRetrieverChunk {
-  { chunk, source, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend SemanticRetrieverChunk with ToJson::{to_json}
-
-///|
-pub impl ToJson for SemanticRetrieverChunk with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("chunk", self.chunk)
-  .opt("source", self.source)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend SemanticRetrieverChunk with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for SemanticRetrieverChunk with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    chunk: @sdkjson.opt_field(obj, "chunk", path),
-    source: @sdkjson.opt_field(obj, "source", path),
-  }
-}
-
-///|
-///
-/// Identifier for the source contributing to this attribution.
-#derive(Eq, @debug.Debug)
-pub(all) struct AttributionSourceId {
-  grounding_passage : GroundingPassageId?
-  semantic_retriever_chunk : SemanticRetrieverChunk?
-}
-
-///|
-pub extend AttributionSourceId with Eq::{equal, not_equal}
-
-///|
-pub extend AttributionSourceId with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a AttributionSourceId with omitted optional fields absent.
-pub fn AttributionSourceId::new(
-  grounding_passage? : GroundingPassageId,
-  semantic_retriever_chunk? : SemanticRetrieverChunk,
-) -> AttributionSourceId {
-  { grounding_passage, semantic_retriever_chunk, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend AttributionSourceId with ToJson::{to_json}
-
-///|
-pub impl ToJson for AttributionSourceId with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("groundingPassage", self.grounding_passage)
-  .opt("semanticRetrieverChunk", self.semantic_retriever_chunk)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend AttributionSourceId with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for AttributionSourceId with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    grounding_passage: @sdkjson.opt_field(obj, "groundingPassage", path),
-    semantic_retriever_chunk: @sdkjson.opt_field(
-      obj, "semanticRetrieverChunk", path,
-    ),
-  }
-}
-
-///|
-///
-/// Attribution for a source that contributed to an answer.
-#derive(Eq, @debug.Debug)
-pub(all) struct GroundingAttribution {
-  source_id : AttributionSourceId?
-  content : Content?
-}
-
-///|
-pub extend GroundingAttribution with Eq::{equal, not_equal}
-
-///|
-pub extend GroundingAttribution with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GroundingAttribution with omitted optional fields absent.
-pub fn GroundingAttribution::new(
-  source_id? : AttributionSourceId,
-  content? : Content,
-) -> GroundingAttribution {
-  { source_id, content, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GroundingAttribution with ToJson::{to_json}
-
-///|
-pub impl ToJson for GroundingAttribution with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("sourceId", self.source_id)
-  .opt("content", self.content)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GroundingAttribution with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GroundingAttribution with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    source_id: @sdkjson.opt_field(obj, "sourceId", path),
-    content: @sdkjson.opt_field(obj, "content", path),
-  }
-}
-
-///|
-///
-/// The mode of the predictor to be used in dynamic retrieval. Enum values: MODE_UNSPECIFIED: Always trigger retrieval.; MODE_DYNAMIC: Run retrieval only when system decides it is necessary.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum DynamicRetrievalConfigMode {
-  MODEUNSPECIFIED
-  MODEDYNAMIC
-  Unknown(String)
-}
-
-///|
-pub extend DynamicRetrievalConfigMode with Eq::{equal, not_equal}
-
-///|
-pub extend DynamicRetrievalConfigMode with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend DynamicRetrievalConfigMode with ToJson::{to_json}
-
-///|
-pub impl ToJson for DynamicRetrievalConfigMode with fn to_json(self) {
-  let raw = match self {
-    DynamicRetrievalConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
-    DynamicRetrievalConfigMode::MODEDYNAMIC => "MODE_DYNAMIC"
-    DynamicRetrievalConfigMode::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend DynamicRetrievalConfigMode with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for DynamicRetrievalConfigMode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MODE_UNSPECIFIED" =>
-          Option::Some(DynamicRetrievalConfigMode::MODEUNSPECIFIED)
-        "MODE_DYNAMIC" => Option::Some(DynamicRetrievalConfigMode::MODEDYNAMIC)
-        _ => Option::None
-      }
-    },
-    raw => DynamicRetrievalConfigMode::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Describes the options to customize dynamic retrieval.
-#derive(Eq, @debug.Debug)
-pub(all) struct DynamicRetrievalConfig {
-  mode : DynamicRetrievalConfigMode?
-  dynamic_threshold : Double?
-}
-
-///|
-pub extend DynamicRetrievalConfig with Eq::{equal, not_equal}
-
-///|
-pub extend DynamicRetrievalConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a DynamicRetrievalConfig with omitted optional fields absent.
-pub fn DynamicRetrievalConfig::new(
-  mode? : DynamicRetrievalConfigMode,
-  dynamic_threshold? : Double,
-) -> DynamicRetrievalConfig {
-  { mode, dynamic_threshold, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend DynamicRetrievalConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for DynamicRetrievalConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("mode", self.mode)
-  .opt("dynamicThreshold", self.dynamic_threshold)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend DynamicRetrievalConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for DynamicRetrievalConfig with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    mode: @sdkjson.opt_field(obj, "mode", path),
-    dynamic_threshold: @sdkjson.opt_field(obj, "dynamicThreshold", path),
-  }
-}
-
-///|
-///
-/// Tool to retrieve public web data for grounding, powered by Google.
-#derive(Eq, @debug.Debug)
-pub(all) struct GoogleSearchRetrieval {
-  dynamic_retrieval_config : DynamicRetrievalConfig?
-}
-
-///|
-pub extend GoogleSearchRetrieval with Eq::{equal, not_equal}
-
-///|
-pub extend GoogleSearchRetrieval with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GoogleSearchRetrieval with omitted optional fields absent.
-pub fn GoogleSearchRetrieval::new(
-  dynamic_retrieval_config? : DynamicRetrievalConfig,
-) -> GoogleSearchRetrieval {
-  { dynamic_retrieval_config, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GoogleSearchRetrieval with ToJson::{to_json}
-
-///|
-pub impl ToJson for GoogleSearchRetrieval with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("dynamicRetrievalConfig", self.dynamic_retrieval_config)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GoogleSearchRetrieval with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GoogleSearchRetrieval with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    dynamic_retrieval_config: @sdkjson.opt_field(
-      obj, "dynamicRetrievalConfig", path,
-    ),
-  }
-}
-
-///|
-///
-/// The FileSearch tool that retrieves knowledge from Semantic Retrieval corpora. Files are imported to Semantic Retrieval corpora using the ImportFile API.
-#derive(Eq, @debug.Debug)
-pub(all) struct FileSearch {
-  metadata_filter : String?
-  top_k : Int32?
-  file_search_store_names : Array[String]?
-}
-
-///|
-pub extend FileSearch with Eq::{equal, not_equal}
-
-///|
-pub extend FileSearch with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a FileSearch with omitted optional fields absent.
-pub fn FileSearch::new(
-  metadata_filter? : String,
-  top_k? : Int32,
-  file_search_store_names? : Array[String],
-) -> FileSearch {
-  { metadata_filter, top_k, file_search_store_names, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend FileSearch with ToJson::{to_json}
-
-///|
-pub impl ToJson for FileSearch with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("metadataFilter", self.metadata_filter)
-  .opt("topK", self.top_k)
-  .opt("fileSearchStoreNames", self.file_search_store_names)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend FileSearch with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FileSearch with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    metadata_filter: @sdkjson.opt_field(obj, "metadataFilter", path),
-    top_k: @sdkjson.opt_field(obj, "topK", path),
-    file_search_store_names: @sdkjson.opt_field(
-      obj, "fileSearchStoreNames", path,
-    ),
-  }
-}
-
-///|
-///
-/// The GoogleMaps Tool that provides geospatial context for the user's query.
-#derive(Eq, @debug.Debug)
-pub(all) struct GoogleMaps {
-  enable_widget : Bool?
-}
-
-///|
-pub extend GoogleMaps with Eq::{equal, not_equal}
-
-///|
-pub extend GoogleMaps with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GoogleMaps with omitted optional fields absent.
-pub fn GoogleMaps::new(enable_widget? : Bool) -> GoogleMaps {
-  { enable_widget, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GoogleMaps with ToJson::{to_json}
-
-///|
-pub impl ToJson for GoogleMaps with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("enableWidget", self.enable_widget).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GoogleMaps with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GoogleMaps with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { enable_widget: @sdkjson.opt_field(obj, "enableWidget", path), }
-}
-
-///|
-///
-/// Required. Data type. Enum values: TYPE_UNSPECIFIED: Not specified, should not be used.; STRING: String type.; NUMBER: Number type.; INTEGER: Integer type.; BOOLEAN: Boolean type.; ARRAY: Array type.; OBJECT: Object type.; NULL: Null type.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum SchemaType {
-  TYPEUNSPECIFIED
-  STRING
-  NUMBER
-  INTEGER
-  BOOLEAN
-  ARRAY
-  OBJECT
-  NULL
-  Unknown(String)
-}
-
-///|
-pub extend SchemaType with Eq::{equal, not_equal}
-
-///|
-pub extend SchemaType with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend SchemaType with ToJson::{to_json}
-
-///|
-pub impl ToJson for SchemaType with fn to_json(self) {
-  let raw = match self {
-    SchemaType::TYPEUNSPECIFIED => "TYPE_UNSPECIFIED"
-    SchemaType::STRING => "STRING"
-    SchemaType::NUMBER => "NUMBER"
-    SchemaType::INTEGER => "INTEGER"
-    SchemaType::BOOLEAN => "BOOLEAN"
-    SchemaType::ARRAY => "ARRAY"
-    SchemaType::OBJECT => "OBJECT"
-    SchemaType::NULL => "NULL"
-    SchemaType::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend SchemaType with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for SchemaType with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "TYPE_UNSPECIFIED" => Option::Some(SchemaType::TYPEUNSPECIFIED)
-        "STRING" => Option::Some(SchemaType::STRING)
-        "NUMBER" => Option::Some(SchemaType::NUMBER)
-        "INTEGER" => Option::Some(SchemaType::INTEGER)
-        "BOOLEAN" => Option::Some(SchemaType::BOOLEAN)
-        "ARRAY" => Option::Some(SchemaType::ARRAY)
-        "OBJECT" => Option::Some(SchemaType::OBJECT)
-        "NULL" => Option::Some(SchemaType::NULL)
-        _ => Option::None
-      }
-    },
-    raw => SchemaType::Unknown(raw),
-  )
-}
-
-///|
-///
-/// The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).
-#derive(Eq, @debug.Debug)
-pub(all) struct Schema {
-  maximum : Double?
-  example : Json?
-  type_ : SchemaType?
-  min_items : Int64?
-  default : Json?
-  min_properties : Int64?
-  nullable : Bool?
-  properties : Map[String, Schema]?
-  pattern : String?
-  description : String?
-  max_length : Int64?
-  any_of : Array[Schema]?
-  enum_ : Array[String]?
-  title : String?
-  minimum : Double?
-  min_length : Int64?
-  max_items : Int64?
-  items : Schema?
-  property_ordering : Array[String]?
-  format : String?
-  required : Array[String]?
-  max_properties : Int64?
-}
-
-///|
-pub extend Schema with Eq::{equal, not_equal}
-
-///|
-pub extend Schema with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a Schema with omitted optional fields absent.
-pub fn Schema::new(
-  maximum? : Double,
-  example? : Json,
-  type_? : SchemaType,
-  min_items? : Int64,
-  default? : Json,
-  min_properties? : Int64,
-  nullable? : Bool,
-  properties? : Map[String, Schema],
-  pattern? : String,
-  description? : String,
-  max_length? : Int64,
-  any_of? : Array[Schema],
-  enum_? : Array[String],
-  title? : String,
-  minimum? : Double,
-  min_length? : Int64,
-  max_items? : Int64,
-  items? : Schema,
-  property_ordering? : Array[String],
-  format? : String,
-  required? : Array[String],
-  max_properties? : Int64,
-) -> Schema {
-  {
-    maximum,
-    example,
-    type_,
-    min_items,
-    default,
-    min_properties,
-    nullable,
-    properties,
-    pattern,
-    description,
-    max_length,
-    any_of,
-    enum_,
-    title,
-    minimum,
-    min_length,
-    max_items,
-    items,
-    property_ordering,
-    format,
-    required,
-    max_properties,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend Schema with ToJson::{to_json}
-
-///|
-pub impl ToJson for Schema with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("maximum", self.maximum)
-  .opt("example", self.example)
-  .opt("type", self.type_)
-  .opt(
-    "minItems",
-    self.min_items.map(value => json_string_int64_to_json(value)),
-  )
-  .opt("default", self.default)
-  .opt(
-    "minProperties",
-    self.min_properties.map(value => json_string_int64_to_json(value)),
-  )
-  .opt("nullable", self.nullable)
-  .opt("properties", self.properties.map(value => json_map_to_json(value)))
-  .opt("pattern", self.pattern)
-  .opt("description", self.description)
-  .opt(
-    "maxLength",
-    self.max_length.map(value => json_string_int64_to_json(value)),
-  )
-  .opt("anyOf", self.any_of)
-  .opt("enum", self.enum_)
-  .opt("title", self.title)
-  .opt("minimum", self.minimum)
-  .opt(
-    "minLength",
-    self.min_length.map(value => json_string_int64_to_json(value)),
-  )
-  .opt(
-    "maxItems",
-    self.max_items.map(value => json_string_int64_to_json(value)),
-  )
-  .opt("items", self.items)
-  .opt("propertyOrdering", self.property_ordering)
-  .opt("format", self.format)
-  .opt("required", self.required)
-  .opt(
-    "maxProperties",
-    self.max_properties.map(value => json_string_int64_to_json(value)),
-  )
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend Schema with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Schema with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    maximum: @sdkjson.opt_field(obj, "maximum", path),
-    example: @sdkjson.opt_field(obj, "example", path),
-    type_: @sdkjson.opt_field(obj, "type", path),
-    min_items: decode_optional_custom(obj, "minItems", path, (value, value_path) => {
-      json_string_int64(value, value_path)
-    }),
-    default: @sdkjson.opt_field(obj, "default", path),
-    min_properties: decode_optional_custom(obj, "minProperties", path, (
-      value,
-      value_path,
-    ) => json_string_int64(value, value_path)),
-    nullable: @sdkjson.opt_field(obj, "nullable", path),
-    properties: decode_optional_json_map(obj, "properties", path),
-    pattern: @sdkjson.opt_field(obj, "pattern", path),
-    description: @sdkjson.opt_field(obj, "description", path),
-    max_length: decode_optional_custom(obj, "maxLength", path, (
-      value,
-      value_path,
-    ) => json_string_int64(value, value_path)),
-    any_of: @sdkjson.opt_field(obj, "anyOf", path),
-    enum_: @sdkjson.opt_field(obj, "enum", path),
-    title: @sdkjson.opt_field(obj, "title", path),
-    minimum: @sdkjson.opt_field(obj, "minimum", path),
-    min_length: decode_optional_custom(obj, "minLength", path, (
-      value,
-      value_path,
-    ) => json_string_int64(value, value_path)),
-    max_items: decode_optional_custom(obj, "maxItems", path, (value, value_path) => {
-      json_string_int64(value, value_path)
-    }),
-    items: @sdkjson.opt_field(obj, "items", path),
-    property_ordering: @sdkjson.opt_field(obj, "propertyOrdering", path),
-    format: @sdkjson.opt_field(obj, "format", path),
-    required: @sdkjson.opt_field(obj, "required", path),
-    max_properties: decode_optional_custom(obj, "maxProperties", path, (
-      value,
-      value_path,
-    ) => json_string_int64(value, value_path)),
   }
 }
 
@@ -6259,13 +7124,13 @@ pub impl @json.FromJson for FunctionDeclarationBehavior with fn from_json(
 /// Structured representation of a function declaration as defined by the [OpenAPI 3.03 specification](https://spec.openapis.org/oas/v3.0.3). Included in this declaration are the function name and parameters. This FunctionDeclaration is a representation of a block of code that can be used as a `Tool` by the model and executed by the client.
 #derive(Eq, @debug.Debug)
 pub(all) struct FunctionDeclaration {
-  description : String?
+  behavior : FunctionDeclarationBehavior?
+  parameters_json_schema : Json?
   response_json_schema : Json?
+  description : String?
+  parameters : Schema?
   name : String?
   response : Schema?
-  parameters_json_schema : Json?
-  parameters : Schema?
-  behavior : FunctionDeclarationBehavior?
 }
 
 ///|
@@ -6278,22 +7143,22 @@ pub extend FunctionDeclaration with @debug.Debug::{to_repr}
 ///
 /// Creates a FunctionDeclaration with omitted optional fields absent.
 pub fn FunctionDeclaration::new(
-  description? : String,
+  behavior? : FunctionDeclarationBehavior,
+  parameters_json_schema? : Json,
   response_json_schema? : Json,
+  description? : String,
+  parameters? : Schema,
   name? : String,
   response? : Schema,
-  parameters_json_schema? : Json,
-  parameters? : Schema,
-  behavior? : FunctionDeclarationBehavior,
 ) -> FunctionDeclaration {
   {
-    description,
+    behavior,
+    parameters_json_schema,
     response_json_schema,
+    description,
+    parameters,
     name,
     response,
-    parameters_json_schema,
-    parameters,
-    behavior,
   }
 }
 
@@ -6305,13 +7170,13 @@ pub extend FunctionDeclaration with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionDeclaration with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("description", self.description)
+  .opt("behavior", self.behavior)
+  .opt("parametersJsonSchema", self.parameters_json_schema)
   .opt("responseJsonSchema", self.response_json_schema)
+  .opt("description", self.description)
+  .opt("parameters", self.parameters)
   .opt("name", self.name)
   .opt("response", self.response)
-  .opt("parametersJsonSchema", self.parameters_json_schema)
-  .opt("parameters", self.parameters)
-  .opt("behavior", self.behavior)
   .build()
 }
 
@@ -6324,136 +7189,326 @@ pub extend FunctionDeclaration with @json.FromJson::{from_json}
 pub impl @json.FromJson for FunctionDeclaration with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    description: @sdkjson.opt_field(obj, "description", path),
-    response_json_schema: @sdkjson.opt_field(obj, "responseJsonSchema", path),
-    name: @sdkjson.opt_field(obj, "name", path),
-    response: @sdkjson.opt_field(obj, "response", path),
+    behavior: @sdkjson.opt_field(obj, "behavior", path),
     parameters_json_schema: @sdkjson.opt_field(
       obj, "parametersJsonSchema", path,
     ),
+    response_json_schema: @sdkjson.opt_field(obj, "responseJsonSchema", path),
+    description: @sdkjson.opt_field(obj, "description", path),
     parameters: @sdkjson.opt_field(obj, "parameters", path),
-    behavior: @sdkjson.opt_field(obj, "behavior", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+    response: @sdkjson.opt_field(obj, "response", path),
   }
 }
 
 ///|
 ///
-/// A transport that can stream HTTP requests and responses.
+/// The mode of the predictor to be used in dynamic retrieval. Enum values: MODE_UNSPECIFIED: Always trigger retrieval.; MODE_DYNAMIC: Run retrieval only when system decides it is necessary.
 #derive(Eq, @debug.Debug)
-pub(all) struct StreamableHttpTransport {
-  sse_read_timeout : String?
-  headers : Map[String, String]?
-  timeout : String?
-  url : String?
-  terminate_on_close : Bool?
+#non_exhaustive
+pub(all) enum DynamicRetrievalConfigMode {
+  MODEUNSPECIFIED
+  MODEDYNAMIC
+  Unknown(String)
 }
 
 ///|
-pub extend StreamableHttpTransport with Eq::{equal, not_equal}
+pub extend DynamicRetrievalConfigMode with Eq::{equal, not_equal}
 
 ///|
-pub extend StreamableHttpTransport with @debug.Debug::{to_repr}
+pub extend DynamicRetrievalConfigMode with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a StreamableHttpTransport with omitted optional fields absent.
-pub fn StreamableHttpTransport::new(
-  sse_read_timeout? : String,
-  headers? : Map[String, String],
-  timeout? : String,
-  url? : String,
-  terminate_on_close? : Bool,
-) -> StreamableHttpTransport {
-  { sse_read_timeout, headers, timeout, url, terminate_on_close, }
+/// Encodes this string enum as JSON.
+pub extend DynamicRetrievalConfigMode with ToJson::{to_json}
+
+///|
+pub impl ToJson for DynamicRetrievalConfigMode with fn to_json(self) {
+  let raw = match self {
+    DynamicRetrievalConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
+    DynamicRetrievalConfigMode::MODEDYNAMIC => "MODE_DYNAMIC"
+    DynamicRetrievalConfigMode::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend DynamicRetrievalConfigMode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for DynamicRetrievalConfigMode with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MODE_UNSPECIFIED" =>
+          Option::Some(DynamicRetrievalConfigMode::MODEUNSPECIFIED)
+        "MODE_DYNAMIC" => Option::Some(DynamicRetrievalConfigMode::MODEDYNAMIC)
+        _ => Option::None
+      }
+    },
+    raw => DynamicRetrievalConfigMode::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Describes the options to customize dynamic retrieval.
+#derive(Eq, @debug.Debug)
+pub(all) struct DynamicRetrievalConfig {
+  dynamic_threshold : Double?
+  mode : DynamicRetrievalConfigMode?
+}
+
+///|
+pub extend DynamicRetrievalConfig with Eq::{equal, not_equal}
+
+///|
+pub extend DynamicRetrievalConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a DynamicRetrievalConfig with omitted optional fields absent.
+pub fn DynamicRetrievalConfig::new(
+  dynamic_threshold? : Double,
+  mode? : DynamicRetrievalConfigMode,
+) -> DynamicRetrievalConfig {
+  { dynamic_threshold, mode, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend StreamableHttpTransport with ToJson::{to_json}
+pub extend DynamicRetrievalConfig with ToJson::{to_json}
 
 ///|
-pub impl ToJson for StreamableHttpTransport with fn to_json(self) {
+pub impl ToJson for DynamicRetrievalConfig with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("sseReadTimeout", self.sse_read_timeout)
-  .opt("headers", self.headers.map(value => json_map_to_json(value)))
-  .opt("timeout", self.timeout)
-  .opt("url", self.url)
-  .opt("terminateOnClose", self.terminate_on_close)
+  .opt("dynamicThreshold", self.dynamic_threshold)
+  .opt("mode", self.mode)
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend StreamableHttpTransport with @json.FromJson::{from_json}
+pub extend DynamicRetrievalConfig with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for StreamableHttpTransport with fn from_json(
+pub impl @json.FromJson for DynamicRetrievalConfig with fn from_json(
   value,
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    sse_read_timeout: @sdkjson.opt_field(obj, "sseReadTimeout", path),
-    headers: decode_optional_json_map(obj, "headers", path),
-    timeout: @sdkjson.opt_field(obj, "timeout", path),
-    url: @sdkjson.opt_field(obj, "url", path),
-    terminate_on_close: @sdkjson.opt_field(obj, "terminateOnClose", path),
+    dynamic_threshold: @sdkjson.opt_field(obj, "dynamicThreshold", path),
+    mode: @sdkjson.opt_field(obj, "mode", path),
   }
 }
 
 ///|
 ///
-/// A MCPServer is a server that can be called by the model to perform actions. It is a server that implements the MCP protocol.
+/// Tool to retrieve public web data for grounding, powered by Google.
 #derive(Eq, @debug.Debug)
-pub(all) struct McpServer {
-  name : String?
-  streamable_http_transport : StreamableHttpTransport?
+pub(all) struct GoogleSearchRetrieval {
+  dynamic_retrieval_config : DynamicRetrievalConfig?
 }
 
 ///|
-pub extend McpServer with Eq::{equal, not_equal}
+pub extend GoogleSearchRetrieval with Eq::{equal, not_equal}
 
 ///|
-pub extend McpServer with @debug.Debug::{to_repr}
+pub extend GoogleSearchRetrieval with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a McpServer with omitted optional fields absent.
-pub fn McpServer::new(
-  name? : String,
-  streamable_http_transport? : StreamableHttpTransport,
-) -> McpServer {
-  { name, streamable_http_transport, }
+/// Creates a GoogleSearchRetrieval with omitted optional fields absent.
+pub fn GoogleSearchRetrieval::new(
+  dynamic_retrieval_config? : DynamicRetrievalConfig,
+) -> GoogleSearchRetrieval {
+  { dynamic_retrieval_config, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend McpServer with ToJson::{to_json}
+pub extend GoogleSearchRetrieval with ToJson::{to_json}
 
 ///|
-pub impl ToJson for McpServer with fn to_json(self) {
+pub impl ToJson for GoogleSearchRetrieval with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("name", self.name)
-  .opt("streamableHttpTransport", self.streamable_http_transport)
+  .opt("dynamicRetrievalConfig", self.dynamic_retrieval_config)
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend McpServer with @json.FromJson::{from_json}
+pub extend GoogleSearchRetrieval with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for McpServer with fn from_json(value, path) {
+pub impl @json.FromJson for GoogleSearchRetrieval with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    name: @sdkjson.opt_field(obj, "name", path),
-    streamable_http_transport: @sdkjson.opt_field(
-      obj, "streamableHttpTransport", path,
+    dynamic_retrieval_config: @sdkjson.opt_field(
+      obj, "dynamicRetrievalConfig", path,
     ),
+  }
+}
+
+///|
+///
+/// The GoogleMaps Tool that provides geospatial context for the user's query.
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleMaps {
+  enable_widget : Bool?
+}
+
+///|
+pub extend GoogleMaps with Eq::{equal, not_equal}
+
+///|
+pub extend GoogleMaps with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GoogleMaps with omitted optional fields absent.
+pub fn GoogleMaps::new(enable_widget? : Bool) -> GoogleMaps {
+  { enable_widget, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GoogleMaps with ToJson::{to_json}
+
+///|
+pub impl ToJson for GoogleMaps with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("enableWidget", self.enable_widget).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GoogleMaps with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GoogleMaps with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { enable_widget: @sdkjson.opt_field(obj, "enableWidget", path), }
+}
+
+///|
+///
+/// The FileSearch tool that retrieves knowledge from Semantic Retrieval corpora. Files are imported to Semantic Retrieval corpora using the ImportFile API.
+#derive(Eq, @debug.Debug)
+pub(all) struct FileSearch {
+  file_search_store_names : Array[String]?
+  top_k : Int32?
+  metadata_filter : String?
+}
+
+///|
+pub extend FileSearch with Eq::{equal, not_equal}
+
+///|
+pub extend FileSearch with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a FileSearch with omitted optional fields absent.
+pub fn FileSearch::new(
+  file_search_store_names? : Array[String],
+  top_k? : Int32,
+  metadata_filter? : String,
+) -> FileSearch {
+  { file_search_store_names, top_k, metadata_filter, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FileSearch with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileSearch with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("fileSearchStoreNames", self.file_search_store_names)
+  .opt("topK", self.top_k)
+  .opt("metadataFilter", self.metadata_filter)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FileSearch with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileSearch with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    file_search_store_names: @sdkjson.opt_field(
+      obj, "fileSearchStoreNames", path,
+    ),
+    top_k: @sdkjson.opt_field(obj, "topK", path),
+    metadata_filter: @sdkjson.opt_field(obj, "metadataFilter", path),
+  }
+}
+
+///|
+///
+/// Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time.
+#derive(Eq, @debug.Debug)
+pub(all) struct Interval {
+  start_time : String?
+  end_time : String?
+}
+
+///|
+pub extend Interval with Eq::{equal, not_equal}
+
+///|
+pub extend Interval with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Interval with omitted optional fields absent.
+pub fn Interval::new(start_time? : String, end_time? : String) -> Interval {
+  { start_time, end_time, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Interval with ToJson::{to_json}
+
+///|
+pub impl ToJson for Interval with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("startTime", self.start_time)
+  .opt("endTime", self.end_time)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Interval with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Interval with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    start_time: @sdkjson.opt_field(obj, "startTime", path),
+    end_time: @sdkjson.opt_field(obj, "endTime", path),
   }
 }
 
@@ -6511,60 +7566,11 @@ pub impl @json.FromJson for SearchTypes with fn from_json(value, path) {
 
 ///|
 ///
-/// Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time.
-#derive(Eq, @debug.Debug)
-pub(all) struct Interval {
-  start_time : String?
-  end_time : String?
-}
-
-///|
-pub extend Interval with Eq::{equal, not_equal}
-
-///|
-pub extend Interval with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a Interval with omitted optional fields absent.
-pub fn Interval::new(start_time? : String, end_time? : String) -> Interval {
-  { start_time, end_time, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend Interval with ToJson::{to_json}
-
-///|
-pub impl ToJson for Interval with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("startTime", self.start_time)
-  .opt("endTime", self.end_time)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend Interval with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Interval with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    start_time: @sdkjson.opt_field(obj, "startTime", path),
-    end_time: @sdkjson.opt_field(obj, "endTime", path),
-  }
-}
-
-///|
-///
 /// GoogleSearch tool type. Tool to support Google Search in Model. Powered by Google.
 #derive(Eq, @debug.Debug)
 pub(all) struct GoogleSearch {
-  search_types : SearchTypes?
   time_range_filter : Interval?
+  search_types : SearchTypes?
 }
 
 ///|
@@ -6577,10 +7583,10 @@ pub extend GoogleSearch with @debug.Debug::{to_repr}
 ///
 /// Creates a GoogleSearch with omitted optional fields absent.
 pub fn GoogleSearch::new(
-  search_types? : SearchTypes,
   time_range_filter? : Interval,
+  search_types? : SearchTypes,
 ) -> GoogleSearch {
-  { search_types, time_range_filter, }
+  { time_range_filter, search_types, }
 }
 
 ///|
@@ -6591,8 +7597,8 @@ pub extend GoogleSearch with ToJson::{to_json}
 ///|
 pub impl ToJson for GoogleSearch with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("searchTypes", self.search_types)
   .opt("timeRangeFilter", self.time_range_filter)
+  .opt("searchTypes", self.search_types)
   .build()
 }
 
@@ -6605,8 +7611,8 @@ pub extend GoogleSearch with @json.FromJson::{from_json}
 pub impl @json.FromJson for GoogleSearch with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    search_types: @sdkjson.opt_field(obj, "searchTypes", path),
     time_range_filter: @sdkjson.opt_field(obj, "timeRangeFilter", path),
+    search_types: @sdkjson.opt_field(obj, "searchTypes", path),
   }
 }
 
@@ -6615,14 +7621,14 @@ pub impl @json.FromJson for GoogleSearch with fn from_json(value, path) {
 /// Tool details that the model may use to generate response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the model.
 #derive(Eq, @debug.Debug)
 pub(all) struct Tool {
-  google_search_retrieval : GoogleSearchRetrieval?
-  url_context : Json?
+  mcp_servers : Array[McpServer]?
   code_execution : Json?
-  file_search : FileSearch?
-  google_maps : GoogleMaps?
   computer_use : ComputerUse?
   function_declarations : Array[FunctionDeclaration]?
-  mcp_servers : Array[McpServer]?
+  google_search_retrieval : GoogleSearchRetrieval?
+  google_maps : GoogleMaps?
+  file_search : FileSearch?
+  url_context : Json?
   google_search : GoogleSearch?
 }
 
@@ -6636,25 +7642,25 @@ pub extend Tool with @debug.Debug::{to_repr}
 ///
 /// Creates a Tool with omitted optional fields absent.
 pub fn Tool::new(
-  google_search_retrieval? : GoogleSearchRetrieval,
-  url_context? : Json,
+  mcp_servers? : Array[McpServer],
   code_execution? : Json,
-  file_search? : FileSearch,
-  google_maps? : GoogleMaps,
   computer_use? : ComputerUse,
   function_declarations? : Array[FunctionDeclaration],
-  mcp_servers? : Array[McpServer],
+  google_search_retrieval? : GoogleSearchRetrieval,
+  google_maps? : GoogleMaps,
+  file_search? : FileSearch,
+  url_context? : Json,
   google_search? : GoogleSearch,
 ) -> Tool {
   {
-    google_search_retrieval,
-    url_context,
+    mcp_servers,
     code_execution,
-    file_search,
-    google_maps,
     computer_use,
     function_declarations,
-    mcp_servers,
+    google_search_retrieval,
+    google_maps,
+    file_search,
+    url_context,
     google_search,
   }
 }
@@ -6667,14 +7673,14 @@ pub extend Tool with ToJson::{to_json}
 ///|
 pub impl ToJson for Tool with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("googleSearchRetrieval", self.google_search_retrieval)
-  .opt("urlContext", self.url_context)
+  .opt("mcpServers", self.mcp_servers)
   .opt("codeExecution", self.code_execution)
-  .opt("fileSearch", self.file_search)
-  .opt("googleMaps", self.google_maps)
   .opt("computerUse", self.computer_use)
   .opt("functionDeclarations", self.function_declarations)
-  .opt("mcpServers", self.mcp_servers)
+  .opt("googleSearchRetrieval", self.google_search_retrieval)
+  .opt("googleMaps", self.google_maps)
+  .opt("fileSearch", self.file_search)
+  .opt("urlContext", self.url_context)
   .opt("googleSearch", self.google_search)
   .build()
 }
@@ -6688,16 +7694,16 @@ pub extend Tool with @json.FromJson::{from_json}
 pub impl @json.FromJson for Tool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
+    mcp_servers: @sdkjson.opt_field(obj, "mcpServers", path),
+    code_execution: @sdkjson.opt_field(obj, "codeExecution", path),
+    computer_use: @sdkjson.opt_field(obj, "computerUse", path),
+    function_declarations: @sdkjson.opt_field(obj, "functionDeclarations", path),
     google_search_retrieval: @sdkjson.opt_field(
       obj, "googleSearchRetrieval", path,
     ),
-    url_context: @sdkjson.opt_field(obj, "urlContext", path),
-    code_execution: @sdkjson.opt_field(obj, "codeExecution", path),
-    file_search: @sdkjson.opt_field(obj, "fileSearch", path),
     google_maps: @sdkjson.opt_field(obj, "googleMaps", path),
-    computer_use: @sdkjson.opt_field(obj, "computerUse", path),
-    function_declarations: @sdkjson.opt_field(obj, "functionDeclarations", path),
-    mcp_servers: @sdkjson.opt_field(obj, "mcpServers", path),
+    file_search: @sdkjson.opt_field(obj, "fileSearch", path),
+    url_context: @sdkjson.opt_field(obj, "urlContext", path),
     google_search: @sdkjson.opt_field(obj, "googleSearch", path),
   }
 }
@@ -6753,88 +7759,21 @@ pub impl @json.FromJson for CachedContentUsageMetadata with fn from_json(
 
 ///|
 ///
-/// The Tool configuration containing parameters for specifying `Tool` use in the request.
-#derive(Eq, @debug.Debug)
-pub(all) struct ToolConfig {
-  function_calling_config : FunctionCallingConfig?
-  include_server_side_tool_invocations : Bool?
-  retrieval_config : RetrievalConfig?
-}
-
-///|
-pub extend ToolConfig with Eq::{equal, not_equal}
-
-///|
-pub extend ToolConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ToolConfig with omitted optional fields absent.
-pub fn ToolConfig::new(
-  function_calling_config? : FunctionCallingConfig,
-  include_server_side_tool_invocations? : Bool,
-  retrieval_config? : RetrievalConfig,
-) -> ToolConfig {
-  {
-    function_calling_config,
-    include_server_side_tool_invocations,
-    retrieval_config,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ToolConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for ToolConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("functionCallingConfig", self.function_calling_config)
-  .opt(
-    "includeServerSideToolInvocations",
-    self.include_server_side_tool_invocations,
-  )
-  .opt("retrievalConfig", self.retrieval_config)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ToolConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ToolConfig with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    function_calling_config: @sdkjson.opt_field(
-      obj, "functionCallingConfig", path,
-    ),
-    include_server_side_tool_invocations: @sdkjson.opt_field(
-      obj, "includeServerSideToolInvocations", path,
-    ),
-    retrieval_config: @sdkjson.opt_field(obj, "retrievalConfig", path),
-  }
-}
-
-///|
-///
 /// Content that has been preprocessed and can be used in subsequent request to GenerativeService. Cached content can be only used with model it was created for.
 #derive(Eq, @debug.Debug)
 pub(all) struct CachedContent {
+  model : String?
+  update_time : String?
+  name : String?
+  system_instruction : Content?
+  expire_time : String?
+  ttl : String?
+  create_time : String?
+  display_name : String?
+  contents : Array[Content]?
+  tool_config : ToolConfig?
   tools : Array[Tool]?
   usage_metadata : CachedContentUsageMetadata?
-  contents : Array[Content]?
-  display_name : String?
-  update_time : String?
-  ttl : String?
-  name : String?
-  model : String?
-  system_instruction : Content?
-  tool_config : ToolConfig?
-  expire_time : String?
-  create_time : String?
 }
 
 ///|
@@ -6847,32 +7786,32 @@ pub extend CachedContent with @debug.Debug::{to_repr}
 ///
 /// Creates a CachedContent with omitted optional fields absent.
 pub fn CachedContent::new(
+  model? : String,
+  update_time? : String,
+  name? : String,
+  system_instruction? : Content,
+  expire_time? : String,
+  ttl? : String,
+  create_time? : String,
+  display_name? : String,
+  contents? : Array[Content],
+  tool_config? : ToolConfig,
   tools? : Array[Tool],
   usage_metadata? : CachedContentUsageMetadata,
-  contents? : Array[Content],
-  display_name? : String,
-  update_time? : String,
-  ttl? : String,
-  name? : String,
-  model? : String,
-  system_instruction? : Content,
-  tool_config? : ToolConfig,
-  expire_time? : String,
-  create_time? : String,
 ) -> CachedContent {
   {
+    model,
+    update_time,
+    name,
+    system_instruction,
+    expire_time,
+    ttl,
+    create_time,
+    display_name,
+    contents,
+    tool_config,
     tools,
     usage_metadata,
-    contents,
-    display_name,
-    update_time,
-    ttl,
-    name,
-    model,
-    system_instruction,
-    tool_config,
-    expire_time,
-    create_time,
   }
 }
 
@@ -6884,18 +7823,18 @@ pub extend CachedContent with ToJson::{to_json}
 ///|
 pub impl ToJson for CachedContent with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
+  .opt("model", self.model)
+  .opt("updateTime", self.update_time)
+  .opt("name", self.name)
+  .opt("systemInstruction", self.system_instruction)
+  .opt("expireTime", self.expire_time)
+  .opt("ttl", self.ttl)
+  .opt("createTime", self.create_time)
+  .opt("displayName", self.display_name)
+  .opt("contents", self.contents)
+  .opt("toolConfig", self.tool_config)
   .opt("tools", self.tools)
   .opt("usageMetadata", self.usage_metadata)
-  .opt("contents", self.contents)
-  .opt("displayName", self.display_name)
-  .opt("updateTime", self.update_time)
-  .opt("ttl", self.ttl)
-  .opt("name", self.name)
-  .opt("model", self.model)
-  .opt("systemInstruction", self.system_instruction)
-  .opt("toolConfig", self.tool_config)
-  .opt("expireTime", self.expire_time)
-  .opt("createTime", self.create_time)
   .build()
 }
 
@@ -6908,1725 +7847,18 @@ pub extend CachedContent with @json.FromJson::{from_json}
 pub impl @json.FromJson for CachedContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
+    model: @sdkjson.opt_field(obj, "model", path),
+    update_time: @sdkjson.opt_field(obj, "updateTime", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+    system_instruction: @sdkjson.opt_field(obj, "systemInstruction", path),
+    expire_time: @sdkjson.opt_field(obj, "expireTime", path),
+    ttl: @sdkjson.opt_field(obj, "ttl", path),
+    create_time: @sdkjson.opt_field(obj, "createTime", path),
+    display_name: @sdkjson.opt_field(obj, "displayName", path),
+    contents: @sdkjson.opt_field(obj, "contents", path),
+    tool_config: @sdkjson.opt_field(obj, "toolConfig", path),
     tools: @sdkjson.opt_field(obj, "tools", path),
     usage_metadata: @sdkjson.opt_field(obj, "usageMetadata", path),
-    contents: @sdkjson.opt_field(obj, "contents", path),
-    display_name: @sdkjson.opt_field(obj, "displayName", path),
-    update_time: @sdkjson.opt_field(obj, "updateTime", path),
-    ttl: @sdkjson.opt_field(obj, "ttl", path),
-    name: @sdkjson.opt_field(obj, "name", path),
-    model: @sdkjson.opt_field(obj, "model", path),
-    system_instruction: @sdkjson.opt_field(obj, "systemInstruction", path),
-    tool_config: @sdkjson.opt_field(obj, "toolConfig", path),
-    expire_time: @sdkjson.opt_field(obj, "expireTime", path),
-    create_time: @sdkjson.opt_field(obj, "createTime", path),
-  }
-}
-
-///|
-///
-/// Provides hints to the model about possible languages present in the audio.
-#derive(Eq, @debug.Debug)
-pub(all) struct LanguageHints {
-  language_codes : Array[String]?
-}
-
-///|
-pub extend LanguageHints with Eq::{equal, not_equal}
-
-///|
-pub extend LanguageHints with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a LanguageHints with omitted optional fields absent.
-pub fn LanguageHints::new(language_codes? : Array[String]) -> LanguageHints {
-  { language_codes, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend LanguageHints with ToJson::{to_json}
-
-///|
-pub impl ToJson for LanguageHints with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("languageCodes", self.language_codes).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend LanguageHints with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for LanguageHints with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { language_codes: @sdkjson.opt_field(obj, "languageCodes", path), }
-}
-
-///|
-///
-/// Optional. Configures transcription mode. Supported values: `VERBATIM`, `SMART`. If unspecified, defaults to `VERBATIM` transcription. In `SMART` mode, the model performs disfluency removal (eliminating filler words, repetitions, and false starts), light grammatical cleanup, automatic formatting (paragraphs, bullet points, numbered lists), and minor user edits (inline self-corrections). Timestamps and diarization are incompatible with mode `SMART`. Enum values: MODE_UNSPECIFIED: Unspecified transcription mode.; VERBATIM: Verbatim transcription mode.; SMART: Smart transcription mode.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum AudioTranscriptionConfigMode {
-  MODEUNSPECIFIED
-  VERBATIM
-  SMART
-  Custom(String)
-}
-
-///|
-pub extend AudioTranscriptionConfigMode with Eq::{equal, not_equal}
-
-///|
-pub extend AudioTranscriptionConfigMode with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend AudioTranscriptionConfigMode with ToJson::{to_json}
-
-///|
-pub impl ToJson for AudioTranscriptionConfigMode with fn to_json(self) {
-  let raw = match self {
-    AudioTranscriptionConfigMode::MODEUNSPECIFIED => "MODE_UNSPECIFIED"
-    AudioTranscriptionConfigMode::VERBATIM => "VERBATIM"
-    AudioTranscriptionConfigMode::SMART => "SMART"
-    AudioTranscriptionConfigMode::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend AudioTranscriptionConfigMode with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for AudioTranscriptionConfigMode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MODE_UNSPECIFIED" =>
-          Option::Some(AudioTranscriptionConfigMode::MODEUNSPECIFIED)
-        "VERBATIM" => Option::Some(AudioTranscriptionConfigMode::VERBATIM)
-        "SMART" => Option::Some(AudioTranscriptionConfigMode::SMART)
-        _ => Option::None
-      }
-    },
-    raw => AudioTranscriptionConfigMode::Custom(raw),
-  )
-}
-
-///|
-///
-/// The audio transcription configuration.
-#derive(Eq, @debug.Debug)
-pub(all) struct AudioTranscriptionConfig {
-  custom_vocabulary : Array[String]?
-  diarization : Bool?
-  word_timestamp : Bool?
-  source_text : String?
-  language_auto : Json?
-  language_hints : LanguageHints?
-  adaptation_phrases : Array[String]?
-  language_codes : Array[String]?
-  mode : AudioTranscriptionConfigMode?
-}
-
-///|
-pub extend AudioTranscriptionConfig with Eq::{equal, not_equal}
-
-///|
-pub extend AudioTranscriptionConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a AudioTranscriptionConfig with omitted optional fields absent.
-pub fn AudioTranscriptionConfig::new(
-  custom_vocabulary? : Array[String],
-  diarization? : Bool,
-  word_timestamp? : Bool,
-  source_text? : String,
-  language_auto? : Json,
-  language_hints? : LanguageHints,
-  adaptation_phrases? : Array[String],
-  language_codes? : Array[String],
-  mode? : AudioTranscriptionConfigMode,
-) -> AudioTranscriptionConfig {
-  {
-    custom_vocabulary,
-    diarization,
-    word_timestamp,
-    source_text,
-    language_auto,
-    language_hints,
-    adaptation_phrases,
-    language_codes,
-    mode,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend AudioTranscriptionConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for AudioTranscriptionConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("customVocabulary", self.custom_vocabulary)
-  .opt("diarization", self.diarization)
-  .opt("wordTimestamp", self.word_timestamp)
-  .opt("sourceText", self.source_text)
-  .opt("languageAuto", self.language_auto)
-  .opt("languageHints", self.language_hints)
-  .opt("adaptationPhrases", self.adaptation_phrases)
-  .opt("languageCodes", self.language_codes)
-  .opt("mode", self.mode)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend AudioTranscriptionConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for AudioTranscriptionConfig with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    custom_vocabulary: @sdkjson.opt_field(obj, "customVocabulary", path),
-    diarization: @sdkjson.opt_field(obj, "diarization", path),
-    word_timestamp: @sdkjson.opt_field(obj, "wordTimestamp", path),
-    source_text: @sdkjson.opt_field(obj, "sourceText", path),
-    language_auto: @sdkjson.opt_field(obj, "languageAuto", path),
-    language_hints: @sdkjson.opt_field(obj, "languageHints", path),
-    adaptation_phrases: @sdkjson.opt_field(obj, "adaptationPhrases", path),
-    language_codes: @sdkjson.opt_field(obj, "languageCodes", path),
-    mode: @sdkjson.opt_field(obj, "mode", path),
-  }
-}
-
-///|
-///
-/// Optional. Controls the maximum depth of the model's internal reasoning process before it produces a response. The default value is model-dependent. Refer to the [Thinking levels guide](https://aistudio.google.com/docs/thinking#thinking-levels) for more details. Recommended for Gemini 3 or later models. Use with earlier models results in an error. Enum values: THINKING_LEVEL_UNSPECIFIED: Default value.; MINIMAL: Little to no thinking.; LOW: Low thinking level.; MEDIUM: Medium thinking level.; HIGH: High thinking level.; XHIGH: XHigh thinking level.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum ThinkingConfigThinkingLevel {
-  THINKINGLEVELUNSPECIFIED
-  MINIMAL
-  LOW
-  MEDIUM
-  HIGH
-  XHIGH
-  Custom(String)
-}
-
-///|
-pub extend ThinkingConfigThinkingLevel with Eq::{equal, not_equal}
-
-///|
-pub extend ThinkingConfigThinkingLevel with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ThinkingConfigThinkingLevel with ToJson::{to_json}
-
-///|
-pub impl ToJson for ThinkingConfigThinkingLevel with fn to_json(self) {
-  let raw = match self {
-    ThinkingConfigThinkingLevel::THINKINGLEVELUNSPECIFIED =>
-      "THINKING_LEVEL_UNSPECIFIED"
-    ThinkingConfigThinkingLevel::MINIMAL => "MINIMAL"
-    ThinkingConfigThinkingLevel::LOW => "LOW"
-    ThinkingConfigThinkingLevel::MEDIUM => "MEDIUM"
-    ThinkingConfigThinkingLevel::HIGH => "HIGH"
-    ThinkingConfigThinkingLevel::XHIGH => "XHIGH"
-    ThinkingConfigThinkingLevel::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ThinkingConfigThinkingLevel with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ThinkingConfigThinkingLevel with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "THINKING_LEVEL_UNSPECIFIED" =>
-          Option::Some(ThinkingConfigThinkingLevel::THINKINGLEVELUNSPECIFIED)
-        "MINIMAL" => Option::Some(ThinkingConfigThinkingLevel::MINIMAL)
-        "LOW" => Option::Some(ThinkingConfigThinkingLevel::LOW)
-        "MEDIUM" => Option::Some(ThinkingConfigThinkingLevel::MEDIUM)
-        "HIGH" => Option::Some(ThinkingConfigThinkingLevel::HIGH)
-        "XHIGH" => Option::Some(ThinkingConfigThinkingLevel::XHIGH)
-        _ => Option::None
-      }
-    },
-    raw => ThinkingConfigThinkingLevel::Custom(raw),
-  )
-}
-
-///|
-///
-/// Config for thinking features.
-#derive(Eq, @debug.Debug)
-pub(all) struct ThinkingConfig {
-  include_thoughts : Bool?
-  thinking_level : ThinkingConfigThinkingLevel?
-  thinking_budget : Int32?
-}
-
-///|
-pub extend ThinkingConfig with Eq::{equal, not_equal}
-
-///|
-pub extend ThinkingConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ThinkingConfig with omitted optional fields absent.
-pub fn ThinkingConfig::new(
-  include_thoughts? : Bool,
-  thinking_level? : ThinkingConfigThinkingLevel,
-  thinking_budget? : Int32,
-) -> ThinkingConfig {
-  { include_thoughts, thinking_level, thinking_budget, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ThinkingConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for ThinkingConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("includeThoughts", self.include_thoughts)
-  .opt("thinkingLevel", self.thinking_level)
-  .opt("thinkingBudget", self.thinking_budget)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ThinkingConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ThinkingConfig with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    include_thoughts: @sdkjson.opt_field(obj, "includeThoughts", path),
-    thinking_level: @sdkjson.opt_field(obj, "thinkingLevel", path),
-    thinking_budget: @sdkjson.opt_field(obj, "thinkingBudget", path),
-  }
-}
-
-///|
-///
-/// Optional. The MIME type of the audio output. Enum values: MIME_TYPE_UNSPECIFIED: Default value. This value is unused.; AUDIO_MP3: MP3 audio format.; AUDIO_OGG_OPUS: OGG Opus audio format.; AUDIO_L16: Raw PCM (L16) audio format.; AUDIO_WAV: WAV audio format.; AUDIO_ALAW: A-law audio format.; AUDIO_MULAW: Mu-law audio format.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum AudioResponseFormatMimeType {
-  MIMETYPEUNSPECIFIED
-  AUDIOMP3
-  AUDIOOGGOPUS
-  AUDIOL16
-  AUDIOWAV
-  AUDIOALAW
-  AUDIOMULAW
-  Custom(String)
-}
-
-///|
-pub extend AudioResponseFormatMimeType with Eq::{equal, not_equal}
-
-///|
-pub extend AudioResponseFormatMimeType with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend AudioResponseFormatMimeType with ToJson::{to_json}
-
-///|
-pub impl ToJson for AudioResponseFormatMimeType with fn to_json(self) {
-  let raw = match self {
-    AudioResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
-    AudioResponseFormatMimeType::AUDIOMP3 => "AUDIO_MP3"
-    AudioResponseFormatMimeType::AUDIOOGGOPUS => "AUDIO_OGG_OPUS"
-    AudioResponseFormatMimeType::AUDIOL16 => "AUDIO_L16"
-    AudioResponseFormatMimeType::AUDIOWAV => "AUDIO_WAV"
-    AudioResponseFormatMimeType::AUDIOALAW => "AUDIO_ALAW"
-    AudioResponseFormatMimeType::AUDIOMULAW => "AUDIO_MULAW"
-    AudioResponseFormatMimeType::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend AudioResponseFormatMimeType with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for AudioResponseFormatMimeType with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MIME_TYPE_UNSPECIFIED" =>
-          Option::Some(AudioResponseFormatMimeType::MIMETYPEUNSPECIFIED)
-        "AUDIO_MP3" => Option::Some(AudioResponseFormatMimeType::AUDIOMP3)
-        "AUDIO_OGG_OPUS" =>
-          Option::Some(AudioResponseFormatMimeType::AUDIOOGGOPUS)
-        "AUDIO_L16" => Option::Some(AudioResponseFormatMimeType::AUDIOL16)
-        "AUDIO_WAV" => Option::Some(AudioResponseFormatMimeType::AUDIOWAV)
-        "AUDIO_ALAW" => Option::Some(AudioResponseFormatMimeType::AUDIOALAW)
-        "AUDIO_MULAW" => Option::Some(AudioResponseFormatMimeType::AUDIOMULAW)
-        _ => Option::None
-      }
-    },
-    raw => AudioResponseFormatMimeType::Custom(raw),
-  )
-}
-
-///|
-///
-/// Optional. The delivery mode for the audio output. Enum values: DELIVERY_UNSPECIFIED: Default value. This value is unused.; INLINE: Audio data is returned inline in the response.; URI: Audio data is returned as a URI.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum AudioResponseFormatDelivery {
-  DELIVERYUNSPECIFIED
-  INLINE
-  URI
-  Custom(String)
-}
-
-///|
-pub extend AudioResponseFormatDelivery with Eq::{equal, not_equal}
-
-///|
-pub extend AudioResponseFormatDelivery with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend AudioResponseFormatDelivery with ToJson::{to_json}
-
-///|
-pub impl ToJson for AudioResponseFormatDelivery with fn to_json(self) {
-  let raw = match self {
-    AudioResponseFormatDelivery::DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
-    AudioResponseFormatDelivery::INLINE => "INLINE"
-    AudioResponseFormatDelivery::URI => "URI"
-    AudioResponseFormatDelivery::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend AudioResponseFormatDelivery with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for AudioResponseFormatDelivery with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "DELIVERY_UNSPECIFIED" =>
-          Option::Some(AudioResponseFormatDelivery::DELIVERYUNSPECIFIED)
-        "INLINE" => Option::Some(AudioResponseFormatDelivery::INLINE)
-        "URI" => Option::Some(AudioResponseFormatDelivery::URI)
-        _ => Option::None
-      }
-    },
-    raw => AudioResponseFormatDelivery::Custom(raw),
-  )
-}
-
-///|
-///
-/// Configuration for audio output format.
-#derive(Eq, @debug.Debug)
-pub(all) struct AudioResponseFormat {
-  sample_rate : Int32?
-  mime_type : AudioResponseFormatMimeType?
-  bit_rate : Int32?
-  delivery : AudioResponseFormatDelivery?
-}
-
-///|
-pub extend AudioResponseFormat with Eq::{equal, not_equal}
-
-///|
-pub extend AudioResponseFormat with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a AudioResponseFormat with omitted optional fields absent.
-pub fn AudioResponseFormat::new(
-  sample_rate? : Int32,
-  mime_type? : AudioResponseFormatMimeType,
-  bit_rate? : Int32,
-  delivery? : AudioResponseFormatDelivery,
-) -> AudioResponseFormat {
-  { sample_rate, mime_type, bit_rate, delivery, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend AudioResponseFormat with ToJson::{to_json}
-
-///|
-pub impl ToJson for AudioResponseFormat with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("sampleRate", self.sample_rate)
-  .opt("mimeType", self.mime_type)
-  .opt("bitRate", self.bit_rate)
-  .opt("delivery", self.delivery)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend AudioResponseFormat with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for AudioResponseFormat with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    sample_rate: @sdkjson.opt_field(obj, "sampleRate", path),
-    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
-    bit_rate: @sdkjson.opt_field(obj, "bitRate", path),
-    delivery: @sdkjson.opt_field(obj, "delivery", path),
-  }
-}
-
-///|
-///
-/// Optional. The aspect ratio for the image output. Enum values: ASPECT_RATIO_UNSPECIFIED: Default value. This value is unused.; ASPECT_RATIO_ONE_BY_ONE: 1:1 aspect ratio.; ASPECT_RATIO_TWO_BY_THREE: 2:3 aspect ratio.; ASPECT_RATIO_THREE_BY_TWO: 3:2 aspect ratio.; ASPECT_RATIO_THREE_BY_FOUR: 3:4 aspect ratio.; ASPECT_RATIO_FOUR_BY_THREE: 4:3 aspect ratio.; ASPECT_RATIO_FOUR_BY_FIVE: 4:5 aspect ratio.; ASPECT_RATIO_FIVE_BY_FOUR: 5:4 aspect ratio.; ASPECT_RATIO_NINE_BY_SIXTEEN: 9:16 aspect ratio.; ASPECT_RATIO_SIXTEEN_BY_NINE: 16:9 aspect ratio.; ASPECT_RATIO_TWENTY_ONE_BY_NINE: 21:9 aspect ratio.; ASPECT_RATIO_ONE_BY_EIGHT: 1:8 aspect ratio.; ASPECT_RATIO_EIGHT_BY_ONE: 8:1 aspect ratio.; ASPECT_RATIO_ONE_BY_FOUR: 1:4 aspect ratio.; ASPECT_RATIO_FOUR_BY_ONE: 4:1 aspect ratio.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum ImageResponseFormatAspectRatio {
-  ASPECTRATIOUNSPECIFIED
-  ASPECTRATIOONEBYONE
-  ASPECTRATIOTWOBYTHREE
-  ASPECTRATIOTHREEBYTWO
-  ASPECTRATIOTHREEBYFOUR
-  ASPECTRATIOFOURBYTHREE
-  ASPECTRATIOFOURBYFIVE
-  ASPECTRATIOFIVEBYFOUR
-  ASPECTRATIONINEBYSIXTEEN
-  ASPECTRATIOSIXTEENBYNINE
-  ASPECTRATIOTWENTYONEBYNINE
-  ASPECTRATIOONEBYEIGHT
-  ASPECTRATIOEIGHTBYONE
-  ASPECTRATIOONEBYFOUR
-  ASPECTRATIOFOURBYONE
-  Custom(String)
-}
-
-///|
-pub extend ImageResponseFormatAspectRatio with Eq::{equal, not_equal}
-
-///|
-pub extend ImageResponseFormatAspectRatio with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ImageResponseFormatAspectRatio with ToJson::{to_json}
-
-///|
-pub impl ToJson for ImageResponseFormatAspectRatio with fn to_json(self) {
-  let raw = match self {
-    ImageResponseFormatAspectRatio::ASPECTRATIOUNSPECIFIED =>
-      "ASPECT_RATIO_UNSPECIFIED"
-    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYONE =>
-      "ASPECT_RATIO_ONE_BY_ONE"
-    ImageResponseFormatAspectRatio::ASPECTRATIOTWOBYTHREE =>
-      "ASPECT_RATIO_TWO_BY_THREE"
-    ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYTWO =>
-      "ASPECT_RATIO_THREE_BY_TWO"
-    ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYFOUR =>
-      "ASPECT_RATIO_THREE_BY_FOUR"
-    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYTHREE =>
-      "ASPECT_RATIO_FOUR_BY_THREE"
-    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYFIVE =>
-      "ASPECT_RATIO_FOUR_BY_FIVE"
-    ImageResponseFormatAspectRatio::ASPECTRATIOFIVEBYFOUR =>
-      "ASPECT_RATIO_FIVE_BY_FOUR"
-    ImageResponseFormatAspectRatio::ASPECTRATIONINEBYSIXTEEN =>
-      "ASPECT_RATIO_NINE_BY_SIXTEEN"
-    ImageResponseFormatAspectRatio::ASPECTRATIOSIXTEENBYNINE =>
-      "ASPECT_RATIO_SIXTEEN_BY_NINE"
-    ImageResponseFormatAspectRatio::ASPECTRATIOTWENTYONEBYNINE =>
-      "ASPECT_RATIO_TWENTY_ONE_BY_NINE"
-    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYEIGHT =>
-      "ASPECT_RATIO_ONE_BY_EIGHT"
-    ImageResponseFormatAspectRatio::ASPECTRATIOEIGHTBYONE =>
-      "ASPECT_RATIO_EIGHT_BY_ONE"
-    ImageResponseFormatAspectRatio::ASPECTRATIOONEBYFOUR =>
-      "ASPECT_RATIO_ONE_BY_FOUR"
-    ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYONE =>
-      "ASPECT_RATIO_FOUR_BY_ONE"
-    ImageResponseFormatAspectRatio::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ImageResponseFormatAspectRatio with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ImageResponseFormatAspectRatio with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "ASPECT_RATIO_UNSPECIFIED" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOUNSPECIFIED)
-        "ASPECT_RATIO_ONE_BY_ONE" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYONE)
-        "ASPECT_RATIO_TWO_BY_THREE" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTWOBYTHREE)
-        "ASPECT_RATIO_THREE_BY_TWO" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYTWO)
-        "ASPECT_RATIO_THREE_BY_FOUR" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOTHREEBYFOUR)
-        "ASPECT_RATIO_FOUR_BY_THREE" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYTHREE)
-        "ASPECT_RATIO_FOUR_BY_FIVE" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYFIVE)
-        "ASPECT_RATIO_FIVE_BY_FOUR" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFIVEBYFOUR)
-        "ASPECT_RATIO_NINE_BY_SIXTEEN" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIONINEBYSIXTEEN)
-        "ASPECT_RATIO_SIXTEEN_BY_NINE" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOSIXTEENBYNINE)
-        "ASPECT_RATIO_TWENTY_ONE_BY_NINE" =>
-          Option::Some(
-            ImageResponseFormatAspectRatio::ASPECTRATIOTWENTYONEBYNINE,
-          )
-        "ASPECT_RATIO_ONE_BY_EIGHT" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYEIGHT)
-        "ASPECT_RATIO_EIGHT_BY_ONE" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOEIGHTBYONE)
-        "ASPECT_RATIO_ONE_BY_FOUR" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOONEBYFOUR)
-        "ASPECT_RATIO_FOUR_BY_ONE" =>
-          Option::Some(ImageResponseFormatAspectRatio::ASPECTRATIOFOURBYONE)
-        _ => Option::None
-      }
-    },
-    raw => ImageResponseFormatAspectRatio::Custom(raw),
-  )
-}
-
-///|
-///
-/// Optional. The delivery mode for the image output. Enum values: DELIVERY_UNSPECIFIED: Default value. This value is unused.; INLINE: Image data is returned inline in the response.; URI: Image data is returned as a URI.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum ImageResponseFormatDelivery {
-  DELIVERYUNSPECIFIED
-  INLINE
-  URI
-  Custom(String)
-}
-
-///|
-pub extend ImageResponseFormatDelivery with Eq::{equal, not_equal}
-
-///|
-pub extend ImageResponseFormatDelivery with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ImageResponseFormatDelivery with ToJson::{to_json}
-
-///|
-pub impl ToJson for ImageResponseFormatDelivery with fn to_json(self) {
-  let raw = match self {
-    ImageResponseFormatDelivery::DELIVERYUNSPECIFIED => "DELIVERY_UNSPECIFIED"
-    ImageResponseFormatDelivery::INLINE => "INLINE"
-    ImageResponseFormatDelivery::URI => "URI"
-    ImageResponseFormatDelivery::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ImageResponseFormatDelivery with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ImageResponseFormatDelivery with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "DELIVERY_UNSPECIFIED" =>
-          Option::Some(ImageResponseFormatDelivery::DELIVERYUNSPECIFIED)
-        "INLINE" => Option::Some(ImageResponseFormatDelivery::INLINE)
-        "URI" => Option::Some(ImageResponseFormatDelivery::URI)
-        _ => Option::None
-      }
-    },
-    raw => ImageResponseFormatDelivery::Custom(raw),
-  )
-}
-
-///|
-///
-/// Optional. The MIME type of the image output. Enum values: MIME_TYPE_UNSPECIFIED: Default value. This value is unused.; IMAGE_JPEG: JPEG image format.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum ImageResponseFormatMimeType {
-  MIMETYPEUNSPECIFIED
-  IMAGEJPEG
-  Custom(String)
-}
-
-///|
-pub extend ImageResponseFormatMimeType with Eq::{equal, not_equal}
-
-///|
-pub extend ImageResponseFormatMimeType with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ImageResponseFormatMimeType with ToJson::{to_json}
-
-///|
-pub impl ToJson for ImageResponseFormatMimeType with fn to_json(self) {
-  let raw = match self {
-    ImageResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
-    ImageResponseFormatMimeType::IMAGEJPEG => "IMAGE_JPEG"
-    ImageResponseFormatMimeType::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ImageResponseFormatMimeType with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ImageResponseFormatMimeType with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MIME_TYPE_UNSPECIFIED" =>
-          Option::Some(ImageResponseFormatMimeType::MIMETYPEUNSPECIFIED)
-        "IMAGE_JPEG" => Option::Some(ImageResponseFormatMimeType::IMAGEJPEG)
-        _ => Option::None
-      }
-    },
-    raw => ImageResponseFormatMimeType::Custom(raw),
-  )
-}
-
-///|
-///
-/// Optional. The size of the image output. Enum values: IMAGE_SIZE_UNSPECIFIED: Default value. This value is unused.; IMAGE_SIZE_FIVE_TWELVE: 512px image size.; IMAGE_SIZE_ONE_K: 1K image size.; IMAGE_SIZE_TWO_K: 2K image size.; IMAGE_SIZE_FOUR_K: 4K image size.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum ImageResponseFormatImageSize {
-  IMAGESIZEUNSPECIFIED
-  IMAGESIZEFIVETWELVE
-  IMAGESIZEONEK
-  IMAGESIZETWOK
-  IMAGESIZEFOURK
-  Custom(String)
-}
-
-///|
-pub extend ImageResponseFormatImageSize with Eq::{equal, not_equal}
-
-///|
-pub extend ImageResponseFormatImageSize with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ImageResponseFormatImageSize with ToJson::{to_json}
-
-///|
-pub impl ToJson for ImageResponseFormatImageSize with fn to_json(self) {
-  let raw = match self {
-    ImageResponseFormatImageSize::IMAGESIZEUNSPECIFIED =>
-      "IMAGE_SIZE_UNSPECIFIED"
-    ImageResponseFormatImageSize::IMAGESIZEFIVETWELVE =>
-      "IMAGE_SIZE_FIVE_TWELVE"
-    ImageResponseFormatImageSize::IMAGESIZEONEK => "IMAGE_SIZE_ONE_K"
-    ImageResponseFormatImageSize::IMAGESIZETWOK => "IMAGE_SIZE_TWO_K"
-    ImageResponseFormatImageSize::IMAGESIZEFOURK => "IMAGE_SIZE_FOUR_K"
-    ImageResponseFormatImageSize::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ImageResponseFormatImageSize with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ImageResponseFormatImageSize with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "IMAGE_SIZE_UNSPECIFIED" =>
-          Option::Some(ImageResponseFormatImageSize::IMAGESIZEUNSPECIFIED)
-        "IMAGE_SIZE_FIVE_TWELVE" =>
-          Option::Some(ImageResponseFormatImageSize::IMAGESIZEFIVETWELVE)
-        "IMAGE_SIZE_ONE_K" =>
-          Option::Some(ImageResponseFormatImageSize::IMAGESIZEONEK)
-        "IMAGE_SIZE_TWO_K" =>
-          Option::Some(ImageResponseFormatImageSize::IMAGESIZETWOK)
-        "IMAGE_SIZE_FOUR_K" =>
-          Option::Some(ImageResponseFormatImageSize::IMAGESIZEFOURK)
-        _ => Option::None
-      }
-    },
-    raw => ImageResponseFormatImageSize::Custom(raw),
-  )
-}
-
-///|
-///
-/// Configuration for image output format.
-#derive(Eq, @debug.Debug)
-pub(all) struct ImageResponseFormat {
-  aspect_ratio : ImageResponseFormatAspectRatio?
-  delivery : ImageResponseFormatDelivery?
-  mime_type : ImageResponseFormatMimeType?
-  image_size : ImageResponseFormatImageSize?
-}
-
-///|
-pub extend ImageResponseFormat with Eq::{equal, not_equal}
-
-///|
-pub extend ImageResponseFormat with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ImageResponseFormat with omitted optional fields absent.
-pub fn ImageResponseFormat::new(
-  aspect_ratio? : ImageResponseFormatAspectRatio,
-  delivery? : ImageResponseFormatDelivery,
-  mime_type? : ImageResponseFormatMimeType,
-  image_size? : ImageResponseFormatImageSize,
-) -> ImageResponseFormat {
-  { aspect_ratio, delivery, mime_type, image_size, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ImageResponseFormat with ToJson::{to_json}
-
-///|
-pub impl ToJson for ImageResponseFormat with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("aspectRatio", self.aspect_ratio)
-  .opt("delivery", self.delivery)
-  .opt("mimeType", self.mime_type)
-  .opt("imageSize", self.image_size)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ImageResponseFormat with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ImageResponseFormat with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    aspect_ratio: @sdkjson.opt_field(obj, "aspectRatio", path),
-    delivery: @sdkjson.opt_field(obj, "delivery", path),
-    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
-    image_size: @sdkjson.opt_field(obj, "imageSize", path),
-  }
-}
-
-///|
-///
-/// Optional. The MIME type of the text output. Enum values: MIME_TYPE_UNSPECIFIED: Default value. This value is unused.; APPLICATION_JSON: JSON output format.; TEXT_PLAIN: Plain text output format.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum TextResponseFormatMimeType {
-  MIMETYPEUNSPECIFIED
-  APPLICATIONJSON
-  TEXTPLAIN
-  Custom(String)
-}
-
-///|
-pub extend TextResponseFormatMimeType with Eq::{equal, not_equal}
-
-///|
-pub extend TextResponseFormatMimeType with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend TextResponseFormatMimeType with ToJson::{to_json}
-
-///|
-pub impl ToJson for TextResponseFormatMimeType with fn to_json(self) {
-  let raw = match self {
-    TextResponseFormatMimeType::MIMETYPEUNSPECIFIED => "MIME_TYPE_UNSPECIFIED"
-    TextResponseFormatMimeType::APPLICATIONJSON => "APPLICATION_JSON"
-    TextResponseFormatMimeType::TEXTPLAIN => "TEXT_PLAIN"
-    TextResponseFormatMimeType::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend TextResponseFormatMimeType with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for TextResponseFormatMimeType with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MIME_TYPE_UNSPECIFIED" =>
-          Option::Some(TextResponseFormatMimeType::MIMETYPEUNSPECIFIED)
-        "APPLICATION_JSON" =>
-          Option::Some(TextResponseFormatMimeType::APPLICATIONJSON)
-        "TEXT_PLAIN" => Option::Some(TextResponseFormatMimeType::TEXTPLAIN)
-        _ => Option::None
-      }
-    },
-    raw => TextResponseFormatMimeType::Custom(raw),
-  )
-}
-
-///|
-///
-/// Configuration for text output format.
-#derive(Eq, @debug.Debug)
-pub(all) struct TextResponseFormat {
-  mime_type : TextResponseFormatMimeType?
-  schema : Json?
-}
-
-///|
-pub extend TextResponseFormat with Eq::{equal, not_equal}
-
-///|
-pub extend TextResponseFormat with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a TextResponseFormat with omitted optional fields absent.
-pub fn TextResponseFormat::new(
-  mime_type? : TextResponseFormatMimeType,
-  schema? : Json,
-) -> TextResponseFormat {
-  { mime_type, schema, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend TextResponseFormat with ToJson::{to_json}
-
-///|
-pub impl ToJson for TextResponseFormat with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("mimeType", self.mime_type)
-  .opt("schema", self.schema)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend TextResponseFormat with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for TextResponseFormat with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    mime_type: @sdkjson.opt_field(obj, "mimeType", path),
-    schema: @sdkjson.opt_field(obj, "schema", path),
-  }
-}
-
-///|
-///
-/// Configuration for the response output format. This is a flat object where each optional sub-field configures a specific output modality.
-#derive(Eq, @debug.Debug)
-pub(all) struct ResponseFormatConfig {
-  audio : AudioResponseFormat?
-  image : ImageResponseFormat?
-  text : TextResponseFormat?
-}
-
-///|
-pub extend ResponseFormatConfig with Eq::{equal, not_equal}
-
-///|
-pub extend ResponseFormatConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ResponseFormatConfig with omitted optional fields absent.
-pub fn ResponseFormatConfig::new(
-  audio? : AudioResponseFormat,
-  image? : ImageResponseFormat,
-  text? : TextResponseFormat,
-) -> ResponseFormatConfig {
-  { audio, image, text, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ResponseFormatConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for ResponseFormatConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("audio", self.audio)
-  .opt("image", self.image)
-  .opt("text", self.text)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ResponseFormatConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ResponseFormatConfig with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    audio: @sdkjson.opt_field(obj, "audio", path),
-    image: @sdkjson.opt_field(obj, "image", path),
-    text: @sdkjson.opt_field(obj, "text", path),
-  }
-}
-
-///|
-///
-/// Config for translation features.
-#derive(Eq, @debug.Debug)
-pub(all) struct TranslationConfig {
-  echo_target_language : Bool?
-  target_language_code : String?
-}
-
-///|
-pub extend TranslationConfig with Eq::{equal, not_equal}
-
-///|
-pub extend TranslationConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a TranslationConfig with omitted optional fields absent.
-pub fn TranslationConfig::new(
-  echo_target_language? : Bool,
-  target_language_code? : String,
-) -> TranslationConfig {
-  { echo_target_language, target_language_code, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend TranslationConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for TranslationConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("echoTargetLanguage", self.echo_target_language)
-  .opt("targetLanguageCode", self.target_language_code)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend TranslationConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for TranslationConfig with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    echo_target_language: @sdkjson.opt_field(obj, "echoTargetLanguage", path),
-    target_language_code: @sdkjson.opt_field(obj, "targetLanguageCode", path),
-  }
-}
-
-///|
-///
-/// Optional. If specified, the media resolution specified will be used. Enum values: MEDIA_RESOLUTION_UNSPECIFIED: Media resolution has not been set.; MEDIA_RESOLUTION_LOW: Media resolution set to low (64 tokens).; MEDIA_RESOLUTION_MEDIUM: Media resolution set to medium (256 tokens).; MEDIA_RESOLUTION_HIGH: Media resolution set to high (zoomed reframing with 256 tokens).
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum GenerationConfigMediaResolution {
-  MEDIARESOLUTIONUNSPECIFIED
-  MEDIARESOLUTIONLOW
-  MEDIARESOLUTIONMEDIUM
-  MEDIARESOLUTIONHIGH
-  Custom(String)
-}
-
-///|
-pub extend GenerationConfigMediaResolution with Eq::{equal, not_equal}
-
-///|
-pub extend GenerationConfigMediaResolution with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend GenerationConfigMediaResolution with ToJson::{to_json}
-
-///|
-pub impl ToJson for GenerationConfigMediaResolution with fn to_json(self) {
-  let raw = match self {
-    GenerationConfigMediaResolution::MEDIARESOLUTIONUNSPECIFIED =>
-      "MEDIA_RESOLUTION_UNSPECIFIED"
-    GenerationConfigMediaResolution::MEDIARESOLUTIONLOW =>
-      "MEDIA_RESOLUTION_LOW"
-    GenerationConfigMediaResolution::MEDIARESOLUTIONMEDIUM =>
-      "MEDIA_RESOLUTION_MEDIUM"
-    GenerationConfigMediaResolution::MEDIARESOLUTIONHIGH =>
-      "MEDIA_RESOLUTION_HIGH"
-    GenerationConfigMediaResolution::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend GenerationConfigMediaResolution with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GenerationConfigMediaResolution with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MEDIA_RESOLUTION_UNSPECIFIED" =>
-          Option::Some(
-            GenerationConfigMediaResolution::MEDIARESOLUTIONUNSPECIFIED,
-          )
-        "MEDIA_RESOLUTION_LOW" =>
-          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONLOW)
-        "MEDIA_RESOLUTION_MEDIUM" =>
-          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONMEDIUM)
-        "MEDIA_RESOLUTION_HIGH" =>
-          Option::Some(GenerationConfigMediaResolution::MEDIARESOLUTIONHIGH)
-        _ => Option::None
-      }
-    },
-    raw => GenerationConfigMediaResolution::Custom(raw),
-  )
-}
-
-///|
-///
-/// Enum values: MODALITY_UNSPECIFIED: Default value.; TEXT: Indicates the model should return text.; IMAGE: Indicates the model should return images.; AUDIO: Indicates the model should return audio.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum GenerationConfigResponseModalitiesItem {
-  MODALITYUNSPECIFIED
-  TEXT
-  IMAGE
-  AUDIO
-  Custom(String)
-}
-
-///|
-pub extend GenerationConfigResponseModalitiesItem with Eq::{equal, not_equal}
-
-///|
-pub extend GenerationConfigResponseModalitiesItem with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend GenerationConfigResponseModalitiesItem with ToJson::{to_json}
-
-///|
-pub impl ToJson for GenerationConfigResponseModalitiesItem with fn to_json(self) {
-  let raw = match self {
-    GenerationConfigResponseModalitiesItem::MODALITYUNSPECIFIED =>
-      "MODALITY_UNSPECIFIED"
-    GenerationConfigResponseModalitiesItem::TEXT => "TEXT"
-    GenerationConfigResponseModalitiesItem::IMAGE => "IMAGE"
-    GenerationConfigResponseModalitiesItem::AUDIO => "AUDIO"
-    GenerationConfigResponseModalitiesItem::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend GenerationConfigResponseModalitiesItem with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for GenerationConfigResponseModalitiesItem with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MODALITY_UNSPECIFIED" =>
-          Option::Some(
-            GenerationConfigResponseModalitiesItem::MODALITYUNSPECIFIED,
-          )
-        "TEXT" => Option::Some(GenerationConfigResponseModalitiesItem::TEXT)
-        "IMAGE" => Option::Some(GenerationConfigResponseModalitiesItem::IMAGE)
-        "AUDIO" => Option::Some(GenerationConfigResponseModalitiesItem::AUDIO)
-        _ => Option::None
-      }
-    },
-    raw => GenerationConfigResponseModalitiesItem::Custom(raw),
-  )
-}
-
-///|
-///
-/// Config for image generation features.
-#derive(Eq, @debug.Debug)
-pub(all) struct ImageConfig {
-  image_size : String?
-  aspect_ratio : String?
-}
-
-///|
-pub extend ImageConfig with Eq::{equal, not_equal}
-
-///|
-pub extend ImageConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ImageConfig with omitted optional fields absent.
-pub fn ImageConfig::new(
-  image_size? : String,
-  aspect_ratio? : String,
-) -> ImageConfig {
-  { image_size, aspect_ratio, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ImageConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for ImageConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("imageSize", self.image_size)
-  .opt("aspectRatio", self.aspect_ratio)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ImageConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ImageConfig with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    image_size: @sdkjson.opt_field(obj, "imageSize", path),
-    aspect_ratio: @sdkjson.opt_field(obj, "aspectRatio", path),
-  }
-}
-
-///|
-///
-/// Configuration options for model generation and outputs. Not all parameters are configurable for every model.
-#derive(Eq, @debug.Debug)
-pub(all) struct GenerationConfig {
-  audio_transcription_config : AudioTranscriptionConfig?
-  stop_sequences : Array[String]?
-  top_p : Double?
-  candidate_count : Int32?
-  response_json_schema : Json?
-  frequency_penalty : Double?
-  response_mime_type : String?
-  enable_affective_dialog : Bool?
-  presence_penalty : Double?
-  thinking_config : ThinkingConfig?
-  response_logprobs : Bool?
-  temperature : Double?
-  top_k : Int32?
-  response_format : ResponseFormatConfig?
-  seed : Int32?
-  response_json_schema_2 : Json?
-  translation_config : TranslationConfig?
-  speech_config : SpeechConfig?
-  logprobs : Int32?
-  media_resolution : GenerationConfigMediaResolution?
-  response_schema : Schema?
-  enable_enhanced_civic_answers : Bool?
-  response_modalities : Array[GenerationConfigResponseModalitiesItem]?
-  image_config : ImageConfig?
-  max_output_tokens : Int32?
-}
-
-///|
-pub extend GenerationConfig with Eq::{equal, not_equal}
-
-///|
-pub extend GenerationConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GenerationConfig with omitted optional fields absent.
-pub fn GenerationConfig::new(
-  audio_transcription_config? : AudioTranscriptionConfig,
-  stop_sequences? : Array[String],
-  top_p? : Double,
-  candidate_count? : Int32,
-  response_json_schema? : Json,
-  frequency_penalty? : Double,
-  response_mime_type? : String,
-  enable_affective_dialog? : Bool,
-  presence_penalty? : Double,
-  thinking_config? : ThinkingConfig,
-  response_logprobs? : Bool,
-  temperature? : Double,
-  top_k? : Int32,
-  response_format? : ResponseFormatConfig,
-  seed? : Int32,
-  response_json_schema_2? : Json,
-  translation_config? : TranslationConfig,
-  speech_config? : SpeechConfig,
-  logprobs? : Int32,
-  media_resolution? : GenerationConfigMediaResolution,
-  response_schema? : Schema,
-  enable_enhanced_civic_answers? : Bool,
-  response_modalities? : Array[GenerationConfigResponseModalitiesItem],
-  image_config? : ImageConfig,
-  max_output_tokens? : Int32,
-) -> GenerationConfig {
-  {
-    audio_transcription_config,
-    stop_sequences,
-    top_p,
-    candidate_count,
-    response_json_schema,
-    frequency_penalty,
-    response_mime_type,
-    enable_affective_dialog,
-    presence_penalty,
-    thinking_config,
-    response_logprobs,
-    temperature,
-    top_k,
-    response_format,
-    seed,
-    response_json_schema_2,
-    translation_config,
-    speech_config,
-    logprobs,
-    media_resolution,
-    response_schema,
-    enable_enhanced_civic_answers,
-    response_modalities,
-    image_config,
-    max_output_tokens,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GenerationConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for GenerationConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("audioTranscriptionConfig", self.audio_transcription_config)
-  .opt("stopSequences", self.stop_sequences)
-  .opt("topP", self.top_p)
-  .opt("candidateCount", self.candidate_count)
-  .opt("responseJsonSchema", self.response_json_schema)
-  .opt("frequencyPenalty", self.frequency_penalty)
-  .opt("responseMimeType", self.response_mime_type)
-  .opt("enableAffectiveDialog", self.enable_affective_dialog)
-  .opt("presencePenalty", self.presence_penalty)
-  .opt("thinkingConfig", self.thinking_config)
-  .opt("responseLogprobs", self.response_logprobs)
-  .opt("temperature", self.temperature)
-  .opt("topK", self.top_k)
-  .opt("responseFormat", self.response_format)
-  .opt("seed", self.seed)
-  .opt("_responseJsonSchema", self.response_json_schema_2)
-  .opt("translationConfig", self.translation_config)
-  .opt("speechConfig", self.speech_config)
-  .opt("logprobs", self.logprobs)
-  .opt("mediaResolution", self.media_resolution)
-  .opt("responseSchema", self.response_schema)
-  .opt("enableEnhancedCivicAnswers", self.enable_enhanced_civic_answers)
-  .opt("responseModalities", self.response_modalities)
-  .opt("imageConfig", self.image_config)
-  .opt("maxOutputTokens", self.max_output_tokens)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GenerationConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GenerationConfig with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    audio_transcription_config: @sdkjson.opt_field(
-      obj, "audioTranscriptionConfig", path,
-    ),
-    stop_sequences: @sdkjson.opt_field(obj, "stopSequences", path),
-    top_p: @sdkjson.opt_field(obj, "topP", path),
-    candidate_count: @sdkjson.opt_field(obj, "candidateCount", path),
-    response_json_schema: @sdkjson.opt_field(obj, "responseJsonSchema", path),
-    frequency_penalty: @sdkjson.opt_field(obj, "frequencyPenalty", path),
-    response_mime_type: @sdkjson.opt_field(obj, "responseMimeType", path),
-    enable_affective_dialog: @sdkjson.opt_field(
-      obj, "enableAffectiveDialog", path,
-    ),
-    presence_penalty: @sdkjson.opt_field(obj, "presencePenalty", path),
-    thinking_config: @sdkjson.opt_field(obj, "thinkingConfig", path),
-    response_logprobs: @sdkjson.opt_field(obj, "responseLogprobs", path),
-    temperature: @sdkjson.opt_field(obj, "temperature", path),
-    top_k: @sdkjson.opt_field(obj, "topK", path),
-    response_format: @sdkjson.opt_field(obj, "responseFormat", path),
-    seed: @sdkjson.opt_field(obj, "seed", path),
-    response_json_schema_2: @sdkjson.opt_field(obj, "_responseJsonSchema", path),
-    translation_config: @sdkjson.opt_field(obj, "translationConfig", path),
-    speech_config: @sdkjson.opt_field(obj, "speechConfig", path),
-    logprobs: @sdkjson.opt_field(obj, "logprobs", path),
-    media_resolution: @sdkjson.opt_field(obj, "mediaResolution", path),
-    response_schema: @sdkjson.opt_field(obj, "responseSchema", path),
-    enable_enhanced_civic_answers: @sdkjson.opt_field(
-      obj, "enableEnhancedCivicAnswers", path,
-    ),
-    response_modalities: @sdkjson.opt_field(obj, "responseModalities", path),
-    image_config: @sdkjson.opt_field(obj, "imageConfig", path),
-    max_output_tokens: @sdkjson.opt_field(obj, "maxOutputTokens", path),
-  }
-}
-
-///|
-///
-/// Chunk from the web.
-#derive(Eq, @debug.Debug)
-pub(all) struct Web {
-  title : String?
-  uri : String?
-}
-
-///|
-pub extend Web with Eq::{equal, not_equal}
-
-///|
-pub extend Web with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a Web with omitted optional fields absent.
-pub fn Web::new(title? : String, uri? : String) -> Web {
-  { title, uri, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend Web with ToJson::{to_json}
-
-///|
-pub impl ToJson for Web with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("title", self.title)
-  .opt("uri", self.uri)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend Web with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Web with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    title: @sdkjson.opt_field(obj, "title", path),
-    uri: @sdkjson.opt_field(obj, "uri", path),
-  }
-}
-
-///|
-///
-/// Google search entry point.
-#derive(Eq, @debug.Debug)
-pub(all) struct SearchEntryPoint {
-  rendered_content : String?
-  sdk_blob : String?
-}
-
-///|
-pub extend SearchEntryPoint with Eq::{equal, not_equal}
-
-///|
-pub extend SearchEntryPoint with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a SearchEntryPoint with omitted optional fields absent.
-pub fn SearchEntryPoint::new(
-  rendered_content? : String,
-  sdk_blob? : String,
-) -> SearchEntryPoint {
-  { rendered_content, sdk_blob, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend SearchEntryPoint with ToJson::{to_json}
-
-///|
-pub impl ToJson for SearchEntryPoint with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("renderedContent", self.rendered_content)
-  .opt("sdkBlob", self.sdk_blob)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend SearchEntryPoint with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for SearchEntryPoint with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    rendered_content: @sdkjson.opt_field(obj, "renderedContent", path),
-    sdk_blob: @sdkjson.opt_field(obj, "sdkBlob", path),
-  }
-}
-
-///|
-///
-/// A response from `CountTokens`. It returns the model's `token_count` for the `prompt`.
-#derive(Eq, @debug.Debug)
-pub(all) struct CountTokensResponse {
-  total_tokens : Int32?
-  prompt_tokens_details : Array[ModalityTokenCount]?
-  cache_tokens_details : Array[ModalityTokenCount]?
-  cached_content_token_count : Int32?
-}
-
-///|
-pub extend CountTokensResponse with Eq::{equal, not_equal}
-
-///|
-pub extend CountTokensResponse with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a CountTokensResponse with omitted optional fields absent.
-pub fn CountTokensResponse::new(
-  total_tokens? : Int32,
-  prompt_tokens_details? : Array[ModalityTokenCount],
-  cache_tokens_details? : Array[ModalityTokenCount],
-  cached_content_token_count? : Int32,
-) -> CountTokensResponse {
-  {
-    total_tokens,
-    prompt_tokens_details,
-    cache_tokens_details,
-    cached_content_token_count,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend CountTokensResponse with ToJson::{to_json}
-
-///|
-pub impl ToJson for CountTokensResponse with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("totalTokens", self.total_tokens)
-  .opt("promptTokensDetails", self.prompt_tokens_details)
-  .opt("cacheTokensDetails", self.cache_tokens_details)
-  .opt("cachedContentTokenCount", self.cached_content_token_count)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend CountTokensResponse with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CountTokensResponse with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    total_tokens: @sdkjson.opt_field(obj, "totalTokens", path),
-    prompt_tokens_details: @sdkjson.opt_field(obj, "promptTokensDetails", path),
-    cache_tokens_details: @sdkjson.opt_field(obj, "cacheTokensDetails", path),
-    cached_content_token_count: @sdkjson.opt_field(
-      obj, "cachedContentTokenCount", path,
-    ),
-  }
-}
-
-///|
-///
-/// Chunk from image search.
-#derive(Eq, @debug.Debug)
-pub(all) struct Image {
-  domain : String?
-  title : String?
-  source_uri : String?
-  image_uri : String?
-}
-
-///|
-pub extend Image with Eq::{equal, not_equal}
-
-///|
-pub extend Image with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a Image with omitted optional fields absent.
-pub fn Image::new(
-  domain? : String,
-  title? : String,
-  source_uri? : String,
-  image_uri? : String,
-) -> Image {
-  { domain, title, source_uri, image_uri, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend Image with ToJson::{to_json}
-
-///|
-pub impl ToJson for Image with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("domain", self.domain)
-  .opt("title", self.title)
-  .opt("sourceUri", self.source_uri)
-  .opt("imageUri", self.image_uri)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend Image with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Image with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    domain: @sdkjson.opt_field(obj, "domain", path),
-    title: @sdkjson.opt_field(obj, "title", path),
-    source_uri: @sdkjson.opt_field(obj, "sourceUri", path),
-    image_uri: @sdkjson.opt_field(obj, "imageUri", path),
   }
 }
 
@@ -8635,8 +7867,8 @@ pub impl @json.FromJson for Image with fn from_json(value, path) {
 /// Response with CachedContents list.
 #derive(Eq, @debug.Debug)
 pub(all) struct ListCachedContentsResponse {
-  cached_contents : Array[CachedContent]?
   next_page_token : String?
+  cached_contents : Array[CachedContent]?
 }
 
 ///|
@@ -8649,10 +7881,10 @@ pub extend ListCachedContentsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ListCachedContentsResponse with omitted optional fields absent.
 pub fn ListCachedContentsResponse::new(
-  cached_contents? : Array[CachedContent],
   next_page_token? : String,
+  cached_contents? : Array[CachedContent],
 ) -> ListCachedContentsResponse {
-  { cached_contents, next_page_token, }
+  { next_page_token, cached_contents, }
 }
 
 ///|
@@ -8663,8 +7895,8 @@ pub extend ListCachedContentsResponse with ToJson::{to_json}
 ///|
 pub impl ToJson for ListCachedContentsResponse with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("cachedContents", self.cached_contents)
   .opt("nextPageToken", self.next_page_token)
+  .opt("cachedContents", self.cached_contents)
   .build()
 }
 
@@ -8680,46 +7912,43 @@ pub impl @json.FromJson for ListCachedContentsResponse with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    cached_contents: @sdkjson.opt_field(obj, "cachedContents", path),
     next_page_token: @sdkjson.opt_field(obj, "nextPageToken", path),
+    cached_contents: @sdkjson.opt_field(obj, "cachedContents", path),
   }
 }
 
 ///|
 ///
-/// Required. The probability of harm for this content. Enum values: HARM_PROBABILITY_UNSPECIFIED: Probability is unspecified.; NEGLIGIBLE: Content has a negligible chance of being unsafe.; LOW: Content has a low chance of being unsafe.; MEDIUM: Content has a medium chance of being unsafe.; HIGH: Content has a high chance of being unsafe.
+/// Optional. The service tier of the request. Enum values: unspecified: Default service tier, which is standard.; standard: Standard service tier.; flex: Flex service tier.; priority: Priority service tier.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
-pub(all) enum SafetyRatingProbability {
-  HARMPROBABILITYUNSPECIFIED
-  NEGLIGIBLE
-  LOW
-  MEDIUM
-  HIGH
-  Unknown(String)
+pub(all) enum GenerateContentRequestServiceTier {
+  Unspecified
+  Standard
+  Flex
+  Priority
+  Custom(String)
 }
 
 ///|
-pub extend SafetyRatingProbability with Eq::{equal, not_equal}
+pub extend GenerateContentRequestServiceTier with Eq::{equal, not_equal}
 
 ///|
-pub extend SafetyRatingProbability with @debug.Debug::{to_repr}
+pub extend GenerateContentRequestServiceTier with @debug.Debug::{to_repr}
 
 ///|
 ///
 /// Encodes this string enum as JSON.
-pub extend SafetyRatingProbability with ToJson::{to_json}
+pub extend GenerateContentRequestServiceTier with ToJson::{to_json}
 
 ///|
-pub impl ToJson for SafetyRatingProbability with fn to_json(self) {
+pub impl ToJson for GenerateContentRequestServiceTier with fn to_json(self) {
   let raw = match self {
-    SafetyRatingProbability::HARMPROBABILITYUNSPECIFIED =>
-      "HARM_PROBABILITY_UNSPECIFIED"
-    SafetyRatingProbability::NEGLIGIBLE => "NEGLIGIBLE"
-    SafetyRatingProbability::LOW => "LOW"
-    SafetyRatingProbability::MEDIUM => "MEDIUM"
-    SafetyRatingProbability::HIGH => "HIGH"
-    SafetyRatingProbability::Unknown(raw) => raw
+    GenerateContentRequestServiceTier::Unspecified => "unspecified"
+    GenerateContentRequestServiceTier::Standard => "standard"
+    GenerateContentRequestServiceTier::Flex => "flex"
+    GenerateContentRequestServiceTier::Priority => "priority"
+    GenerateContentRequestServiceTier::Custom(raw) => raw
   }
   @json.Json::Json(raw)
 }
@@ -8727,10 +7956,10 @@ pub impl ToJson for SafetyRatingProbability with fn to_json(self) {
 ///|
 ///
 /// Decodes this string enum from JSON.
-pub extend SafetyRatingProbability with @json.FromJson::{from_json}
+pub extend GenerateContentRequestServiceTier with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for SafetyRatingProbability with fn from_json(
+pub impl @json.FromJson for GenerateContentRequestServiceTier with fn from_json(
   value,
   path,
 ) {
@@ -8739,1711 +7968,16 @@ pub impl @json.FromJson for SafetyRatingProbability with fn from_json(
     path,
     raw => {
       match raw {
-        "HARM_PROBABILITY_UNSPECIFIED" =>
-          Option::Some(SafetyRatingProbability::HARMPROBABILITYUNSPECIFIED)
-        "NEGLIGIBLE" => Option::Some(SafetyRatingProbability::NEGLIGIBLE)
-        "LOW" => Option::Some(SafetyRatingProbability::LOW)
-        "MEDIUM" => Option::Some(SafetyRatingProbability::MEDIUM)
-        "HIGH" => Option::Some(SafetyRatingProbability::HIGH)
+        "unspecified" =>
+          Option::Some(GenerateContentRequestServiceTier::Unspecified)
+        "standard" => Option::Some(GenerateContentRequestServiceTier::Standard)
+        "flex" => Option::Some(GenerateContentRequestServiceTier::Flex)
+        "priority" => Option::Some(GenerateContentRequestServiceTier::Priority)
         _ => Option::None
       }
     },
-    raw => SafetyRatingProbability::Unknown(raw),
+    raw => GenerateContentRequestServiceTier::Custom(raw),
   )
-}
-
-///|
-///
-/// Required. The category for this rating. Enum values: HARM_CATEGORY_UNSPECIFIED: Category is unspecified.; HARM_CATEGORY_DEROGATORY: **PaLM** - Negative or harmful comments targeting identity and/or protected attribute. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_TOXICITY: **PaLM** - Content that is rude, disrespectful, or profane. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_VIOLENCE: **PaLM** - Describes scenarios depicting violence against an individual or group, or general descriptions of gore. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_SEXUAL: **PaLM** - Contains references to sexual acts or other lewd content. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_MEDICAL: **PaLM** - Promotes unchecked medical advice. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_DANGEROUS: **PaLM** - Dangerous content that promotes, facilitates, or encourages harmful acts. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_HARASSMENT: **Gemini** - Harassment content.; HARM_CATEGORY_HATE_SPEECH: **Gemini** - Hate speech and content.; HARM_CATEGORY_SEXUALLY_EXPLICIT: **Gemini** - Sexually explicit content.; HARM_CATEGORY_DANGEROUS_CONTENT: **Gemini** - Dangerous content.; HARM_CATEGORY_CIVIC_INTEGRITY: **Gemini** - Content that may be used to harm civic integrity. DEPRECATED: use enable_enhanced_civic_answers instead.; HARM_CATEGORY_JAILBREAK: **Gemini** - Prompts attempting to bypass or subvert the model's safety guidelines (jailbreak attempts).
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum SafetyRatingCategory {
-  HARMCATEGORYUNSPECIFIED
-  HARMCATEGORYDEROGATORY
-  HARMCATEGORYTOXICITY
-  HARMCATEGORYVIOLENCE
-  HARMCATEGORYSEXUAL
-  HARMCATEGORYMEDICAL
-  HARMCATEGORYDANGEROUS
-  HARMCATEGORYHARASSMENT
-  HARMCATEGORYHATESPEECH
-  HARMCATEGORYSEXUALLYEXPLICIT
-  HARMCATEGORYDANGEROUSCONTENT
-  HARMCATEGORYCIVICINTEGRITY
-  HARMCATEGORYJAILBREAK
-  Unknown(String)
-}
-
-///|
-pub extend SafetyRatingCategory with Eq::{equal, not_equal}
-
-///|
-pub extend SafetyRatingCategory with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend SafetyRatingCategory with ToJson::{to_json}
-
-///|
-pub impl ToJson for SafetyRatingCategory with fn to_json(self) {
-  let raw = match self {
-    SafetyRatingCategory::HARMCATEGORYUNSPECIFIED => "HARM_CATEGORY_UNSPECIFIED"
-    SafetyRatingCategory::HARMCATEGORYDEROGATORY => "HARM_CATEGORY_DEROGATORY"
-    SafetyRatingCategory::HARMCATEGORYTOXICITY => "HARM_CATEGORY_TOXICITY"
-    SafetyRatingCategory::HARMCATEGORYVIOLENCE => "HARM_CATEGORY_VIOLENCE"
-    SafetyRatingCategory::HARMCATEGORYSEXUAL => "HARM_CATEGORY_SEXUAL"
-    SafetyRatingCategory::HARMCATEGORYMEDICAL => "HARM_CATEGORY_MEDICAL"
-    SafetyRatingCategory::HARMCATEGORYDANGEROUS => "HARM_CATEGORY_DANGEROUS"
-    SafetyRatingCategory::HARMCATEGORYHARASSMENT => "HARM_CATEGORY_HARASSMENT"
-    SafetyRatingCategory::HARMCATEGORYHATESPEECH => "HARM_CATEGORY_HATE_SPEECH"
-    SafetyRatingCategory::HARMCATEGORYSEXUALLYEXPLICIT =>
-      "HARM_CATEGORY_SEXUALLY_EXPLICIT"
-    SafetyRatingCategory::HARMCATEGORYDANGEROUSCONTENT =>
-      "HARM_CATEGORY_DANGEROUS_CONTENT"
-    SafetyRatingCategory::HARMCATEGORYCIVICINTEGRITY =>
-      "HARM_CATEGORY_CIVIC_INTEGRITY"
-    SafetyRatingCategory::HARMCATEGORYJAILBREAK => "HARM_CATEGORY_JAILBREAK"
-    SafetyRatingCategory::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend SafetyRatingCategory with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for SafetyRatingCategory with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "HARM_CATEGORY_UNSPECIFIED" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYUNSPECIFIED)
-        "HARM_CATEGORY_DEROGATORY" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYDEROGATORY)
-        "HARM_CATEGORY_TOXICITY" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYTOXICITY)
-        "HARM_CATEGORY_VIOLENCE" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYVIOLENCE)
-        "HARM_CATEGORY_SEXUAL" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYSEXUAL)
-        "HARM_CATEGORY_MEDICAL" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYMEDICAL)
-        "HARM_CATEGORY_DANGEROUS" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYDANGEROUS)
-        "HARM_CATEGORY_HARASSMENT" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYHARASSMENT)
-        "HARM_CATEGORY_HATE_SPEECH" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYHATESPEECH)
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYSEXUALLYEXPLICIT)
-        "HARM_CATEGORY_DANGEROUS_CONTENT" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYDANGEROUSCONTENT)
-        "HARM_CATEGORY_CIVIC_INTEGRITY" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYCIVICINTEGRITY)
-        "HARM_CATEGORY_JAILBREAK" =>
-          Option::Some(SafetyRatingCategory::HARMCATEGORYJAILBREAK)
-        _ => Option::None
-      }
-    },
-    raw => SafetyRatingCategory::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.
-#derive(Eq, @debug.Debug)
-pub(all) struct SafetyRating {
-  probability : SafetyRatingProbability?
-  category : SafetyRatingCategory?
-  blocked : Bool?
-}
-
-///|
-pub extend SafetyRating with Eq::{equal, not_equal}
-
-///|
-pub extend SafetyRating with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a SafetyRating with omitted optional fields absent.
-pub fn SafetyRating::new(
-  probability? : SafetyRatingProbability,
-  category? : SafetyRatingCategory,
-  blocked? : Bool,
-) -> SafetyRating {
-  { probability, category, blocked, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend SafetyRating with ToJson::{to_json}
-
-///|
-pub impl ToJson for SafetyRating with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("probability", self.probability)
-  .opt("category", self.category)
-  .opt("blocked", self.blocked)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend SafetyRating with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for SafetyRating with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    probability: @sdkjson.opt_field(obj, "probability", path),
-    category: @sdkjson.opt_field(obj, "category", path),
-    blocked: @sdkjson.opt_field(obj, "blocked", path),
-  }
-}
-
-///|
-///
-/// A citation to a source for a portion of a specific response.
-#derive(Eq, @debug.Debug)
-pub(all) struct CitationSource {
-  license : String?
-  start_index : Int32?
-  end_index : Int32?
-  uri : String?
-}
-
-///|
-pub extend CitationSource with Eq::{equal, not_equal}
-
-///|
-pub extend CitationSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a CitationSource with omitted optional fields absent.
-pub fn CitationSource::new(
-  license? : String,
-  start_index? : Int32,
-  end_index? : Int32,
-  uri? : String,
-) -> CitationSource {
-  { license, start_index, end_index, uri, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend CitationSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for CitationSource with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("license", self.license)
-  .opt("startIndex", self.start_index)
-  .opt("endIndex", self.end_index)
-  .opt("uri", self.uri)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend CitationSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CitationSource with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    license: @sdkjson.opt_field(obj, "license", path),
-    start_index: @sdkjson.opt_field(obj, "startIndex", path),
-    end_index: @sdkjson.opt_field(obj, "endIndex", path),
-    uri: @sdkjson.opt_field(obj, "uri", path),
-  }
-}
-
-///|
-///
-/// A collection of source attributions for a piece of content.
-#derive(Eq, @debug.Debug)
-pub(all) struct CitationMetadata {
-  citation_sources : Array[CitationSource]?
-}
-
-///|
-pub extend CitationMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend CitationMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a CitationMetadata with omitted optional fields absent.
-pub fn CitationMetadata::new(
-  citation_sources? : Array[CitationSource],
-) -> CitationMetadata {
-  { citation_sources, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend CitationMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for CitationMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("citationSources", self.citation_sources)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend CitationMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CitationMetadata with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { citation_sources: @sdkjson.opt_field(obj, "citationSources", path), }
-}
-
-///|
-///
-/// The stage of the underlying model. Enum values: MODEL_STAGE_UNSPECIFIED: Unspecified model stage.; UNSTABLE_EXPERIMENTAL: The underlying model is subject to lots of tunings.; EXPERIMENTAL: Models in this stage are for experimental purposes only.; PREVIEW: Models in this stage are more mature than experimental models.; STABLE: Models in this stage are considered stable and ready for production use.; LEGACY: If the model is on this stage, it means that this model is on the path to deprecation in near future. Only existing customers can use this model.; DEPRECATED: Models in this stage are deprecated. These models cannot be used.; RETIRED: Models in this stage are retired. These models cannot be used.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum ModelStatusModelStage {
-  MODELSTAGEUNSPECIFIED
-  UNSTABLEEXPERIMENTAL
-  EXPERIMENTAL
-  PREVIEW
-  STABLE
-  LEGACY
-  DEPRECATED
-  RETIRED
-  Unknown(String)
-}
-
-///|
-pub extend ModelStatusModelStage with Eq::{equal, not_equal}
-
-///|
-pub extend ModelStatusModelStage with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ModelStatusModelStage with ToJson::{to_json}
-
-///|
-pub impl ToJson for ModelStatusModelStage with fn to_json(self) {
-  let raw = match self {
-    ModelStatusModelStage::MODELSTAGEUNSPECIFIED => "MODEL_STAGE_UNSPECIFIED"
-    ModelStatusModelStage::UNSTABLEEXPERIMENTAL => "UNSTABLE_EXPERIMENTAL"
-    ModelStatusModelStage::EXPERIMENTAL => "EXPERIMENTAL"
-    ModelStatusModelStage::PREVIEW => "PREVIEW"
-    ModelStatusModelStage::STABLE => "STABLE"
-    ModelStatusModelStage::LEGACY => "LEGACY"
-    ModelStatusModelStage::DEPRECATED => "DEPRECATED"
-    ModelStatusModelStage::RETIRED => "RETIRED"
-    ModelStatusModelStage::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ModelStatusModelStage with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ModelStatusModelStage with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "MODEL_STAGE_UNSPECIFIED" =>
-          Option::Some(ModelStatusModelStage::MODELSTAGEUNSPECIFIED)
-        "UNSTABLE_EXPERIMENTAL" =>
-          Option::Some(ModelStatusModelStage::UNSTABLEEXPERIMENTAL)
-        "EXPERIMENTAL" => Option::Some(ModelStatusModelStage::EXPERIMENTAL)
-        "PREVIEW" => Option::Some(ModelStatusModelStage::PREVIEW)
-        "STABLE" => Option::Some(ModelStatusModelStage::STABLE)
-        "LEGACY" => Option::Some(ModelStatusModelStage::LEGACY)
-        "DEPRECATED" => Option::Some(ModelStatusModelStage::DEPRECATED)
-        "RETIRED" => Option::Some(ModelStatusModelStage::RETIRED)
-        _ => Option::None
-      }
-    },
-    raw => ModelStatusModelStage::Unknown(raw),
-  )
-}
-
-///|
-///
-/// The status of the underlying model. This is used to indicate the stage of the underlying model and the retirement time if applicable.
-#derive(Eq, @debug.Debug)
-pub(all) struct ModelStatus {
-  retirement_time : String?
-  message : String?
-  model_stage : ModelStatusModelStage?
-}
-
-///|
-pub extend ModelStatus with Eq::{equal, not_equal}
-
-///|
-pub extend ModelStatus with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ModelStatus with omitted optional fields absent.
-pub fn ModelStatus::new(
-  retirement_time? : String,
-  message? : String,
-  model_stage? : ModelStatusModelStage,
-) -> ModelStatus {
-  { retirement_time, message, model_stage, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ModelStatus with ToJson::{to_json}
-
-///|
-pub impl ToJson for ModelStatus with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("retirementTime", self.retirement_time)
-  .opt("message", self.message)
-  .opt("modelStage", self.model_stage)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ModelStatus with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ModelStatus with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    retirement_time: @sdkjson.opt_field(obj, "retirementTime", path),
-    message: @sdkjson.opt_field(obj, "message", path),
-    model_stage: @sdkjson.opt_field(obj, "modelStage", path),
-  }
-}
-
-///|
-///
-/// Optional. If set, the prompt was blocked and no candidates are returned. Rephrase the prompt. Enum values: BLOCK_REASON_UNSPECIFIED: Default value. This value is unused.; SAFETY: Prompt was blocked due to safety reasons. Inspect `safety_ratings` to understand which safety category blocked it.; OTHER: Prompt was blocked due to unknown reasons.; BLOCKLIST: Prompt was blocked due to the terms which are included from the terminology blocklist.; PROHIBITED_CONTENT: Prompt was blocked due to prohibited content.; IMAGE_SAFETY: Candidates blocked due to unsafe image generation content.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum PromptFeedbackBlockReason {
-  BLOCKREASONUNSPECIFIED
-  SAFETY
-  OTHER
-  BLOCKLIST
-  PROHIBITEDCONTENT
-  IMAGESAFETY
-  Unknown(String)
-}
-
-///|
-pub extend PromptFeedbackBlockReason with Eq::{equal, not_equal}
-
-///|
-pub extend PromptFeedbackBlockReason with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend PromptFeedbackBlockReason with ToJson::{to_json}
-
-///|
-pub impl ToJson for PromptFeedbackBlockReason with fn to_json(self) {
-  let raw = match self {
-    PromptFeedbackBlockReason::BLOCKREASONUNSPECIFIED =>
-      "BLOCK_REASON_UNSPECIFIED"
-    PromptFeedbackBlockReason::SAFETY => "SAFETY"
-    PromptFeedbackBlockReason::OTHER => "OTHER"
-    PromptFeedbackBlockReason::BLOCKLIST => "BLOCKLIST"
-    PromptFeedbackBlockReason::PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
-    PromptFeedbackBlockReason::IMAGESAFETY => "IMAGE_SAFETY"
-    PromptFeedbackBlockReason::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend PromptFeedbackBlockReason with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for PromptFeedbackBlockReason with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "BLOCK_REASON_UNSPECIFIED" =>
-          Option::Some(PromptFeedbackBlockReason::BLOCKREASONUNSPECIFIED)
-        "SAFETY" => Option::Some(PromptFeedbackBlockReason::SAFETY)
-        "OTHER" => Option::Some(PromptFeedbackBlockReason::OTHER)
-        "BLOCKLIST" => Option::Some(PromptFeedbackBlockReason::BLOCKLIST)
-        "PROHIBITED_CONTENT" =>
-          Option::Some(PromptFeedbackBlockReason::PROHIBITEDCONTENT)
-        "IMAGE_SAFETY" => Option::Some(PromptFeedbackBlockReason::IMAGESAFETY)
-        _ => Option::None
-      }
-    },
-    raw => PromptFeedbackBlockReason::Unknown(raw),
-  )
-}
-
-///|
-///
-/// A set of the feedback metadata the prompt specified in `GenerateContentRequest.content`.
-#derive(Eq, @debug.Debug)
-pub(all) struct PromptFeedback {
-  block_reason : PromptFeedbackBlockReason?
-  safety_ratings : Array[SafetyRating]?
-}
-
-///|
-pub extend PromptFeedback with Eq::{equal, not_equal}
-
-///|
-pub extend PromptFeedback with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a PromptFeedback with omitted optional fields absent.
-pub fn PromptFeedback::new(
-  block_reason? : PromptFeedbackBlockReason,
-  safety_ratings? : Array[SafetyRating],
-) -> PromptFeedback {
-  { block_reason, safety_ratings, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend PromptFeedback with ToJson::{to_json}
-
-///|
-pub impl ToJson for PromptFeedback with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("blockReason", self.block_reason)
-  .opt("safetyRatings", self.safety_ratings)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend PromptFeedback with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for PromptFeedback with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    block_reason: @sdkjson.opt_field(obj, "blockReason", path),
-    safety_ratings: @sdkjson.opt_field(obj, "safetyRatings", path),
-  }
-}
-
-///|
-///
-/// Segment of the content.
-#derive(Eq, @debug.Debug)
-pub(all) struct GoogleAiGenerativelanguageV1betaSegment {
-  part_index : Int32?
-  text : String?
-  end_index : Int32?
-  start_index : Int32?
-}
-
-///|
-pub extend GoogleAiGenerativelanguageV1betaSegment with Eq::{equal, not_equal}
-
-///|
-pub extend GoogleAiGenerativelanguageV1betaSegment with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GoogleAiGenerativelanguageV1betaSegment with omitted optional fields absent.
-pub fn GoogleAiGenerativelanguageV1betaSegment::new(
-  part_index? : Int32,
-  text? : String,
-  end_index? : Int32,
-  start_index? : Int32,
-) -> GoogleAiGenerativelanguageV1betaSegment {
-  { part_index, text, end_index, start_index, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GoogleAiGenerativelanguageV1betaSegment with ToJson::{to_json}
-
-///|
-pub impl ToJson for GoogleAiGenerativelanguageV1betaSegment with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .opt("partIndex", self.part_index)
-  .opt("text", self.text)
-  .opt("endIndex", self.end_index)
-  .opt("startIndex", self.start_index)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GoogleAiGenerativelanguageV1betaSegment with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for GoogleAiGenerativelanguageV1betaSegment with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    part_index: @sdkjson.opt_field(obj, "partIndex", path),
-    text: @sdkjson.opt_field(obj, "text", path),
-    end_index: @sdkjson.opt_field(obj, "endIndex", path),
-    start_index: @sdkjson.opt_field(obj, "startIndex", path),
-  }
-}
-
-///|
-///
-/// Grounding support.
-#derive(Eq, @debug.Debug)
-pub(all) struct GoogleAiGenerativelanguageV1betaGroundingSupport {
-  grounding_chunk_indices : Array[Int32]?
-  confidence_scores : Array[Double]?
-  rendered_parts : Array[Int32]?
-  segment : GoogleAiGenerativelanguageV1betaSegment?
-}
-
-///|
-pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Creates a GoogleAiGenerativelanguageV1betaGroundingSupport with omitted optional fields absent.
-pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::new(
-  grounding_chunk_indices? : Array[Int32],
-  confidence_scores? : Array[Double],
-  rendered_parts? : Array[Int32],
-  segment? : GoogleAiGenerativelanguageV1betaSegment,
-) -> GoogleAiGenerativelanguageV1betaGroundingSupport {
-  { grounding_chunk_indices, confidence_scores, rendered_parts, segment, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for GoogleAiGenerativelanguageV1betaGroundingSupport with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .opt("groundingChunkIndices", self.grounding_chunk_indices)
-  .opt("confidenceScores", self.confidence_scores)
-  .opt("renderedParts", self.rendered_parts)
-  .opt("segment", self.segment)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GoogleAiGenerativelanguageV1betaGroundingSupport with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for GoogleAiGenerativelanguageV1betaGroundingSupport with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    grounding_chunk_indices: @sdkjson.opt_field(
-      obj, "groundingChunkIndices", path,
-    ),
-    confidence_scores: @sdkjson.opt_field(obj, "confidenceScores", path),
-    rendered_parts: @sdkjson.opt_field(obj, "renderedParts", path),
-    segment: @sdkjson.opt_field(obj, "segment", path),
-  }
-}
-
-///|
-///
-/// Metadata related to retrieval in the grounding flow.
-#derive(Eq, @debug.Debug)
-pub(all) struct RetrievalMetadata {
-  google_search_dynamic_retrieval_score : Double?
-}
-
-///|
-pub extend RetrievalMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend RetrievalMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RetrievalMetadata with omitted optional fields absent.
-pub fn RetrievalMetadata::new(
-  google_search_dynamic_retrieval_score? : Double,
-) -> RetrievalMetadata {
-  { google_search_dynamic_retrieval_score, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RetrievalMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for RetrievalMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt(
-    "googleSearchDynamicRetrievalScore",
-    self.google_search_dynamic_retrieval_score,
-  )
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RetrievalMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RetrievalMetadata with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    google_search_dynamic_retrieval_score: @sdkjson.opt_field(
-      obj, "googleSearchDynamicRetrievalScore", path,
-    ),
-  }
-}
-
-///|
-///
-/// A list of string values.
-#derive(Eq, @debug.Debug)
-pub(all) struct GroundingChunkStringList {
-  values : Array[String]?
-}
-
-///|
-pub extend GroundingChunkStringList with Eq::{equal, not_equal}
-
-///|
-pub extend GroundingChunkStringList with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GroundingChunkStringList with omitted optional fields absent.
-pub fn GroundingChunkStringList::new(
-  values? : Array[String],
-) -> GroundingChunkStringList {
-  { values, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GroundingChunkStringList with ToJson::{to_json}
-
-///|
-pub impl ToJson for GroundingChunkStringList with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("values", self.values).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GroundingChunkStringList with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GroundingChunkStringList with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  { values: @sdkjson.opt_field(obj, "values", path), }
-}
-
-///|
-///
-/// User provided metadata about the GroundingFact.
-#derive(Eq, @debug.Debug)
-pub(all) struct GroundingChunkCustomMetadata {
-  numeric_value : Double?
-  key : String?
-  string_list_value : GroundingChunkStringList?
-  string_value : String?
-}
-
-///|
-pub extend GroundingChunkCustomMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend GroundingChunkCustomMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GroundingChunkCustomMetadata with omitted optional fields absent.
-pub fn GroundingChunkCustomMetadata::new(
-  numeric_value? : Double,
-  key? : String,
-  string_list_value? : GroundingChunkStringList,
-  string_value? : String,
-) -> GroundingChunkCustomMetadata {
-  { numeric_value, key, string_list_value, string_value, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GroundingChunkCustomMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for GroundingChunkCustomMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("numericValue", self.numeric_value)
-  .opt("key", self.key)
-  .opt("stringListValue", self.string_list_value)
-  .opt("stringValue", self.string_value)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GroundingChunkCustomMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GroundingChunkCustomMetadata with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    numeric_value: @sdkjson.opt_field(obj, "numericValue", path),
-    key: @sdkjson.opt_field(obj, "key", path),
-    string_list_value: @sdkjson.opt_field(obj, "stringListValue", path),
-    string_value: @sdkjson.opt_field(obj, "stringValue", path),
-  }
-}
-
-///|
-///
-/// Chunk from context retrieved by the file search tool.
-#derive(Eq, @debug.Debug)
-pub(all) struct RetrievedContext {
-  title : String?
-  text : String?
-  page_number : Int32?
-  media_id : String?
-  file_search_store : String?
-  custom_metadata : Array[GroundingChunkCustomMetadata]?
-  uri : String?
-}
-
-///|
-pub extend RetrievedContext with Eq::{equal, not_equal}
-
-///|
-pub extend RetrievedContext with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RetrievedContext with omitted optional fields absent.
-pub fn RetrievedContext::new(
-  title? : String,
-  text? : String,
-  page_number? : Int32,
-  media_id? : String,
-  file_search_store? : String,
-  custom_metadata? : Array[GroundingChunkCustomMetadata],
-  uri? : String,
-) -> RetrievedContext {
-  {
-    title,
-    text,
-    page_number,
-    media_id,
-    file_search_store,
-    custom_metadata,
-    uri,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RetrievedContext with ToJson::{to_json}
-
-///|
-pub impl ToJson for RetrievedContext with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("title", self.title)
-  .opt("text", self.text)
-  .opt("pageNumber", self.page_number)
-  .opt("mediaId", self.media_id)
-  .opt("fileSearchStore", self.file_search_store)
-  .opt("customMetadata", self.custom_metadata)
-  .opt("uri", self.uri)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RetrievedContext with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RetrievedContext with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    title: @sdkjson.opt_field(obj, "title", path),
-    text: @sdkjson.opt_field(obj, "text", path),
-    page_number: @sdkjson.opt_field(obj, "pageNumber", path),
-    media_id: @sdkjson.opt_field(obj, "mediaId", path),
-    file_search_store: @sdkjson.opt_field(obj, "fileSearchStore", path),
-    custom_metadata: @sdkjson.opt_field(obj, "customMetadata", path),
-    uri: @sdkjson.opt_field(obj, "uri", path),
-  }
-}
-
-///|
-///
-/// A `GroundingChunk` represents a segment of supporting evidence that grounds the model's response. It can be a chunk from the web, a retrieved context from a file, or information from Google Maps.
-#derive(Eq, @debug.Debug)
-pub(all) struct GroundingChunk {
-  image : Image?
-  retrieved_context : RetrievedContext?
-  web : Web?
-  maps : Maps?
-}
-
-///|
-pub extend GroundingChunk with Eq::{equal, not_equal}
-
-///|
-pub extend GroundingChunk with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GroundingChunk with omitted optional fields absent.
-pub fn GroundingChunk::new(
-  image? : Image,
-  retrieved_context? : RetrievedContext,
-  web? : Web,
-  maps? : Maps,
-) -> GroundingChunk {
-  { image, retrieved_context, web, maps, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GroundingChunk with ToJson::{to_json}
-
-///|
-pub impl ToJson for GroundingChunk with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("image", self.image)
-  .opt("retrievedContext", self.retrieved_context)
-  .opt("web", self.web)
-  .opt("maps", self.maps)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GroundingChunk with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GroundingChunk with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    image: @sdkjson.opt_field(obj, "image", path),
-    retrieved_context: @sdkjson.opt_field(obj, "retrievedContext", path),
-    web: @sdkjson.opt_field(obj, "web", path),
-    maps: @sdkjson.opt_field(obj, "maps", path),
-  }
-}
-
-///|
-///
-/// Metadata returned to client when grounding is enabled.
-#derive(Eq, @debug.Debug)
-pub(all) struct GroundingMetadata {
-  web_search_queries : Array[String]?
-  grounding_supports : Array[GoogleAiGenerativelanguageV1betaGroundingSupport]?
-  retrieval_metadata : RetrievalMetadata?
-  search_entry_point : SearchEntryPoint?
-  google_maps_widget_context_token : String?
-  image_search_queries : Array[String]?
-  grounding_chunks : Array[GroundingChunk]?
-}
-
-///|
-pub extend GroundingMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend GroundingMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GroundingMetadata with omitted optional fields absent.
-pub fn GroundingMetadata::new(
-  web_search_queries? : Array[String],
-  grounding_supports? : Array[GoogleAiGenerativelanguageV1betaGroundingSupport],
-  retrieval_metadata? : RetrievalMetadata,
-  search_entry_point? : SearchEntryPoint,
-  google_maps_widget_context_token? : String,
-  image_search_queries? : Array[String],
-  grounding_chunks? : Array[GroundingChunk],
-) -> GroundingMetadata {
-  {
-    web_search_queries,
-    grounding_supports,
-    retrieval_metadata,
-    search_entry_point,
-    google_maps_widget_context_token,
-    image_search_queries,
-    grounding_chunks,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GroundingMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for GroundingMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("webSearchQueries", self.web_search_queries)
-  .opt("groundingSupports", self.grounding_supports)
-  .opt("retrievalMetadata", self.retrieval_metadata)
-  .opt("searchEntryPoint", self.search_entry_point)
-  .opt("googleMapsWidgetContextToken", self.google_maps_widget_context_token)
-  .opt("imageSearchQueries", self.image_search_queries)
-  .opt("groundingChunks", self.grounding_chunks)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GroundingMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GroundingMetadata with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    web_search_queries: @sdkjson.opt_field(obj, "webSearchQueries", path),
-    grounding_supports: @sdkjson.opt_field(obj, "groundingSupports", path),
-    retrieval_metadata: @sdkjson.opt_field(obj, "retrievalMetadata", path),
-    search_entry_point: @sdkjson.opt_field(obj, "searchEntryPoint", path),
-    google_maps_widget_context_token: @sdkjson.opt_field(
-      obj, "googleMapsWidgetContextToken", path,
-    ),
-    image_search_queries: @sdkjson.opt_field(obj, "imageSearchQueries", path),
-    grounding_chunks: @sdkjson.opt_field(obj, "groundingChunks", path),
-  }
-}
-
-///|
-///
-/// Candidate for the logprobs token and score.
-#derive(Eq, @debug.Debug)
-pub(all) struct LogprobsResultCandidate {
-  token : String?
-  token_id : Int32?
-  log_probability : Double?
-}
-
-///|
-pub extend LogprobsResultCandidate with Eq::{equal, not_equal}
-
-///|
-pub extend LogprobsResultCandidate with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a LogprobsResultCandidate with omitted optional fields absent.
-pub fn LogprobsResultCandidate::new(
-  token? : String,
-  token_id? : Int32,
-  log_probability? : Double,
-) -> LogprobsResultCandidate {
-  { token, token_id, log_probability, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend LogprobsResultCandidate with ToJson::{to_json}
-
-///|
-pub impl ToJson for LogprobsResultCandidate with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("token", self.token)
-  .opt("tokenId", self.token_id)
-  .opt("logProbability", self.log_probability)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend LogprobsResultCandidate with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for LogprobsResultCandidate with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    token: @sdkjson.opt_field(obj, "token", path),
-    token_id: @sdkjson.opt_field(obj, "tokenId", path),
-    log_probability: @sdkjson.opt_field(obj, "logProbability", path),
-  }
-}
-
-///|
-///
-/// Candidates with top log probabilities at each decoding step.
-#derive(Eq, @debug.Debug)
-pub(all) struct TopCandidates {
-  candidates : Array[LogprobsResultCandidate]?
-}
-
-///|
-pub extend TopCandidates with Eq::{equal, not_equal}
-
-///|
-pub extend TopCandidates with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a TopCandidates with omitted optional fields absent.
-pub fn TopCandidates::new(
-  candidates? : Array[LogprobsResultCandidate],
-) -> TopCandidates {
-  { candidates, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend TopCandidates with ToJson::{to_json}
-
-///|
-pub impl ToJson for TopCandidates with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("candidates", self.candidates).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend TopCandidates with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for TopCandidates with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { candidates: @sdkjson.opt_field(obj, "candidates", path), }
-}
-
-///|
-///
-/// Logprobs Result
-#derive(Eq, @debug.Debug)
-pub(all) struct LogprobsResult {
-  top_candidates : Array[TopCandidates]?
-  log_probability_sum : Double?
-  chosen_candidates : Array[LogprobsResultCandidate]?
-}
-
-///|
-pub extend LogprobsResult with Eq::{equal, not_equal}
-
-///|
-pub extend LogprobsResult with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a LogprobsResult with omitted optional fields absent.
-pub fn LogprobsResult::new(
-  top_candidates? : Array[TopCandidates],
-  log_probability_sum? : Double,
-  chosen_candidates? : Array[LogprobsResultCandidate],
-) -> LogprobsResult {
-  { top_candidates, log_probability_sum, chosen_candidates, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend LogprobsResult with ToJson::{to_json}
-
-///|
-pub impl ToJson for LogprobsResult with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("topCandidates", self.top_candidates)
-  .opt("logProbabilitySum", self.log_probability_sum)
-  .opt("chosenCandidates", self.chosen_candidates)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend LogprobsResult with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for LogprobsResult with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    top_candidates: @sdkjson.opt_field(obj, "topCandidates", path),
-    log_probability_sum: @sdkjson.opt_field(obj, "logProbabilitySum", path),
-    chosen_candidates: @sdkjson.opt_field(obj, "chosenCandidates", path),
-  }
-}
-
-///|
-///
-/// Optional. Output only. The reason why the model stopped generating tokens. If empty, the model has not stopped generating tokens. Enum values: FINISH_REASON_UNSPECIFIED: Default value. This value is unused.; STOP: Natural stop point of the model or provided stop sequence.; MAX_TOKENS: The maximum number of tokens as specified in the request was reached.; SAFETY: The response candidate content was flagged for safety reasons.; RECITATION: The response candidate content was flagged for recitation reasons.; LANGUAGE: The response candidate content was flagged for using an unsupported language.; OTHER: Unknown reason.; BLOCKLIST: Token generation stopped because the content contains forbidden terms.; PROHIBITED_CONTENT: Token generation stopped for potentially containing prohibited content.; SPII: Token generation stopped because the content potentially contains Sensitive Personally Identifiable Information (SPII).; MALFORMED_FUNCTION_CALL: The function call generated by the model is invalid.; IMAGE_SAFETY: Token generation stopped because generated images contain safety violations.; IMAGE_PROHIBITED_CONTENT: Image generation stopped because generated images has other prohibited content.; IMAGE_OTHER: Image generation stopped because of other miscellaneous issue.; NO_IMAGE: The model was expected to generate an image, but none was generated.; IMAGE_RECITATION: Image generation stopped due to recitation.; UNEXPECTED_TOOL_CALL: Model generated a tool call but no tools were enabled in the request.; TOO_MANY_TOOL_CALLS: Model called too many tools consecutively, thus the system exited execution.; MISSING_THOUGHT_SIGNATURE: Request has at least one thought signature missing.; MALFORMED_RESPONSE: Finished due to malformed response.; ESCALATION: Request was filtered by an escalation rule.; PUP_LIMITED_DISABLED: Indicates that token generation stopped because the user account is limited or disabled due to Prohibited Use Policy (PUP) violations.; CONTINUATION: Token generation was stopped because the response reached the per-request token limit, but generation is not yet complete. The model response can be continued via a subsequent request using the returned `continuation_token`. Note, the `max_output_tokens` is cumulative across continuation hops and must be monotonically increased or omitted.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum CandidateFinishReason {
-  FINISHREASONUNSPECIFIED
-  STOP
-  MAXTOKENS
-  SAFETY
-  RECITATION
-  LANGUAGE
-  OTHER
-  BLOCKLIST
-  PROHIBITEDCONTENT
-  SPII
-  MALFORMEDFUNCTIONCALL
-  IMAGESAFETY
-  IMAGEPROHIBITEDCONTENT
-  IMAGEOTHER
-  NOIMAGE
-  IMAGERECITATION
-  UNEXPECTEDTOOLCALL
-  TOOMANYTOOLCALLS
-  MISSINGTHOUGHTSIGNATURE
-  MALFORMEDRESPONSE
-  ESCALATION
-  PUPLIMITEDDISABLED
-  CONTINUATION
-  Unknown(String)
-}
-
-///|
-pub extend CandidateFinishReason with Eq::{equal, not_equal}
-
-///|
-pub extend CandidateFinishReason with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend CandidateFinishReason with ToJson::{to_json}
-
-///|
-pub impl ToJson for CandidateFinishReason with fn to_json(self) {
-  let raw = match self {
-    CandidateFinishReason::FINISHREASONUNSPECIFIED =>
-      "FINISH_REASON_UNSPECIFIED"
-    CandidateFinishReason::STOP => "STOP"
-    CandidateFinishReason::MAXTOKENS => "MAX_TOKENS"
-    CandidateFinishReason::SAFETY => "SAFETY"
-    CandidateFinishReason::RECITATION => "RECITATION"
-    CandidateFinishReason::LANGUAGE => "LANGUAGE"
-    CandidateFinishReason::OTHER => "OTHER"
-    CandidateFinishReason::BLOCKLIST => "BLOCKLIST"
-    CandidateFinishReason::PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
-    CandidateFinishReason::SPII => "SPII"
-    CandidateFinishReason::MALFORMEDFUNCTIONCALL => "MALFORMED_FUNCTION_CALL"
-    CandidateFinishReason::IMAGESAFETY => "IMAGE_SAFETY"
-    CandidateFinishReason::IMAGEPROHIBITEDCONTENT => "IMAGE_PROHIBITED_CONTENT"
-    CandidateFinishReason::IMAGEOTHER => "IMAGE_OTHER"
-    CandidateFinishReason::NOIMAGE => "NO_IMAGE"
-    CandidateFinishReason::IMAGERECITATION => "IMAGE_RECITATION"
-    CandidateFinishReason::UNEXPECTEDTOOLCALL => "UNEXPECTED_TOOL_CALL"
-    CandidateFinishReason::TOOMANYTOOLCALLS => "TOO_MANY_TOOL_CALLS"
-    CandidateFinishReason::MISSINGTHOUGHTSIGNATURE =>
-      "MISSING_THOUGHT_SIGNATURE"
-    CandidateFinishReason::MALFORMEDRESPONSE => "MALFORMED_RESPONSE"
-    CandidateFinishReason::ESCALATION => "ESCALATION"
-    CandidateFinishReason::PUPLIMITEDDISABLED => "PUP_LIMITED_DISABLED"
-    CandidateFinishReason::CONTINUATION => "CONTINUATION"
-    CandidateFinishReason::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend CandidateFinishReason with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CandidateFinishReason with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "FINISH_REASON_UNSPECIFIED" =>
-          Option::Some(CandidateFinishReason::FINISHREASONUNSPECIFIED)
-        "STOP" => Option::Some(CandidateFinishReason::STOP)
-        "MAX_TOKENS" => Option::Some(CandidateFinishReason::MAXTOKENS)
-        "SAFETY" => Option::Some(CandidateFinishReason::SAFETY)
-        "RECITATION" => Option::Some(CandidateFinishReason::RECITATION)
-        "LANGUAGE" => Option::Some(CandidateFinishReason::LANGUAGE)
-        "OTHER" => Option::Some(CandidateFinishReason::OTHER)
-        "BLOCKLIST" => Option::Some(CandidateFinishReason::BLOCKLIST)
-        "PROHIBITED_CONTENT" =>
-          Option::Some(CandidateFinishReason::PROHIBITEDCONTENT)
-        "SPII" => Option::Some(CandidateFinishReason::SPII)
-        "MALFORMED_FUNCTION_CALL" =>
-          Option::Some(CandidateFinishReason::MALFORMEDFUNCTIONCALL)
-        "IMAGE_SAFETY" => Option::Some(CandidateFinishReason::IMAGESAFETY)
-        "IMAGE_PROHIBITED_CONTENT" =>
-          Option::Some(CandidateFinishReason::IMAGEPROHIBITEDCONTENT)
-        "IMAGE_OTHER" => Option::Some(CandidateFinishReason::IMAGEOTHER)
-        "NO_IMAGE" => Option::Some(CandidateFinishReason::NOIMAGE)
-        "IMAGE_RECITATION" =>
-          Option::Some(CandidateFinishReason::IMAGERECITATION)
-        "UNEXPECTED_TOOL_CALL" =>
-          Option::Some(CandidateFinishReason::UNEXPECTEDTOOLCALL)
-        "TOO_MANY_TOOL_CALLS" =>
-          Option::Some(CandidateFinishReason::TOOMANYTOOLCALLS)
-        "MISSING_THOUGHT_SIGNATURE" =>
-          Option::Some(CandidateFinishReason::MISSINGTHOUGHTSIGNATURE)
-        "MALFORMED_RESPONSE" =>
-          Option::Some(CandidateFinishReason::MALFORMEDRESPONSE)
-        "ESCALATION" => Option::Some(CandidateFinishReason::ESCALATION)
-        "PUP_LIMITED_DISABLED" =>
-          Option::Some(CandidateFinishReason::PUPLIMITEDDISABLED)
-        "CONTINUATION" => Option::Some(CandidateFinishReason::CONTINUATION)
-        _ => Option::None
-      }
-    },
-    raw => CandidateFinishReason::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Status of the url retrieval. Enum values: URL_RETRIEVAL_STATUS_UNSPECIFIED: Default value. This value is unused.; URL_RETRIEVAL_STATUS_SUCCESS: Url retrieval is successful.; URL_RETRIEVAL_STATUS_ERROR: Url retrieval is failed due to error.; URL_RETRIEVAL_STATUS_PAYWALL: Url retrieval is failed because the content is behind paywall.; URL_RETRIEVAL_STATUS_UNSAFE: Url retrieval is failed because the content is unsafe.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum UrlMetadataUrlRetrievalStatus {
-  URLRETRIEVALSTATUSUNSPECIFIED
-  URLRETRIEVALSTATUSSUCCESS
-  URLRETRIEVALSTATUSERROR
-  URLRETRIEVALSTATUSPAYWALL
-  URLRETRIEVALSTATUSUNSAFE
-  Unknown(String)
-}
-
-///|
-pub extend UrlMetadataUrlRetrievalStatus with Eq::{equal, not_equal}
-
-///|
-pub extend UrlMetadataUrlRetrievalStatus with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend UrlMetadataUrlRetrievalStatus with ToJson::{to_json}
-
-///|
-pub impl ToJson for UrlMetadataUrlRetrievalStatus with fn to_json(self) {
-  let raw = match self {
-    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSPECIFIED =>
-      "URL_RETRIEVAL_STATUS_UNSPECIFIED"
-    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSSUCCESS =>
-      "URL_RETRIEVAL_STATUS_SUCCESS"
-    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSERROR =>
-      "URL_RETRIEVAL_STATUS_ERROR"
-    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSPAYWALL =>
-      "URL_RETRIEVAL_STATUS_PAYWALL"
-    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSAFE =>
-      "URL_RETRIEVAL_STATUS_UNSAFE"
-    UrlMetadataUrlRetrievalStatus::Unknown(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend UrlMetadataUrlRetrievalStatus with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for UrlMetadataUrlRetrievalStatus with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "URL_RETRIEVAL_STATUS_UNSPECIFIED" =>
-          Option::Some(
-            UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSPECIFIED,
-          )
-        "URL_RETRIEVAL_STATUS_SUCCESS" =>
-          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSSUCCESS)
-        "URL_RETRIEVAL_STATUS_ERROR" =>
-          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSERROR)
-        "URL_RETRIEVAL_STATUS_PAYWALL" =>
-          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSPAYWALL)
-        "URL_RETRIEVAL_STATUS_UNSAFE" =>
-          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSAFE)
-        _ => Option::None
-      }
-    },
-    raw => UrlMetadataUrlRetrievalStatus::Unknown(raw),
-  )
-}
-
-///|
-///
-/// Context of the a single url retrieval.
-#derive(Eq, @debug.Debug)
-pub(all) struct UrlMetadata {
-  retrieved_url : String?
-  url_retrieval_status : UrlMetadataUrlRetrievalStatus?
-}
-
-///|
-pub extend UrlMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend UrlMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a UrlMetadata with omitted optional fields absent.
-pub fn UrlMetadata::new(
-  retrieved_url? : String,
-  url_retrieval_status? : UrlMetadataUrlRetrievalStatus,
-) -> UrlMetadata {
-  { retrieved_url, url_retrieval_status, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend UrlMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for UrlMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("retrievedUrl", self.retrieved_url)
-  .opt("urlRetrievalStatus", self.url_retrieval_status)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend UrlMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for UrlMetadata with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    retrieved_url: @sdkjson.opt_field(obj, "retrievedUrl", path),
-    url_retrieval_status: @sdkjson.opt_field(obj, "urlRetrievalStatus", path),
-  }
-}
-
-///|
-///
-/// Metadata related to url context retrieval tool.
-#derive(Eq, @debug.Debug)
-pub(all) struct UrlContextMetadata {
-  url_metadata : Array[UrlMetadata]?
-}
-
-///|
-pub extend UrlContextMetadata with Eq::{equal, not_equal}
-
-///|
-pub extend UrlContextMetadata with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a UrlContextMetadata with omitted optional fields absent.
-pub fn UrlContextMetadata::new(
-  url_metadata? : Array[UrlMetadata],
-) -> UrlContextMetadata {
-  { url_metadata, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend UrlContextMetadata with ToJson::{to_json}
-
-///|
-pub impl ToJson for UrlContextMetadata with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("urlMetadata", self.url_metadata).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend UrlContextMetadata with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for UrlContextMetadata with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { url_metadata: @sdkjson.opt_field(obj, "urlMetadata", path), }
-}
-
-///|
-///
-/// A response candidate generated from the model.
-#derive(Eq, @debug.Debug)
-pub(all) struct Candidate {
-  continuation_token : String?
-  avg_logprobs : Double?
-  grounding_metadata : GroundingMetadata?
-  safety_ratings : Array[SafetyRating]?
-  grounding_attributions : Array[GroundingAttribution]?
-  logprobs_result : LogprobsResult?
-  finish_reason : CandidateFinishReason?
-  finish_message : String?
-  content : Content?
-  index : Int32?
-  token_count : Int32?
-  url_context_metadata : UrlContextMetadata?
-  citation_metadata : CitationMetadata?
-}
-
-///|
-pub extend Candidate with Eq::{equal, not_equal}
-
-///|
-pub extend Candidate with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a Candidate with omitted optional fields absent.
-pub fn Candidate::new(
-  continuation_token? : String,
-  avg_logprobs? : Double,
-  grounding_metadata? : GroundingMetadata,
-  safety_ratings? : Array[SafetyRating],
-  grounding_attributions? : Array[GroundingAttribution],
-  logprobs_result? : LogprobsResult,
-  finish_reason? : CandidateFinishReason,
-  finish_message? : String,
-  content? : Content,
-  index? : Int32,
-  token_count? : Int32,
-  url_context_metadata? : UrlContextMetadata,
-  citation_metadata? : CitationMetadata,
-) -> Candidate {
-  {
-    continuation_token,
-    avg_logprobs,
-    grounding_metadata,
-    safety_ratings,
-    grounding_attributions,
-    logprobs_result,
-    finish_reason,
-    finish_message,
-    content,
-    index,
-    token_count,
-    url_context_metadata,
-    citation_metadata,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend Candidate with ToJson::{to_json}
-
-///|
-pub impl ToJson for Candidate with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("continuationToken", self.continuation_token)
-  .opt("avgLogprobs", self.avg_logprobs)
-  .opt("groundingMetadata", self.grounding_metadata)
-  .opt("safetyRatings", self.safety_ratings)
-  .opt("groundingAttributions", self.grounding_attributions)
-  .opt("logprobsResult", self.logprobs_result)
-  .opt("finishReason", self.finish_reason)
-  .opt("finishMessage", self.finish_message)
-  .opt("content", self.content)
-  .opt("index", self.index)
-  .opt("tokenCount", self.token_count)
-  .opt("urlContextMetadata", self.url_context_metadata)
-  .opt("citationMetadata", self.citation_metadata)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend Candidate with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Candidate with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    continuation_token: @sdkjson.opt_field(obj, "continuationToken", path),
-    avg_logprobs: @sdkjson.opt_field(obj, "avgLogprobs", path),
-    grounding_metadata: @sdkjson.opt_field(obj, "groundingMetadata", path),
-    safety_ratings: @sdkjson.opt_field(obj, "safetyRatings", path),
-    grounding_attributions: @sdkjson.opt_field(
-      obj, "groundingAttributions", path,
-    ),
-    logprobs_result: @sdkjson.opt_field(obj, "logprobsResult", path),
-    finish_reason: @sdkjson.opt_field(obj, "finishReason", path),
-    finish_message: @sdkjson.opt_field(obj, "finishMessage", path),
-    content: @sdkjson.opt_field(obj, "content", path),
-    index: @sdkjson.opt_field(obj, "index", path),
-    token_count: @sdkjson.opt_field(obj, "tokenCount", path),
-    url_context_metadata: @sdkjson.opt_field(obj, "urlContextMetadata", path),
-    citation_metadata: @sdkjson.opt_field(obj, "citationMetadata", path),
-  }
-}
-
-///|
-///
-/// Response from the model supporting multiple candidate responses. Safety ratings and content filtering are reported for both prompt in `GenerateContentResponse.prompt_feedback` and for each candidate in `finish_reason` and in `safety_ratings`. The API: - Returns either all requested candidates or none of them - Returns no candidates at all only if there was something wrong with the prompt (check `prompt_feedback`) - Reports feedback on each candidate in `finish_reason` and `safety_ratings`.
-#derive(Eq, @debug.Debug)
-pub(all) struct GenerateContentResponse {
-  model_status : ModelStatus?
-  prompt_feedback : PromptFeedback?
-  model_version : String?
-  usage_metadata : UsageMetadata?
-  response_id : String?
-  candidates : Array[Candidate]?
-}
-
-///|
-pub extend GenerateContentResponse with Eq::{equal, not_equal}
-
-///|
-pub extend GenerateContentResponse with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a GenerateContentResponse with omitted optional fields absent.
-pub fn GenerateContentResponse::new(
-  model_status? : ModelStatus,
-  prompt_feedback? : PromptFeedback,
-  model_version? : String,
-  usage_metadata? : UsageMetadata,
-  response_id? : String,
-  candidates? : Array[Candidate],
-) -> GenerateContentResponse {
-  {
-    model_status,
-    prompt_feedback,
-    model_version,
-    usage_metadata,
-    response_id,
-    candidates,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend GenerateContentResponse with ToJson::{to_json}
-
-///|
-pub impl ToJson for GenerateContentResponse with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("modelStatus", self.model_status)
-  .opt("promptFeedback", self.prompt_feedback)
-  .opt("modelVersion", self.model_version)
-  .opt("usageMetadata", self.usage_metadata)
-  .opt("responseId", self.response_id)
-  .opt("candidates", self.candidates)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend GenerateContentResponse with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GenerateContentResponse with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    model_status: @sdkjson.opt_field(obj, "modelStatus", path),
-    prompt_feedback: @sdkjson.opt_field(obj, "promptFeedback", path),
-    model_version: @sdkjson.opt_field(obj, "modelVersion", path),
-    usage_metadata: @sdkjson.opt_field(obj, "usageMetadata", path),
-    response_id: @sdkjson.opt_field(obj, "responseId", path),
-    candidates: @sdkjson.opt_field(obj, "candidates", path),
-  }
 }
 
 ///|
@@ -10675,84 +8209,21 @@ pub impl @json.FromJson for SafetySetting with fn from_json(value, path) {
 
 ///|
 ///
-/// Optional. The service tier of the request. Enum values: unspecified: Default service tier, which is standard.; standard: Standard service tier.; flex: Flex service tier.; priority: Priority service tier.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum GenerateContentRequestServiceTier {
-  Unspecified
-  Standard
-  Flex
-  Priority
-  Custom(String)
-}
-
-///|
-pub extend GenerateContentRequestServiceTier with Eq::{equal, not_equal}
-
-///|
-pub extend GenerateContentRequestServiceTier with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend GenerateContentRequestServiceTier with ToJson::{to_json}
-
-///|
-pub impl ToJson for GenerateContentRequestServiceTier with fn to_json(self) {
-  let raw = match self {
-    GenerateContentRequestServiceTier::Unspecified => "unspecified"
-    GenerateContentRequestServiceTier::Standard => "standard"
-    GenerateContentRequestServiceTier::Flex => "flex"
-    GenerateContentRequestServiceTier::Priority => "priority"
-    GenerateContentRequestServiceTier::Custom(raw) => raw
-  }
-  @json.Json::Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend GenerateContentRequestServiceTier with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for GenerateContentRequestServiceTier with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "unspecified" =>
-          Option::Some(GenerateContentRequestServiceTier::Unspecified)
-        "standard" => Option::Some(GenerateContentRequestServiceTier::Standard)
-        "flex" => Option::Some(GenerateContentRequestServiceTier::Flex)
-        "priority" => Option::Some(GenerateContentRequestServiceTier::Priority)
-        _ => Option::None
-      }
-    },
-    raw => GenerateContentRequestServiceTier::Custom(raw),
-  )
-}
-
-///|
-///
 /// Request to generate a completion from the model.
 #derive(Eq, @debug.Debug)
 pub(all) struct GenerateContentRequest {
+  contents : Array[Content]?
+  generation_config : GenerationConfig?
+  store : Bool?
   tools : Array[Tool]?
+  model : String?
+  continuation_token : String?
+  service_tier : GenerateContentRequestServiceTier?
   cached_content : String?
   system_instruction : Content?
-  safety_settings : Array[SafetySetting]?
-  tool_config : ToolConfig?
-  contents : Array[Content]?
-  model : String?
-  generation_config : GenerationConfig?
-  service_tier : GenerateContentRequestServiceTier?
-  continuation_token : String?
   labels : Map[String, String]?
-  store : Bool?
+  tool_config : ToolConfig?
+  safety_settings : Array[SafetySetting]?
 }
 
 ///|
@@ -10765,32 +8236,32 @@ pub extend GenerateContentRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a GenerateContentRequest with omitted optional fields absent.
 pub fn GenerateContentRequest::new(
+  contents? : Array[Content],
+  generation_config? : GenerationConfig,
+  store? : Bool,
   tools? : Array[Tool],
+  model? : String,
+  continuation_token? : String,
+  service_tier? : GenerateContentRequestServiceTier,
   cached_content? : String,
   system_instruction? : Content,
-  safety_settings? : Array[SafetySetting],
-  tool_config? : ToolConfig,
-  contents? : Array[Content],
-  model? : String,
-  generation_config? : GenerationConfig,
-  service_tier? : GenerateContentRequestServiceTier,
-  continuation_token? : String,
   labels? : Map[String, String],
-  store? : Bool,
+  tool_config? : ToolConfig,
+  safety_settings? : Array[SafetySetting],
 ) -> GenerateContentRequest {
   {
+    contents,
+    generation_config,
+    store,
     tools,
+    model,
+    continuation_token,
+    service_tier,
     cached_content,
     system_instruction,
-    safety_settings,
-    tool_config,
-    contents,
-    model,
-    generation_config,
-    service_tier,
-    continuation_token,
     labels,
-    store,
+    tool_config,
+    safety_settings,
   }
 }
 
@@ -10802,18 +8273,18 @@ pub extend GenerateContentRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for GenerateContentRequest with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
+  .opt("contents", self.contents)
+  .opt("generationConfig", self.generation_config)
+  .opt("store", self.store)
   .opt("tools", self.tools)
+  .opt("model", self.model)
+  .opt("continuationToken", self.continuation_token)
+  .opt("serviceTier", self.service_tier)
   .opt("cachedContent", self.cached_content)
   .opt("systemInstruction", self.system_instruction)
-  .opt("safetySettings", self.safety_settings)
-  .opt("toolConfig", self.tool_config)
-  .opt("contents", self.contents)
-  .opt("model", self.model)
-  .opt("generationConfig", self.generation_config)
-  .opt("serviceTier", self.service_tier)
-  .opt("continuationToken", self.continuation_token)
   .opt("labels", self.labels.map(value => json_map_to_json(value)))
-  .opt("store", self.store)
+  .opt("toolConfig", self.tool_config)
+  .opt("safetySettings", self.safety_settings)
   .build()
 }
 
@@ -10829,18 +8300,18 @@ pub impl @json.FromJson for GenerateContentRequest with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
+    contents: @sdkjson.opt_field(obj, "contents", path),
+    generation_config: @sdkjson.opt_field(obj, "generationConfig", path),
+    store: @sdkjson.opt_field(obj, "store", path),
     tools: @sdkjson.opt_field(obj, "tools", path),
+    model: @sdkjson.opt_field(obj, "model", path),
+    continuation_token: @sdkjson.opt_field(obj, "continuationToken", path),
+    service_tier: @sdkjson.opt_field(obj, "serviceTier", path),
     cached_content: @sdkjson.opt_field(obj, "cachedContent", path),
     system_instruction: @sdkjson.opt_field(obj, "systemInstruction", path),
-    safety_settings: @sdkjson.opt_field(obj, "safetySettings", path),
-    tool_config: @sdkjson.opt_field(obj, "toolConfig", path),
-    contents: @sdkjson.opt_field(obj, "contents", path),
-    model: @sdkjson.opt_field(obj, "model", path),
-    generation_config: @sdkjson.opt_field(obj, "generationConfig", path),
-    service_tier: @sdkjson.opt_field(obj, "serviceTier", path),
-    continuation_token: @sdkjson.opt_field(obj, "continuationToken", path),
     labels: decode_optional_json_map(obj, "labels", path),
-    store: @sdkjson.opt_field(obj, "store", path),
+    tool_config: @sdkjson.opt_field(obj, "toolConfig", path),
+    safety_settings: @sdkjson.opt_field(obj, "safetySettings", path),
   }
 }
 
@@ -10900,11 +8371,2165 @@ pub impl @json.FromJson for CountTokensRequest with fn from_json(value, path) {
 
 ///|
 ///
+/// Optional. Output only. The reason why the model stopped generating tokens. If empty, the model has not stopped generating tokens. Enum values: FINISH_REASON_UNSPECIFIED: Default value. This value is unused.; STOP: Natural stop point of the model or provided stop sequence.; MAX_TOKENS: The maximum number of tokens as specified in the request was reached.; SAFETY: The response candidate content was flagged for safety reasons.; RECITATION: The response candidate content was flagged for recitation reasons.; LANGUAGE: The response candidate content was flagged for using an unsupported language.; OTHER: Unknown reason.; BLOCKLIST: Token generation stopped because the content contains forbidden terms.; PROHIBITED_CONTENT: Token generation stopped for potentially containing prohibited content.; SPII: Token generation stopped because the content potentially contains Sensitive Personally Identifiable Information (SPII).; MALFORMED_FUNCTION_CALL: The function call generated by the model is invalid.; IMAGE_SAFETY: Token generation stopped because generated images contain safety violations.; IMAGE_PROHIBITED_CONTENT: Image generation stopped because generated images has other prohibited content.; IMAGE_OTHER: Image generation stopped because of other miscellaneous issue.; NO_IMAGE: The model was expected to generate an image, but none was generated.; IMAGE_RECITATION: Image generation stopped due to recitation.; UNEXPECTED_TOOL_CALL: Model generated a tool call but no tools were enabled in the request.; TOO_MANY_TOOL_CALLS: Model called too many tools consecutively, thus the system exited execution.; MISSING_THOUGHT_SIGNATURE: Request has at least one thought signature missing.; MALFORMED_RESPONSE: Finished due to malformed response.; ESCALATION: Request was filtered by an escalation rule.; PUP_LIMITED_DISABLED: Indicates that token generation stopped because the user account is limited or disabled due to Prohibited Use Policy (PUP) violations.; CONTINUATION: Token generation was stopped because the response reached the per-request token limit, but generation is not yet complete. The model response can be continued via a subsequent request using the returned `continuation_token`. Note, the `max_output_tokens` is cumulative across continuation hops and must be monotonically increased or omitted.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum CandidateFinishReason {
+  FINISHREASONUNSPECIFIED
+  STOP
+  MAXTOKENS
+  SAFETY
+  RECITATION
+  LANGUAGE
+  OTHER
+  BLOCKLIST
+  PROHIBITEDCONTENT
+  SPII
+  MALFORMEDFUNCTIONCALL
+  IMAGESAFETY
+  IMAGEPROHIBITEDCONTENT
+  IMAGEOTHER
+  NOIMAGE
+  IMAGERECITATION
+  UNEXPECTEDTOOLCALL
+  TOOMANYTOOLCALLS
+  MISSINGTHOUGHTSIGNATURE
+  MALFORMEDRESPONSE
+  ESCALATION
+  PUPLIMITEDDISABLED
+  CONTINUATION
+  Unknown(String)
+}
+
+///|
+pub extend CandidateFinishReason with Eq::{equal, not_equal}
+
+///|
+pub extend CandidateFinishReason with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CandidateFinishReason with ToJson::{to_json}
+
+///|
+pub impl ToJson for CandidateFinishReason with fn to_json(self) {
+  let raw = match self {
+    CandidateFinishReason::FINISHREASONUNSPECIFIED =>
+      "FINISH_REASON_UNSPECIFIED"
+    CandidateFinishReason::STOP => "STOP"
+    CandidateFinishReason::MAXTOKENS => "MAX_TOKENS"
+    CandidateFinishReason::SAFETY => "SAFETY"
+    CandidateFinishReason::RECITATION => "RECITATION"
+    CandidateFinishReason::LANGUAGE => "LANGUAGE"
+    CandidateFinishReason::OTHER => "OTHER"
+    CandidateFinishReason::BLOCKLIST => "BLOCKLIST"
+    CandidateFinishReason::PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
+    CandidateFinishReason::SPII => "SPII"
+    CandidateFinishReason::MALFORMEDFUNCTIONCALL => "MALFORMED_FUNCTION_CALL"
+    CandidateFinishReason::IMAGESAFETY => "IMAGE_SAFETY"
+    CandidateFinishReason::IMAGEPROHIBITEDCONTENT => "IMAGE_PROHIBITED_CONTENT"
+    CandidateFinishReason::IMAGEOTHER => "IMAGE_OTHER"
+    CandidateFinishReason::NOIMAGE => "NO_IMAGE"
+    CandidateFinishReason::IMAGERECITATION => "IMAGE_RECITATION"
+    CandidateFinishReason::UNEXPECTEDTOOLCALL => "UNEXPECTED_TOOL_CALL"
+    CandidateFinishReason::TOOMANYTOOLCALLS => "TOO_MANY_TOOL_CALLS"
+    CandidateFinishReason::MISSINGTHOUGHTSIGNATURE =>
+      "MISSING_THOUGHT_SIGNATURE"
+    CandidateFinishReason::MALFORMEDRESPONSE => "MALFORMED_RESPONSE"
+    CandidateFinishReason::ESCALATION => "ESCALATION"
+    CandidateFinishReason::PUPLIMITEDDISABLED => "PUP_LIMITED_DISABLED"
+    CandidateFinishReason::CONTINUATION => "CONTINUATION"
+    CandidateFinishReason::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CandidateFinishReason with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CandidateFinishReason with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "FINISH_REASON_UNSPECIFIED" =>
+          Option::Some(CandidateFinishReason::FINISHREASONUNSPECIFIED)
+        "STOP" => Option::Some(CandidateFinishReason::STOP)
+        "MAX_TOKENS" => Option::Some(CandidateFinishReason::MAXTOKENS)
+        "SAFETY" => Option::Some(CandidateFinishReason::SAFETY)
+        "RECITATION" => Option::Some(CandidateFinishReason::RECITATION)
+        "LANGUAGE" => Option::Some(CandidateFinishReason::LANGUAGE)
+        "OTHER" => Option::Some(CandidateFinishReason::OTHER)
+        "BLOCKLIST" => Option::Some(CandidateFinishReason::BLOCKLIST)
+        "PROHIBITED_CONTENT" =>
+          Option::Some(CandidateFinishReason::PROHIBITEDCONTENT)
+        "SPII" => Option::Some(CandidateFinishReason::SPII)
+        "MALFORMED_FUNCTION_CALL" =>
+          Option::Some(CandidateFinishReason::MALFORMEDFUNCTIONCALL)
+        "IMAGE_SAFETY" => Option::Some(CandidateFinishReason::IMAGESAFETY)
+        "IMAGE_PROHIBITED_CONTENT" =>
+          Option::Some(CandidateFinishReason::IMAGEPROHIBITEDCONTENT)
+        "IMAGE_OTHER" => Option::Some(CandidateFinishReason::IMAGEOTHER)
+        "NO_IMAGE" => Option::Some(CandidateFinishReason::NOIMAGE)
+        "IMAGE_RECITATION" =>
+          Option::Some(CandidateFinishReason::IMAGERECITATION)
+        "UNEXPECTED_TOOL_CALL" =>
+          Option::Some(CandidateFinishReason::UNEXPECTEDTOOLCALL)
+        "TOO_MANY_TOOL_CALLS" =>
+          Option::Some(CandidateFinishReason::TOOMANYTOOLCALLS)
+        "MISSING_THOUGHT_SIGNATURE" =>
+          Option::Some(CandidateFinishReason::MISSINGTHOUGHTSIGNATURE)
+        "MALFORMED_RESPONSE" =>
+          Option::Some(CandidateFinishReason::MALFORMEDRESPONSE)
+        "ESCALATION" => Option::Some(CandidateFinishReason::ESCALATION)
+        "PUP_LIMITED_DISABLED" =>
+          Option::Some(CandidateFinishReason::PUPLIMITEDDISABLED)
+        "CONTINUATION" => Option::Some(CandidateFinishReason::CONTINUATION)
+        _ => Option::None
+      }
+    },
+    raw => CandidateFinishReason::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Status of the url retrieval. Enum values: URL_RETRIEVAL_STATUS_UNSPECIFIED: Default value. This value is unused.; URL_RETRIEVAL_STATUS_SUCCESS: Url retrieval is successful.; URL_RETRIEVAL_STATUS_ERROR: Url retrieval is failed due to error.; URL_RETRIEVAL_STATUS_PAYWALL: Url retrieval is failed because the content is behind paywall.; URL_RETRIEVAL_STATUS_UNSAFE: Url retrieval is failed because the content is unsafe.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UrlMetadataUrlRetrievalStatus {
+  URLRETRIEVALSTATUSUNSPECIFIED
+  URLRETRIEVALSTATUSSUCCESS
+  URLRETRIEVALSTATUSERROR
+  URLRETRIEVALSTATUSPAYWALL
+  URLRETRIEVALSTATUSUNSAFE
+  Unknown(String)
+}
+
+///|
+pub extend UrlMetadataUrlRetrievalStatus with Eq::{equal, not_equal}
+
+///|
+pub extend UrlMetadataUrlRetrievalStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UrlMetadataUrlRetrievalStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for UrlMetadataUrlRetrievalStatus with fn to_json(self) {
+  let raw = match self {
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSPECIFIED =>
+      "URL_RETRIEVAL_STATUS_UNSPECIFIED"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSSUCCESS =>
+      "URL_RETRIEVAL_STATUS_SUCCESS"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSERROR =>
+      "URL_RETRIEVAL_STATUS_ERROR"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSPAYWALL =>
+      "URL_RETRIEVAL_STATUS_PAYWALL"
+    UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSAFE =>
+      "URL_RETRIEVAL_STATUS_UNSAFE"
+    UrlMetadataUrlRetrievalStatus::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UrlMetadataUrlRetrievalStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UrlMetadataUrlRetrievalStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "URL_RETRIEVAL_STATUS_UNSPECIFIED" =>
+          Option::Some(
+            UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSPECIFIED,
+          )
+        "URL_RETRIEVAL_STATUS_SUCCESS" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSSUCCESS)
+        "URL_RETRIEVAL_STATUS_ERROR" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSERROR)
+        "URL_RETRIEVAL_STATUS_PAYWALL" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSPAYWALL)
+        "URL_RETRIEVAL_STATUS_UNSAFE" =>
+          Option::Some(UrlMetadataUrlRetrievalStatus::URLRETRIEVALSTATUSUNSAFE)
+        _ => Option::None
+      }
+    },
+    raw => UrlMetadataUrlRetrievalStatus::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Context of the a single url retrieval.
+#derive(Eq, @debug.Debug)
+pub(all) struct UrlMetadata {
+  url_retrieval_status : UrlMetadataUrlRetrievalStatus?
+  retrieved_url : String?
+}
+
+///|
+pub extend UrlMetadata with Eq::{equal, not_equal}
+
+///|
+pub extend UrlMetadata with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UrlMetadata with omitted optional fields absent.
+pub fn UrlMetadata::new(
+  url_retrieval_status? : UrlMetadataUrlRetrievalStatus,
+  retrieved_url? : String,
+) -> UrlMetadata {
+  { url_retrieval_status, retrieved_url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UrlMetadata with ToJson::{to_json}
+
+///|
+pub impl ToJson for UrlMetadata with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("urlRetrievalStatus", self.url_retrieval_status)
+  .opt("retrievedUrl", self.retrieved_url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UrlMetadata with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UrlMetadata with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    url_retrieval_status: @sdkjson.opt_field(obj, "urlRetrievalStatus", path),
+    retrieved_url: @sdkjson.opt_field(obj, "retrievedUrl", path),
+  }
+}
+
+///|
+///
+/// Metadata related to url context retrieval tool.
+#derive(Eq, @debug.Debug)
+pub(all) struct UrlContextMetadata {
+  url_metadata : Array[UrlMetadata]?
+}
+
+///|
+pub extend UrlContextMetadata with Eq::{equal, not_equal}
+
+///|
+pub extend UrlContextMetadata with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UrlContextMetadata with omitted optional fields absent.
+pub fn UrlContextMetadata::new(
+  url_metadata? : Array[UrlMetadata],
+) -> UrlContextMetadata {
+  { url_metadata, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UrlContextMetadata with ToJson::{to_json}
+
+///|
+pub impl ToJson for UrlContextMetadata with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("urlMetadata", self.url_metadata).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UrlContextMetadata with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UrlContextMetadata with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { url_metadata: @sdkjson.opt_field(obj, "urlMetadata", path), }
+}
+
+///|
+///
+/// Candidate for the logprobs token and score.
+#derive(Eq, @debug.Debug)
+pub(all) struct LogprobsResultCandidate {
+  token_id : Int32?
+  token : String?
+  log_probability : Double?
+}
+
+///|
+pub extend LogprobsResultCandidate with Eq::{equal, not_equal}
+
+///|
+pub extend LogprobsResultCandidate with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a LogprobsResultCandidate with omitted optional fields absent.
+pub fn LogprobsResultCandidate::new(
+  token_id? : Int32,
+  token? : String,
+  log_probability? : Double,
+) -> LogprobsResultCandidate {
+  { token_id, token, log_probability, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend LogprobsResultCandidate with ToJson::{to_json}
+
+///|
+pub impl ToJson for LogprobsResultCandidate with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("tokenId", self.token_id)
+  .opt("token", self.token)
+  .opt("logProbability", self.log_probability)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend LogprobsResultCandidate with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for LogprobsResultCandidate with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    token_id: @sdkjson.opt_field(obj, "tokenId", path),
+    token: @sdkjson.opt_field(obj, "token", path),
+    log_probability: @sdkjson.opt_field(obj, "logProbability", path),
+  }
+}
+
+///|
+///
+/// Candidates with top log probabilities at each decoding step.
+#derive(Eq, @debug.Debug)
+pub(all) struct TopCandidates {
+  candidates : Array[LogprobsResultCandidate]?
+}
+
+///|
+pub extend TopCandidates with Eq::{equal, not_equal}
+
+///|
+pub extend TopCandidates with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a TopCandidates with omitted optional fields absent.
+pub fn TopCandidates::new(
+  candidates? : Array[LogprobsResultCandidate],
+) -> TopCandidates {
+  { candidates, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend TopCandidates with ToJson::{to_json}
+
+///|
+pub impl ToJson for TopCandidates with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("candidates", self.candidates).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend TopCandidates with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for TopCandidates with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { candidates: @sdkjson.opt_field(obj, "candidates", path), }
+}
+
+///|
+///
+/// Logprobs Result
+#derive(Eq, @debug.Debug)
+pub(all) struct LogprobsResult {
+  top_candidates : Array[TopCandidates]?
+  log_probability_sum : Double?
+  chosen_candidates : Array[LogprobsResultCandidate]?
+}
+
+///|
+pub extend LogprobsResult with Eq::{equal, not_equal}
+
+///|
+pub extend LogprobsResult with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a LogprobsResult with omitted optional fields absent.
+pub fn LogprobsResult::new(
+  top_candidates? : Array[TopCandidates],
+  log_probability_sum? : Double,
+  chosen_candidates? : Array[LogprobsResultCandidate],
+) -> LogprobsResult {
+  { top_candidates, log_probability_sum, chosen_candidates, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend LogprobsResult with ToJson::{to_json}
+
+///|
+pub impl ToJson for LogprobsResult with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("topCandidates", self.top_candidates)
+  .opt("logProbabilitySum", self.log_probability_sum)
+  .opt("chosenCandidates", self.chosen_candidates)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend LogprobsResult with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for LogprobsResult with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    top_candidates: @sdkjson.opt_field(obj, "topCandidates", path),
+    log_probability_sum: @sdkjson.opt_field(obj, "logProbabilitySum", path),
+    chosen_candidates: @sdkjson.opt_field(obj, "chosenCandidates", path),
+  }
+}
+
+///|
+///
+/// Attribution for a source that contributed to an answer.
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingAttribution {
+  content : Content?
+  source_id : AttributionSourceId?
+}
+
+///|
+pub extend GroundingAttribution with Eq::{equal, not_equal}
+
+///|
+pub extend GroundingAttribution with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GroundingAttribution with omitted optional fields absent.
+pub fn GroundingAttribution::new(
+  content? : Content,
+  source_id? : AttributionSourceId,
+) -> GroundingAttribution {
+  { content, source_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GroundingAttribution with ToJson::{to_json}
+
+///|
+pub impl ToJson for GroundingAttribution with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("content", self.content)
+  .opt("sourceId", self.source_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GroundingAttribution with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GroundingAttribution with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: @sdkjson.opt_field(obj, "content", path),
+    source_id: @sdkjson.opt_field(obj, "sourceId", path),
+  }
+}
+
+///|
+///
+/// Required. The category for this rating. Enum values: HARM_CATEGORY_UNSPECIFIED: Category is unspecified.; HARM_CATEGORY_DEROGATORY: **PaLM** - Negative or harmful comments targeting identity and/or protected attribute. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_TOXICITY: **PaLM** - Content that is rude, disrespectful, or profane. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_VIOLENCE: **PaLM** - Describes scenarios depicting violence against an individual or group, or general descriptions of gore. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_SEXUAL: **PaLM** - Contains references to sexual acts or other lewd content. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_MEDICAL: **PaLM** - Promotes unchecked medical advice. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_DANGEROUS: **PaLM** - Dangerous content that promotes, facilitates, or encourages harmful acts. DEPRECATED: PaLM-only category, not supported by Gemini models.; HARM_CATEGORY_HARASSMENT: **Gemini** - Harassment content.; HARM_CATEGORY_HATE_SPEECH: **Gemini** - Hate speech and content.; HARM_CATEGORY_SEXUALLY_EXPLICIT: **Gemini** - Sexually explicit content.; HARM_CATEGORY_DANGEROUS_CONTENT: **Gemini** - Dangerous content.; HARM_CATEGORY_CIVIC_INTEGRITY: **Gemini** - Content that may be used to harm civic integrity. DEPRECATED: use enable_enhanced_civic_answers instead.; HARM_CATEGORY_JAILBREAK: **Gemini** - Prompts attempting to bypass or subvert the model's safety guidelines (jailbreak attempts).
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum SafetyRatingCategory {
+  HARMCATEGORYUNSPECIFIED
+  HARMCATEGORYDEROGATORY
+  HARMCATEGORYTOXICITY
+  HARMCATEGORYVIOLENCE
+  HARMCATEGORYSEXUAL
+  HARMCATEGORYMEDICAL
+  HARMCATEGORYDANGEROUS
+  HARMCATEGORYHARASSMENT
+  HARMCATEGORYHATESPEECH
+  HARMCATEGORYSEXUALLYEXPLICIT
+  HARMCATEGORYDANGEROUSCONTENT
+  HARMCATEGORYCIVICINTEGRITY
+  HARMCATEGORYJAILBREAK
+  Unknown(String)
+}
+
+///|
+pub extend SafetyRatingCategory with Eq::{equal, not_equal}
+
+///|
+pub extend SafetyRatingCategory with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend SafetyRatingCategory with ToJson::{to_json}
+
+///|
+pub impl ToJson for SafetyRatingCategory with fn to_json(self) {
+  let raw = match self {
+    SafetyRatingCategory::HARMCATEGORYUNSPECIFIED => "HARM_CATEGORY_UNSPECIFIED"
+    SafetyRatingCategory::HARMCATEGORYDEROGATORY => "HARM_CATEGORY_DEROGATORY"
+    SafetyRatingCategory::HARMCATEGORYTOXICITY => "HARM_CATEGORY_TOXICITY"
+    SafetyRatingCategory::HARMCATEGORYVIOLENCE => "HARM_CATEGORY_VIOLENCE"
+    SafetyRatingCategory::HARMCATEGORYSEXUAL => "HARM_CATEGORY_SEXUAL"
+    SafetyRatingCategory::HARMCATEGORYMEDICAL => "HARM_CATEGORY_MEDICAL"
+    SafetyRatingCategory::HARMCATEGORYDANGEROUS => "HARM_CATEGORY_DANGEROUS"
+    SafetyRatingCategory::HARMCATEGORYHARASSMENT => "HARM_CATEGORY_HARASSMENT"
+    SafetyRatingCategory::HARMCATEGORYHATESPEECH => "HARM_CATEGORY_HATE_SPEECH"
+    SafetyRatingCategory::HARMCATEGORYSEXUALLYEXPLICIT =>
+      "HARM_CATEGORY_SEXUALLY_EXPLICIT"
+    SafetyRatingCategory::HARMCATEGORYDANGEROUSCONTENT =>
+      "HARM_CATEGORY_DANGEROUS_CONTENT"
+    SafetyRatingCategory::HARMCATEGORYCIVICINTEGRITY =>
+      "HARM_CATEGORY_CIVIC_INTEGRITY"
+    SafetyRatingCategory::HARMCATEGORYJAILBREAK => "HARM_CATEGORY_JAILBREAK"
+    SafetyRatingCategory::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend SafetyRatingCategory with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SafetyRatingCategory with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "HARM_CATEGORY_UNSPECIFIED" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYUNSPECIFIED)
+        "HARM_CATEGORY_DEROGATORY" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYDEROGATORY)
+        "HARM_CATEGORY_TOXICITY" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYTOXICITY)
+        "HARM_CATEGORY_VIOLENCE" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYVIOLENCE)
+        "HARM_CATEGORY_SEXUAL" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYSEXUAL)
+        "HARM_CATEGORY_MEDICAL" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYMEDICAL)
+        "HARM_CATEGORY_DANGEROUS" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYDANGEROUS)
+        "HARM_CATEGORY_HARASSMENT" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYHARASSMENT)
+        "HARM_CATEGORY_HATE_SPEECH" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYHATESPEECH)
+        "HARM_CATEGORY_SEXUALLY_EXPLICIT" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYSEXUALLYEXPLICIT)
+        "HARM_CATEGORY_DANGEROUS_CONTENT" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYDANGEROUSCONTENT)
+        "HARM_CATEGORY_CIVIC_INTEGRITY" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYCIVICINTEGRITY)
+        "HARM_CATEGORY_JAILBREAK" =>
+          Option::Some(SafetyRatingCategory::HARMCATEGORYJAILBREAK)
+        _ => Option::None
+      }
+    },
+    raw => SafetyRatingCategory::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Required. The probability of harm for this content. Enum values: HARM_PROBABILITY_UNSPECIFIED: Probability is unspecified.; NEGLIGIBLE: Content has a negligible chance of being unsafe.; LOW: Content has a low chance of being unsafe.; MEDIUM: Content has a medium chance of being unsafe.; HIGH: Content has a high chance of being unsafe.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum SafetyRatingProbability {
+  HARMPROBABILITYUNSPECIFIED
+  NEGLIGIBLE
+  LOW
+  MEDIUM
+  HIGH
+  Unknown(String)
+}
+
+///|
+pub extend SafetyRatingProbability with Eq::{equal, not_equal}
+
+///|
+pub extend SafetyRatingProbability with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend SafetyRatingProbability with ToJson::{to_json}
+
+///|
+pub impl ToJson for SafetyRatingProbability with fn to_json(self) {
+  let raw = match self {
+    SafetyRatingProbability::HARMPROBABILITYUNSPECIFIED =>
+      "HARM_PROBABILITY_UNSPECIFIED"
+    SafetyRatingProbability::NEGLIGIBLE => "NEGLIGIBLE"
+    SafetyRatingProbability::LOW => "LOW"
+    SafetyRatingProbability::MEDIUM => "MEDIUM"
+    SafetyRatingProbability::HIGH => "HIGH"
+    SafetyRatingProbability::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend SafetyRatingProbability with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SafetyRatingProbability with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "HARM_PROBABILITY_UNSPECIFIED" =>
+          Option::Some(SafetyRatingProbability::HARMPROBABILITYUNSPECIFIED)
+        "NEGLIGIBLE" => Option::Some(SafetyRatingProbability::NEGLIGIBLE)
+        "LOW" => Option::Some(SafetyRatingProbability::LOW)
+        "MEDIUM" => Option::Some(SafetyRatingProbability::MEDIUM)
+        "HIGH" => Option::Some(SafetyRatingProbability::HIGH)
+        _ => Option::None
+      }
+    },
+    raw => SafetyRatingProbability::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.
+#derive(Eq, @debug.Debug)
+pub(all) struct SafetyRating {
+  blocked : Bool?
+  category : SafetyRatingCategory?
+  probability : SafetyRatingProbability?
+}
+
+///|
+pub extend SafetyRating with Eq::{equal, not_equal}
+
+///|
+pub extend SafetyRating with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a SafetyRating with omitted optional fields absent.
+pub fn SafetyRating::new(
+  blocked? : Bool,
+  category? : SafetyRatingCategory,
+  probability? : SafetyRatingProbability,
+) -> SafetyRating {
+  { blocked, category, probability, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend SafetyRating with ToJson::{to_json}
+
+///|
+pub impl ToJson for SafetyRating with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("blocked", self.blocked)
+  .opt("category", self.category)
+  .opt("probability", self.probability)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend SafetyRating with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SafetyRating with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    blocked: @sdkjson.opt_field(obj, "blocked", path),
+    category: @sdkjson.opt_field(obj, "category", path),
+    probability: @sdkjson.opt_field(obj, "probability", path),
+  }
+}
+
+///|
+///
+/// A citation to a source for a portion of a specific response.
+#derive(Eq, @debug.Debug)
+pub(all) struct CitationSource {
+  end_index : Int32?
+  uri : String?
+  start_index : Int32?
+  license : String?
+}
+
+///|
+pub extend CitationSource with Eq::{equal, not_equal}
+
+///|
+pub extend CitationSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CitationSource with omitted optional fields absent.
+pub fn CitationSource::new(
+  end_index? : Int32,
+  uri? : String,
+  start_index? : Int32,
+  license? : String,
+) -> CitationSource {
+  { end_index, uri, start_index, license, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CitationSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for CitationSource with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("endIndex", self.end_index)
+  .opt("uri", self.uri)
+  .opt("startIndex", self.start_index)
+  .opt("license", self.license)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CitationSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CitationSource with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    end_index: @sdkjson.opt_field(obj, "endIndex", path),
+    uri: @sdkjson.opt_field(obj, "uri", path),
+    start_index: @sdkjson.opt_field(obj, "startIndex", path),
+    license: @sdkjson.opt_field(obj, "license", path),
+  }
+}
+
+///|
+///
+/// A collection of source attributions for a piece of content.
+#derive(Eq, @debug.Debug)
+pub(all) struct CitationMetadata {
+  citation_sources : Array[CitationSource]?
+}
+
+///|
+pub extend CitationMetadata with Eq::{equal, not_equal}
+
+///|
+pub extend CitationMetadata with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CitationMetadata with omitted optional fields absent.
+pub fn CitationMetadata::new(
+  citation_sources? : Array[CitationSource],
+) -> CitationMetadata {
+  { citation_sources, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CitationMetadata with ToJson::{to_json}
+
+///|
+pub impl ToJson for CitationMetadata with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("citationSources", self.citation_sources)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CitationMetadata with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CitationMetadata with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { citation_sources: @sdkjson.opt_field(obj, "citationSources", path), }
+}
+
+///|
+///
+/// Chunk from image search.
+#derive(Eq, @debug.Debug)
+pub(all) struct Image {
+  domain : String?
+  title : String?
+  source_uri : String?
+  image_uri : String?
+}
+
+///|
+pub extend Image with Eq::{equal, not_equal}
+
+///|
+pub extend Image with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Image with omitted optional fields absent.
+pub fn Image::new(
+  domain? : String,
+  title? : String,
+  source_uri? : String,
+  image_uri? : String,
+) -> Image {
+  { domain, title, source_uri, image_uri, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Image with ToJson::{to_json}
+
+///|
+pub impl ToJson for Image with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("domain", self.domain)
+  .opt("title", self.title)
+  .opt("sourceUri", self.source_uri)
+  .opt("imageUri", self.image_uri)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Image with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Image with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    domain: @sdkjson.opt_field(obj, "domain", path),
+    title: @sdkjson.opt_field(obj, "title", path),
+    source_uri: @sdkjson.opt_field(obj, "sourceUri", path),
+    image_uri: @sdkjson.opt_field(obj, "imageUri", path),
+  }
+}
+
+///|
+///
+/// A list of string values.
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingChunkStringList {
+  values : Array[String]?
+}
+
+///|
+pub extend GroundingChunkStringList with Eq::{equal, not_equal}
+
+///|
+pub extend GroundingChunkStringList with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GroundingChunkStringList with omitted optional fields absent.
+pub fn GroundingChunkStringList::new(
+  values? : Array[String],
+) -> GroundingChunkStringList {
+  { values, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GroundingChunkStringList with ToJson::{to_json}
+
+///|
+pub impl ToJson for GroundingChunkStringList with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("values", self.values).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GroundingChunkStringList with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GroundingChunkStringList with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { values: @sdkjson.opt_field(obj, "values", path), }
+}
+
+///|
+///
+/// User provided metadata about the GroundingFact.
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingChunkCustomMetadata {
+  key : String?
+  string_value : String?
+  numeric_value : Double?
+  string_list_value : GroundingChunkStringList?
+}
+
+///|
+pub extend GroundingChunkCustomMetadata with Eq::{equal, not_equal}
+
+///|
+pub extend GroundingChunkCustomMetadata with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GroundingChunkCustomMetadata with omitted optional fields absent.
+pub fn GroundingChunkCustomMetadata::new(
+  key? : String,
+  string_value? : String,
+  numeric_value? : Double,
+  string_list_value? : GroundingChunkStringList,
+) -> GroundingChunkCustomMetadata {
+  { key, string_value, numeric_value, string_list_value, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GroundingChunkCustomMetadata with ToJson::{to_json}
+
+///|
+pub impl ToJson for GroundingChunkCustomMetadata with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("key", self.key)
+  .opt("stringValue", self.string_value)
+  .opt("numericValue", self.numeric_value)
+  .opt("stringListValue", self.string_list_value)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GroundingChunkCustomMetadata with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GroundingChunkCustomMetadata with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    key: @sdkjson.opt_field(obj, "key", path),
+    string_value: @sdkjson.opt_field(obj, "stringValue", path),
+    numeric_value: @sdkjson.opt_field(obj, "numericValue", path),
+    string_list_value: @sdkjson.opt_field(obj, "stringListValue", path),
+  }
+}
+
+///|
+///
+/// Chunk from context retrieved by the file search tool.
+#derive(Eq, @debug.Debug)
+pub(all) struct RetrievedContext {
+  text : String?
+  custom_metadata : Array[GroundingChunkCustomMetadata]?
+  file_search_store : String?
+  uri : String?
+  title : String?
+  page_number : Int32?
+  media_id : String?
+}
+
+///|
+pub extend RetrievedContext with Eq::{equal, not_equal}
+
+///|
+pub extend RetrievedContext with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RetrievedContext with omitted optional fields absent.
+pub fn RetrievedContext::new(
+  text? : String,
+  custom_metadata? : Array[GroundingChunkCustomMetadata],
+  file_search_store? : String,
+  uri? : String,
+  title? : String,
+  page_number? : Int32,
+  media_id? : String,
+) -> RetrievedContext {
+  {
+    text,
+    custom_metadata,
+    file_search_store,
+    uri,
+    title,
+    page_number,
+    media_id,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RetrievedContext with ToJson::{to_json}
+
+///|
+pub impl ToJson for RetrievedContext with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("text", self.text)
+  .opt("customMetadata", self.custom_metadata)
+  .opt("fileSearchStore", self.file_search_store)
+  .opt("uri", self.uri)
+  .opt("title", self.title)
+  .opt("pageNumber", self.page_number)
+  .opt("mediaId", self.media_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RetrievedContext with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RetrievedContext with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    text: @sdkjson.opt_field(obj, "text", path),
+    custom_metadata: @sdkjson.opt_field(obj, "customMetadata", path),
+    file_search_store: @sdkjson.opt_field(obj, "fileSearchStore", path),
+    uri: @sdkjson.opt_field(obj, "uri", path),
+    title: @sdkjson.opt_field(obj, "title", path),
+    page_number: @sdkjson.opt_field(obj, "pageNumber", path),
+    media_id: @sdkjson.opt_field(obj, "mediaId", path),
+  }
+}
+
+///|
+///
+/// Chunk from the web.
+#derive(Eq, @debug.Debug)
+pub(all) struct Web {
+  title : String?
+  uri : String?
+}
+
+///|
+pub extend Web with Eq::{equal, not_equal}
+
+///|
+pub extend Web with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Web with omitted optional fields absent.
+pub fn Web::new(title? : String, uri? : String) -> Web {
+  { title, uri, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Web with ToJson::{to_json}
+
+///|
+pub impl ToJson for Web with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("title", self.title)
+  .opt("uri", self.uri)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Web with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Web with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    title: @sdkjson.opt_field(obj, "title", path),
+    uri: @sdkjson.opt_field(obj, "uri", path),
+  }
+}
+
+///|
+///
+/// A `GroundingChunk` represents a segment of supporting evidence that grounds the model's response. It can be a chunk from the web, a retrieved context from a file, or information from Google Maps.
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingChunk {
+  image : Image?
+  retrieved_context : RetrievedContext?
+  web : Web?
+  maps : Maps?
+}
+
+///|
+pub extend GroundingChunk with Eq::{equal, not_equal}
+
+///|
+pub extend GroundingChunk with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GroundingChunk with omitted optional fields absent.
+pub fn GroundingChunk::new(
+  image? : Image,
+  retrieved_context? : RetrievedContext,
+  web? : Web,
+  maps? : Maps,
+) -> GroundingChunk {
+  { image, retrieved_context, web, maps, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GroundingChunk with ToJson::{to_json}
+
+///|
+pub impl ToJson for GroundingChunk with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("image", self.image)
+  .opt("retrievedContext", self.retrieved_context)
+  .opt("web", self.web)
+  .opt("maps", self.maps)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GroundingChunk with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GroundingChunk with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    image: @sdkjson.opt_field(obj, "image", path),
+    retrieved_context: @sdkjson.opt_field(obj, "retrievedContext", path),
+    web: @sdkjson.opt_field(obj, "web", path),
+    maps: @sdkjson.opt_field(obj, "maps", path),
+  }
+}
+
+///|
+///
+/// Google search entry point.
+#derive(Eq, @debug.Debug)
+pub(all) struct SearchEntryPoint {
+  rendered_content : String?
+  sdk_blob : String?
+}
+
+///|
+pub extend SearchEntryPoint with Eq::{equal, not_equal}
+
+///|
+pub extend SearchEntryPoint with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a SearchEntryPoint with omitted optional fields absent.
+pub fn SearchEntryPoint::new(
+  rendered_content? : String,
+  sdk_blob? : String,
+) -> SearchEntryPoint {
+  { rendered_content, sdk_blob, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend SearchEntryPoint with ToJson::{to_json}
+
+///|
+pub impl ToJson for SearchEntryPoint with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("renderedContent", self.rendered_content)
+  .opt("sdkBlob", self.sdk_blob)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend SearchEntryPoint with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for SearchEntryPoint with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    rendered_content: @sdkjson.opt_field(obj, "renderedContent", path),
+    sdk_blob: @sdkjson.opt_field(obj, "sdkBlob", path),
+  }
+}
+
+///|
+///
+/// Metadata returned to client when grounding is enabled.
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingMetadata {
+  image_search_queries : Array[String]?
+  web_search_queries : Array[String]?
+  grounding_chunks : Array[GroundingChunk]?
+  search_entry_point : SearchEntryPoint?
+  google_maps_widget_context_token : String?
+  grounding_supports : Array[GoogleAiGenerativelanguageV1betaGroundingSupport]?
+  retrieval_metadata : RetrievalMetadata?
+}
+
+///|
+pub extend GroundingMetadata with Eq::{equal, not_equal}
+
+///|
+pub extend GroundingMetadata with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GroundingMetadata with omitted optional fields absent.
+pub fn GroundingMetadata::new(
+  image_search_queries? : Array[String],
+  web_search_queries? : Array[String],
+  grounding_chunks? : Array[GroundingChunk],
+  search_entry_point? : SearchEntryPoint,
+  google_maps_widget_context_token? : String,
+  grounding_supports? : Array[GoogleAiGenerativelanguageV1betaGroundingSupport],
+  retrieval_metadata? : RetrievalMetadata,
+) -> GroundingMetadata {
+  {
+    image_search_queries,
+    web_search_queries,
+    grounding_chunks,
+    search_entry_point,
+    google_maps_widget_context_token,
+    grounding_supports,
+    retrieval_metadata,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GroundingMetadata with ToJson::{to_json}
+
+///|
+pub impl ToJson for GroundingMetadata with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("imageSearchQueries", self.image_search_queries)
+  .opt("webSearchQueries", self.web_search_queries)
+  .opt("groundingChunks", self.grounding_chunks)
+  .opt("searchEntryPoint", self.search_entry_point)
+  .opt("googleMapsWidgetContextToken", self.google_maps_widget_context_token)
+  .opt("groundingSupports", self.grounding_supports)
+  .opt("retrievalMetadata", self.retrieval_metadata)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GroundingMetadata with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GroundingMetadata with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    image_search_queries: @sdkjson.opt_field(obj, "imageSearchQueries", path),
+    web_search_queries: @sdkjson.opt_field(obj, "webSearchQueries", path),
+    grounding_chunks: @sdkjson.opt_field(obj, "groundingChunks", path),
+    search_entry_point: @sdkjson.opt_field(obj, "searchEntryPoint", path),
+    google_maps_widget_context_token: @sdkjson.opt_field(
+      obj, "googleMapsWidgetContextToken", path,
+    ),
+    grounding_supports: @sdkjson.opt_field(obj, "groundingSupports", path),
+    retrieval_metadata: @sdkjson.opt_field(obj, "retrievalMetadata", path),
+  }
+}
+
+///|
+///
+/// A response candidate generated from the model.
+#derive(Eq, @debug.Debug)
+pub(all) struct Candidate {
+  finish_reason : CandidateFinishReason?
+  content : Content?
+  token_count : Int32?
+  avg_logprobs : Double?
+  finish_message : String?
+  index : Int32?
+  url_context_metadata : UrlContextMetadata?
+  logprobs_result : LogprobsResult?
+  grounding_attributions : Array[GroundingAttribution]?
+  safety_ratings : Array[SafetyRating]?
+  citation_metadata : CitationMetadata?
+  grounding_metadata : GroundingMetadata?
+  continuation_token : String?
+}
+
+///|
+pub extend Candidate with Eq::{equal, not_equal}
+
+///|
+pub extend Candidate with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Candidate with omitted optional fields absent.
+pub fn Candidate::new(
+  finish_reason? : CandidateFinishReason,
+  content? : Content,
+  token_count? : Int32,
+  avg_logprobs? : Double,
+  finish_message? : String,
+  index? : Int32,
+  url_context_metadata? : UrlContextMetadata,
+  logprobs_result? : LogprobsResult,
+  grounding_attributions? : Array[GroundingAttribution],
+  safety_ratings? : Array[SafetyRating],
+  citation_metadata? : CitationMetadata,
+  grounding_metadata? : GroundingMetadata,
+  continuation_token? : String,
+) -> Candidate {
+  {
+    finish_reason,
+    content,
+    token_count,
+    avg_logprobs,
+    finish_message,
+    index,
+    url_context_metadata,
+    logprobs_result,
+    grounding_attributions,
+    safety_ratings,
+    citation_metadata,
+    grounding_metadata,
+    continuation_token,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Candidate with ToJson::{to_json}
+
+///|
+pub impl ToJson for Candidate with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("finishReason", self.finish_reason)
+  .opt("content", self.content)
+  .opt("tokenCount", self.token_count)
+  .opt("avgLogprobs", self.avg_logprobs)
+  .opt("finishMessage", self.finish_message)
+  .opt("index", self.index)
+  .opt("urlContextMetadata", self.url_context_metadata)
+  .opt("logprobsResult", self.logprobs_result)
+  .opt("groundingAttributions", self.grounding_attributions)
+  .opt("safetyRatings", self.safety_ratings)
+  .opt("citationMetadata", self.citation_metadata)
+  .opt("groundingMetadata", self.grounding_metadata)
+  .opt("continuationToken", self.continuation_token)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Candidate with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Candidate with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    finish_reason: @sdkjson.opt_field(obj, "finishReason", path),
+    content: @sdkjson.opt_field(obj, "content", path),
+    token_count: @sdkjson.opt_field(obj, "tokenCount", path),
+    avg_logprobs: @sdkjson.opt_field(obj, "avgLogprobs", path),
+    finish_message: @sdkjson.opt_field(obj, "finishMessage", path),
+    index: @sdkjson.opt_field(obj, "index", path),
+    url_context_metadata: @sdkjson.opt_field(obj, "urlContextMetadata", path),
+    logprobs_result: @sdkjson.opt_field(obj, "logprobsResult", path),
+    grounding_attributions: @sdkjson.opt_field(
+      obj, "groundingAttributions", path,
+    ),
+    safety_ratings: @sdkjson.opt_field(obj, "safetyRatings", path),
+    citation_metadata: @sdkjson.opt_field(obj, "citationMetadata", path),
+    grounding_metadata: @sdkjson.opt_field(obj, "groundingMetadata", path),
+    continuation_token: @sdkjson.opt_field(obj, "continuationToken", path),
+  }
+}
+
+///|
+///
+/// Optional. Deprecated: Please use EmbedContentConfig.task_type instead. Optional task type for which the embeddings will be used. Not supported on earlier models (`models/embedding-001`). Enum values: TASK_TYPE_UNSPECIFIED: Unset value, which will default to one of the other enum values.; RETRIEVAL_QUERY: Specifies the given text is a query in a search/retrieval setting.; RETRIEVAL_DOCUMENT: Specifies the given text is a document from the corpus being searched.; SEMANTIC_SIMILARITY: Specifies the given text will be used for STS.; CLASSIFICATION: Specifies that the given text will be classified.; CLUSTERING: Specifies that the embeddings will be used for clustering.; QUESTION_ANSWERING: Specifies that the given text will be used for question answering.; FACT_VERIFICATION: Specifies that the given text will be used for fact verification.; CODE_RETRIEVAL_QUERY: Specifies that the given text will be used for code retrieval.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum EmbedContentRequestTaskType {
+  TASKTYPEUNSPECIFIED
+  RETRIEVALQUERY
+  RETRIEVALDOCUMENT
+  SEMANTICSIMILARITY
+  CLASSIFICATION
+  CLUSTERING
+  QUESTIONANSWERING
+  FACTVERIFICATION
+  CODERETRIEVALQUERY
+  Custom(String)
+}
+
+///|
+pub extend EmbedContentRequestTaskType with Eq::{equal, not_equal}
+
+///|
+pub extend EmbedContentRequestTaskType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend EmbedContentRequestTaskType with ToJson::{to_json}
+
+///|
+pub impl ToJson for EmbedContentRequestTaskType with fn to_json(self) {
+  let raw = match self {
+    EmbedContentRequestTaskType::TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
+    EmbedContentRequestTaskType::RETRIEVALQUERY => "RETRIEVAL_QUERY"
+    EmbedContentRequestTaskType::RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
+    EmbedContentRequestTaskType::SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
+    EmbedContentRequestTaskType::CLASSIFICATION => "CLASSIFICATION"
+    EmbedContentRequestTaskType::CLUSTERING => "CLUSTERING"
+    EmbedContentRequestTaskType::QUESTIONANSWERING => "QUESTION_ANSWERING"
+    EmbedContentRequestTaskType::FACTVERIFICATION => "FACT_VERIFICATION"
+    EmbedContentRequestTaskType::CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
+    EmbedContentRequestTaskType::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend EmbedContentRequestTaskType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EmbedContentRequestTaskType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "TASK_TYPE_UNSPECIFIED" =>
+          Option::Some(EmbedContentRequestTaskType::TASKTYPEUNSPECIFIED)
+        "RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentRequestTaskType::RETRIEVALQUERY)
+        "RETRIEVAL_DOCUMENT" =>
+          Option::Some(EmbedContentRequestTaskType::RETRIEVALDOCUMENT)
+        "SEMANTIC_SIMILARITY" =>
+          Option::Some(EmbedContentRequestTaskType::SEMANTICSIMILARITY)
+        "CLASSIFICATION" =>
+          Option::Some(EmbedContentRequestTaskType::CLASSIFICATION)
+        "CLUSTERING" => Option::Some(EmbedContentRequestTaskType::CLUSTERING)
+        "QUESTION_ANSWERING" =>
+          Option::Some(EmbedContentRequestTaskType::QUESTIONANSWERING)
+        "FACT_VERIFICATION" =>
+          Option::Some(EmbedContentRequestTaskType::FACTVERIFICATION)
+        "CODE_RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentRequestTaskType::CODERETRIEVALQUERY)
+        _ => Option::None
+      }
+    },
+    raw => EmbedContentRequestTaskType::Custom(raw),
+  )
+}
+
+///|
+///
+/// Optional. The task type of the embedding. Enum values: TASK_TYPE_UNSPECIFIED: Unset value, which will default to one of the other enum values.; RETRIEVAL_QUERY: Specifies the given text is a query in a search/retrieval setting.; RETRIEVAL_DOCUMENT: Specifies the given text is a document from the corpus being searched.; SEMANTIC_SIMILARITY: Specifies the given text will be used for STS.; CLASSIFICATION: Specifies that the given text will be classified.; CLUSTERING: Specifies that the embeddings will be used for clustering.; QUESTION_ANSWERING: Specifies that the given text will be used for question answering.; FACT_VERIFICATION: Specifies that the given text will be used for fact verification.; CODE_RETRIEVAL_QUERY: Specifies that the given text will be used for code retrieval.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum EmbedContentConfigTaskType {
+  TASKTYPEUNSPECIFIED
+  RETRIEVALQUERY
+  RETRIEVALDOCUMENT
+  SEMANTICSIMILARITY
+  CLASSIFICATION
+  CLUSTERING
+  QUESTIONANSWERING
+  FACTVERIFICATION
+  CODERETRIEVALQUERY
+  Custom(String)
+}
+
+///|
+pub extend EmbedContentConfigTaskType with Eq::{equal, not_equal}
+
+///|
+pub extend EmbedContentConfigTaskType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend EmbedContentConfigTaskType with ToJson::{to_json}
+
+///|
+pub impl ToJson for EmbedContentConfigTaskType with fn to_json(self) {
+  let raw = match self {
+    EmbedContentConfigTaskType::TASKTYPEUNSPECIFIED => "TASK_TYPE_UNSPECIFIED"
+    EmbedContentConfigTaskType::RETRIEVALQUERY => "RETRIEVAL_QUERY"
+    EmbedContentConfigTaskType::RETRIEVALDOCUMENT => "RETRIEVAL_DOCUMENT"
+    EmbedContentConfigTaskType::SEMANTICSIMILARITY => "SEMANTIC_SIMILARITY"
+    EmbedContentConfigTaskType::CLASSIFICATION => "CLASSIFICATION"
+    EmbedContentConfigTaskType::CLUSTERING => "CLUSTERING"
+    EmbedContentConfigTaskType::QUESTIONANSWERING => "QUESTION_ANSWERING"
+    EmbedContentConfigTaskType::FACTVERIFICATION => "FACT_VERIFICATION"
+    EmbedContentConfigTaskType::CODERETRIEVALQUERY => "CODE_RETRIEVAL_QUERY"
+    EmbedContentConfigTaskType::Custom(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend EmbedContentConfigTaskType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EmbedContentConfigTaskType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "TASK_TYPE_UNSPECIFIED" =>
+          Option::Some(EmbedContentConfigTaskType::TASKTYPEUNSPECIFIED)
+        "RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentConfigTaskType::RETRIEVALQUERY)
+        "RETRIEVAL_DOCUMENT" =>
+          Option::Some(EmbedContentConfigTaskType::RETRIEVALDOCUMENT)
+        "SEMANTIC_SIMILARITY" =>
+          Option::Some(EmbedContentConfigTaskType::SEMANTICSIMILARITY)
+        "CLASSIFICATION" =>
+          Option::Some(EmbedContentConfigTaskType::CLASSIFICATION)
+        "CLUSTERING" => Option::Some(EmbedContentConfigTaskType::CLUSTERING)
+        "QUESTION_ANSWERING" =>
+          Option::Some(EmbedContentConfigTaskType::QUESTIONANSWERING)
+        "FACT_VERIFICATION" =>
+          Option::Some(EmbedContentConfigTaskType::FACTVERIFICATION)
+        "CODE_RETRIEVAL_QUERY" =>
+          Option::Some(EmbedContentConfigTaskType::CODERETRIEVALQUERY)
+        _ => Option::None
+      }
+    },
+    raw => EmbedContentConfigTaskType::Custom(raw),
+  )
+}
+
+///|
+///
+/// Configurations for the EmbedContent request.
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbedContentConfig {
+  title : String?
+  document_ocr : Bool?
+  auto_truncate : Bool?
+  task_type : EmbedContentConfigTaskType?
+  output_dimensionality : Int32?
+  audio_track_extraction : Bool?
+}
+
+///|
+pub extend EmbedContentConfig with Eq::{equal, not_equal}
+
+///|
+pub extend EmbedContentConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a EmbedContentConfig with omitted optional fields absent.
+pub fn EmbedContentConfig::new(
+  title? : String,
+  document_ocr? : Bool,
+  auto_truncate? : Bool,
+  task_type? : EmbedContentConfigTaskType,
+  output_dimensionality? : Int32,
+  audio_track_extraction? : Bool,
+) -> EmbedContentConfig {
+  {
+    title,
+    document_ocr,
+    auto_truncate,
+    task_type,
+    output_dimensionality,
+    audio_track_extraction,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend EmbedContentConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for EmbedContentConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("title", self.title)
+  .opt("documentOcr", self.document_ocr)
+  .opt("autoTruncate", self.auto_truncate)
+  .opt("taskType", self.task_type)
+  .opt("outputDimensionality", self.output_dimensionality)
+  .opt("audioTrackExtraction", self.audio_track_extraction)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend EmbedContentConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EmbedContentConfig with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    title: @sdkjson.opt_field(obj, "title", path),
+    document_ocr: @sdkjson.opt_field(obj, "documentOcr", path),
+    auto_truncate: @sdkjson.opt_field(obj, "autoTruncate", path),
+    task_type: @sdkjson.opt_field(obj, "taskType", path),
+    output_dimensionality: @sdkjson.opt_field(obj, "outputDimensionality", path),
+    audio_track_extraction: @sdkjson.opt_field(
+      obj, "audioTrackExtraction", path,
+    ),
+  }
+}
+
+///|
+///
+/// Request containing the `Content` for the model to embed.
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbedContentRequest {
+  task_type : EmbedContentRequestTaskType?
+  model : String?
+  output_dimensionality : Int32?
+  title : String?
+  embed_content_config : EmbedContentConfig?
+  content : Content?
+}
+
+///|
+pub extend EmbedContentRequest with Eq::{equal, not_equal}
+
+///|
+pub extend EmbedContentRequest with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a EmbedContentRequest with omitted optional fields absent.
+pub fn EmbedContentRequest::new(
+  task_type? : EmbedContentRequestTaskType,
+  model? : String,
+  output_dimensionality? : Int32,
+  title? : String,
+  embed_content_config? : EmbedContentConfig,
+  content? : Content,
+) -> EmbedContentRequest {
+  {
+    task_type,
+    model,
+    output_dimensionality,
+    title,
+    embed_content_config,
+    content,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend EmbedContentRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for EmbedContentRequest with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("taskType", self.task_type)
+  .opt("model", self.model)
+  .opt("outputDimensionality", self.output_dimensionality)
+  .opt("title", self.title)
+  .opt("embedContentConfig", self.embed_content_config)
+  .opt("content", self.content)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend EmbedContentRequest with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EmbedContentRequest with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    task_type: @sdkjson.opt_field(obj, "taskType", path),
+    model: @sdkjson.opt_field(obj, "model", path),
+    output_dimensionality: @sdkjson.opt_field(obj, "outputDimensionality", path),
+    title: @sdkjson.opt_field(obj, "title", path),
+    embed_content_config: @sdkjson.opt_field(obj, "embedContentConfig", path),
+    content: @sdkjson.opt_field(obj, "content", path),
+  }
+}
+
+///|
+///
+/// Batch request to get embeddings from the model for a list of prompts.
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchEmbedContentsRequest {
+  requests : Array[EmbedContentRequest]?
+}
+
+///|
+pub extend BatchEmbedContentsRequest with Eq::{equal, not_equal}
+
+///|
+pub extend BatchEmbedContentsRequest with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a BatchEmbedContentsRequest with omitted optional fields absent.
+pub fn BatchEmbedContentsRequest::new(
+  requests? : Array[EmbedContentRequest],
+) -> BatchEmbedContentsRequest {
+  { requests, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend BatchEmbedContentsRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for BatchEmbedContentsRequest with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("requests", self.requests).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend BatchEmbedContentsRequest with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for BatchEmbedContentsRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { requests: @sdkjson.opt_field(obj, "requests", path), }
+}
+
+///|
+///
+/// Information about a Generative Language Model.
+#derive(Eq, @debug.Debug)
+pub(all) struct Model {
+  top_p : Double?
+  top_k : Int32?
+  temperature : Double?
+  output_token_limit : Int32?
+  thinking : Bool?
+  name : String?
+  display_name : String?
+  supported_generation_methods : Array[String]?
+  description : String?
+  base_model_id : String?
+  input_token_limit : Int32?
+  version : String?
+  max_temperature : Double?
+}
+
+///|
+pub extend Model with Eq::{equal, not_equal}
+
+///|
+pub extend Model with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Model with omitted optional fields absent.
+pub fn Model::new(
+  top_p? : Double,
+  top_k? : Int32,
+  temperature? : Double,
+  output_token_limit? : Int32,
+  thinking? : Bool,
+  name? : String,
+  display_name? : String,
+  supported_generation_methods? : Array[String],
+  description? : String,
+  base_model_id? : String,
+  input_token_limit? : Int32,
+  version? : String,
+  max_temperature? : Double,
+) -> Model {
+  {
+    top_p,
+    top_k,
+    temperature,
+    output_token_limit,
+    thinking,
+    name,
+    display_name,
+    supported_generation_methods,
+    description,
+    base_model_id,
+    input_token_limit,
+    version,
+    max_temperature,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Model with ToJson::{to_json}
+
+///|
+pub impl ToJson for Model with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("topP", self.top_p)
+  .opt("topK", self.top_k)
+  .opt("temperature", self.temperature)
+  .opt("outputTokenLimit", self.output_token_limit)
+  .opt("thinking", self.thinking)
+  .opt("name", self.name)
+  .opt("displayName", self.display_name)
+  .opt("supportedGenerationMethods", self.supported_generation_methods)
+  .opt("description", self.description)
+  .opt("baseModelId", self.base_model_id)
+  .opt("inputTokenLimit", self.input_token_limit)
+  .opt("version", self.version)
+  .opt("maxTemperature", self.max_temperature)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Model with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Model with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    top_p: @sdkjson.opt_field(obj, "topP", path),
+    top_k: @sdkjson.opt_field(obj, "topK", path),
+    temperature: @sdkjson.opt_field(obj, "temperature", path),
+    output_token_limit: @sdkjson.opt_field(obj, "outputTokenLimit", path),
+    thinking: @sdkjson.opt_field(obj, "thinking", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+    display_name: @sdkjson.opt_field(obj, "displayName", path),
+    supported_generation_methods: @sdkjson.opt_field(
+      obj, "supportedGenerationMethods", path,
+    ),
+    description: @sdkjson.opt_field(obj, "description", path),
+    base_model_id: @sdkjson.opt_field(obj, "baseModelId", path),
+    input_token_limit: @sdkjson.opt_field(obj, "inputTokenLimit", path),
+    version: @sdkjson.opt_field(obj, "version", path),
+    max_temperature: @sdkjson.opt_field(obj, "maxTemperature", path),
+  }
+}
+
+///|
+///
+/// Response from `ListModel` containing a paginated list of Models.
+#derive(Eq, @debug.Debug)
+pub(all) struct ListModelsResponse {
+  models : Array[Model]?
+  next_page_token : String?
+}
+
+///|
+pub extend ListModelsResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ListModelsResponse with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ListModelsResponse with omitted optional fields absent.
+pub fn ListModelsResponse::new(
+  models? : Array[Model],
+  next_page_token? : String,
+) -> ListModelsResponse {
+  { models, next_page_token, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ListModelsResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for ListModelsResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("models", self.models)
+  .opt("nextPageToken", self.next_page_token)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ListModelsResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ListModelsResponse with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    models: @sdkjson.opt_field(obj, "models", path),
+    next_page_token: @sdkjson.opt_field(obj, "nextPageToken", path),
+  }
+}
+
+///|
+///
+/// A list of floats representing an embedding.
+#derive(Eq, @debug.Debug)
+pub(all) struct ContentEmbedding {
+  shape : Array[Int32]?
+  values : Array[Double]?
+}
+
+///|
+pub extend ContentEmbedding with Eq::{equal, not_equal}
+
+///|
+pub extend ContentEmbedding with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ContentEmbedding with omitted optional fields absent.
+pub fn ContentEmbedding::new(
+  shape? : Array[Int32],
+  values? : Array[Double],
+) -> ContentEmbedding {
+  { shape, values, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ContentEmbedding with ToJson::{to_json}
+
+///|
+pub impl ToJson for ContentEmbedding with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("shape", self.shape)
+  .opt("values", self.values)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ContentEmbedding with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ContentEmbedding with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    shape: @sdkjson.opt_field(obj, "shape", path),
+    values: @sdkjson.opt_field(obj, "values", path),
+  }
+}
+
+///|
+///
+/// The modality associated with this token count. Enum values: MODALITY_UNSPECIFIED: Unspecified modality.; TEXT: Plain text.; IMAGE: Image.; VIDEO: Video.; AUDIO: Audio.; DOCUMENT: Document, e.g. PDF.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ModalityTokenCountModality {
+  MODALITYUNSPECIFIED
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  Unknown(String)
+}
+
+///|
+pub extend ModalityTokenCountModality with Eq::{equal, not_equal}
+
+///|
+pub extend ModalityTokenCountModality with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ModalityTokenCountModality with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModalityTokenCountModality with fn to_json(self) {
+  let raw = match self {
+    ModalityTokenCountModality::MODALITYUNSPECIFIED => "MODALITY_UNSPECIFIED"
+    ModalityTokenCountModality::TEXT => "TEXT"
+    ModalityTokenCountModality::IMAGE => "IMAGE"
+    ModalityTokenCountModality::VIDEO => "VIDEO"
+    ModalityTokenCountModality::AUDIO => "AUDIO"
+    ModalityTokenCountModality::DOCUMENT => "DOCUMENT"
+    ModalityTokenCountModality::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ModalityTokenCountModality with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModalityTokenCountModality with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MODALITY_UNSPECIFIED" =>
+          Option::Some(ModalityTokenCountModality::MODALITYUNSPECIFIED)
+        "TEXT" => Option::Some(ModalityTokenCountModality::TEXT)
+        "IMAGE" => Option::Some(ModalityTokenCountModality::IMAGE)
+        "VIDEO" => Option::Some(ModalityTokenCountModality::VIDEO)
+        "AUDIO" => Option::Some(ModalityTokenCountModality::AUDIO)
+        "DOCUMENT" => Option::Some(ModalityTokenCountModality::DOCUMENT)
+        _ => Option::None
+      }
+    },
+    raw => ModalityTokenCountModality::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Represents token counting info for a single modality.
+#derive(Eq, @debug.Debug)
+pub(all) struct ModalityTokenCount {
+  token_count : Int32?
+  modality : ModalityTokenCountModality?
+}
+
+///|
+pub extend ModalityTokenCount with Eq::{equal, not_equal}
+
+///|
+pub extend ModalityTokenCount with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ModalityTokenCount with omitted optional fields absent.
+pub fn ModalityTokenCount::new(
+  token_count? : Int32,
+  modality? : ModalityTokenCountModality,
+) -> ModalityTokenCount {
+  { token_count, modality, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ModalityTokenCount with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModalityTokenCount with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("tokenCount", self.token_count)
+  .opt("modality", self.modality)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ModalityTokenCount with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModalityTokenCount with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    token_count: @sdkjson.opt_field(obj, "tokenCount", path),
+    modality: @sdkjson.opt_field(obj, "modality", path),
+  }
+}
+
+///|
+///
 /// Metadata on the usage of the embedding request.
 #derive(Eq, @debug.Debug)
 pub(all) struct EmbeddingUsageMetadata {
-  prompt_token_details : Array[ModalityTokenCount]?
   prompt_token_count : Int32?
+  prompt_token_details : Array[ModalityTokenCount]?
 }
 
 ///|
@@ -10917,10 +10542,10 @@ pub extend EmbeddingUsageMetadata with @debug.Debug::{to_repr}
 ///
 /// Creates a EmbeddingUsageMetadata with omitted optional fields absent.
 pub fn EmbeddingUsageMetadata::new(
-  prompt_token_details? : Array[ModalityTokenCount],
   prompt_token_count? : Int32,
+  prompt_token_details? : Array[ModalityTokenCount],
 ) -> EmbeddingUsageMetadata {
-  { prompt_token_details, prompt_token_count, }
+  { prompt_token_count, prompt_token_details, }
 }
 
 ///|
@@ -10931,8 +10556,8 @@ pub extend EmbeddingUsageMetadata with ToJson::{to_json}
 ///|
 pub impl ToJson for EmbeddingUsageMetadata with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("promptTokenDetails", self.prompt_token_details)
   .opt("promptTokenCount", self.prompt_token_count)
+  .opt("promptTokenDetails", self.prompt_token_details)
   .build()
 }
 
@@ -10948,164 +10573,8 @@ pub impl @json.FromJson for EmbeddingUsageMetadata with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    prompt_token_details: @sdkjson.opt_field(obj, "promptTokenDetails", path),
     prompt_token_count: @sdkjson.opt_field(obj, "promptTokenCount", path),
-  }
-}
-
-///|
-///
-/// Response for `ListFiles`.
-#derive(Eq, @debug.Debug)
-pub(all) struct ListFilesResponse {
-  files : Array[File]?
-  next_page_token : String?
-}
-
-///|
-pub extend ListFilesResponse with Eq::{equal, not_equal}
-
-///|
-pub extend ListFilesResponse with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ListFilesResponse with omitted optional fields absent.
-pub fn ListFilesResponse::new(
-  files? : Array[File],
-  next_page_token? : String,
-) -> ListFilesResponse {
-  { files, next_page_token, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ListFilesResponse with ToJson::{to_json}
-
-///|
-pub impl ToJson for ListFilesResponse with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("files", self.files)
-  .opt("nextPageToken", self.next_page_token)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ListFilesResponse with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ListFilesResponse with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    files: @sdkjson.opt_field(obj, "files", path),
-    next_page_token: @sdkjson.opt_field(obj, "nextPageToken", path),
-  }
-}
-
-///|
-///
-/// A list of floats representing an embedding.
-#derive(Eq, @debug.Debug)
-pub(all) struct ContentEmbedding {
-  values : Array[Double]?
-  shape : Array[Int32]?
-}
-
-///|
-pub extend ContentEmbedding with Eq::{equal, not_equal}
-
-///|
-pub extend ContentEmbedding with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ContentEmbedding with omitted optional fields absent.
-pub fn ContentEmbedding::new(
-  values? : Array[Double],
-  shape? : Array[Int32],
-) -> ContentEmbedding {
-  { values, shape, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ContentEmbedding with ToJson::{to_json}
-
-///|
-pub impl ToJson for ContentEmbedding with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("values", self.values)
-  .opt("shape", self.shape)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ContentEmbedding with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ContentEmbedding with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    values: @sdkjson.opt_field(obj, "values", path),
-    shape: @sdkjson.opt_field(obj, "shape", path),
-  }
-}
-
-///|
-///
-/// The response to an `EmbedContentRequest`.
-#derive(Eq, @debug.Debug)
-pub(all) struct EmbedContentResponse {
-  embedding : ContentEmbedding?
-  usage_metadata : EmbeddingUsageMetadata?
-}
-
-///|
-pub extend EmbedContentResponse with Eq::{equal, not_equal}
-
-///|
-pub extend EmbedContentResponse with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a EmbedContentResponse with omitted optional fields absent.
-pub fn EmbedContentResponse::new(
-  embedding? : ContentEmbedding,
-  usage_metadata? : EmbeddingUsageMetadata,
-) -> EmbedContentResponse {
-  { embedding, usage_metadata, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend EmbedContentResponse with ToJson::{to_json}
-
-///|
-pub impl ToJson for EmbedContentResponse with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("embedding", self.embedding)
-  .opt("usageMetadata", self.usage_metadata)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend EmbedContentResponse with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for EmbedContentResponse with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    embedding: @sdkjson.opt_field(obj, "embedding", path),
-    usage_metadata: @sdkjson.opt_field(obj, "usageMetadata", path),
+    prompt_token_details: @sdkjson.opt_field(obj, "promptTokenDetails", path),
   }
 }
 
@@ -11166,100 +10635,706 @@ pub impl @json.FromJson for BatchEmbedContentsResponse with fn from_json(
 
 ///|
 ///
-/// Batch request to get embeddings from the model for a list of prompts.
+/// Optional. If set, the prompt was blocked and no candidates are returned. Rephrase the prompt. Enum values: BLOCK_REASON_UNSPECIFIED: Default value. This value is unused.; SAFETY: Prompt was blocked due to safety reasons. Inspect `safety_ratings` to understand which safety category blocked it.; OTHER: Prompt was blocked due to unknown reasons.; BLOCKLIST: Prompt was blocked due to the terms which are included from the terminology blocklist.; PROHIBITED_CONTENT: Prompt was blocked due to prohibited content.; IMAGE_SAFETY: Candidates blocked due to unsafe image generation content.
 #derive(Eq, @debug.Debug)
-pub(all) struct BatchEmbedContentsRequest {
-  requests : Array[EmbedContentRequest]?
+#non_exhaustive
+pub(all) enum PromptFeedbackBlockReason {
+  BLOCKREASONUNSPECIFIED
+  SAFETY
+  OTHER
+  BLOCKLIST
+  PROHIBITEDCONTENT
+  IMAGESAFETY
+  Unknown(String)
 }
 
 ///|
-pub extend BatchEmbedContentsRequest with Eq::{equal, not_equal}
+pub extend PromptFeedbackBlockReason with Eq::{equal, not_equal}
 
 ///|
-pub extend BatchEmbedContentsRequest with @debug.Debug::{to_repr}
+pub extend PromptFeedbackBlockReason with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a BatchEmbedContentsRequest with omitted optional fields absent.
-pub fn BatchEmbedContentsRequest::new(
-  requests? : Array[EmbedContentRequest],
-) -> BatchEmbedContentsRequest {
-  { requests, }
+/// Encodes this string enum as JSON.
+pub extend PromptFeedbackBlockReason with ToJson::{to_json}
+
+///|
+pub impl ToJson for PromptFeedbackBlockReason with fn to_json(self) {
+  let raw = match self {
+    PromptFeedbackBlockReason::BLOCKREASONUNSPECIFIED =>
+      "BLOCK_REASON_UNSPECIFIED"
+    PromptFeedbackBlockReason::SAFETY => "SAFETY"
+    PromptFeedbackBlockReason::OTHER => "OTHER"
+    PromptFeedbackBlockReason::BLOCKLIST => "BLOCKLIST"
+    PromptFeedbackBlockReason::PROHIBITEDCONTENT => "PROHIBITED_CONTENT"
+    PromptFeedbackBlockReason::IMAGESAFETY => "IMAGE_SAFETY"
+    PromptFeedbackBlockReason::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
 }
 
 ///|
 ///
-/// Encodes this value as JSON.
-pub extend BatchEmbedContentsRequest with ToJson::{to_json}
+/// Decodes this string enum from JSON.
+pub extend PromptFeedbackBlockReason with @json.FromJson::{from_json}
 
 ///|
-pub impl ToJson for BatchEmbedContentsRequest with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("requests", self.requests).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend BatchEmbedContentsRequest with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for BatchEmbedContentsRequest with fn from_json(
+pub impl @json.FromJson for PromptFeedbackBlockReason with fn from_json(
   value,
   path,
 ) {
-  let obj = @sdkjson.expect_object(value, path)
-  { requests: @sdkjson.opt_field(obj, "requests", path), }
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "BLOCK_REASON_UNSPECIFIED" =>
+          Option::Some(PromptFeedbackBlockReason::BLOCKREASONUNSPECIFIED)
+        "SAFETY" => Option::Some(PromptFeedbackBlockReason::SAFETY)
+        "OTHER" => Option::Some(PromptFeedbackBlockReason::OTHER)
+        "BLOCKLIST" => Option::Some(PromptFeedbackBlockReason::BLOCKLIST)
+        "PROHIBITED_CONTENT" =>
+          Option::Some(PromptFeedbackBlockReason::PROHIBITEDCONTENT)
+        "IMAGE_SAFETY" => Option::Some(PromptFeedbackBlockReason::IMAGESAFETY)
+        _ => Option::None
+      }
+    },
+    raw => PromptFeedbackBlockReason::Unknown(raw),
+  )
 }
 
 ///|
 ///
-/// Response from `ListModel` containing a paginated list of Models.
+/// A set of the feedback metadata the prompt specified in `GenerateContentRequest.content`.
 #derive(Eq, @debug.Debug)
-pub(all) struct ListModelsResponse {
-  models : Array[Model]?
-  next_page_token : String?
+pub(all) struct PromptFeedback {
+  block_reason : PromptFeedbackBlockReason?
+  safety_ratings : Array[SafetyRating]?
 }
 
 ///|
-pub extend ListModelsResponse with Eq::{equal, not_equal}
+pub extend PromptFeedback with Eq::{equal, not_equal}
 
 ///|
-pub extend ListModelsResponse with @debug.Debug::{to_repr}
+pub extend PromptFeedback with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a ListModelsResponse with omitted optional fields absent.
-pub fn ListModelsResponse::new(
-  models? : Array[Model],
-  next_page_token? : String,
-) -> ListModelsResponse {
-  { models, next_page_token, }
+/// Creates a PromptFeedback with omitted optional fields absent.
+pub fn PromptFeedback::new(
+  block_reason? : PromptFeedbackBlockReason,
+  safety_ratings? : Array[SafetyRating],
+) -> PromptFeedback {
+  { block_reason, safety_ratings, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend ListModelsResponse with ToJson::{to_json}
+pub extend PromptFeedback with ToJson::{to_json}
 
 ///|
-pub impl ToJson for ListModelsResponse with fn to_json(self) {
+pub impl ToJson for PromptFeedback with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("models", self.models)
-  .opt("nextPageToken", self.next_page_token)
+  .opt("blockReason", self.block_reason)
+  .opt("safetyRatings", self.safety_ratings)
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend ListModelsResponse with @json.FromJson::{from_json}
+pub extend PromptFeedback with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for ListModelsResponse with fn from_json(value, path) {
+pub impl @json.FromJson for PromptFeedback with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    models: @sdkjson.opt_field(obj, "models", path),
-    next_page_token: @sdkjson.opt_field(obj, "nextPageToken", path),
+    block_reason: @sdkjson.opt_field(obj, "blockReason", path),
+    safety_ratings: @sdkjson.opt_field(obj, "safetyRatings", path),
+  }
+}
+
+///|
+///
+/// The stage of the underlying model. Enum values: MODEL_STAGE_UNSPECIFIED: Unspecified model stage.; UNSTABLE_EXPERIMENTAL: The underlying model is subject to lots of tunings.; EXPERIMENTAL: Models in this stage are for experimental purposes only.; PREVIEW: Models in this stage are more mature than experimental models.; STABLE: Models in this stage are considered stable and ready for production use.; LEGACY: If the model is on this stage, it means that this model is on the path to deprecation in near future. Only existing customers can use this model.; DEPRECATED: Models in this stage are deprecated. These models cannot be used.; RETIRED: Models in this stage are retired. These models cannot be used.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum ModelStatusModelStage {
+  MODELSTAGEUNSPECIFIED
+  UNSTABLEEXPERIMENTAL
+  EXPERIMENTAL
+  PREVIEW
+  STABLE
+  LEGACY
+  DEPRECATED
+  RETIRED
+  Unknown(String)
+}
+
+///|
+pub extend ModelStatusModelStage with Eq::{equal, not_equal}
+
+///|
+pub extend ModelStatusModelStage with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ModelStatusModelStage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModelStatusModelStage with fn to_json(self) {
+  let raw = match self {
+    ModelStatusModelStage::MODELSTAGEUNSPECIFIED => "MODEL_STAGE_UNSPECIFIED"
+    ModelStatusModelStage::UNSTABLEEXPERIMENTAL => "UNSTABLE_EXPERIMENTAL"
+    ModelStatusModelStage::EXPERIMENTAL => "EXPERIMENTAL"
+    ModelStatusModelStage::PREVIEW => "PREVIEW"
+    ModelStatusModelStage::STABLE => "STABLE"
+    ModelStatusModelStage::LEGACY => "LEGACY"
+    ModelStatusModelStage::DEPRECATED => "DEPRECATED"
+    ModelStatusModelStage::RETIRED => "RETIRED"
+    ModelStatusModelStage::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ModelStatusModelStage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModelStatusModelStage with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "MODEL_STAGE_UNSPECIFIED" =>
+          Option::Some(ModelStatusModelStage::MODELSTAGEUNSPECIFIED)
+        "UNSTABLE_EXPERIMENTAL" =>
+          Option::Some(ModelStatusModelStage::UNSTABLEEXPERIMENTAL)
+        "EXPERIMENTAL" => Option::Some(ModelStatusModelStage::EXPERIMENTAL)
+        "PREVIEW" => Option::Some(ModelStatusModelStage::PREVIEW)
+        "STABLE" => Option::Some(ModelStatusModelStage::STABLE)
+        "LEGACY" => Option::Some(ModelStatusModelStage::LEGACY)
+        "DEPRECATED" => Option::Some(ModelStatusModelStage::DEPRECATED)
+        "RETIRED" => Option::Some(ModelStatusModelStage::RETIRED)
+        _ => Option::None
+      }
+    },
+    raw => ModelStatusModelStage::Unknown(raw),
+  )
+}
+
+///|
+///
+/// The status of the underlying model. This is used to indicate the stage of the underlying model and the retirement time if applicable.
+#derive(Eq, @debug.Debug)
+pub(all) struct ModelStatus {
+  retirement_time : String?
+  model_stage : ModelStatusModelStage?
+  message : String?
+}
+
+///|
+pub extend ModelStatus with Eq::{equal, not_equal}
+
+///|
+pub extend ModelStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ModelStatus with omitted optional fields absent.
+pub fn ModelStatus::new(
+  retirement_time? : String,
+  model_stage? : ModelStatusModelStage,
+  message? : String,
+) -> ModelStatus {
+  { retirement_time, model_stage, message, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ModelStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModelStatus with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("retirementTime", self.retirement_time)
+  .opt("modelStage", self.model_stage)
+  .opt("message", self.message)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ModelStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModelStatus with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    retirement_time: @sdkjson.opt_field(obj, "retirementTime", path),
+    model_stage: @sdkjson.opt_field(obj, "modelStage", path),
+    message: @sdkjson.opt_field(obj, "message", path),
+  }
+}
+
+///|
+///
+/// Output only. Service tier of the request. Enum values: unspecified: Default service tier, which is standard.; standard: Standard service tier.; flex: Flex service tier.; priority: Priority service tier.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UsageMetadataServiceTier {
+  Unspecified
+  Standard
+  Flex
+  Priority
+  Unknown(String)
+}
+
+///|
+pub extend UsageMetadataServiceTier with Eq::{equal, not_equal}
+
+///|
+pub extend UsageMetadataServiceTier with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UsageMetadataServiceTier with ToJson::{to_json}
+
+///|
+pub impl ToJson for UsageMetadataServiceTier with fn to_json(self) {
+  let raw = match self {
+    UsageMetadataServiceTier::Unspecified => "unspecified"
+    UsageMetadataServiceTier::Standard => "standard"
+    UsageMetadataServiceTier::Flex => "flex"
+    UsageMetadataServiceTier::Priority => "priority"
+    UsageMetadataServiceTier::Unknown(raw) => raw
+  }
+  @json.Json::Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UsageMetadataServiceTier with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UsageMetadataServiceTier with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "unspecified" => Option::Some(UsageMetadataServiceTier::Unspecified)
+        "standard" => Option::Some(UsageMetadataServiceTier::Standard)
+        "flex" => Option::Some(UsageMetadataServiceTier::Flex)
+        "priority" => Option::Some(UsageMetadataServiceTier::Priority)
+        _ => Option::None
+      }
+    },
+    raw => UsageMetadataServiceTier::Unknown(raw),
+  )
+}
+
+///|
+///
+/// Metadata on the generation request's token usage.
+#derive(Eq, @debug.Debug)
+pub(all) struct UsageMetadata {
+  service_tier : UsageMetadataServiceTier?
+  candidates_token_count : Int32?
+  cache_tokens_details : Array[ModalityTokenCount]?
+  tool_use_prompt_token_count : Int32?
+  candidates_tokens_details : Array[ModalityTokenCount]?
+  cached_content_token_count : Int32?
+  thoughts_token_count : Int32?
+  prompt_tokens_details : Array[ModalityTokenCount]?
+  total_token_count : Int32?
+  tool_use_prompt_tokens_details : Array[ModalityTokenCount]?
+  prompt_token_count : Int32?
+}
+
+///|
+pub extend UsageMetadata with Eq::{equal, not_equal}
+
+///|
+pub extend UsageMetadata with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UsageMetadata with omitted optional fields absent.
+pub fn UsageMetadata::new(
+  service_tier? : UsageMetadataServiceTier,
+  candidates_token_count? : Int32,
+  cache_tokens_details? : Array[ModalityTokenCount],
+  tool_use_prompt_token_count? : Int32,
+  candidates_tokens_details? : Array[ModalityTokenCount],
+  cached_content_token_count? : Int32,
+  thoughts_token_count? : Int32,
+  prompt_tokens_details? : Array[ModalityTokenCount],
+  total_token_count? : Int32,
+  tool_use_prompt_tokens_details? : Array[ModalityTokenCount],
+  prompt_token_count? : Int32,
+) -> UsageMetadata {
+  {
+    service_tier,
+    candidates_token_count,
+    cache_tokens_details,
+    tool_use_prompt_token_count,
+    candidates_tokens_details,
+    cached_content_token_count,
+    thoughts_token_count,
+    prompt_tokens_details,
+    total_token_count,
+    tool_use_prompt_tokens_details,
+    prompt_token_count,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UsageMetadata with ToJson::{to_json}
+
+///|
+pub impl ToJson for UsageMetadata with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("serviceTier", self.service_tier)
+  .opt("candidatesTokenCount", self.candidates_token_count)
+  .opt("cacheTokensDetails", self.cache_tokens_details)
+  .opt("toolUsePromptTokenCount", self.tool_use_prompt_token_count)
+  .opt("candidatesTokensDetails", self.candidates_tokens_details)
+  .opt("cachedContentTokenCount", self.cached_content_token_count)
+  .opt("thoughtsTokenCount", self.thoughts_token_count)
+  .opt("promptTokensDetails", self.prompt_tokens_details)
+  .opt("totalTokenCount", self.total_token_count)
+  .opt("toolUsePromptTokensDetails", self.tool_use_prompt_tokens_details)
+  .opt("promptTokenCount", self.prompt_token_count)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UsageMetadata with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UsageMetadata with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    service_tier: @sdkjson.opt_field(obj, "serviceTier", path),
+    candidates_token_count: @sdkjson.opt_field(
+      obj, "candidatesTokenCount", path,
+    ),
+    cache_tokens_details: @sdkjson.opt_field(obj, "cacheTokensDetails", path),
+    tool_use_prompt_token_count: @sdkjson.opt_field(
+      obj, "toolUsePromptTokenCount", path,
+    ),
+    candidates_tokens_details: @sdkjson.opt_field(
+      obj, "candidatesTokensDetails", path,
+    ),
+    cached_content_token_count: @sdkjson.opt_field(
+      obj, "cachedContentTokenCount", path,
+    ),
+    thoughts_token_count: @sdkjson.opt_field(obj, "thoughtsTokenCount", path),
+    prompt_tokens_details: @sdkjson.opt_field(obj, "promptTokensDetails", path),
+    total_token_count: @sdkjson.opt_field(obj, "totalTokenCount", path),
+    tool_use_prompt_tokens_details: @sdkjson.opt_field(
+      obj, "toolUsePromptTokensDetails", path,
+    ),
+    prompt_token_count: @sdkjson.opt_field(obj, "promptTokenCount", path),
+  }
+}
+
+///|
+///
+/// Response from the model supporting multiple candidate responses. Safety ratings and content filtering are reported for both prompt in `GenerateContentResponse.prompt_feedback` and for each candidate in `finish_reason` and in `safety_ratings`. The API: - Returns either all requested candidates or none of them - Returns no candidates at all only if there was something wrong with the prompt (check `prompt_feedback`) - Reports feedback on each candidate in `finish_reason` and `safety_ratings`.
+#derive(Eq, @debug.Debug)
+pub(all) struct GenerateContentResponse {
+  response_id : String?
+  prompt_feedback : PromptFeedback?
+  model_version : String?
+  model_status : ModelStatus?
+  usage_metadata : UsageMetadata?
+  candidates : Array[Candidate]?
+}
+
+///|
+pub extend GenerateContentResponse with Eq::{equal, not_equal}
+
+///|
+pub extend GenerateContentResponse with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a GenerateContentResponse with omitted optional fields absent.
+pub fn GenerateContentResponse::new(
+  response_id? : String,
+  prompt_feedback? : PromptFeedback,
+  model_version? : String,
+  model_status? : ModelStatus,
+  usage_metadata? : UsageMetadata,
+  candidates? : Array[Candidate],
+) -> GenerateContentResponse {
+  {
+    response_id,
+    prompt_feedback,
+    model_version,
+    model_status,
+    usage_metadata,
+    candidates,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend GenerateContentResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for GenerateContentResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("responseId", self.response_id)
+  .opt("promptFeedback", self.prompt_feedback)
+  .opt("modelVersion", self.model_version)
+  .opt("modelStatus", self.model_status)
+  .opt("usageMetadata", self.usage_metadata)
+  .opt("candidates", self.candidates)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend GenerateContentResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for GenerateContentResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    response_id: @sdkjson.opt_field(obj, "responseId", path),
+    prompt_feedback: @sdkjson.opt_field(obj, "promptFeedback", path),
+    model_version: @sdkjson.opt_field(obj, "modelVersion", path),
+    model_status: @sdkjson.opt_field(obj, "modelStatus", path),
+    usage_metadata: @sdkjson.opt_field(obj, "usageMetadata", path),
+    candidates: @sdkjson.opt_field(obj, "candidates", path),
+  }
+}
+
+///|
+///
+/// The response to an `EmbedContentRequest`.
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbedContentResponse {
+  usage_metadata : EmbeddingUsageMetadata?
+  embedding : ContentEmbedding?
+}
+
+///|
+pub extend EmbedContentResponse with Eq::{equal, not_equal}
+
+///|
+pub extend EmbedContentResponse with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a EmbedContentResponse with omitted optional fields absent.
+pub fn EmbedContentResponse::new(
+  usage_metadata? : EmbeddingUsageMetadata,
+  embedding? : ContentEmbedding,
+) -> EmbedContentResponse {
+  { usage_metadata, embedding, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend EmbedContentResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for EmbedContentResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("usageMetadata", self.usage_metadata)
+  .opt("embedding", self.embedding)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend EmbedContentResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EmbedContentResponse with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    usage_metadata: @sdkjson.opt_field(obj, "usageMetadata", path),
+    embedding: @sdkjson.opt_field(obj, "embedding", path),
+  }
+}
+
+///|
+///
+/// Response for `CreateFile`.
+#derive(Eq, @debug.Debug)
+pub(all) struct CreateFileResponse {
+  file : File?
+}
+
+///|
+pub extend CreateFileResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CreateFileResponse with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CreateFileResponse with omitted optional fields absent.
+pub fn CreateFileResponse::new(file? : File) -> CreateFileResponse {
+  { file, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateFileResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateFileResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("file", self.file).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateFileResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateFileResponse with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { file: @sdkjson.opt_field(obj, "file", path), }
+}
+
+///|
+///
+/// Request for `CreateFile`.
+#derive(Eq, @debug.Debug)
+pub(all) struct CreateFileRequest {
+  file : File?
+}
+
+///|
+pub extend CreateFileRequest with Eq::{equal, not_equal}
+
+///|
+pub extend CreateFileRequest with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CreateFileRequest with omitted optional fields absent.
+pub fn CreateFileRequest::new(file? : File) -> CreateFileRequest {
+  { file, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateFileRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateFileRequest with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("file", self.file).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateFileRequest with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateFileRequest with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { file: @sdkjson.opt_field(obj, "file", path), }
+}
+
+///|
+///
+/// A response from `CountTokens`. It returns the model's `token_count` for the `prompt`.
+#derive(Eq, @debug.Debug)
+pub(all) struct CountTokensResponse {
+  cached_content_token_count : Int32?
+  prompt_tokens_details : Array[ModalityTokenCount]?
+  cache_tokens_details : Array[ModalityTokenCount]?
+  total_tokens : Int32?
+}
+
+///|
+pub extend CountTokensResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CountTokensResponse with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CountTokensResponse with omitted optional fields absent.
+pub fn CountTokensResponse::new(
+  cached_content_token_count? : Int32,
+  prompt_tokens_details? : Array[ModalityTokenCount],
+  cache_tokens_details? : Array[ModalityTokenCount],
+  total_tokens? : Int32,
+) -> CountTokensResponse {
+  {
+    cached_content_token_count,
+    prompt_tokens_details,
+    cache_tokens_details,
+    total_tokens,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CountTokensResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for CountTokensResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("cachedContentTokenCount", self.cached_content_token_count)
+  .opt("promptTokensDetails", self.prompt_tokens_details)
+  .opt("cacheTokensDetails", self.cache_tokens_details)
+  .opt("totalTokens", self.total_tokens)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CountTokensResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CountTokensResponse with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cached_content_token_count: @sdkjson.opt_field(
+      obj, "cachedContentTokenCount", path,
+    ),
+    prompt_tokens_details: @sdkjson.opt_field(obj, "promptTokensDetails", path),
+    cache_tokens_details: @sdkjson.opt_field(obj, "cacheTokensDetails", path),
+    total_tokens: @sdkjson.opt_field(obj, "totalTokens", path),
   }
 }
 

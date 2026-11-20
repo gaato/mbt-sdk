@@ -8,6 +8,7 @@
 - **Regenerated from the upstream spec fetched 2026-11-16** (sha256 `9ef8b554c97e`). Changes are batched for the next weekly release; see the generated interface diff.
 - **Build with MoonBit 0.10.21 and mttp_core 0.3.0.** Invalid explicit header values, including surrounding whitespace, return validation failures before I/O.
 - **Regenerated from the upstream spec fetched 2026-11-18** (sha256 `f9fc221fdb72`). Changes are batched for the next weekly release; see the generated interface diff.
+- **Regenerated from the upstream spec fetched 2026-11-20** (sha256 `474ab75875fb`). Changes are batched for the next weekly release; see the generated interface diff.
 
 ### Security
 

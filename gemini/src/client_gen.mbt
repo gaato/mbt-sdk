@@ -339,71 +339,7 @@ fn Gemini::operation_config(
 ) -> (Bool, String) {
   ignore(self)
   match operation {
-    "files_get" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "files_delete" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "files_list" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "media_upload" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "cached_contents_delete" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "cached_contents_patch" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "cached_contents_list" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "cached_contents_create" =>
-      (
-        match self.auth {
-          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
-          _ => false
-        },
-        "",
-      )
-    "cached_contents_get" =>
+    "models_get" =>
       (
         match self.auth {
           Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
@@ -427,6 +363,22 @@ fn Gemini::operation_config(
         },
         "",
       )
+    "models_count_tokens" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
+    "models_list" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
     "models_generate_content" =>
       (
         match self.auth {
@@ -443,7 +395,7 @@ fn Gemini::operation_config(
         },
         "",
       )
-    "models_list" =>
+    "files_list" =>
       (
         match self.auth {
           Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
@@ -451,7 +403,7 @@ fn Gemini::operation_config(
         },
         "",
       )
-    "models_get" =>
+    "media_upload" =>
       (
         match self.auth {
           Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
@@ -459,7 +411,55 @@ fn Gemini::operation_config(
         },
         "",
       )
-    "models_count_tokens" =>
+    "files_delete" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
+    "files_get" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
+    "cached_contents_create" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
+    "cached_contents_list" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
+    "cached_contents_patch" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
+    "cached_contents_delete" =>
+      (
+        match self.auth {
+          Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
+          _ => false
+        },
+        "",
+      )
+    "cached_contents_get" =>
       (
         match self.auth {
           Auth::ApiKey(_) | Auth::ApiKeyInQuery(_) | Auth::OAuthToken(_) => true
@@ -476,66 +476,10 @@ fn Gemini::infer_operation(self : Gemini, request : @http.Request) -> String {
   if request.meth == @http.Method::parse("GET") &&
     resource_route_matches(
       request.url,
-      "^/v1beta/(?:files/[^/]+)$",
+      "^/v1beta/(?:models/[^/]+)$",
       self.operation_base(""),
     ) {
-    return "files_get"
-  }
-  if request.meth == @http.Method::parse("DELETE") &&
-    resource_route_matches(
-      request.url,
-      "^/v1beta/(?:files/[^/]+)$",
-      self.operation_base(""),
-    ) {
-    return "files_delete"
-  }
-  if request.meth == @http.Method::parse("GET") &&
-    route_matches(request.url, "/v1beta/files", self.operation_base("")) {
-    return "files_list"
-  }
-  if request.meth == @http.Method::parse("POST") &&
-    route_matches(request.url, "/v1beta/files", self.operation_base("")) {
-    return "media_upload"
-  }
-  if request.meth == @http.Method::parse("DELETE") &&
-    resource_route_matches(
-      request.url,
-      "^/v1beta/(?:cachedContents/[^/]+)$",
-      self.operation_base(""),
-    ) {
-    return "cached_contents_delete"
-  }
-  if request.meth == @http.Method::parse("PATCH") &&
-    resource_route_matches(
-      request.url,
-      "^/v1beta/(?:cachedContents/[^/]+)$",
-      self.operation_base(""),
-    ) {
-    return "cached_contents_patch"
-  }
-  if request.meth == @http.Method::parse("GET") &&
-    route_matches(
-      request.url,
-      "/v1beta/cachedContents",
-      self.operation_base(""),
-    ) {
-    return "cached_contents_list"
-  }
-  if request.meth == @http.Method::parse("POST") &&
-    route_matches(
-      request.url,
-      "/v1beta/cachedContents",
-      self.operation_base(""),
-    ) {
-    return "cached_contents_create"
-  }
-  if request.meth == @http.Method::parse("GET") &&
-    resource_route_matches(
-      request.url,
-      "^/v1beta/(?:cachedContents/[^/]+)$",
-      self.operation_base(""),
-    ) {
-    return "cached_contents_get"
+    return "models_get"
   }
   if request.meth == @http.Method::parse("POST") &&
     resource_route_matches(
@@ -556,6 +500,18 @@ fn Gemini::infer_operation(self : Gemini, request : @http.Request) -> String {
   if request.meth == @http.Method::parse("POST") &&
     resource_route_matches(
       request.url,
+      "^/v1beta/(?:models/[^/]+):countTokens$",
+      self.operation_base(""),
+    ) {
+    return "models_count_tokens"
+  }
+  if request.meth == @http.Method::parse("GET") &&
+    route_matches(request.url, "/v1beta/models", self.operation_base("")) {
+    return "models_list"
+  }
+  if request.meth == @http.Method::parse("POST") &&
+    resource_route_matches(
+      request.url,
       "^/v1beta/(?:models/[^/]+):generateContent$",
       self.operation_base(""),
     ) {
@@ -570,24 +526,68 @@ fn Gemini::infer_operation(self : Gemini, request : @http.Request) -> String {
     return "models_stream_generate_content"
   }
   if request.meth == @http.Method::parse("GET") &&
-    route_matches(request.url, "/v1beta/models", self.operation_base("")) {
-    return "models_list"
+    route_matches(request.url, "/v1beta/files", self.operation_base("")) {
+    return "files_list"
+  }
+  if request.meth == @http.Method::parse("POST") &&
+    route_matches(request.url, "/v1beta/files", self.operation_base("")) {
+    return "media_upload"
+  }
+  if request.meth == @http.Method::parse("DELETE") &&
+    resource_route_matches(
+      request.url,
+      "^/v1beta/(?:files/[^/]+)$",
+      self.operation_base(""),
+    ) {
+    return "files_delete"
   }
   if request.meth == @http.Method::parse("GET") &&
     resource_route_matches(
       request.url,
-      "^/v1beta/(?:models/[^/]+)$",
+      "^/v1beta/(?:files/[^/]+)$",
       self.operation_base(""),
     ) {
-    return "models_get"
+    return "files_get"
   }
   if request.meth == @http.Method::parse("POST") &&
-    resource_route_matches(
+    route_matches(
       request.url,
-      "^/v1beta/(?:models/[^/]+):countTokens$",
+      "/v1beta/cachedContents",
       self.operation_base(""),
     ) {
-    return "models_count_tokens"
+    return "cached_contents_create"
+  }
+  if request.meth == @http.Method::parse("GET") &&
+    route_matches(
+      request.url,
+      "/v1beta/cachedContents",
+      self.operation_base(""),
+    ) {
+    return "cached_contents_list"
+  }
+  if request.meth == @http.Method::parse("PATCH") &&
+    resource_route_matches(
+      request.url,
+      "^/v1beta/(?:cachedContents/[^/]+)$",
+      self.operation_base(""),
+    ) {
+    return "cached_contents_patch"
+  }
+  if request.meth == @http.Method::parse("DELETE") &&
+    resource_route_matches(
+      request.url,
+      "^/v1beta/(?:cachedContents/[^/]+)$",
+      self.operation_base(""),
+    ) {
+    return "cached_contents_delete"
+  }
+  if request.meth == @http.Method::parse("GET") &&
+    resource_route_matches(
+      request.url,
+      "^/v1beta/(?:cachedContents/[^/]+)$",
+      self.operation_base(""),
+    ) {
+    return "cached_contents_get"
   }
   ""
 }
