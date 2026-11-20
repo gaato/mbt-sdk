@@ -22210,6 +22210,62 @@ pub impl @json.FromJson for ErrorResponse with fn from_json(value, path) {
 
 ///|
 ///
+/// The longest side of one or more images in the request exceeds the image size limit. Scale each image in `paths` so that neither side exceeds `max_side_length_pixels`, or remove it, then retry.
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageDimensionsTooLargeErrorDetails {
+  max_side_length_pixels : Int32
+  paths : Array[String]
+}
+
+///|
+pub extend ImageDimensionsTooLargeErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ImageDimensionsTooLargeErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ImageDimensionsTooLargeErrorDetails with omitted optional fields absent.
+pub fn ImageDimensionsTooLargeErrorDetails::new(
+  max_side_length_pixels~ : Int32,
+  paths~ : Array[String],
+) -> ImageDimensionsTooLargeErrorDetails {
+  { max_side_length_pixels, paths, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ImageDimensionsTooLargeErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ImageDimensionsTooLargeErrorDetails with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "image_dimensions_too_large")
+  .field("max_side_length_pixels", self.max_side_length_pixels)
+  .field("paths", self.paths)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ImageDimensionsTooLargeErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ImageDimensionsTooLargeErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    max_side_length_pixels: required_field(obj, "max_side_length_pixels", path),
+    paths: required_field(obj, "paths", path),
+  }
+}
+
+///|
+///
 /// Anthropic cannot currently bill the organization linked to the request's user profile, for a reason that lies with that organization's own account. The response does not say what the reason is.
 #derive(Eq, @debug.Debug)
 pub(all) struct LinkedOrganizationBillingUnavailableErrorDetails {}
@@ -24462,7 +24518,7 @@ pub impl @json.FromJson for ToolReferenceUnresolvedErrorDetails with fn from_jso
 
 ///|
 ///
-/// The customer that the named user profile represents has not authorized the caller to bill them, or the authorization that the request's credential uses has ended. The response does not say which applies.
+/// The customer that the request's user profile represents has not authorized the caller to bill them, or the authorization that the request's credential uses has ended. The response does not say which applies.
 #derive(Eq, @debug.Debug)
 pub(all) struct UserProfileBillingNotAuthorizedErrorDetails {}
 
@@ -24509,7 +24565,7 @@ pub impl @json.FromJson for UserProfileBillingNotAuthorizedErrorDetails with fn 
 
 ///|
 ///
-/// The caller is not allowed to bill the user profile that the request names. The response gives no more specific error code and does not say what the reason is.
+/// The request's user profile cannot be billed. The response gives no more specific error code and does not say what the reason is.
 #derive(Eq, @debug.Debug)
 pub(all) struct UserProfileNotBillableErrorDetails {}
 
