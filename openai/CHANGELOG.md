@@ -70,6 +70,9 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
   JSON objects and arrays in `extra`, preserving metadata snapshots.
 - `create_embeddings` rejects `encoding_format: "base64"` in `extra` before
   I/O. Embeddings returned as JSON number arrays remain supported.
+- **The README's Timeouts no longer refer to an example that is not there.**
+  It names the backend's phase deadlines (`connect_timeout_ms`,
+  `read_timeout_ms` and the rest of its `ClientConfig`) instead.
 
 ### Security
 

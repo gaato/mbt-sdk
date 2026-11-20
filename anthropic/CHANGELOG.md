@@ -26,6 +26,12 @@ are optional unless the field is required, and keep a wildcard arm.
 
 - **Mark x-api-key and Authorization on each request.** Caller-owned Clients strip the marked headers on cross-host redirects and redact them in curl diagnostics. The same-host default-port HTTP-to-HTTPS exception still applies.
 
+### Fixed
+
+- **The README's Timeouts no longer refer to an example that is not there.**
+  It names the backend's phase deadlines (`connect_timeout_ms`,
+  `read_timeout_ms` and the rest of its `ClientConfig`) instead.
+
 ## [0.17.0] - 2026-11-12
 
 ### Changed

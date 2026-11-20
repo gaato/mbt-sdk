@@ -242,8 +242,9 @@ policy; free-text error messages are not used to guess retryability.
 Each attempt defaults to 600 s. A configured `total_timeout_ms` requires a
 `timer` and covers admission, retries, waits and streaming callbacks.
 Expiry initiates cancellation; necessary cleanup may finish afterwards.
-Backend phase deadlines can finish a call earlier. The example sets a
-5-second connect deadline; the SDK passes the attempt budget in SendOptions.
+Backend phase deadlines (`connect_timeout_ms`, `read_timeout_ms` and the
+others of the backend's `ClientConfig`) can finish a call earlier; the SDK
+passes the attempt budget in SendOptions.
 Streaming callbacks run after the attempt has been selected and are not
 retried after delivery starts. Close the backend when its owner shuts down.
 

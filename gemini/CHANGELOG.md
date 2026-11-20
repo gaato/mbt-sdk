@@ -13,6 +13,10 @@
 
 - **Mark x-goog-api-key and Authorization on each request.** Caller-owned Clients use the marks for redirect stripping and curl redaction.
 
+### Fixed
+
+- **The README's Install adds every module the examples use** (`gaato/mttp_core` and `gaato/mttp`), and the module has a description on mooncakes.io.
+
 ## [0.1.0] - 2026-11-16
 
 First release: a Gemini API client generated from Google's Discovery document

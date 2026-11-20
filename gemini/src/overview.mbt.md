@@ -14,7 +14,13 @@ grounding metadata and typed media parts.
 
 ```sh
 moon add gaato/gemini
+moon add gaato/mttp_core
+moon add gaato/mttp
 ```
+
+An app adds all three: `gaato/mttp` for its backend and clock, `gaato/mttp_core`
+for the `client.Client` the examples take. A library that wraps this SDK adds
+`gaato/gemini` and `gaato/mttp_core`, and takes the backend from its caller.
 
 Import `gaato/gemini`, `gaato/gemini/gen` and `gaato/mttp_core/client`.
 With an existing runtime client:
