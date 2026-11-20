@@ -2202,6 +2202,20 @@ pub fn GatewayTimeoutError::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for GatewayTimeoutError
 pub impl @json.ToJson for GatewayTimeoutError
 
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageDimensionsTooLargeErrorDetails {
+  max_side_length_pixels : Int32
+  paths : Array[String]
+}
+pub fn ImageDimensionsTooLargeErrorDetails::equal(Self, Self) -> Bool
+pub fn ImageDimensionsTooLargeErrorDetails::from_json(@json.Json, @json.DecodeContext) -> Self raise @json.JsonDecodeError
+pub fn ImageDimensionsTooLargeErrorDetails::new(max_side_length_pixels~ : Int32, paths~ : Array[String]) -> Self
+pub fn ImageDimensionsTooLargeErrorDetails::not_equal(Self, Self) -> Bool
+pub fn ImageDimensionsTooLargeErrorDetails::to_json(Self) -> @json.Json
+pub fn ImageDimensionsTooLargeErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageDimensionsTooLargeErrorDetails
+pub impl @json.ToJson for ImageDimensionsTooLargeErrorDetails
+
 #non_exhaustive
 #derive(Eq, @debug.Debug)
 pub(all) enum InputContentBlock {
