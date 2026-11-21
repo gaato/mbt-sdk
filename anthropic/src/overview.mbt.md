@@ -139,7 +139,10 @@ pub async fn answer_with_stock(
   )
   let user = @anthropic.Message::user(question)
   let request = @anthropic.MessageRequest::new(
-    model~, max_tokens=1024, messages=[user], tools=[tool],
+    model~,
+    max_tokens=1024,
+    messages=[user],
+    tools=[tool],
     tool_choice=@anthropic.tool_choice_auto(disable_parallel_tool_use=true),
   )
   let first = match client.create_message(request) {
@@ -150,14 +153,22 @@ pub async fn answer_with_stock(
   let result = match (name, input) {
     ("lookup_stock", { "sku": String(sku), .. }) =>
       @anthropic.Message::tool_result(tool_use_id=id, content=stock_for(sku))
-    _ => @anthropic.Message::tool_result(
-      tool_use_id=id, content="Expected lookup_stock with a string SKU.", is_error=true,
-    )
+    _ =>
+      @anthropic.Message::tool_result(
+        tool_use_id=id,
+        content="Expected lookup_stock with a string SKU.",
+        is_error=true,
+      )
   }
-  client.create_message(@anthropic.MessageRequest::new(
-    model~, max_tokens=1024, tools=[tool], tool_choice=@anthropic.tool_choice_none(),
-    messages=[user, @anthropic.Message::from_response(first), result],
-  ))
+  client.create_message(
+    @anthropic.MessageRequest::new(
+      model~,
+      max_tokens=1024,
+      tools=[tool],
+      tool_choice=@anthropic.tool_choice_none(),
+      messages=[user, @anthropic.Message::from_response(first), result],
+    ),
+  )
 }
 ```
 

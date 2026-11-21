@@ -166,12 +166,14 @@ pub async fn answer_with_stock(
     ),
   )
   for call in first.tool_calls {
-    let args = try Some(call.arguments_json()) catch { _ => None }
+    let args = Some(call.arguments_json()) catch { _ => None }
     let result = match (call.name, args) {
       ("lookup_stock", Some({ "sku": String(sku), .. })) => stock_for(sku)
       _ => "Lookup failed: expected lookup_stock with a string sku."
     }
-    messages.push(@openai.ChatMessage::tool(tool_call_id=call.id, content=result))
+    messages.push(
+      @openai.ChatMessage::tool(tool_call_id=call.id, content=result),
+    )
   }
   match
     client.chat_completion(@openai.ChatRequest::new(model~, messages~, tools~)) {
