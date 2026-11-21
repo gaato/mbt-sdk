@@ -175,8 +175,14 @@ pub async fn answer_with_stock(
       @openai.ChatMessage::tool(tool_call_id=call.id, content=result),
     )
   }
-  match
-    client.chat_completion(@openai.ChatRequest::new(model~, messages~, tools~)) {
+  // `tool_choice="none"` asks for the answer instead of another lookup.
+  let request = @openai.ChatRequest::new(
+    model~,
+    messages~,
+    tools~,
+    tool_choice="none",
+  )
+  match client.chat_completion(request) {
     Ok(reply) => Ok(reply.text)
     Err(failure) => Err(failure)
   }
