@@ -3,8 +3,8 @@
     "src/gen/pkg.generated.mbti": "1783d05d8558e868fff40176e4710a9cec38433c3acba59d618332452f4ca632",
     "src/pkg.generated.mbti": "9c35f3c5acceab32951aac524011ec254678ef4f958274e98527a49a0a9520f4"
   },
-  "artifact_checksum": "12f16b872ea56accb86f08deb06531482dbfc3d8e3224349393f19724dafe0ff",
+  "artifact_checksum": "19d9e559011dce84bd0ad07af8b7a0f037ede5723f7c140a079420f69afd8e90",
   "module": "gaato/cloudflare_dns",
-  "published_at": "2026-11-18T06:45:43.098737+00:00",
-  "version": "0.1.0"
+  "published_at": "2026-11-21T04:04:58.590001+00:00",
+  "version": "0.1.1"
 }
