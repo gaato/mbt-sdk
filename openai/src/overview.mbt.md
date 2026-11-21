@@ -278,6 +278,8 @@ support varies by model.
 | [DashScope / Qwen](https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope) | your region's `compatible-mode/v1` URL | chat, streaming, Responses, embeddings | `prompt_tokens` can be `None`. |
 | [Voyage AI](https://docs.voyageai.com/reference/embeddings-api) | `https://api.voyageai.com/v1` | embeddings | Integer vectors decode; a string `detail` error becomes the `Api` message. |
 
+Providers may restrict temperature, tool choices or streaming tools; Ollama
+does not implement `tool_choice`, which the tool example above sets.
 Provider options go in `extra`, for example `{ "input_type": "query" }` on a
 Voyage `EmbeddingRequest`. Thinking models return
 `ChatCompletion.reasoning_content` and stream `ReasoningDelta` pieces; send the
