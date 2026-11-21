@@ -181,7 +181,8 @@ would refuse the result.
 ## Other operations
 
 The client also has `count_tokens`, `list_models`, `retrieve_model` and
-`paginate_models`. `MessageRequest` takes thinking, output configuration,
+`paginate_models`. `MessageResponse.raw` keeps the full JSON for fields the
+typed view leaves out. `MessageRequest` takes thinking, output configuration,
 metadata and stop sequences, and its `extra` map adds fields it does not type.
 `create_message_params` and `stream_message_params` take the generated
 `CreateMessageParams` from `gaato/anthropic/gen` for the whole request

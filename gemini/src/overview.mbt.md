@@ -126,6 +126,9 @@ interrupted stream is not resumed. When you pass model output into a later
 turn, keep each part's thought signature and other metadata, which Gemini
 needs back.
 
+`list_models`, `list_models_pages` and `get_model` list the models your key
+can use and describe one.
+
 ## Media, files and cached context
 
 - **Small media:** an `InlineData` part, with the bytes as their base64 wire

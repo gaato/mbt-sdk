@@ -190,6 +190,10 @@ Calls return `Result` with `GitHubFailure`:
 
 Transport failures raise `TransportError`.
 
+For a proxy, extra headers or other client settings, build an mttp `Client`
+yourself and pass it to `GitHub::from_client`; that client's settings apply.
+GraphQL then goes to GitHub's own endpoint unless you pass `graphql_url`.
+
 ## GitHub Enterprise Server
 
 Point `base_url` at the REST mount:

@@ -1,8 +1,9 @@
 # gaato/cloudflare_dns
 
-Manage Cloudflare DNS from MoonBit through the v4 REST API: list zones, read,
-create and change DNS records, batch changes in one transaction, import and
-export BIND zone files, and read DNSSEC and zone DNS settings. Use it for a
+Manage Cloudflare DNS from MoonBit through the v4 REST API: list, create,
+change and delete zones; read, create and change DNS records; batch changes in
+one transaction; import and export BIND zone files; and read and change DNSSEC
+and zone DNS settings. Use it for a
 deploy tool, a dynamic-DNS updater or certificate automation. It runs on
 native, JavaScript and Wasm GC.
 
