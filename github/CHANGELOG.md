@@ -20,6 +20,8 @@ are optional unless the field is required, and keep a wildcard arm.
 - Generated code now qualifies constructor references; no public API change.
 - **Regenerated from the upstream spec fetched 2026-11-17** (sha256 `1b1a8248bd69`). Changes are batched for the next weekly release; see the generated interface diff.
 - **Build with MoonBit 0.10.21 and mttp_core 0.3.0.** Invalid explicit header values, including surrounding whitespace, return validation failures before I/O.
+- **Depends on gaato/mttp_core 0.3.2**; the client behaves as before.
+- **The README is rewritten**: complete examples, the retries, deadlines and limits and what the client does not cover.
 
 ### Security
 

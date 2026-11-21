@@ -14,8 +14,8 @@ source = "src"
 preferred_target = "native"
 
 import {
-  "gaato/mttp@0.5.0",
-  "gaato/mttp_core@0.3.0",
+  "gaato/mttp@0.5.1",
+  "gaato/mttp_core@0.3.2",
   "gaato/openai@0.10.0",
   "gaato/anthropic@0.17.0",
   "gaato/github@0.25.0",

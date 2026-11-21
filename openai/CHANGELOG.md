@@ -60,6 +60,8 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
   bounded raw body. The SDK leaves the provider code unset.
 - Generated code now qualifies constructor references; no public API change.
 - **Build with MoonBit 0.10.21 and mttp_core 0.3.0.** Invalid explicit header values, including surrounding whitespace, return validation failures before I/O.
+- **Depends on gaato/mttp_core 0.3.2**; the client behaves as before.
+- **The README is rewritten**: complete examples, the retries, deadlines and limits and what the client does not cover.
 
 ### Fixed
 

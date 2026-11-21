@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **Depends on gaato/mttp_core 0.3.2**; the client behaves as before.
+
 ## [0.1.1] - 2026-11-21
 
 ### Changed
