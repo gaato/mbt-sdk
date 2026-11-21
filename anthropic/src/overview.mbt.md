@@ -1,15 +1,20 @@
 # gaato/anthropic
 
-An unofficial Anthropic Messages API client for
-[MoonBit](https://www.moonbitlang.com/): messages, streaming, tool use, token
-counting and Models. Compatible servers are selected with `base_url`.
-It uses [`gaato/mttp_core`](https://github.com/gaato/mttp), with a caller-supplied
-`Backend` and `Clock`. The facade itself requires no async runtime.
+Call Anthropic's Messages API from MoonBit: send a message, stream text as it
+arrives, and let the model call your own functions with the results carried
+into the next turn. The client also counts input tokens and lists or retrieves
+models. `base_url` selects a server that implements the same API.
 
-> **Status**: unofficial and experimental. Minor releases may contain breaking
-> changes; the
-> [changelog](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/CHANGELOG.md)
-> lists each one with a migration note.
+The client does no I/O of its own. It sends through an HTTP `Backend` and reads
+time from a `Clock` that you pass in, so it builds for every MoonBit target and
+a test can hand it a fake backend. `gaato/mttp` supplies the real ones.
+
+Unofficial, and not affiliated with Anthropic. A minor release can change the
+API; the
+[changelog](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/CHANGELOG.md)
+lists each change.
+
+What it does not cover: the beta APIs, message batches and the Files API.
 
 ## Install
 
@@ -18,100 +23,74 @@ moon add gaato/anthropic
 moon add gaato/mttp
 ```
 
-An app adds these two modules. A library that wraps this SDK adds
-`gaato/anthropic` and `gaato/mttp_core`, whose `Backend` and `rt.Clock` it takes
-from its caller, instead of `gaato/mttp`.
+An application imports `gaato/anthropic` and `gaato/mttp`. `gaato/mttp`
+supplies the network, the clock and the timer the client needs. A library that
+wraps this SDK adds `gaato/mttp_core` instead, and takes those three from its
+caller, so its tests can use a fake backend.
 
-## Usage
+## A complete program
 
-`gaato/mttp` supplies the real network, the clock and the timer; no
-experimental opt-in is needed:
-
-```mbt nocheck
-///|
-let client = @anthropic.Anthropic::new(
-  api_key~,
-  @mttp.backend(),
-  @mttp.clock(),
-  timer=@mttp.timer(),
-)
-```
-
-The function below takes the same three values as parameters, so it also runs
-against a fake `Backend` in tests. To send a message:
+`answer` sends one question and returns the reply's text:
 
 ```mbt check
 ///|
-/// Asks `model` one question and returns its answer.
-pub async fn ask(
-  backend : &@http.Backend,
-  clock : &@rt.Clock,
-  timer : &@rt.Timer,
-  api_key~ : String,
-  model~ : String,
+pub async fn answer(
+  client : @anthropic.Anthropic,
+  model : String,
+  question : String,
 ) -> Result[String, @anthropic.AnthropicFailure] {
-  let client = @anthropic.Anthropic::new(
-    api_key~,
-    backend,
-    clock,
-    timer~,
-    total_timeout_ms=900_000,
-  )
-  let reply = client.create_message(
-    @anthropic.MessageRequest::new(model~, max_tokens=1024, messages=[
-      @anthropic.Message::user("Hello"),
-    ]),
-  )
-  match reply {
-    Ok(reply) => Ok(reply.text())
-    Err(error) => Err(error)
+  let request = @anthropic.MessageRequest::new(model~, max_tokens=1024, messages=[
+    @anthropic.Message::user(question),
+  ])
+  match client.create_message(request) {
+    Ok(message) => Ok(message.text())
+    Err(failure) => Err(failure)
   }
 }
 ```
 
-Buffered responses are limited to 64 MiB by default. To change the limit,
-construct an mttp `Client` with `max_body_bytes` and pass it
-to `from_client`. Streaming reads incrementally, with a 16 MiB per-event
-limit. Limit failures raise `TransportError(TooLarge, ...)`. HTTP and decode
-failures return `Err(Response(ResponseFailure))`, preserving the received head
-and bounded diagnostic body. Input checks, including surrounding whitespace
-in explicit header values, return `Err(Validation(message))` before sending.
-`api_error` extracts a provider error envelope from an `AnthropicFailure` value.
-Transport failures and unknown callback exceptions remain raised errors;
-cancellation remains a signal.
+A command-line program builds the client once, from mttp's backend, clock and
+timer, and closes the backend when it is done. Import `gaato/mttp`,
+`moonbitlang/core/env` and `moonbitlang/core/debug` in its `moon.pkg`:
 
-The SDK marks `x-api-key` and `authorization` on each
-request, including with `from_client`. A redirect strips them when the host,
-port or scheme changes, except for a same-host HTTP port 80 to HTTPS port 443
-upgrade. HTTPS to HTTP is refused by default.
+```mbt nocheck
+///|
+fn main {
+  @mttp.run(async fn() {
+    guard @env.get_env_var("ANTHROPIC_API_KEY") is Some(api_key) else {
+      println("Set ANTHROPIC_API_KEY")
+      return
+    }
+    guard @env.get_env_var("ANTHROPIC_MODEL") is Some(model) else {
+      println("Set ANTHROPIC_MODEL to a model your account can use")
+      return
+    }
+    let backend = @mttp.backend()
+    defer backend.close()
+    let client = @anthropic.Anthropic::new(
+      api_key~,
+      backend,
+      @mttp.clock(),
+      timer=@mttp.timer(),
+    )
+    match answer(client, model, "Write a haiku about rivers.") {
+      Ok(text) => println(text)
+      Err(failure) => println(@debug.to_string(failure))
+    }
+  })
+}
+```
 
-## Packages
+Run it with `moon run . --target native`. Build one `Anthropic` value and reuse
+it, so calls share connections. A system prompt goes in
+`MessageRequest::new(system=...)`. To keep a conversation, pass the earlier
+`Message::user` and `Message::assistant` turns in `messages` with each request.
 
-| Package | What it is |
-|---|---|
-| `gaato/anthropic` | The `Anthropic` client, `MessageRequest`, `MessageResponse`, `MessageEvent`, and tool helpers |
-| `gaato/anthropic/gen` | Request and response types and operations generated from the official Python SDK's OpenAPI document |
+`Message::user_blocks` takes content blocks from `gaato/anthropic/gen` instead
+of a string, so a user turn can carry images (base64, URL or file ID) and PDF
+or plain-text documents beside its text.
 
-## Operations
-
-The client has `create_message`, `stream_message`, `count_tokens`,
-`list_models` and `retrieve_model`. Beta APIs, batches, files and other
-endpoints are not included.
-
-- `MessageRequest` takes typed input blocks, tool choice (the `tool_choice_*`
-  helpers build the common ones), thinking, output configuration and
-  metadata; its `extra` map adds fields it does not type.
-- `create_message_params` and `stream_message_params` take the generated
-  `CreateMessageParams`, for the whole request vocabulary.
-- A `MessageResponse` keeps both the generated `message` and the original
-  `raw` JSON. `Message::from_response` turns it into the assistant turn of the
-  next request, and `tool_uses()` lists the tool calls it asks for.
-- `client.paginate_models(limit=100).collect(max=1000)` collects up to 1000
-  models across pages.
-
-## Streaming
-
-`stream_message` calls a handler for each `MessageEvent` as it arrives:
+## Stream text as it arrives
 
 ```mbt check
 ///|
@@ -130,37 +109,108 @@ pub async fn stream_text(
 }
 ```
 
-`ToolUseAccumulator` reassembles streamed tool arguments. It grows with what
-you feed it, so cap a stream by its events or bytes, and set `max_tokens`.
+The callback receives every `MessageEvent`. For a streamed tool call,
+`ToolUseAccumulator` joins the partial JSON arguments. It grows with what you
+feed it, so bound the stream as well as `max_tokens`.
 
-## Retries
+## Let the model call your function
 
-Retries follow the official Python SDK: two retries of 408, 409, 429 and every
-5xx (529 overloaded included), and of a timeout or network failure, for every
-method. That includes `POST`, so a message can be generated, and billed,
-twice; pass `retry=@client.RetryPolicy::conservative()` to retry a `POST`
-only when a failure proves nothing was sent, unless replay safety is explicit. The server's
-`x-should-retry` is obeyed, waits back off from 0.5 s to 8 s, and a
-`Retry-After` is waited out however long it is, so bound the call with
-`total_timeout_ms` as above: a wait that would outlast it is not begun.
+Give the model a tool definition, and supply the function in your application.
+This example allows one stock lookup, then asks for a final reply. If the model
+answers immediately, or asks the user for a SKU, the first message goes
+straight back to the caller.
 
-## Timeouts
+```mbt check
+///|
+pub async fn answer_with_stock(
+  client : @anthropic.Anthropic,
+  model : String,
+  question : String,
+  stock_for : (String) -> String,
+) -> Result[@anthropic.MessageResponse, @anthropic.AnthropicFailure] {
+  let tool = @anthropic.ToolDef::new(
+    name="lookup_stock",
+    description="Look up availability for a product SKU",
+    input_schema={
+      "type": "object",
+      "properties": { "sku": { "type": "string" } },
+      "required": ["sku"],
+    },
+  )
+  let user = @anthropic.Message::user(question)
+  let request = @anthropic.MessageRequest::new(
+    model~, max_tokens=1024, messages=[user], tools=[tool],
+    tool_choice=@anthropic.tool_choice_auto(disable_parallel_tool_use=true),
+  )
+  let first = match client.create_message(request) {
+    Ok(reply) => reply
+    Err(failure) => return Err(failure)
+  }
+  guard first.tool_uses() is [(id, name, input)] else { return Ok(first) }
+  let result = match (name, input) {
+    ("lookup_stock", { "sku": String(sku), .. }) =>
+      @anthropic.Message::tool_result(tool_use_id=id, content=stock_for(sku))
+    _ => @anthropic.Message::tool_result(
+      tool_use_id=id, content="Expected lookup_stock with a string SKU.", is_error=true,
+    )
+  }
+  client.create_message(@anthropic.MessageRequest::new(
+    model~, max_tokens=1024, tools=[tool], tool_choice=@anthropic.tool_choice_none(),
+    messages=[user, @anthropic.Message::from_response(first), result],
+  ))
+}
+```
 
-Each attempt defaults to 600 s. A configured `total_timeout_ms` requires a
-`timer` and covers admission, retries, waits and streaming callbacks.
-Expiry initiates cancellation; necessary cleanup may finish afterwards.
-Backend phase deadlines (`connect_timeout_ms`, `read_timeout_ms` and the
-others of the backend's `ClientConfig`) can finish a call earlier; the SDK
-passes the attempt budget in SendOptions.
-Streaming callbacks run after the attempt has been selected and are not
-retried after delivery starts. Close the backend when its owner shuts down.
+Read `text()` from the returned message. The second request carries the
+original user message, the assistant's whole tool-use turn
+(`Message::from_response`) and a result with the matching `tool_use_id`.
+Keeping only the assistant's text would lose the tool-use block, and the API
+would refuse the result.
+
+## Other operations
+
+The client also has `count_tokens`, `list_models`, `retrieve_model` and
+`paginate_models`. `MessageRequest` takes thinking, output configuration,
+metadata and stop sequences, and its `extra` map adds fields it does not type.
+`create_message_params` and `stream_message_params` take the generated
+`CreateMessageParams` from `gaato/anthropic/gen` for the whole request
+vocabulary. `auth_header=Bearer` sends the key as `authorization: Bearer` for
+gateways that expect it, with `base_url` set to the gateway's root.
+
+## Failures, retries and deadlines
+
+A call returns `Err` for a failure the server reported, and raises for a
+failure to reach it:
+
+- `Err(Validation(...))`: invalid input, caught before sending.
+- `Err(Response(...))`: an HTTP or decoding failure. `api_error(failure)`
+  extracts Anthropic's error envelope from it.
+- Raised `TransportError`: the network failed, a deadline expired, or a body
+  passed its limit.
+
+| Setting | Default | Notes |
+| --- | --- | --- |
+| Retries | 2, on 408, 409, 429, 5xx (529 overloaded included), timeouts and network failures, **POST included**; `x-should-retry` is obeyed | As in Anthropic's official Python SDK. A retried message can be billed twice. `retry=@mttp.RetryPolicy::conservative()` retries a POST only when nothing was sent. |
+| `Retry-After` | Waited out, however long | Bound the call with `total_timeout_ms`: a wait that would outlast it is not begun. |
+| `timeout_ms` | 600 s per attempt | Needs `timer=`. |
+| `total_timeout_ms` | none | Needs `timer=`. Covers retries, waits and stream callbacks. |
+| Buffered body | 64 MiB | `max_body_bytes=` |
+| Stream event | 16 MiB each | |
+
+Once a stream has started delivering events, it is never replayed.
+
+## Packages
+
+| Package | What it is |
+|---|---|
+| `gaato/anthropic` | The `Anthropic` client, `MessageRequest`, `MessageResponse`, `MessageEvent` and tool helpers |
+| `gaato/anthropic/gen` | Types and operations generated from the official Python SDK's OpenAPI document |
 
 ## Links
 
 - [Changelog](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/CHANGELOG.md)
 - [Repository](https://github.com/gaato/moonbit-sdks)
 - [Spec provenance](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/spec/SOURCE.md)
-  and [generation overlays](https://github.com/gaato/moonbit-sdks/blob/main/anthropic/overlays/moonbit.yaml)
 
 ## License
 

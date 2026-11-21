@@ -3,6 +3,9 @@
 API SDKs and a Codex app-server client for [MoonBit](https://www.moonbitlang.com/).
 Pinned upstream API descriptions generate the public vocabulary; small facades
 add vendor-specific retries, streaming, pagination and error interpretation.
+Each SDK is unofficial and not affiliated with its vendor.
+
+[日本語](README.ja.md)
 
 <!-- BEGIN sdks: modules -->
 | Module | Purpose | Dependencies |
@@ -13,8 +16,8 @@ add vendor-specific retries, streaming, pagination and error interpretation.
 | gaato/codex-protocol | Generated typed Codex calls/events (not published yet) | mttp_core/jsonkit |
 | [gaato/jina](jina/README.md) | Generated API vocabulary (not published yet) | mttp_core |
 | [gaato/replicate](replicate/README.md) | Generated API vocabulary (not published yet) | mttp_core |
-| [gaato/gemini](gemini/README.md) | Generated API vocabulary | mttp_core |
-| [gaato/cloudflare_dns](cloudflare_dns/README.md) | Generated API vocabulary | mttp_core |
+| [gaato/gemini](gemini/README.md) | Gemini API: generation, streaming, embeddings, files and cached content | mttp_core |
+| [gaato/cloudflare_dns](cloudflare_dns/README.md) | Cloudflare DNS: zones, records, batches and BIND import and export | mttp_core |
 | gaato/jsonrpc | Portable JSON-RPC messages and NDJSON framing | core |
 | gaato/jsonrpc-async | Bidirectional connections and native child processes | jsonrpc, core/async |
 | [gaato/codex-app-server](codex-app-server/README.md) | Initialized sessions, typed events and handlers | protocol, jsonrpc-async, core/async |
@@ -27,11 +30,12 @@ gaato/mttp_core supplies the vocabulary, Backend and the client policy, and
 gaato/mttp supplies the I/O an app adds. SDK modules do not import a
 runtime.
 
-The caller supplies a Backend and clock. Wrap AsyncBackend in Decompress when
-content decoding is wanted, and supply ClockTimer for a total call deadline.
-SDK failures are Result values; TransportError and callback exceptions remain
-effects. Buffered bodies default to 64 MiB, SSE events to 16 MiB. Each module
-overview has checked usage examples and its retry/timeout behavior.
+An app passes an SDK `@mttp.backend()`, `@mttp.clock()` and `@mttp.timer()`
+from gaato/mttp: the network with connection reuse and decompressed
+responses, and the time a deadline needs. SDK failures are Result values;
+TransportError and callback exceptions remain effects. Buffered bodies default
+to 64 MiB, SSE events to 16 MiB. Each module's README has checked usage
+examples and its retry and timeout behaviour.
 
 ## Development
 

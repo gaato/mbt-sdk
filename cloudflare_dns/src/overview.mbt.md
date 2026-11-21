@@ -1,45 +1,51 @@
 # gaato/cloudflare_dns
 
-Cloudflare v4 REST client for zones, DNS records, DNSSEC, and zone-level DNS
-settings. It supports MoonBit's wasm-gc, JavaScript and native targets.
-For code that runs in Cloudflare Workers and needs runtime bindings, see
+Manage Cloudflare DNS from MoonBit through the v4 REST API: list zones, read,
+create and change DNS records, batch changes in one transaction, import and
+export BIND zone files, and read DNSSEC and zone DNS settings. Use it for a
+deploy tool, a dynamic-DNS updater or certificate automation. It runs on
+native, JavaScript and Wasm GC.
+
+This module manages DNS from outside Cloudflare. For code that runs inside
+Cloudflare Workers and needs runtime bindings, see
 [mizchi/cloudflare](https://mooncakes.io/docs/mizchi/cloudflare).
+
+Unofficial, and not affiliated with Cloudflare. A minor release can change the
+API; the
+[changelog](https://github.com/gaato/moonbit-sdks/blob/main/cloudflare_dns/CHANGELOG.md)
+lists each change.
 
 ## Install
 
 ```sh
 moon add gaato/cloudflare_dns
-moon add gaato/mttp_core
 moon add gaato/mttp
 ```
 
-An app adds all three: `gaato/mttp` for its backend and clock, `gaato/mttp_core`
-for the `client.Client` the examples take. A library that wraps this SDK adds
-`gaato/cloudflare_dns` and `gaato/mttp_core`, and takes the backend from its
-caller.
+Import `gaato/cloudflare_dns` and `gaato/cloudflare_dns/gen` (record types
+and low-level builders). `gaato/mttp` supplies the network and the clock. Also
+add `gaato/mttp_core` if you pass an existing `gaato/mttp_core/client.Client`
+to `CloudflareDns::from_client`, or if you write a library that takes the
+backend from its caller.
 
-Import `gaato/cloudflare_dns`, `gaato/cloudflare_dns/gen` for the data types
-and low-level builders, and `gaato/mttp_core/client` if you pass a runtime
-client. Create a [Cloudflare API token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
-with Zone Read and DNS Read on the zones you intend to list. Add DNS Write
-for record changes. Pass the token with `ApiToken(token)`. Existing global
-keys use `GlobalApiKey(email~, key~)`. Keep the runtime client's default
-headers credential-free and supply the credential through `auth`.
+Create a
+[Cloudflare API token](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
+with **Zone Read** and **DNS Read** on the zones you need, plus **DNS Write** to
+change records. Pass it as `auth=ApiToken(token)`. Older global keys use
+`GlobalApiKey(email~, key~)`.
+
+## Find a zone's records
 
 ```mbt check
 ///|
-pub async fn list_zone_records(
-  runtime : @client.Client,
-  token : String,
+pub async fn count_records(
+  dns : @cloudflare_dns.CloudflareDns,
+  zone_name : String,
 ) -> Unit {
-  let dns = @cloudflare_dns.CloudflareDns::from_client(
-    runtime,
-    auth=ApiToken(token),
-  )
-  match dns.list_zones(name="example.com") {
+  match dns.list_zones(name=zone_name) {
     Ok([zone, ..]) =>
       match
-        dns.list_dns_records(zone_id=zone.id, name_endswith=".example.com") {
+        dns.list_dns_records(zone_id=zone.id, name_endswith="." + zone_name) {
         Ok(records) => println(records.length())
         Err(error) => println(@debug.to_string(error))
       }
@@ -49,11 +55,40 @@ pub async fn list_zone_records(
 }
 ```
 
-`CloudflareDns::new(backend, clock, auth=ApiToken(token))` configures defaults
-over a backend and clock you supply. `from_client` uses the lifetime and
-policies of your supplied runtime.
+A command-line program builds the client from mttp's backend and clock, and
+closes the backend when it is done. Import `gaato/mttp`, `moonbitlang/core/env`
+and `moonbitlang/core/debug` in its `moon.pkg`:
+
+```mbt nocheck
+///|
+fn main {
+  @mttp.run(async fn() {
+    guard @env.get_env_var("CLOUDFLARE_API_TOKEN") is Some(token) else {
+      println("Set CLOUDFLARE_API_TOKEN")
+      return
+    }
+    let backend = @mttp.backend()
+    defer backend.close()
+    let dns = @cloudflare_dns.CloudflareDns::new(
+      backend,
+      @mttp.clock(),
+      auth=ApiToken(token),
+      timer=@mttp.timer(),
+      total_timeout_ms=300_000,
+    )
+    count_records(dns, "example.com")
+  })
+}
+```
+
+`list_zones` and `list_dns_records` return one page. `list_zones_pages` and
+`list_dns_records_pages` take the same filters and return a paginator. Call
+`next_page()` until it returns `Ok(None)`.
 
 ## Add or change records
+
+The record constructor sets the wire `type`. `batch_dns_records` applies
+`deletes`, `patches`, `puts` and `posts` in one transaction.
 
 ```mbt check
 ///|
@@ -86,14 +121,13 @@ pub async fn add_records(
 }
 ```
 
-Use `edit_dns_record` for PATCH and `update_dns_record` for PUT. The record
-constructor selects the wire `type`. New response types can be matched as
-`Unknown(type, json)`. Batch requests accept `deletes`, `patches`, `puts` and
-`posts` in one transaction. Changes propagate individually. The batch limit
-is 200 records per action on Free and 3,500 per action on paid plans.
-[Cloudflare batch record changes](https://developers.cloudflare.com/dns/manage-dns-records/how-to/batch-record-changes/)
+`edit_dns_record` patches selected fields (PATCH), and `update_dns_record`
+replaces a record (PUT). A record type this SDK does not know comes back as
+`Unknown(type, json)`. Cloudflare limits a batch to 200 records per action on
+the Free plan and 3,500 on paid plans.
+[Batch record changes](https://developers.cloudflare.com/dns/manage-dns-records/how-to/batch-record-changes/)
 
-## Import and export BIND
+## Import and export BIND zone files
 
 ```mbt check
 ///|
@@ -109,40 +143,34 @@ pub async fn transfer_bind(
 }
 ```
 
-Import chooses a multipart boundary absent from the submitted parts.
-It accepts up to 256 KiB and export returns UTF-8 text. Cloudflare limits these
-endpoints to three requests per minute per user.
-[Cloudflare BIND import and export](https://developers.cloudflare.com/dns/manage-dns-records/how-to/import-and-export/)
+Import accepts up to 256 KiB, and export returns UTF-8 text. Cloudflare allows
+three of these requests per minute per user.
 
-## Pages, errors and deadlines
+## Errors, retries and deadlines
 
-`list_zones` and `list_dns_records` each return a single page. The
-`_pages` methods take the same filters and return a paginator. Call
-`next_page()` until it returns `Ok(None)`. The paginator uses
-`result_info.total_pages` when supplied and otherwise stops at an empty
-page. For the full response including the five `result_info` fields, use
-`send` with the corresponding request builder from `gaato/cloudflare_dns/gen`.
+**Check the `Result` even when the status is 200.** Cloudflare can answer
+`success: false` with a 2xx status, and that becomes `Failure::Http` too.
 
-`delete_zone` returns `Ok(None)` when Cloudflare sends a null or omitted
-result. Other methods that decode a result require a non-null payload.
-Fields represented by `Presence` distinguish an omitted field from an
-explicit null.
+- `Http(...)`: the status and headers, Cloudflare's error and message arrays
+  (codes, descriptions, documentation links), and up to 1 MiB of the body.
+- `Decode(...)`: a successful response that does not match the model.
+- `Transport(...)`: the network failed or a deadline expired.
+- `Validation(...)`: invalid input, caught before sending.
 
-HTTP errors and JSON responses with `success: false` return `Failure::Http`.
-Its response head includes the status and headers. The two message arrays
-include codes, descriptions and available documentation links or source
-pointers. The failure retains up to 1 MiB of response bytes, including when a
-429 has an empty body or a proxy returns text. `Failure::Decode` covers bad
-success payloads, `Failure::Transport` covers transport errors, and
-`Failure::Validation` covers invalid request headers.
+| Setting | Default with `CloudflareDns::new` | Notes |
+| --- | --- | --- |
+| Retries | 2. GET, PUT, DELETE and HEAD on 408, 409, 5xx and network failures; every method, POST and PATCH included, on 429 and when the request was never sent | A 429 honours `Retry-After` however long, which can be minutes. |
+| `timeout_ms` | 60 s per attempt | |
+| `total_timeout_ms` | none | Set it, with `timer=`, to bound the waits. |
 
-The default retry policy allows two retries and a 60-second per-attempt
-timeout. HTTP 429 honors the server's `Retry-After`, so a call can wait for
-minutes between attempts. Cancel the task running the call to interrupt the
-wait when using a cancellation-aware clock such as mttp's async clock. Supply a
-timer and `total_timeout_ms` for a whole-call deadline that includes waits.
-Cloudflare also applies per-token and per-IP limits across operations.
+`from_client` keeps the supplied client's policies instead. Cloudflare also
+applies per-token and per-IP limits across operations.
 [Cloudflare API limits](https://developers.cloudflare.com/fundamentals/api/reference/limits/)
+
+## Links
+
+- [Changelog](https://github.com/gaato/moonbit-sdks/blob/main/cloudflare_dns/CHANGELOG.md)
+- [Repository](https://github.com/gaato/moonbit-sdks)
 
 ## License
 

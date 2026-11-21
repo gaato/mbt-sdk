@@ -1,75 +1,108 @@
 # gaato/gemini
 
-Gemini API client for MoonBit: typed multimodal generation, SSE streaming,
-embeddings, token counting, file uploads and context caching. Request and
-response types live in `gaato/gemini/gen`. Applications supply an HTTP backend
-and clock, or a configured `gaato/mttp_core/client.Client`.
+A client for Google's native Gemini API in MoonBit: text and multimodal
+generation, streaming, embeddings, token counting, file uploads and context
+caching, with typed request and response models in `gaato/gemini/gen`.
 
-For plain chat, the [gaato/openai client](https://mooncakes.io/docs/gaato/openai)
-also works with Gemini's [OpenAI-compatible endpoint](https://ai.google.dev/gemini-api/docs/openai).
-Use this module for native files, caching, safety settings, thinking signatures,
-grounding metadata and typed media parts.
+For plain chat, [gaato/openai](https://mooncakes.io/docs/gaato/openai) also
+works with Gemini's
+[OpenAI-compatible endpoint](https://ai.google.dev/gemini-api/docs/openai).
+Use this module when you need what only the native API has: uploaded files,
+cached content, safety settings, thought signatures, grounding metadata and
+typed media parts.
+
+Unofficial, and not affiliated with Google. A minor release can change the
+API; the
+[changelog](https://github.com/gaato/moonbit-sdks/blob/main/gemini/CHANGELOG.md)
+lists each change.
 
 ## Install
 
 ```sh
 moon add gaato/gemini
-moon add gaato/mttp_core
 moon add gaato/mttp
 ```
 
-An app adds all three: `gaato/mttp` for its backend and clock, `gaato/mttp_core`
-for the `client.Client` the examples take. A library that wraps this SDK adds
-`gaato/gemini` and `gaato/mttp_core`, and takes the backend from its caller.
+Import `gaato/gemini` and `gaato/gemini/gen`. `gaato/mttp` supplies the network
+and the clock. Also add `gaato/mttp_core` if you pass an existing
+`gaato/mttp_core/client.Client` to `Gemini::from_client`, or if you write a
+library that takes the backend from its caller.
 
-Import `gaato/gemini`, `gaato/gemini/gen` and `gaato/mttp_core/client`.
-With an existing runtime client:
+## Generate text
 
 ```mbt check
 ///|
+fn print_text(reply : @gen.GenerateContentResponse) -> Unit {
+  for candidate in reply.candidates.unwrap_or([]) {
+    if candidate.content is Some(content) {
+      for part in content.parts.unwrap_or([]) {
+        if part is Text(piece) {
+          println(piece.text)
+        }
+      }
+    }
+  }
+}
+
+///|
 pub async fn generate(
-  client : @client.Client,
-  api_key : String,
+  gemini : @gemini.Gemini,
   model_id : String,
-) -> Unit {
-  let gemini = @gemini.Gemini::from_client(client, auth=ApiKey(api_key))
+  prompt : String,
+) -> Result[Unit, @gemini.Failure] {
   let request = @gen.GenerateContentRequest::new(contents=[
-    @gen.Content::new(role="user", parts=[
-      Text(@gen.PartText::new(text="Describe a quiet morning.")),
-    ]),
+    @gen.Content::new(role="user", parts=[Text(@gen.PartText::new(text=prompt))]),
   ])
   match gemini.generate_content(model=model_id, request) {
-    Ok(reply) => println(reply.candidates.unwrap_or([]).length())
-    Err(_) => println("Gemini request failed")
+    Ok(reply) => Ok(print_text(reply))
+    Err(failure) => Err(failure)
   }
 }
 ```
 
-Pass returned resource names straight back: `generate_content(model=...)`
-accepts both `gemini-2.5-flash` and `models/gemini-2.5-flash`, producing the same
-request. `get_model(name=...)` accepts the same forms. For files,
-`get_file(name=...)` takes `files/abc`, as returned in `upload_file`'s
-`result.file.name`; a bare `abc` also works. Cache methods similarly accept
-`cachedContents/abc` or `abc`. Other resource-name patterns require a complete
-name. Invalid names return `Failure::Validation` before any request is sent.
-Body fields such as `model`, `cached_content` and file URIs use the full names
-required by Gemini.
-Header API keys keep credentials out of URLs. `ApiKeyInQuery(key)` query authentication
-and `OAuthToken(access_token)` OAuth authentication are alternatives; obtaining an
-OAuth token is the application's responsibility.
-
-For an application using `gaato/mttp`:
+A command-line program builds the client from mttp's backend and clock, and
+closes the backend when it is done. Import `gaato/mttp`, `moonbitlang/core/env`
+and `moonbitlang/core/debug` in its `moon.pkg`:
 
 ```mbt nocheck
 ///|
-let gemini = @gemini.Gemini::new(
-  @mttp.backend(),
-  @mttp.clock(),
-  auth=ApiKey(api_key),
-)
+fn main {
+  @mttp.run(async fn() {
+    guard @env.get_env_var("GEMINI_API_KEY") is Some(key) else {
+      println("Set GEMINI_API_KEY")
+      return
+    }
+    guard @env.get_env_var("GEMINI_MODEL") is Some(model) else {
+      println("Set GEMINI_MODEL to a model your account can use")
+      return
+    }
+    let backend = @mttp.backend()
+    defer backend.close()
+    let gemini = @gemini.Gemini::new(
+      backend,
+      @mttp.clock(),
+      auth=ApiKey(key),
+      timer=@mttp.timer(),
+      total_timeout_ms=120_000,
+    )
+    match generate(gemini, model, "Describe a quiet morning.") {
+      Ok(_) => ()
+      Err(failure) => println(@debug.to_string(failure))
+    }
+  })
+}
 ```
 
-## Streaming and multimodal parts
+`model=` takes a bare ID or a resource name starting with `models/`. **A
+successful response can have no text**: when a prompt is blocked, there are no
+candidates. Check `prompt_feedback` and each candidate's finish reason before
+expecting text.
+
+`auth=` takes `ApiKey(key)` (sent in a header), `ApiKeyInQuery(key)` (in the
+URL, so it can appear in logs) or `OAuthToken(token)`. Obtaining an OAuth token
+is up to the application.
+
+## Stream model output
 
 ```mbt check
 ///|
@@ -77,96 +110,65 @@ pub async fn stream(
   gemini : @gemini.Gemini,
   model_id : String,
   request : @gen.GenerateContentRequest,
-) -> Unit {
-  match
-    gemini.stream_generate_content(model=model_id, request, event => {
-      for candidate in event.candidates.unwrap_or([]) {
-        for
-          part in candidate.content
-          .map(content => content.parts.unwrap_or([]))
-          .unwrap_or([]) {
-          match part {
-            Text(text) => println(text.text)
-            _ => ()
-          }
-        }
-      }
-    }) {
-    Ok(_) => ()
-    Err(_) => println("Stream failed")
-  }
+) -> Result[Unit, @gemini.Failure] {
+  gemini.stream_generate_content(model=model_id, request, reply => {
+    print_text(reply)
+  })
 }
 ```
 
-Streaming sets `alt=sse` and decodes each event. An optional typed `stop`
-predicate closes the response before delivering its matching event. EOF,
-errors and callback exit also close it; interrupted streams are not resumed.
+The callback receives a decoded response for each event. An optional `stop`
+predicate closes the stream before delivering the event it matches. An
+interrupted stream is not resumed. When you pass model output into a later
+turn, keep each part's thought signature and other metadata, which Gemini
+needs back.
 
-`Part` chooses exactly one data variant. For inline media, use
-`InlineData(@gen.PartInlineData::new(inline_data=...))`; for uploaded media,
-use `FileData(@gen.PartFileData::new(file_data=...))`. Each payload also accepts
-thought signatures, video metadata and other metadata fields. Byte fields use
-their wire base64 strings. Preserve thought signatures when echoing model
-parts back to Gemini. Unknown data variants require an SDK update.
+## Media, files and cached context
 
-## Files and cached content
+- **Small media:** an `InlineData` part, with the bytes as their base64 wire
+  string.
+- **Larger files:** `upload_file(bytes, mime_type=..., display_name=...)`, then
+  a `FileData` part with the returned file URI. The upload holds the whole input
+  in memory and does not resume an interrupted session. A new file can still
+  be processing, so check it with `get_file` before generating. `list_files_pages`
+  and `delete_file` manage files.
+- **Reusable context:** `create_cached_content`, then pass its full resource
+  name as `cached_content` in the request. `get_`, `list_`, `update_` and
+  `delete_cached_content` manage caches.
 
-```mbt check
-///|
-pub async fn upload(gemini : @gemini.Gemini, bytes : Bytes) -> Unit {
-  match
-    gemini.upload_file(bytes, mime_type="text/plain", display_name="notes") {
-    Ok(result) =>
-      println(result.file.bind(file => file.uri).unwrap_or("No URI returned"))
-    Err(_) => println("Upload failed")
-  }
-}
-```
+File and cache methods accept the names they return (`files/abc`,
+`cachedContents/abc`) or the bare ID.
 
-Uploads start a resumable session and upload/finalize the buffered bytes. They
-do not recover interrupted sessions or chunk large inputs. Only session URLs
-on the configured origin are accepted. A returned file can still be processing:
-use `get_file` to inspect its state before generation. `list_files_pages`
-follows page tokens; `delete_file` removes a file.
+## Retries, deadlines and errors
 
-Use `create_cached_content`, `get_cached_content`, `list_cached_contents_pages`,
-`update_cached_content` and `delete_cached_content` to manage caches. Updates
-support expiration fields with `update_mask`; generating against a cache uses
-the full cache resource name in `GenerateContentRequest.cached_content`.
+| Setting | Default with `Gemini::new` | Notes |
+| --- | --- | --- |
+| Retries | Up to 4, on HTTP 503 and on transport failures known to be unsent | 429 and failures after sending are not retried. `Retry-After` is honoured; a server that asks for more than 60 s is not retried. |
+| `timeout_ms`, `total_timeout_ms` | none | Set them, with `timer=`, to bound calls. |
+| Buffered body | the runtime's default | `max_body_bytes=` |
 
-## Limits, retries and errors
+`Gemini::from_client` keeps the supplied client's policies instead.
 
-The backend-plus-clock constructor retries HTTP 503 and transport failures that
-prove nothing was sent. It does not retry 429 or ambiguous sent failures.
-Retries are bounded, use backoff with jitter, and honour `Retry-After` up to
-60 seconds. A longer server delay stops retries and returns the HTTP failure.
-`RetryInfo` body delays are retained in error details but are not applied by
-the generated retry policy. Disable retries when repeating a write could have
-unintended effects. `from_client` uses the supplied client's policies instead.
+Failures are values of `Failure`. Match with a wildcard arm:
 
-No per-attempt or total timeout is imposed by default. Choose `timeout_ms`,
-`total_timeout_ms` and a timer to bound calls; connection limits belong to the
-backend. Buffered responses use the runtime's default size limit. File upload
-buffers its entire input; service file and project quotas still apply.
+- `Http(...)`: the status, headers, diagnostic bytes, and Google's typed error
+  when present.
+- `Transport(...)`: the network failed or a deadline expired.
+- `Decode(...)`: the response did not match the model.
+- `Validation(operation~, parameter~, message~)`: invalid input, caught before
+  sending.
 
-Failures are `Http` (operation, status, headers, diagnostic bytes and optional
-typed `GoogleError`), `Transport` (kind and phase), `Decode` or `Validation`.
-Explicit SDK header values with surrounding whitespace return `Validation`
-before I/O. Invalid defaults on a supplied Client return `Transport` with
-kind `Invalid` and phase `Pool`.
-Match with a default arm. Safety blocking may be a successful response with feedback and
-no candidate, so inspect `prompt_feedback` and candidate finish reasons.
-Generic `call` decoders return `Result` without raising; streaming callback
-exceptions propagate. The SDK marks its credential header names even with
-`from_client`, including names on runtime defaults. Redirects that change host, port or scheme
-strip them, except for a same-host HTTP port 80 to HTTPS port 443 upgrade.
-HTTPS to HTTP is refused by default. Query keys appear in URLs and logs.
+An exception raised in a streaming callback reaches the caller unchanged.
 
-The SDK supports wasm-gc, JavaScript and native; transport support depends on
-the backend. It covers the native generateContent API; Live, Interactions,
-tuning, batch jobs and file-search stores are outside this module's surface.
-See the [behavior survey](https://github.com/gaato/moonbit-sdks/blob/main/docs/behavior/gemini.md)
-and [specification source](https://generativelanguage.googleapis.com/$discovery/rest?version=v1beta).
+## Not included
+
+The Live API, Interactions, tuning, batch jobs and file-search stores.
+
+## Links
+
+- [Changelog](https://github.com/gaato/moonbit-sdks/blob/main/gemini/CHANGELOG.md)
+- [Behaviour survey and API coverage](https://github.com/gaato/moonbit-sdks/blob/main/docs/behavior/gemini.md)
+- [Repository](https://github.com/gaato/moonbit-sdks)
 
 ## License
 

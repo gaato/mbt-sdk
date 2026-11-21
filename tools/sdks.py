@@ -282,24 +282,32 @@ def sync(sdks, check):
     config.update(modules=[s['dir'] for s in published], generated=[s['out'] for s in published])
     update('scripts/docs_audit.json', json.dumps(config, indent=2) + '\n')
     # Preserve human-authored descriptions; registration adds a generic row.
-    readme = (ROOT / 'README.md').read_bytes().decode()
-    pattern = r'\| .*? \| .*? \| .*? \|'
-    block = re.search(r'<!-- BEGIN sdks: modules -->(.*?)<!-- END sdks: modules -->', readme, re.S)
-    require(block, 'README.md: missing module markers')
-    old_rows = re.findall(pattern, block[1])
-    rows = []
-    unpublished = ' (not published yet)'
-    for s in sdks:
-        if s['dir'].startswith('fixtures/'):
+    # README.ja.md, the Japanese translation, keeps a table of its own in the
+    # same slots, so a registered or unpublished module shows in both.
+    for file, header, unpublished, generic in [
+        ('README.md', '| Module | Purpose | Dependencies |', ' (not published yet)', ' Generated API vocabulary '),
+        ('README.ja.md', '| モジュール | 用途 | 依存 |', '(未公開)', ' 生成した API の語彙 '),
+    ]:
+        if file != 'README.md' and not (ROOT / file).is_file():
             continue
-        row = next((r for r in old_rows if f'[{s["module"]}]' in r or f'| {s["module"]} |' in r), None)
-        cells = row.split('|')[2:4] if row else [' Generated API vocabulary ', ' mttp_core ']
-        purpose = cells[0].rstrip().removesuffix(unpublished)
-        cells[0] = purpose + ('' if s['publish'] else unpublished) + ' '
-        label = f'[{s["module"]}]({s["dir"]}/README.md)' if (ROOT / s['dir'] / 'README.md').is_file() else s['module']
-        rows.append(f'| {label} |' + '|'.join(cells) + '|')
-    extras = [r for r in old_rows if not any(s['module'] in r for s in sdks) and not r.startswith(('| Module |', '|---'))]
-    update('README.md', marked(readme, 'modules', '\n'.join(['| Module | Purpose | Dependencies |', '|---|---|---|'] + rows + extras)))
+        readme = (ROOT / file).read_bytes().decode()
+        pattern = r'\| .*? \| .*? \| .*? \|'
+        block = re.search(r'<!-- BEGIN sdks: modules -->(.*?)<!-- END sdks: modules -->', readme, re.S)
+        require(block, f'{file}: missing module markers')
+        old_rows = re.findall(pattern, block[1])
+        rows = []
+        for s in sdks:
+            if s['dir'].startswith('fixtures/'):
+                continue
+            row = next((r for r in old_rows if f'[{s["module"]}]' in r or f'| {s["module"]} |' in r), None)
+            cells = row.split('|')[2:4] if row else [generic, ' mttp_core ']
+            purpose = cells[0].rstrip().removesuffix(unpublished)
+            cells[0] = purpose + ('' if s['publish'] else unpublished) + ' '
+            label = f'[{s["module"]}]({s["dir"]}/README.md)' if (ROOT / s['dir'] / 'README.md').is_file() else s['module']
+            rows.append(f'| {label} |' + '|'.join(cells) + '|')
+        extras = [r for r in old_rows if not any(s['module'] in r for s in sdks) and not r.startswith(('| Module |', '| モジュール |', '|---'))]
+        update(file, marked(readme, 'modules', '\n'.join([header, '|---|---|---|'] + rows + extras)))
+    unpublished = ' (not published yet)'
     arch = (ROOT / 'ARCHITECTURE.md').read_bytes().decode()
     layer = '| SDKs | ' + ', '.join(s['name'] + ('' if s['publish'] else unpublished) for s in sdks if s['generator'] in ('openapi', 'discovery') and not s['dir'].startswith('fixtures/')) + ' | Generated API vocabulary and vendor policy |'
     block = re.search(r'<!-- BEGIN sdks: http-layer -->(.*?)<!-- END sdks: http-layer -->', arch, re.S)
