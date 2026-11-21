@@ -104,8 +104,9 @@ as `accept: application/vnd.github.diff`, wins over the client's default.
 
 Archive, artifact, log and release-asset downloads answer `302` with a
 short-lived URL. `send` follows it and buffers the file, up to
-`max_body_bytes` (64 MiB by default). Credentials are dropped when the redirect
-leaves GitHub's host. For a file too large to buffer, read it with an mttp
+`max_body_bytes` (64 MiB by default). The redirect drops `authorization` and
+`cookie` when the host, port or scheme changes, except on a same-host HTTP port
+80 to HTTPS port 443 upgrade; HTTPS to HTTP is refused. For a file too large to buffer, read it with an mttp
 client and `as_stream`. To get the URL instead, turn off redirects for that
 request with an attribute from `gaato/mttp_core/client`:
 

@@ -243,10 +243,10 @@ quota, balance or disabled-account code (`insufficient_quota`, for one) stops
 at once, even under `x-should-retry: true`. A stream is never retried once its
 callback has received an event.
 
-The API key travels in `authorization`, which is marked as a credential: a
-redirect to another origin drops it, except a same-host move from `http` on
-port 80 to `https` on port 443, and a redirect from `https` to `http` is
-refused. Debug output of an `OpenAI` value hides it.
+The API key travels in `authorization`, which is marked as a credential. A
+redirect strips it when the host, port or scheme changes, except for a
+same-host HTTP port 80 to HTTPS port 443 upgrade, and HTTPS to HTTP is refused
+by default. Debug output of an `OpenAI` value hides it.
 
 For other headers or client settings, build an mttp `Client` with
 `@mttp.client(...)` and pass it to `OpenAI::from_client`. That client's own

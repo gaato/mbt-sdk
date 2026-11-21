@@ -100,7 +100,10 @@ expecting text.
 
 `auth=` takes `ApiKey(key)` (sent in a header), `ApiKeyInQuery(key)` (in the
 URL, so it can appear in logs) or `OAuthToken(token)`. Obtaining an OAuth token
-is up to the application.
+is up to the application. The SDK marks its credential headers even with
+`from_client`. Redirects that change host, port or scheme strip them, except
+for a same-host HTTP port 80 to HTTPS port 443 upgrade, and HTTPS to HTTP is
+refused by default. A key in the query string stays in the URL.
 
 ## Stream model output
 

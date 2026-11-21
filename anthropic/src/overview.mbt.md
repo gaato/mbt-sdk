@@ -210,6 +210,11 @@ failure to reach it:
 
 Once a stream has started delivering events, it is never replayed.
 
+The SDK marks `x-api-key` and `authorization` as credentials on each request,
+including with `from_client`. A redirect strips them when the host, port or
+scheme changes, except for a same-host HTTP port 80 to HTTPS port 443 upgrade.
+HTTPS to HTTP is refused by default.
+
 ## Packages
 
 | Package | What it is |
