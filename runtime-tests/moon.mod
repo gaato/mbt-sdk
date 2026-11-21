@@ -21,5 +21,5 @@ import {
   "gaato/github@0.25.0",
   "gaato/fixture-badhttp@0.0.0",
   "gaato/gemini@0.1.0",
-  "gaato/cloudflare_dns@0.1.0",
+  "gaato/cloudflare_dns@0.1.1",
 }
